@@ -1,3 +1,12 @@
+# RDFauthor advanced ideas #
+
 ## Events ##
 - views etc. throw events
 - RDFauthor registers for event (e.g. subject selected), thus is informed about current subject
+
+## Widgets ##
+- when registering, widgets can register properties that are queried for all properties (rdfs:domain, rdfs:range, rdfs:label etc.)
+- RDFauthor fetches these automatically and provides widgets easy access to the results
+
+## Property Selector ##
+- shows a cloud or a dropdown box of possible properties for easier access
