@@ -1,0 +1,3 @@
+## Events ##
+- views etc. throw events
+- RDFauthor registers for event (e.g. subject selected), thus is informed about current subject
