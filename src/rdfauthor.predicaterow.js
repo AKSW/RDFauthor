@@ -7,11 +7,15 @@
 /**
  * Constructs a property row object that manages a number of widgets sharing 
  * same subject and property.
- * @param string subjectURI
- * @param string predicateURI
- * @param string title
- * @param Node|jQuery container
- * @param String|Number id Used for CSS id
+ *
+ * @param {string} subjectURI
+ * @param {string} predicateURI
+ * @param {string} title
+ * @param {HTMLElement|jQuery} container
+ * @param {string|number} id Used for creating the CSS id
+ *
+ * @constructor
+ * @requires RDFauthor
  */
 function PredicateRow(subjectURI, predicateURI, title, container, id) {
     this._subjectURI        = subjectURI;                   // subject for this row
@@ -77,8 +81,8 @@ function PredicateRow(subjectURI, predicateURI, title, container, id) {
     
     /**
      * Adds a new widget to this property row object.
-     * @param Statement statement
-     * @param function constructor The widget's constructor function (optional)
+     * @param {Statement} statement
+     * @param {function} constructor The widget's constructor function (optional)
      */
     this.addWidget = function (statement, constructor) {
         var widgetInstance = null;
@@ -118,9 +122,6 @@ function PredicateRow(subjectURI, predicateURI, title, container, id) {
     }
 }
 
-/**
- * Prototype object for all property row instances.
- */
 PredicateRow.prototype = {
     /**
      * Denotes whether DOM events have been attached.
@@ -141,7 +142,7 @@ PredicateRow.prototype = {
     
     /**
      * Returns the CSS id for this property row.
-     * @return string
+     * @return {string}
      */
     cssID: function () {
         return this._idPrefix + this._id;
@@ -150,7 +151,7 @@ PredicateRow.prototype = {
     /**
      * Returns the widet instance for an index.
      * @param number index The widget's index.
-     * @return object
+     * @return {object}
      */
     getWidget: function (index) {
         return this._widgets[index];
@@ -158,8 +159,8 @@ PredicateRow.prototype = {
     
     /**
      * Returns the widget instance for a CSS id.
-     * @param string cssID The widget's CSS id.
-     * @return object
+     * @param {string} cssID The widget's CSS id.
+     * @return {object}
      */
     getWidgetForID: function (cssID) {
         var id = String(cssID).replace(this._widgetIDPrefix, '');
@@ -168,7 +169,7 @@ PredicateRow.prototype = {
     
     /**
      * Returns the number of widgets managed by this property row.
-     * @return number
+     * @return {number}
      */
     numberOfWidgets: function () {
         return this._widgetCount;
@@ -176,7 +177,7 @@ PredicateRow.prototype = {
     
     /**
      * Removes the widget identified by CSS id.
-     * @param string cssID The widget's CSS id.
+     * @param {string} cssID The widget's CSS id.
      */
     removeWidget: function (cssID) {
         var widgetInstance = this.getWidgetForID(cssID);
@@ -204,6 +205,7 @@ PredicateRow.prototype = {
     /**
      * Calls onSubmit on all widget instances subsequently and returns the 
      * conjunctively combined result.
+     * @return {boolean}
      */
     onSubmit: function () {
         var submitOk = true;

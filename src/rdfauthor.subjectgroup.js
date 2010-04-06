@@ -6,10 +6,16 @@
 
 /**
  * Constructs a subject group object that manages property rows sharing same subject. 
- * @param string subjectURI
- * @param string title
- * @param Node|jQuery container
- * @param String|Number id Used for CSS id
+ *
+ * @param {string} subjectURI the subject URI
+ * @param {string} title A human-readable representation of the subject 
+ * @param {jQuery|string} container a jQuery object (or selector string) containing the DOM element 
+ *  whose child the SubjectGroup instance should be
+ * @param {string|number} id an ID used to make the DOM element's CSS ID
+ *
+ * @constructor
+ * @requires RDFauthor
+ * @requires PredicateRow
  */
 function SubjectGroup(subjectURI, title, container, id) {
     this._subjectURI = subjectURI;
@@ -45,7 +51,7 @@ function SubjectGroup(subjectURI, title, container, id) {
  */
 SubjectGroup.prototype = {
     /**
-     * Returns the CSS id for this subject group.
+     * Returns the CSS id for the associated DOM element.
      * @return string
      */
     cssID: function () {
@@ -54,9 +60,9 @@ SubjectGroup.prototype = {
     
     /**
      * Adds a widget associated with statement.
-     * @param Statement statement
-     * @exception Throws an exception if the subject of the statement is not managed
-     *  by this subject group instance.
+     * @param {Statement} statement a {@link Statement} object for which to add a widget
+     * @param {function} constructor
+     * @throws An exception if the subject of the statement is not managed by the subject group instance.
      */
     addWidget: function (statement, constructor) {
         if (statement.subjectURI() !== this._subjectURI) {
@@ -80,7 +86,7 @@ SubjectGroup.prototype = {
     
     /**
      * Returns the DOM element associated with this subject group instance.
-     * @return Node
+     * @return {HTMLElement}
      */
     getElement: function () {
         return $('#' + this.cssID()).get(0);
@@ -88,7 +94,7 @@ SubjectGroup.prototype = {
     
     /**
      * Returns the number of rows this subject group currently manages.
-     * @return number
+     * @return {number}
      */
     numberOfRows: function () {
        return this._rowCount; 
@@ -96,8 +102,8 @@ SubjectGroup.prototype = {
     
     /**
      * Returns the property row instance identified by id.
-     * @param string|number id
-     * @return PropertyRow
+     * @param id string|number
+     * @return {PredicateRow}
      */
     getRowByID: function (id) {
         return this._rowsByID[id];
@@ -105,8 +111,8 @@ SubjectGroup.prototype = {
     
     /**
      * Returns the property row instance identified by property URI.
-     * @param string predicateURI
-     * @return PropertyRow
+     * @param predicateURI string
+     * @return {PredicateRow}
      */
     getRowByPredicate: function (predicateURI) {
         return this._rows[predicateURI];
@@ -114,7 +120,7 @@ SubjectGroup.prototype = {
     
     /**
      * Sets this instance's associated DOM element's display property to 'block'.
-     * @param boolean animated Whether to appear with an animation
+     * @param {boolean} animated Whether to appear with an animation
      */
     show: function (animated) {
         var element = this.getElement();
@@ -127,7 +133,7 @@ SubjectGroup.prototype = {
     
     /**
      * Sets this instance's assiciated DOM element's display property to 'none'.
-     * @param boolean animated Whether to disappear with an animation
+     * @param {boolean} animated Whether to disappear with an animation
      */
     hide: function (animated) {
         var element = this.getElement();

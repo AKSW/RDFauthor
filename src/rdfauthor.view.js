@@ -5,11 +5,24 @@
  */
 
 /**
- * Constructs a subject group object that manages property rows sharing same subject. 
- * @param string subjectURI
- * @param string title
- * @param Node|jQuery container
- * @param String|Number id Used for CSS id
+ * Constructs a view object.
+ *
+ * @param options An object with view options. The following keys are recognized
+ * (default values in parantheses):
+ * <ul>
+ *   <li><code>title</code> The view's main title ('Edit Properties'), </li>
+ *   <li><code>saveButtonTitle</code> the title for the save button ('Save'), </li>
+ *   <li><code>cancelButtonTitle</code> the caption for the cancel button ('Cancel'), </li>
+ *   <li><code>container</code> a jQuery selector for the container DOM element ('body'), </li>
+ *   <li><code>showButtons</code> whether to display buttons (true), </li>
+ *   <li><code>animationTime</code> animation time in milliseconds (250), </li>
+ *   <li><code>id</code> the ad attribute for the view's DOM element ('rdfAuthorView'), </li>
+ *   <li><code>contentContainerClass</code> the CSS class for the content container ('rdfAuthorViewContent').</li>
+ * </ul>
+ *
+ * @constructor
+ * @requires RDFauthor
+ * @requires SubjectGroup
  */
 function View(options) {
     // default options
@@ -21,8 +34,8 @@ function View(options) {
         showButtons: true, 
         animationTime: 250, // ms
         id: 'rdfAuthorView', 
-        contentContainerClass: 'rdfAuthorViewContent', 
-        replaceContainerContent: false
+        contentContainerClass: 'rdfAuthorViewContent'/*, 
+        replaceContainerContent: false*/
     };
     
     // overwrite defaults if supplied
@@ -67,14 +80,11 @@ function View(options) {
     }
 }
 
-/**
- * Prototype for all View instances.
- */
 View.prototype = {
     /**
-     * Adds a new widget to this view instance.
-     * @param Statement statement
-     * @param function constructor
+     * Adds a new widget to the view instance.
+     * @param statement Statement object
+     * @param function Constructor function to be used for widget instantiation
      */
     addWidget: function (statement, constructor) {
         var subjectURI = statement.subjectURI();
@@ -93,7 +103,7 @@ View.prototype = {
     /**
      * Returns the DOM element that is used as a container for view content 
      * (i.e. PredicateRows).
-     * @return node
+     * @return jQuery
      */
     getContentContainer: function () {
         return $(this.getElement()).children('.' + this._options.contentContainerClass).eq(0);
@@ -101,7 +111,7 @@ View.prototype = {
     
     /**
      * Returns the DOM element associated with this view instance.
-     * @return node
+     * @return jQuery
      */
     getElement: function () {
         return $('#' + this.cssID()).get(0);
@@ -109,7 +119,7 @@ View.prototype = {
     
     /**
      * Returns the subject group instance identified by URI.
-     * @param string subjectURI
+     * @param subjectURI The subject URI for which to return the {@link SubjectGroup} (string)
      * @return SubjectGroup
      */
     getSubjectGroup: function (subjectURI) {
@@ -125,7 +135,7 @@ View.prototype = {
     }, 
     
     /**
-     * Returns the number of dsitinguished subjects currently managed by this
+     * Returns the number of dsitinguished subjects currently managed by the
      * view instance.
      * @return number
      */
@@ -135,7 +145,7 @@ View.prototype = {
     
     /**
      * Shows this view instance if currently hidden.
-     * @param boolean animated Whether to appear animatedly
+     * @param animated Whether to appear animatedly (<code>boolean</code>)
      */
     show: function (animated) {
         if (!animated) {
@@ -152,7 +162,8 @@ View.prototype = {
     
     /**
      * Hides this view instance if currently visible.
-     * @param boolean animated Whether to disappear animatedly
+     * @member
+     * @param animated Whether to disappear animatedly (<code>boolean</code>)
      */
     hide: function (animated) {
         if (!animated) {

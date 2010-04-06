@@ -5,21 +5,27 @@
  */
 
 /**
- * Constructs an RDFauthor statement object which encapsulates a statement and 
- * display-specific properties.
+ * Constructs a Statement object which encapsulates a statement and display-specific properties.
  * 
- * @param object statementSpec. Either an instance of $.rdf.triple or RDFA.triple 
- *  or a key-value object with the following keys:
- *  - subject: an Object (value, options), 
- *  - predicate: an Object (value, options), 
- *  - object: an Object (value, options = Object (lang xor datatype)).
- * @param object statementOptions. An object with display-specific options.
- *  The following keys are recognized:
- *  - hidden: Boolean, 
- *  - required: Boolean, 
- *  - protected: Boolean, 
- *  - predicateTitle: String, 
- *  - preferredWidget: reserved for future use.
+ * @param statementSpec Either an instance of $.rdf.triple or RDFA.triple or an object 
+ * with the following properties:
+ * <ul>
+ *   <li><code>subject</code> an object (value, options), </li>
+ *   <li><code>predicate</code> an object (value, options), </li>
+ *   <li><code>object</code> an object (value, options). The <code>options</code> 
+ *       object must contain a key named <code>lang</code> or <code>datatype</code>.</li>
+ * </ul>
+ * @param statementOptions an object with display-specific settings. The following keys are recognized:
+ * <ul>
+ *   <li><code>hidden</code> boolean, </li>
+ *   <li><code>required</code> boolean, </li>
+ *   <li><code>protected</code> boolean, </li>
+ *   <li><code>predicateTitle</code> string, </li>
+ *   <li><code>preferredWidget</code> reserved for future use.</li>
+ * </ul>
+ *
+ * @constructor
+ * @requires rdfQuery
  */
 function Statement(statementSpec, statementOptions) {
     if (statementSpec instanceof $.rdf.triple) {
@@ -220,6 +226,7 @@ Statement.prototype = {
     
     /**
      * Denotes whether a given datatype is valid (i.e. registered with rdfQuery).
+     * @param datatypeURI string
      * @return boolean
      */
     isDatatypeValid: function (datatypeURI) {
@@ -228,10 +235,10 @@ Statement.prototype = {
     
     /**
      * Registers the supplied datatype with rdfQuery.
-     * @param string datatypeURI The URI of the datatype to be registered.
-     * @param string regex A RegExp object to test for validity of literal with respect to the datatype.
-     * @param boolean strip
-     * @param function valueFunction A callback function used for value extraction.
+     * @param {string} datatypeURI The URI of the datatype to be registered
+     * @param {RegExp} regex A RegExp object to test for validity of literal with respect to the datatype
+     * @param {boolean} strip
+     * @param {function} valueFunction A callback function used for value extraction
      */
     registerDatatype: function (datatypeURI, regex, strip, valueFunction) {
         $.typedValue.types[datatypeURI] = {
