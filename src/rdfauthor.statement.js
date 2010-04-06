@@ -1,3 +1,9 @@
+/*
+ * This file is part of the RDFauthor project.
+ * http://code.google.com/p/rdfauthor
+ * Author: Norman Heino <norman.heino@gmail.com>
+ */
+
 /**
  * Constructs an RDFauthor statement object which encapsulates a statement and 
  * display-specific properties.
@@ -100,17 +106,21 @@ function Statement(statementSpec, statementOptions) {
         throw 'Invalid statement spec.';
     }
     
-    // statement options
-    if (statementOptions) {
-        this._hidden         = Boolean(statementOptions.hidden) | false;
-        this._required       = Boolean(statementOptions.required) | false;
-        this._protected      = Boolean(statementOptions.protected) | false;
-        this._predicateLabel = statementOptions.title ? String(statementOptions.title) : String(this._predicate.value);
+    // statement options and defaults
+    statementOptions = statementOptions != undefined ? statementOptions : {};
+    this._hidden     = statementOptions.hidden != undefined ? Boolean(statementOptions.hidden) : false;
+    this._required   = statementOptions.required != undefined ? Boolean(statementOptions.required) : false;
+    this._protected  = statementOptions.protected != undefined ? Boolean(statementOptions.protected) : false;
+    
+    // the human-readable string representing the property 
+    if (statementOptions.title && typeof statementOptions.title == 'string' && '' != statementOptions.title) {
+        this._predicateLabel = statementOptions.title;
     } else {
-        this._hidden         = false;
-        this._required       = false;
-        this._protected      = false;
-        this._predicateLabel = String(this._predicate.value);
+        if (String(this._predicate.value).lastIndexOf('#') > -1) {
+            this._predicateLabel = String(this._predicate.value).substr(String(this._predicate.value).lastIndexOf('#') + 1);
+        } else {
+            this._predicateLabel = String(this._predicate.value).substr(String(this._predicate.value).lastIndexOf('/') + 1);
+        }
     }
     
     // other members
@@ -176,12 +186,36 @@ Statement.prototype = {
     }, 
     
     /**
+     * Returns the subject of this statement.
+     * @return string
+     */
+    subjectURI: function() {
+        return this._subject.value;
+    }, 
+    
+    /**
      * Returns the statement's predicate label property or the predicate URI
      * if no label has been set.
      * @return string
      */
     predicateLabel: function () {
         return this._predicateLabel;
+    }, 
+    
+    /**
+     * Returns the predicate of this statement.
+     * @return string
+     */
+    predicateURI: function () {
+        return this._predicate.value;
+    }, 
+    
+    /**
+     * Returns the object of this statement.
+     * @return string
+     */
+    objectValue: function() {
+        return this._object.value;
     }, 
     
     /**

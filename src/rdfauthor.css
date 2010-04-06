@@ -8,7 +8,7 @@
 
 /* -- Layout stuff ---------------------------------------------------------- */
 /* -- copies style of relevant classes from OntoWiki's default.css ---------- */
-/* -- straight to #rdfAuthorContainer --------------------------------------- */
+/* -- straight to #rdfAuthorView --------------------------------------- */
 
 div.modal-wrapper {
     position: absolute;
@@ -21,7 +21,7 @@ div.modal-wrapper {
     z-index: 10000;
 }
 
-#rdfAuthorContainer {
+#rdfAuthorView {
     /* taken from div.window */
     font-size: 12px;
     font-weight: 500;
@@ -46,7 +46,7 @@ div.modal-wrapper {
     left:50%;
 }
 
-#rdfAuthorContainer legend {
+#rdfAuthorView legend {
     color: #000;
     padding-left: 0;
     margin-left: 0;
@@ -54,35 +54,37 @@ div.modal-wrapper {
     font-weight: normal;
 }
 
-#rdfAuthorContainer fieldset legend {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
+#rdfAuthorView fieldset legend {
+/*    margin: 0.5em 0;*/
+/*    margin-top: 0.5em;
+    margin-bottom: 0.5em;*/
+    padding: 0 0.3em;
 }
 
-#rdfAuthorContainer fieldset fieldset legend {
+#rdfAuthorView fieldset fieldset legend {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
 
-#rdfAuthorContainer legend {
+#rdfAuthorView legend {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
 
-#rdfAuthorContainer .title /* taken from div.window .title */
+#rdfAuthorView .title /* taken from div.window .title */
 {
     font-size: 1em;
     font-weight: 900;
     color: #fff;
 /*    text-shadow: -1px -1px 1px #000;*/
     border-bottom: solid 1px #666;
-    padding: 0.3em 0.5em 0.2em 0.5em !important;
+    padding: 0.3em 0.5em 0.2em 0.5em !important;  
     margin: 0 !important;
     line-height: 1.3;
     background:#999;
 }
 
-#rdfAuthorContainer fieldset {
+#rdfAuthorView fieldset {
     border-style: none;
     border-width: 0;
     margin-top: 0.5em;
@@ -92,7 +94,7 @@ div.modal-wrapper {
     float: none;
 }
 
-#rdfAuthorContainer fieldset fieldset {
+#rdfAuthorView fieldset fieldset {
     border-top-style: solid;
     border-color: #999;
     border-width: 1px;
@@ -101,8 +103,8 @@ div.modal-wrapper {
     padding-top: .5em;
 }
 
-#rdfAuthorContainer input.text,
-#rdfAuthorContainer textarea {
+#rdfAuthorView input.text,
+#rdfAuthorView textarea {
 
     display: inline-block;
     border-left-color: #888;
@@ -122,15 +124,14 @@ div.modal-wrapper {
     background:#fff;
 }
 
-#rdfAuthorContainer textarea {
+#rdfAuthorView textarea {
     min-width: 30em;
     min-height: 18.5em;
-    padding: 0;
     line-height: 1.5;
     font-size: 1em;
 }
 
-#rdfAuthorContainer select {
+#rdfAuthorView select {
     min-width: 20em;
     font-size: 1em;
     max-width: 20em;
@@ -147,7 +148,7 @@ div.modal-wrapper {
     vertical-align: middle;
 }
 
-#rdfAuthorContainer button
+#rdfAuthorView button
 {
   display:inline-block;
   margin: 0 0.35em 0.7em 0;
@@ -178,7 +179,7 @@ div.modal-wrapper {
 
 /* -- RDFAuthor unique stuff ------------------------------------------------ */
 
-#rdfAuthorContainer {
+#rdfAuthorView {
     /*z-index: 10000 !important; 
     position: absolute;
     background-color: #eee;
@@ -199,7 +200,7 @@ div.modal-wrapper {
     font-size: 1em;
 }
 
-#rdfAuthorContainer .rdfAuthorPropertyRows {
+#rdfAuthorView .rdfAuthorViewContent {
     padding: 0;
     max-height: 30em;
     overflow-x: hidden;
@@ -207,9 +208,9 @@ div.modal-wrapper {
     background:#fff;
 }
 
-#rdfAuthorContainer *, .rdfAuthorInline * {min-width: 0 !important; min-height: 0 !important;}
+#rdfAuthorView *, .rdfAuthorInline * {min-width: 0 !important; min-height: 0 !important;}
 
-#rdfAuthorContainer fieldset {
+#rdfAuthorView fieldset {
     border: 1px dotted grey;
     border-left: none;
     border-right: none;
@@ -219,7 +220,7 @@ div.modal-wrapper {
     padding-bottom: 0.5em !important;
 }
 
-#rdfAuthorContainer fieldset .widget-override {
+#rdfAuthorView fieldset .widget-override {
 /*    position: absolute;*/
     font-size: 75%;
 }
@@ -228,40 +229,40 @@ div.modal-wrapper {
     
 }
 
-#rdfAuthorContainer .property-row, #rdfAuthorContainer .container, #rdfAuthorContainer .inline-container, 
+#rdfAuthorView .property-row, #rdfAuthorView .container, #rdfAuthorView .inline-container, 
 .rdfAuthorInline .container, .rdfAuthorInline .inline-container {
 /*    border: 1px dotted red;*/
     padding: 0.3em 0.5em;
 }
 
-#rdfAuthorContainer input, #rdfAuthorContainer textarea, 
+#rdfAuthorView input, #rdfAuthorView textarea, 
 .rdfAuthorInline    input, .rdfAuthorInline textarea {
     font-size: 1.1em;
 }
 
-#rdfAuthorContainer .util, .rdfAuthorInline .util {
+#rdfAuthorView .util, .rdfAuthorInline .util {
     font-size: 0.85em;
     display: block;
 }
 
-#rdfAuthorContainer .literal-lang select, #rdfAuthorContainer .literal-datatype select, 
+#rdfAuthorView .literal-lang select, #rdfAuthorView .literal-datatype select, 
 .rdfAuthorInline    .literal-lang select, .rdfAuthorInline    .literal-datatype select {
     margin-left: 0.5em;
 }
 
-#rdfAuthorContainer .container, #rdfAuthorContainer .inline-container, 
+#rdfAuthorView .container, #rdfAuthorView .inline-container, 
 .rdfAuthorInline    .container, .rdfAuthorInline    .inline-container {
     float: left;
 /*    border: 1px dotted green;*/
 }
 
-#rdfAuthorContainer .widget, 
+#rdfAuthorView .widget, 
 .rdfAuthorInline    .widget {
     min-height: 42px;
 /*    border: 1px solid green;*/
 }
 
-#rdfAuthorContainer legend {
+#rdfAuthorView legend {
     margin: 0 0.3em;
     padding: 0 0.2em;
     font-weight: bold;
@@ -274,31 +275,32 @@ div.modal-wrapper {
     display: none;
 }
 
-#rdfAuthorContainer .add-button, #rdfAuthorContainer .delete-button, 
+#rdfAuthorView .add-button, #rdfAuthorView .delete-button, 
 .rdfAuthorInline    .add-button, .rdfAuthorInline    .delete-button {
     width: 16px;
     height: 16px;
 /*    margin: 1px 0;*/
 }
 
-#rdfAuthorContainer .add-button, .rdfAuthorInline .add-button {
+#rdfAuthorView .add-button, .rdfAuthorInline .add-button {
     background-image: url('./../img/badge-add.png');
 }
 
-#rdfAuthorContainer .add-button:hover, .rdfAuthorInline .add-button:hover {
+#rdfAuthorView .add-button:hover, .rdfAuthorInline .add-button:hover {
     background-position: -16px;
 }
 
-#rdfAuthorContainer .delete-button, .rdfAuthorInline .delete-button {
+#rdfAuthorView .delete-button, .rdfAuthorInline .delete-button {
     background-image: url('./../img/badge-delete.png');
 }
 
-#rdfAuthorContainer .delete-button:hover, .rdfAuthorInline .delete-button:hover {
+#rdfAuthorView .delete-button:hover, .rdfAuthorInline .delete-button:hover {
     background-position: -16px;
 }
 
-#rdfAuthorContainer .actions, .rdfAuthorInline .actions {float: right;}
-#rdfAuthorContainer .container > *, .rdfAuthorInline .container > * {display: inline-block;}
+#rdfAuthorView .actions.right, .rdfAuthorInline .actions.right {float: right !important;}
+#rdfAuthorView .actions.left, .rdfAuthorInline .actions.left {float: left !important;}
+#rdfAuthorView .container > *, .rdfAuthorInline .container > * {display: block;}
 
 .disclosure-button-horizontal {
     height: 2em !important;
@@ -356,4 +358,35 @@ div.modal-wrapper {
 
 .disclosure-button-vertical.open:hover {
     background-position: center -10px !important;
+}
+
+.subject-group {
+    display: none;
+}
+
+.subject-group-selected {
+    margin-top: 0.2em;
+    margin-bottom: 0.4em; 
+    display: block;
+}
+
+.tabs ul {
+    margin: 0;
+    padding: 0.3em 0.5em;
+}
+
+.tabs ul li {
+    display: inline;
+}
+
+.tabs ul li a {
+    padding: 0.3em 0.6em;
+}
+
+.subject-group-select {
+    cursor: pointer;
+}
+
+.subject-group-select.selected {
+    background-color: #fff;
 }
