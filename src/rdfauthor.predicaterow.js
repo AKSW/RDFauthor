@@ -5,8 +5,8 @@
  */
 
 /**
- * Constructs a property row object that manages a number of widgets sharing 
- * same subject and property.
+ * Constructs a PredicateRow object that manages a number of widgets sharing 
+ * same subject and predicate.
  *
  * @param {string} subjectURI
  * @param {string} predicateURI
@@ -149,8 +149,8 @@ PredicateRow.prototype = {
     },
     
     /**
-     * Returns the widet instance for an index.
-     * @param number index The widget's index.
+     * Returns the widet instance for an index
+     * @param {number} index of the widget to be returned
      * @return {object}
      */
     getWidget: function (index) {
@@ -176,10 +176,20 @@ PredicateRow.prototype = {
     }, 
     
     /**
+     * Removes the widget at index <code>index</code>.
+     * @param {int} index
+     */
+    removeWidget: function (index) {
+        var widgetInstance = this.getWidget(index);
+        var widgetID = widgetInstance.cssID();
+        return this.removeWidgetForID(widgetID);
+    }, 
+    
+    /**
      * Removes the widget identified by CSS id.
      * @param {string} cssID The widget's CSS id.
      */
-    removeWidget: function (cssID) {
+    removeWidgetForID: function (cssID) {
         var widgetInstance = this.getWidgetForID(cssID);
         widgetInstance.onRemove();
         $('#' + this.cssID()).children('fieldset').children('#' + cssID).remove();

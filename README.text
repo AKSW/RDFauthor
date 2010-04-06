@@ -1,0 +1,31 @@
+# RDFauthor Readme #
+
+## Requirements ##
+To make use of RDFauthor your web project must meet the following requirements:
+
+- [RDFa](http://www.w3.org/TR/xhtml-rdfa-primer/) must be used to embed RDF triples
+  in your XHTML markup.
+- The triple store where your data comes from must provide a SPARQL/Update endpoint.
+- The URI of the update endpoint must be embedded in the page using our
+  [update vocabulary](http://ns.aksw.org/update/).
+
+## Installation ##
+RDFauthor is a JavaScript library, hence no installation is needed.
+
+## Using RDFauthor within your Project ##
+Two steps are required in order to use RDFauthor within your project.
+
+1. Include `loader.js` file into you main template (so it is available on every page).
+2. Embed provenance information (as RDFa) for named graphs in your page. If you don't use
+   named graphs, the URI of the page is used as the graph URI.
+
+## API Documentation ##
+RDFauthor's API documentation can be built with 
+[JsDoc Toolkit](http://code.google.com/p/jsdoc-toolkit/).
+Assuming `jsrun.sh` is available in you path, you can run JsDoc from within the 
+RDFauthor directory using the following command:
+
+    jsrun.sh -d=./doc ./src
+
+This will build the API documentation in a diectory named `doc` under your RDFauthor 
+directory.

@@ -46,9 +46,6 @@ function SubjectGroup(subjectURI, title, container, id) {
     this._container.append(getChrome());
 }
 
-/**
- * Prototype object for all subject group instances.
- */
 SubjectGroup.prototype = {
     /**
      * Returns the CSS id for the associated DOM element.

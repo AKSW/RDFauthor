@@ -225,7 +225,9 @@ Statement.prototype = {
     }, 
     
     /**
-     * Denotes whether a given datatype is valid (i.e. registered with rdfQuery).
+     * Denotes whether a given datatype is valid.
+     * Valid datatypes are the standard RDF datatypes or user-defined datatypes that have
+     * explicitely been registered (see {@link Statement#registerDatatype}).
      * @param datatypeURI string
      * @return boolean
      */

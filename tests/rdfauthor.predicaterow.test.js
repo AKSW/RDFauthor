@@ -1,34 +1,38 @@
 $(document).ready(function() {
     // dummy RDFauthor
-    RDFauthor = {
-        nextID: function() {return Math.round(Math.random() * 1000)}
+    if (RDFauthor == undefined) {
+        RDFauthor = {
+            nextID: function() {return Math.round(Math.random() * 1000)}
+        }
     }
 
     // dummy widget
-    Widget = function(s) {
-        this.s = s;
-        this.remove = false;
-        this.cancel = false;
-        this.submit = false;
-    }
-    // dummy widget prototype
-    Widget.prototype = {
-        init: function () {
-            // do nothing
-        }, 
-        getHTML: function () {
-            return '<span>I am a widget!</span>';
-        }, 
-        onRemove: function() {
-            this.remove = true;
-        }, 
-        onCancel: function() {
-            this.cancel = true;
-        }, 
-        onSubmit: function() {
-            this.submit = true;
+    if (window.Widget == undefined) {
+        Widget = function(s) {
+            this.s = s;
+            this.remove = false;
+            this.cancel = false;
+            this.submit = false;
         }
-    };
+        // dummy widget prototype
+        Widget.prototype = {
+            init: function () {
+                // do nothing
+            }, 
+            getHTML: function () {
+                return '<span>I am a widget!</span>';
+            }, 
+            onRemove: function() {
+                this.remove = true;
+            }, 
+            onCancel: function() {
+                this.cancel = true;
+            }, 
+            onSubmit: function() {
+                this.submit = true;
+            }
+        };
+    }
 
     module('rdfauthor.predicaterow', {
         setup: function () {
@@ -63,12 +67,12 @@ $(document).ready(function() {
         same(this.fixture.getWidgetForID(id), new Widget({}), 'Widget should be the same as a newly created one.');
     });
     
-    test('removeWidget', function() {
+    test('removeWidgetForID', function() {
         expect(5);
         equal(this.fixture.numberOfWidgets(), 0, 'Should have no widgets.');
         var id = this.fixture.addWidget({}, Widget);
         equal(this.fixture.numberOfWidgets(), 1, 'Should have 1 widget.');
-        this.fixture.removeWidget(id);
+        this.fixture.removeWidgetForID(id);
         equal(this.fixture.getWidgetForID(id).remove, true, 'onRemove should have been called for widget.');
         
         // test for issue 1

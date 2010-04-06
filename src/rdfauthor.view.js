@@ -83,8 +83,8 @@ function View(options) {
 View.prototype = {
     /**
      * Adds a new widget to the view instance.
-     * @param statement Statement object
-     * @param function Constructor function to be used for widget instantiation
+     * @param {Statement} statement object
+     * @param {function} Constructor function to be used for widget instantiation
      */
     addWidget: function (statement, constructor) {
         var subjectURI = statement.subjectURI();
@@ -103,7 +103,7 @@ View.prototype = {
     /**
      * Returns the DOM element that is used as a container for view content 
      * (i.e. PredicateRows).
-     * @return jQuery
+     * @return {jQuery}
      */
     getContentContainer: function () {
         return $(this.getElement()).children('.' + this._options.contentContainerClass).eq(0);
@@ -111,7 +111,7 @@ View.prototype = {
     
     /**
      * Returns the DOM element associated with this view instance.
-     * @return jQuery
+     * @return {jQuery}
      */
     getElement: function () {
         return $('#' + this.cssID()).get(0);
@@ -120,7 +120,7 @@ View.prototype = {
     /**
      * Returns the subject group instance identified by URI.
      * @param subjectURI The subject URI for which to return the {@link SubjectGroup} (string)
-     * @return SubjectGroup
+     * @return {SubjectGroup}
      */
     getSubjectGroup: function (subjectURI) {
         return this._subjects[subjectURI];
@@ -128,7 +128,7 @@ View.prototype = {
     
     /**
      * Returns the CSS id of this view instance's associated DOM element.
-     * @return string
+     * @return {string}
      */
     cssID: function () {
         return this._options.id;
@@ -137,7 +137,7 @@ View.prototype = {
     /**
      * Returns the number of dsitinguished subjects currently managed by the
      * view instance.
-     * @return number
+     * @return {number}
      */
     numberOfSubjects: function () {
         return this._subjectCount;
@@ -145,7 +145,7 @@ View.prototype = {
     
     /**
      * Shows this view instance if currently hidden.
-     * @param animated Whether to appear animatedly (<code>boolean</code>)
+     * @param {boolean} animated Whether to appear animatedly
      */
     show: function (animated) {
         if (!animated) {
@@ -163,7 +163,7 @@ View.prototype = {
     /**
      * Hides this view instance if currently visible.
      * @member
-     * @param animated Whether to disappear animatedly (<code>boolean</code>)
+     * @param {boolean} animated Whether to disappear animatedly
      */
     hide: function (animated) {
         if (!animated) {

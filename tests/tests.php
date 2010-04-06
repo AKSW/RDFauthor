@@ -1,7 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
-    <title>RDFauthor Unit Tests</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="../tests/libraries/qunit.css" type="text/css" />
     <script type="text/javascript">var TEST_CONTAINER_ID = 'test-container'</script>
@@ -44,9 +43,10 @@
         }
     }
     ?>
+    <title>RDFauthor Unit Tests<?php if (isset($_GET['module'])) echo ' (Module: ' . (string) $_GET['module'] . ')'?></title>
   </head>
   <body>
-    <h1 id="qunit-header">RDFauthor Unit Tests</h1>
+    <h1 id="qunit-header">RDFauthor Unit Tests<?php if (isset($_GET['module'])) echo ' (Module: ' . (string) $_GET['module'] . ')'?></h1>
     <h2 id="qunit-banner"></h2>
     <h2 id="qunit-userAgent"></h2>
     <ol id="qunit-tests"></ol>
