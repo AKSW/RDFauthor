@@ -16,3 +16,19 @@
 - different view types (global, inline) via factory pattern
 - make sure, views can be used interchangebly and at the same time
 - widget hierarchy (not necessarily by means of a class hierarchy) and widget replacement
+
+## Usage Variants ##
+- Overlay
+  * `parse()`  &rarr; `addStatement()` &hellip;
+  * `start()`
+- Inline
+  * `setRootElement()`
+  * `parse()`
+  * `start()`
+- Template
+  * `addStatement()`
+  * `setParse(false) // disable auto-parsing`
+  * `start()`
+- Bookmarklet
+  * contains calls to inline
+  * sets default resource, graph, endpoints etc.

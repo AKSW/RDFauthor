@@ -39,7 +39,7 @@ function View(options) {
     };
     
     // overwrite defaults if supplied
-    this._options   = $.extend(defaultOptions, options);
+    this._options   = jQuery.extend(defaultOptions, options);
     this._container = this._options.container instanceof jQuery 
                     ? this._options.container 
                     : $(this._options.container);

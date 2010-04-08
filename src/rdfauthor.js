@@ -12,25 +12,81 @@
  * @requires Statement
  */
 RDFauthor = (function () {
-    /** @private {object} databanks indexed by graph URI */
+    /** Databanks indexed by graph URI. */
     var _databanksByGraph = {};
-    /** @private {int} number of errors that occured while parsing RDFa */
+    
+    /** The number of errors that occured while parsing RDFa. */
     var _parserErrors = 0;
-    /** @private {object} information about named graphs in the page (indexed by graph URI) */
+    
+    /** Information about named graphs in the page (indexed by graph URI). */
     var _graphInfo = {};
-    /** @private {int} initial ID */
+    
+    /** Initial ID */
     var _idSeed = Math.round(Math.random() * 1000);
-    /** @private {object} loaded JavaScript URIs */
+    
+    /** Info predicates */
+    var _infoPredicates = {};
+    
+    /** Mapping of info shortcuts to predicate URIs. */
+    var _infoShortcuts = {};
+    
+    var _pageParsed = false;
+    
+    /** Predicate info */
+    var _predicateInfo = {};
+    
+    /** Loaded JavaScript URIs */
     var _loadedScripts = {};
-    /** @private {object} loaded stylesheet URIs */
+    
+    /** Loaded stylesheet URIs */
     var _loadedStylesheets = {};
     
+    /** Default options */
+    var _options = {
+        title: 'Title', 
+        saveButtonTitle: 'saveButtonTitle', 
+        cancelButtonTitle: 'cancelButtonTitle', 
+        showButtons: true, 
+        useAnimations: true, 
+        autoParse: true
+    };
+    
     /**
-     * Updates all sources via SPARQL/Update
+     * Adds a new RDFA triple
      * @private
      */
-    function _updateSource() {
-        
+    function _addTriple(element, triple, graph) {
+        if (triple !== undefined) {
+            var statement = new Statement(triple);
+            if (!statement.isIgnored()) {
+                if (statement.isUpdateVocab()) {
+                    // handle update info
+                } else {
+                    RDFauthor.addStatement(graph, statement, element);
+                }
+            }
+        }
+    };
+    
+    /**
+     * Loads a JavaScript file by including a <code>&lt;script&gt;</code> tag in the page header.
+     * @private
+     * @param {string} scriptURI
+     * @param {function} function that will be called when the script finished loading (optional)
+     */
+    function _loadScript(scriptURI, callback) {
+        if (undefined === _loadedScripts[scriptURI]) {
+            var s  = document.createElement('script');
+            s.type = 'text/javascript';
+            s.src  = scriptURI;
+            
+            if (typeof callback == 'function') {
+                s.onload = callback;
+            }
+            
+            document.getElementsByTagName('head')[0].appendChild(s);
+            _loadedScripts[scriptURI] = true;
+        }
     };
     
     /**
@@ -42,28 +98,41 @@ RDFauthor = (function () {
     };
     
     /**
-     * Adds a new RDFA triple
+     * Parses the current page for RDFa triples
      * @private
      */
-    function _addTriple(element, triple, graph) {
-        if (triple != undefined) {
-            var statement = new Statement(triple);
-            RDFauthor.addStatement(graph, statement, element);
+    function _parse() {
+        if (_options.autoParse && !_pageParsed) {
+            RDFA.parse();
         }
     };
     
-    /**
-     * Sets up RDFA namespace and parser callbacks
-     * @private
-     */
-    function _setupParser() {
-        window.RDFA = window.RDFA | {};
-        window.RDFA.CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT = _addTriple;
-        window.RDFA.CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT = _addTriple;
+    // RDFauthor setup code
+    if (RDFAUTHOR_BASE.charAt(RDFAUTHOR_BASE.length - 1) !== '/') {
+        RDFAUTHOR_BASE = RDFAUTHOR_BASE + '/';
+    }
+    // let RDFa parser load GRDDL files locally
+    __RDFA_BASE = RDFAUTHOR_BASE + 'libraries/';
+    
+    // RDFA namespace and parser options
+    RDFA = {
+        NAMED_GRAPH_ATTRIBUTE: {ns: 'http://ns.aksw.org/update/', attribute: 'from'}, 
+        CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT: _addTriple, 
+        CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT: _addTriple, 
+        CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
     };
     
-    // RDFauthor initialization code
-    _setupParser();
+    // load required scripts
+    _loadScript(__RDFA_BASE + 'rdfa.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');
+    
+    /**
+     * Updates all sources via SPARQL/Update
+     * @private
+     */
+    function _updateSource() {
+        
+    };
     
     // return uninstantiable singleton
     /** @lends RDFauthor */
@@ -74,8 +143,9 @@ RDFauthor = (function () {
          * @param {Statement} statement
          * @param {HTMLElement} element
          */
-        addStatement: function (graphURI, statement, element) {
-            
+        addStatement: function (graphURI, statement, element) {            
+            var databank = this.databankForGraph(graphURI);
+            databank.add(statement.asRdfQueryTriple());
         }, 
         
         /**
@@ -86,8 +156,8 @@ RDFauthor = (function () {
         }, 
         
         /**
-         * Commits an ongoing editing process. All pending changes will be sent to
-         * sources.
+         * Commits an ongoing editing process.
+         * All pending changes will be sent to sources.
          */
         commit: function () {
             
@@ -110,12 +180,16 @@ RDFauthor = (function () {
         }, 
         
         /**
-         * Returns the $.rdf.databank that stores statements for graph denoted by graphURI.
+         * Returns the jQuery.rdf.databank that stores statements for graph denoted by <code>graphURI</code>.
          * @param {string} graphURI
-         * @return {$.rdf.databank}
+         * @return {jQuery.rdf.databank}
          */
         databankForGraph: function (graphURI) {
+            if (undefined === _databanksByGraph[graphURI]) {
+                _databanksByGraph[graphURI] = jQuery.rdf.databank();
+            }
             
+            return _databanksByGraph[graphURI];
         }, 
         
         /**
@@ -123,7 +197,12 @@ RDFauthor = (function () {
          * @return {array}
          */
         literalDatatypes: function () {
-            
+            var types = [];
+            for (var t in jQuery.typedValue.types) {
+                types.push(t);
+            }
+
+            return types;
         }, 
         
         /**
@@ -131,7 +210,7 @@ RDFauthor = (function () {
          * @return {array}
          */
         literalLanguages: function () {
-            
+            return ['de', 'en', 'fr', 'nl', 'es', 'it', 'cn'];
         }, 
         
         /**
@@ -144,8 +223,7 @@ RDFauthor = (function () {
         }, 
         
         /**
-         * Returns an instance of the widget that has been registered for 
-         * hookName and hookValue.
+         * Returns an instance of the widget that has been registered for <code>hookName</code> and <code>hookValue</code>.
          * @param {string} hookName
          * @param {mixed} hookValue
          * @return {Widget}
@@ -163,11 +241,27 @@ RDFauthor = (function () {
         }, 
         
         /**
-         * Loads a JavaScript file by including a <code>&lt;script&gt;</code> tag in the page header.
+         * Loads a JavaScript file from URI <code>scriptURI</code>.
+         * If callback is supplied, it will be called after the script has been loaded.
          * @param {string} scriptURI
+         * @param {function} function that will be called when the script finished loading (optional)
          */
-        loadScript: function (scriptURI) {
-            
+        loadScript: function (scriptURI, callback) {
+            _loadScript(scriptURI, callback);
+        }, 
+        
+        /**
+         * Loads a bunch of JavaScript files at once. If callback is supplied, it will
+         * be called after the last script has been loaded.
+         * @param {Array} scriptURIs
+         * @param {function} callback
+         */
+        loadScripts: function (scriptURIs, callback) {
+            for (var i = 0, max = scriptURIs.length; i < max; i++) {
+                var scriptURI = scriptURIs[i];
+                var cbParam   = (i === (max - 1)) ? callback : undefined;
+                this.loadScript(scriptURI, cbParam);
+            }
         }, 
         
         /**
@@ -175,7 +269,26 @@ RDFauthor = (function () {
          * @param {string} stylesheetURI
          */
         loadStylesheet: function (stylesheetURI) {
+            var styleSheetLoaded = false;
+            var links = document.getElementsByTagName('link');
             
+            for (var i = 0, max = links.length; i < max; i++) {
+                var uri = links[i].getAttribute('href');
+                if ((uri && uri == styleSheetURI)) {
+                    styleSheetLoaded = true;
+                    break;
+                }
+            }
+            
+            if (!styleSheetLoaded) {
+                var l   = document.createElement('link');
+                l.rel   = 'stylesheet';
+                l.type  = 'text/css';
+                l.media = 'screen';
+                l.href  = styleSheetURI;
+                
+                document.getElementsByTagName('head')[0].appendChild(l);
+            }
         }, 
         
         /**
@@ -214,6 +327,41 @@ RDFauthor = (function () {
         }, 
         
         /**
+         * Registers a predicate to automatically be queried for all predicates.
+         * Widgets will be provided with values of these predicates on request.
+         * @param {string} infoPredicateURI The URI of the info predicate.
+         * @param {string} infoSpec Short name for the info predicate (optional).
+         * @throws An exception if shortcut has already been registered .
+         */
+        registerInfoPredicate: function (infoPredicateURI, shortcut) {
+            if (undefined === _infoPredicates[infoPredicateURI]) {
+                _infoPredicates[infoPredicateURI] = true;
+            }
+            
+            if (arguments.length > 1) {
+                if (undefined !== _infoShortcuts[shortcut]) {
+                    throw 'Shortcut has already been registered.';
+                }
+                
+                _infoShortcuts[infoSpec] = predicateURI;
+            }
+        }, 
+        
+        /**
+         * Returns an info predicate value for the predicate given by predicateURI.
+         * @param {string} predicateURI
+         * @param {string} infoSpec
+         * @return {Array}
+         */
+        infoForPredicate: function (predicateURI, infoSpec) {
+            if (undefined !== _infoShortcuts[infoSpec]) {
+                infoSpec = _infoShortcuts[infoSpec];
+            }
+            
+            return _predicateInfo[predicateURI][infoSpec];
+        }, 
+        
+        /**
          * If only an XHTML fragment should be edited, this sets the 
          * fragment's root DOM element.
          * @param {HTMLElement} root
@@ -226,7 +374,7 @@ RDFauthor = (function () {
          * Starts editing the current page
          */
         start: function () {
-            
+            _parse();
         }, 
         
         /**

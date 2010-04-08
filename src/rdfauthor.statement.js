@@ -7,7 +7,7 @@
 /**
  * Constructs a Statement object which encapsulates a statement and display-specific properties.
  * 
- * @param statementSpec Either an instance of $.rdf.triple or RDFA.triple or an object 
+ * @param statementSpec Either an instance of jQuery.rdf.triple or RDFA.triple or an object 
  * with the following properties:
  * <ul>
  *   <li><code>subject</code> an object (value, options), </li>
@@ -28,34 +28,41 @@
  * @requires rdfQuery
  */
 function Statement(statementSpec, statementOptions) {
-    if (statementSpec instanceof $.rdf.triple) {
+    if (statementSpec instanceof jQuery.rdf.triple) {
         // rdfQuery triple, we store the parts directly
         this._subject   = statementSpec.subject;
         this._predicate = statementSpec.property;
         this._object    = statementSpec.object;
-    } else if (statementSpec.constructor == 'RDFStatement') {
+    } else if (statementSpec.constructor == RDFStatement) {
         // RDFA triple, create rdfQuery truple parts and store them
-        this._subject   = $.rdf.resource(statementSpec.subject.uri);
-        this._predicate = $.rdf.resource(statementSpec.predicate.uri);
+        this._subject   = jQuery.rdf.resource('<' + statementSpec.subject.uri + '>');
+        this._predicate = jQuery.rdf.resource('<' + statementSpec.predicate.uri + '>');
         
         // TODO: blank nodes
         if (statementSpec.object.uri) {
-            this._object = $.rdf.resource(statementSpec.object.uri);
+            this._object = jQuery.rdf.resource('<' + statementSpec.object.uri + '>');
         } else {
-            var literalOpts = {};
+            var literalOpts  = {};
+            var quoteLiteral = true;
             
             if (statementSpec.object.lang) {
                 literalOpts.lang = statementSpec.object.lang;
+                quoteLiteral = false;
             } else if (statementSpec.object.datatype) {
-                literalOpts.datatype = triple.object.datatype.uri;
+                literalOpts.datatype = statementSpec.object.datatype.uri;
+                quoteLiteral = false;
                 
                 // register user-defined datatype
-                if (!this.isValidDatatype(literalOpts.datatype)) {
+                if (!this.isDatatypeValid(literalOpts.datatype)) {
                     this.registerDatatype(literalOpts.datatype);
                 }
             }
             
-            this._object = $.rdf.literal(statementSpec.object.value, literalOpts);
+            if (quoteLiteral) {
+                statementSpec.object.value = '"' + statementSpec.object.value + '"';
+            }
+            
+            this._object = jQuery.rdf.literal(statementSpec.object.value, literalOpts);
         }
     } else if (statementSpec.hasOwnProperty('subject') && statementSpec.hasOwnProperty('predicate')) {
         // s, p, o
@@ -63,10 +70,10 @@ function Statement(statementSpec, statementOptions) {
         var subjectSpec = typeof statementSpec.subject == 'object' ? statementSpec.subject.value : statementSpec.subject;
         var subjectOpts = statementSpec.subject.options ? statementSpec.subject.options : null;
         try {
-            this._subject = $.rdf.resource(subjectSpec, subjectOpts);
+            this._subject = jQuery.rdf.resource(subjectSpec, subjectOpts);
         } catch (e) {
             try {
-                this._subject = $.rdf.blank(subjectSpec, subjectOpts);
+                this._subject = jQuery.rdf.blank(subjectSpec, subjectOpts);
             } catch (f) {
                 // error
                 throw 'Invalid subject spec';
@@ -75,7 +82,7 @@ function Statement(statementSpec, statementOptions) {
         
         var predicateSpec = typeof statementSpec.predicate == 'object' ? statementSpec.predicate.value : statementSpec.predicate;
         var predicateOpts = statementSpec.predicate.options ? statementSpec.predicate.options : null;
-        this._predicate = $.rdf.resource(predicateSpec, predicateOpts);
+        this._predicate = jQuery.rdf.resource(predicateSpec, predicateOpts);
         
         this._object = null;
         // specified object
@@ -89,17 +96,17 @@ function Statement(statementSpec, statementOptions) {
             }
             
             try {
-                this._object = $.rdf.resource(objectSpec, objectOpts);
+                this._object = jQuery.rdf.resource(objectSpec, objectOpts);
             } catch (e) {
                 try {
-                    this._object = $.rdf.blank(objectSpec, objectOpts);
+                    this._object = jQuery.rdf.blank(objectSpec, objectOpts);
                 } catch (f) {
                     try {
                         // quote if necessary
                         if (quote) {
                             objectSpec = '"' + objectSpec + '"';
                         }
-                        this._object = $.rdf.literal(objectSpec, objectOpts);
+                        this._object = jQuery.rdf.literal(objectSpec, objectOpts);
                     } catch (g) {
                         // error
                         throw 'Invalid object spec';
@@ -128,23 +135,32 @@ function Statement(statementSpec, statementOptions) {
             this._predicateLabel = String(this._predicate.value).substr(String(this._predicate.value).lastIndexOf('/') + 1);
         }
     }
-    
-    // other members
-    this.updateNamespace = 'http://ns.aksw.org/update/';
 }
 
 Statement.prototype = {
     /**
-     * Returns the statement as an rdfQuery triple object ($.rdf.triple).
-     * @return object
+     * Update vocabulary namespace.
+     * @type {string}
+     */
+    updateNS: 'http://ns.aksw.org/update/', 
+    
+    /**
+     * Namespaces that are ignored (not display, not editable).
+     * @type {array}
+     */
+    ignoreNS: ['http://www.w3.org/1999/xhtml/vocab#'], 
+    
+    /**
+     * Returns the statement as an rdfQuery triple object (jQuery.rdf.triple).
+     * @return {object}
      */
     asRdfQueryTriple: function () {
-        return $.rdf.triple(this._subject, this._predicate, this._object);
+        return jQuery.rdf.triple(this._subject, this._predicate, this._object);
     }, 
     
     /**
      * Returns a string representation of the statement.
-     * @return string
+     * @return {string}
      */
     toString: function () {
         return String(this.asRdfQueryTriple());
@@ -152,15 +168,34 @@ Statement.prototype = {
     
     /**
      * Returns whether the statement has its 'hidden' attribute set.
-     * @return boolean
+     * @return {boolean}
      */
     isHidden: function () {
         return this._hidden;
     }, 
     
     /**
+     * Denotes whether the statement's predicate is from an ignored namespace.
+     * @return {boolean}
+     */
+    isIgnored: function () {
+        if (undefined === this.ignored) {
+            this.ignored = false;
+            
+            for (var i in this.ignoreNS) {
+                if (String(this._predicate.value).search(RegExp('^' + this.ignoreNS[i])) > -1) {
+                    this.ignored = true;
+                    break;
+                }
+            }
+        }
+        
+        return this.ignored;
+    }, 
+    
+    /**
      * Returns whether the statement has its 'required' attribute set.
-     * @return boolean
+     * @return {boolean}
      */
     isRequired: function () {
         return this._required;
@@ -168,7 +203,7 @@ Statement.prototype = {
     
     /**
      * Returns whether the statement has its 'protected' attribute set.
-     * @return boolean
+     * @return {boolean}
      */
     isProtected: function () {
         return this._protected;
@@ -177,15 +212,15 @@ Statement.prototype = {
     /**
      * Returns true if the statement's predicate stems from the AKSW update 
      * vocabulary (http://ns.aksw.org/update/), false otherwise.
-     * @return boolean
+     * @return {boolean}
      */
     isUpdateVocab: function () {
-        return (String(this._predicate.value).search(RegExp('^' + this.updateNamespace)) > -1);
+        return (String(this._predicate.value).search(RegExp('^' + this.updateNS)) > -1);
     }, 
     
     /**
      * Denotes whether the statement's object has been set.
-     * @return boolean
+     * @return {boolean}
      */
     hasObject: function () {
         return (null !== this._object);
@@ -193,7 +228,7 @@ Statement.prototype = {
     
     /**
      * Returns the subject of this statement.
-     * @return string
+     * @return {string}
      */
     subjectURI: function() {
         return this._subject.value;
@@ -202,7 +237,7 @@ Statement.prototype = {
     /**
      * Returns the statement's predicate label property or the predicate URI
      * if no label has been set.
-     * @return string
+     * @return {string}
      */
     predicateLabel: function () {
         return this._predicateLabel;
@@ -210,7 +245,7 @@ Statement.prototype = {
     
     /**
      * Returns the predicate of this statement.
-     * @return string
+     * @return {string}
      */
     predicateURI: function () {
         return this._predicate.value;
@@ -218,7 +253,7 @@ Statement.prototype = {
     
     /**
      * Returns the object of this statement.
-     * @return string
+     * @return {string}
      */
     objectValue: function() {
         return this._object.value;
@@ -228,11 +263,11 @@ Statement.prototype = {
      * Denotes whether a given datatype is valid.
      * Valid datatypes are the standard RDF datatypes or user-defined datatypes that have
      * explicitely been registered (see {@link Statement#registerDatatype}).
-     * @param datatypeURI string
-     * @return boolean
+     * @param {string} datatypeURI
+     * @return {boolean}
      */
     isDatatypeValid: function (datatypeURI) {
-        return $.typedValue.types.hasOwnProperty(datatypeURI);
+        return jQuery.typedValue.types.hasOwnProperty(datatypeURI);
     }, 
     
     /**
@@ -243,7 +278,7 @@ Statement.prototype = {
      * @param {function} valueFunction A callback function used for value extraction
      */
     registerDatatype: function (datatypeURI, regex, strip, valueFunction) {
-        $.typedValue.types[datatypeURI] = {
+        jQuery.typedValue.types[datatypeURI] = {
             regex: regex | /^.*$/, 
             strip: strip | false, 
             value: valueFunction | function(v) {return v;}

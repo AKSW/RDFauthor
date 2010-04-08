@@ -1575,17 +1575,15 @@ RDFA.traverse = function (element, subject, namespaces, lang, base, hanging, gra
     // are there namespaces declared
     namespaces = RDFA.add_namespaces(element,namespaces);
     
-    // for debugging
-    var tagName = element.tagName;
-    
     // replace the lang if it's non null
     lang = RDFA.getNodeAttributeValue(element, 'xml:lang') || lang;
     
     // 2010-04-07 NH
     // check for named graph attribute
+    var newGraph;
     if (undefined !== RDFA.NAMED_GRAPH_ATTRIBUTE) {
         var namedGraphs = RDFA.NAMED_GRAPH_ATTRIBUTE;
-        graph = RDFA.getNodeAttributeValueNS(element, namedGraphs.attribute, namedGraphs.ns, namespaces) || graph;
+        newGraph = RDFA.getNodeAttributeValueNS(element, namedGraphs.attribute, namedGraphs.ns, namespaces) || graph;
     }
 
     // special case the BODY
@@ -1638,6 +1636,12 @@ RDFA.traverse = function (element, subject, namespaces, lang, base, hanging, gra
       // 2007-11-25 JT
       // @resource is a CURIEorURI
       explicit_object = RDFA.CURIEorURI.parse(attrs['resource'], namespaces);
+    }
+    
+    // 2010-04-08 NH
+    // if the current element defines a new property, the graph must be changed immediately
+    if (attrs['rel'] != null || attrs['rev'] != null || attrs['property']) {
+        graph = newGraph;
     }
  
     // if there's only an explicit object but no explicit subject and rel/rev
@@ -1766,6 +1770,9 @@ RDFA.traverse = function (element, subject, namespaces, lang, base, hanging, gra
     // recurse down the children
     var children = element.childNodes;
     for (var i=0; i < children.length; i++) {
+        // 2010-04-08 NH
+        // children get the new graph
+        graph = newGraph;
         // 2010-04-07 NH
         // added graph parameter
         RDFA.traverse(children[i], subject, namespaces, lang, base, hanging, graph);
