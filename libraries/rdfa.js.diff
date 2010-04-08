@@ -1,0 +1,147 @@
+29a30,42
+> // 2010-04-07 NH
+> // for IE
+> if (!('indexOf' in Array.prototype)) {
+>     Array.prototype.indexOf = function(obj) {
+>         for (var i = 0; i < this.length; i++) {
+>             if (this[i] == obj) {
+>                 return i;
+>             }
+>         }
+>         return -1;
+>     }
+> }
+> 
+656,657c669,672
+<     if (typeof features == 'undefined') features = ["sameAs",
+<                     "InverseFunctionalProperty", "FunctionalProperty"];
+---
+>     // 2010-04-07 NH
+>     // would cause problem w/ sameAs etc.
+>     // if (typeof features == 'undefined') features = ["sameAs", "InverseFunctionalProperty", "FunctionalProperty"];
+>     if (typeof features == 'undefined') features = [];
+1184a1200,1201
+>    // 2010-04-07 NH
+>    // TODO: doesn't work in IE
+1296a1314,1338
+> // 2010-04-07 NH
+> // namespace-aware node attribute values
+> RDFA.getNodeAttributeValueNS = function (element, attr, namespace, currentNamespaces) {
+>     // Safari, Chrome, FF, Opera
+>     if (element.getAttributeNS) {
+>         var value = element.getAttributeNS(namespace, attr);
+>         if ((null !== value) && ('' !== value)) {
+>             return value;
+>         }
+>     }
+>     
+>     // IE
+>     for (n in currentNamespaces) {
+>         var ns = currentNamespaces[n]('');
+>         ns = String(ns).replace('<', '').replace('>', '');
+>         
+>         if (namespace === ns) {
+>             var namespacedAttribute = n + ':' + attr;
+>             return RDFA.getNodeAttributeValue(element, namespacedAttribute);
+>         }
+>     }
+>     
+>     return null;
+> }
+> 
+1491,1492c1533,1535
+<       'hanging_result' : null,
+<       'new_subject' : null
+---
+>       'hanging_result': null,
+>       'new_subject': null, 
+>       'new_triple': null
+1499c1542,1543
+<     
+---
+>   
+>   var triple;
+1502c1546
+<     var triple = RDFA.add_triple(hanging.base, hanging.subject, RDFA.CURIE.parse(hanging.rels[i],hanging.namespaces), new_object, false);    
+---
+>     triple = RDFA.add_triple(hanging.base, hanging.subject, RDFA.CURIE.parse(hanging.rels[i],hanging.namespaces), new_object, false);    
+1507c1551
+<     var triple = RDFA.add_triple(hanging.base, new_object, RDFA.CURIE.parse(hanging.revs[i],hanging.namespaces), hanging.subject, false);    
+---
+>     triple = RDFA.add_triple(hanging.base, new_object, RDFA.CURIE.parse(hanging.revs[i],hanging.namespaces), hanging.subject, false);    
+1512c1556,1557
+<     'new_subject' : new_object
+---
+>     'new_subject' : new_object, 
+>     'new_triple': triple
+1527c1572,1574
+< RDFA.traverse = function (element, subject, namespaces, lang, base, hanging) {
+---
+> // 2010-04-07 NH
+> // added graph parameter
+> RDFA.traverse = function (element, subject, namespaces, lang, base, hanging, graph) {
+1530a1578,1580
+>     // for debugging
+>     var tagName = element.tagName;
+>     
+1532a1583,1589
+>     
+>     // 2010-04-07 NH
+>     // check for named graph attribute
+>     if (undefined !== RDFA.NAMED_GRAPH_ATTRIBUTE) {
+>         var namedGraphs = RDFA.NAMED_GRAPH_ATTRIBUTE;
+>         graph = RDFA.getNodeAttributeValueNS(element, namedGraphs.attribute, namedGraphs.ns, namespaces) || graph;
+>     }
+1605c1662,1664
+<         RDFA.CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT(element_to_callback, triple);
+---
+>         // 2010-04-07 NH
+>         // added graph parameter
+>         RDFA.CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT(element_to_callback, triple, graph);
+1616a1676,1681
+>         
+>         // 2010-04-08 NH
+>         // completed hanging triples would not call callback
+>         if (hanging_result.new_triple) {
+>             RDFA.CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT(element_to_callback, hanging_result.new_triple, graph);
+>         }
+1625a1691,1695
+>         // 2010-04-08 NH
+>         // completed hanging triples would not call callback
+>         if (hanging_result.new_triple) {
+>             RDFA.CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT(element_to_callback, hanging_result.new_triple, graph);
+>         }
+1633c1703,1705
+<         RDFA.CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT(element_to_callback, triple);
+---
+>         // 2010-04-07 NH
+>         // added graph parameter
+>         RDFA.CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT(element_to_callback, triple, graph);
+1644c1716,1718
+<         RDFA.CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT(element_to_callback, triple);
+---
+>         // 2010-04-07 NH
+>         // added graph parameter
+>         RDFA.CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT(element_to_callback, triple, graph);
+1680c1754,1756
+<           RDFA.CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT(element_to_callback, triple);                    
+---
+>           // 2010-04-07 NH
+>           // added graph parameter
+>           RDFA.CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT(element_to_callback, triple, graph);                    
+1693c1769,1771
+<         RDFA.traverse(children[i], subject, namespaces, lang, base, hanging);
+---
+>         // 2010-04-07 NH
+>         // added graph parameter
+>         RDFA.traverse(children[i], subject, namespaces, lang, base, hanging, graph);
+1727a1806,1808
+>         // 2010-04-07 NH
+>         // init graph w/ new blank node
+>         var graph = new RDFBlankNode();
+1730c1811,1813
+<         RDFA.traverse(parse_document, RDFA.BASE, namespaces, null, RDFA.BASE, null);
+---
+>         // 2010-04-07 NH
+>         // added graph parameter
+>         RDFA.traverse(parse_document, RDFA.BASE, namespaces, null, RDFA.BASE, null, graph);
