@@ -17,5 +17,14 @@ $(document).ready(function() {
         var first = this.fixture.nextID();
         equal(this.fixture.nextID(), Number(first) + 1);
         equal(this.fixture.nextID('prefix'), 'prefix' + (Number(first) + 2));
-    })
+    });
+    
+    test('loadScript', function() {
+    });
+    
+    test('loadScripts', function() {
+    });
+    
+    test('loadStylesheet', function() {
+    });
 });
