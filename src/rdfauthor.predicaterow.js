@@ -91,7 +91,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id) {
         if ((constructor != undefined) && (typeof constructor == 'function')) {
             widgetInstance = new constructor(statement);
         } else {
-            widgetInstance = RDFauthor.getWidgetByStatement(statement);
+            widgetInstance = RDFauthor.getWidgetForStatement(statement);
         }
         
         // no widget found

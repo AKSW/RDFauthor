@@ -7,15 +7,15 @@ $(document).ready(function() {
     }
 
     // dummy widget
-    if (window.Widget == undefined) {
-        Widget = function(s) {
+    // if (typeof Widget == undefined) {
+        _Widget = function(s) {
             this.s = s;
             this.remove = false;
             this.cancel = false;
             this.submit = false;
         }
         // dummy widget prototype
-        Widget.prototype = {
+        _Widget.prototype = {
             init: function () {
                 // do nothing
             }, 
@@ -32,7 +32,7 @@ $(document).ready(function() {
                 this.submit = true;
             }
         };
-    }
+    // }
 
     module('rdfauthor.predicaterow', {
         setup: function () {
@@ -55,7 +55,7 @@ $(document).ready(function() {
     test('addWidget', function() {       
         expect(4);
         equal(this.fixture.numberOfWidgets(), 0, 'Should have no widgets.');
-        var id = this.fixture.addWidget({}, Widget);
+        var id = this.fixture.addWidget({}, _Widget);
         equal(this.fixture.numberOfWidgets(), 1, 'Should have 1 widget.');
         equal($('#' + TEST_CONTAINER_ID).children('.property-row').children('fieldset').children('.widget').length, 1, 'HTML for one widget should be in DOM.');
         equal($('#' + TEST_CONTAINER_ID).children('.property-row').children('fieldset').children('#' + id).attr('id'), id, 'Widget CSS id should be the id returned.');
@@ -63,14 +63,14 @@ $(document).ready(function() {
 
     test('getWidgetForID', function() {
         expect(1);
-        var id = this.fixture.addWidget({}, Widget);
-        same(this.fixture.getWidgetForID(id), new Widget({}), 'Widget should be the same as a newly created one.');
+        var id = this.fixture.addWidget({}, _Widget);
+        same(this.fixture.getWidgetForID(id), new _Widget({}), 'Widget should be the same as a newly created one.');
     });
     
     test('removeWidgetForID', function() {
         expect(5);
         equal(this.fixture.numberOfWidgets(), 0, 'Should have no widgets.');
-        var id = this.fixture.addWidget({}, Widget);
+        var id = this.fixture.addWidget({}, _Widget);
         equal(this.fixture.numberOfWidgets(), 1, 'Should have 1 widget.');
         this.fixture.removeWidgetForID(id);
         equal(this.fixture.getWidgetForID(id).remove, true, 'onRemove should have been called for widget.');
@@ -85,7 +85,7 @@ $(document).ready(function() {
     test('onCancel', function() {
         expect(3);
         equal(this.fixture.numberOfWidgets(), 0, 'Should have no widgets.');
-        var id = this.fixture.addWidget({}, Widget);
+        var id = this.fixture.addWidget({}, _Widget);
         equal(this.fixture.numberOfWidgets(), 1, 'Should have 1 widget.');
         this.fixture.onCancel();
         equal(this.fixture.getWidgetForID(id).cancel, true, 'onCancel should have been called for widget.');
@@ -94,7 +94,7 @@ $(document).ready(function() {
     test('onSubmit', function() {
         expect(3);
         equal(this.fixture.numberOfWidgets(), 0, 'Should have no widgets.');
-        var id = this.fixture.addWidget({}, Widget);
+        var id = this.fixture.addWidget({}, _Widget);
         equal(this.fixture.numberOfWidgets(), 1, 'Should have 1 widget.');
         this.fixture.onSubmit();
         equal(this.fixture.getWidgetForID(id).submit, true, 'onSubmit should have been called for widget.');

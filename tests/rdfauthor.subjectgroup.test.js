@@ -24,15 +24,15 @@ $(document).ready(function() {
     }
     
     // dummy widget
-    if (Widget == undefined) {
-        Widget = function(s) {
+    // if (Widget == undefined) {
+        _Widget = function(s) {
             this.s = s;
             this.remove = false;
             this.cancel = false;
             this.submit = false;
         }
         // dummy widget prototype
-        Widget.prototype = {
+        _Widget.prototype = {
             init: function () {
                 // do nothing
             }, 
@@ -49,7 +49,7 @@ $(document).ready(function() {
                 this.submit = true;
             }
         };
-    }
+    // }
     
     if (PredicateRow == undefined) {
         PredicateRow = function (sub, pred, tit, cont, id) {};
@@ -77,7 +77,7 @@ $(document).ready(function() {
     test('addWidget', function() {
         expect(2);
         
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture.numberOfRows(), 1, 'Should have 1 row.');
         
         // add wrong statement
@@ -94,10 +94,10 @@ $(document).ready(function() {
     
     test('getRowByPredicate', function() {
         expect(2);
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         var r = this.fixture.getRowByPredicate('http://example.com/predicate1');
         ok(r instanceof PredicateRow, 'Should be an instanceof PredicateRow');
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         var r2 = this.fixture.getRowByPredicate('http://example.com/predicate1');
         equal(r2, r, 'Rows should be equal.');
     });

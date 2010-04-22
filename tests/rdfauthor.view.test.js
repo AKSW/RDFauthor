@@ -19,15 +19,15 @@ $(document).ready(function() {
     }
     
     // dummy widget
-    if (Widget == undefined) {
-        Widget = function(s) {
+    // if (Widget == undefined) {
+        _Widget = function(s) {
             this.s = s;
             this.remove = false;
             this.cancel = false;
             this.submit = false;
         }
         // dummy widget prototype
-        Widget.prototype = {
+        _Widget.prototype = {
             init: function () {
                 // do nothing
             }, 
@@ -44,7 +44,7 @@ $(document).ready(function() {
                 this.submit = true;
             }
         };
-    }
+    // }
     
     if (SubjectGroup == undefined) {
         SubjectGroup = function (uri, title, container, id) {};
@@ -82,11 +82,11 @@ $(document).ready(function() {
     
     test('addWidget', function() {
         expect(3);
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
-        this.fixture.addWidget(statement2, Widget);
+        this.fixture.addWidget(statement2, _Widget);
         equal(this.fixture._subjectCount, 2, 'Should have 2 subjects.');
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture._subjectCount, 2, 'Should have 2 subjects.');
     });
     
@@ -105,7 +105,7 @@ $(document).ready(function() {
     
     test('getSubjectGroup', function() {
         expect(2);
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
         ok(this.fixture.getSubjectGroup('http://example.com/subject1') instanceof SubjectGroup, 
             'Returned subject group should be an instance of SubjectGroup.');
@@ -119,11 +119,11 @@ $(document).ready(function() {
     test('numberOfSubjects', function() {
         expect(4);
         equal(this.fixture.numberOfSubjects(), 0, 'Should have 0 subjects.');
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture.numberOfSubjects(), 1, 'Should have 1 subject.');
-        this.fixture.addWidget(statement2, Widget);
+        this.fixture.addWidget(statement2, _Widget);
         equal(this.fixture.numberOfSubjects(), 2, 'Should have 2 subjects.');
-        this.fixture.addWidget(statement1, Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture.numberOfSubjects(), 2, 'Should still have 2 subjects.');
     });
     

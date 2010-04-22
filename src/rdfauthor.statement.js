@@ -28,12 +28,12 @@
  * @requires rdfQuery
  */
 function Statement(statementSpec, statementOptions) {
-    if (statementSpec instanceof jQuery.rdf.triple) {
+    if (typeof jQuery.rdf.triple != 'undefined' && statementSpec instanceof jQuery.rdf.triple) {
         // rdfQuery triple, we store the parts directly
         this._subject   = statementSpec.subject;
         this._predicate = statementSpec.property;
         this._object    = statementSpec.object;
-    } else if (statementSpec.constructor == RDFStatement) {
+    } else if (typeof RDFStatement != 'undefined' && statementSpec.constructor == RDFStatement) {
         // RDFA triple, create rdfQuery truple parts and store them
         this._subject   = jQuery.rdf.resource('<' + statementSpec.subject.uri + '>');
         this._predicate = jQuery.rdf.resource('<' + statementSpec.predicate.uri + '>');
@@ -124,6 +124,7 @@ function Statement(statementSpec, statementOptions) {
     this._hidden     = statementOptions.hidden != undefined ? Boolean(statementOptions.hidden) : false;
     this._required   = statementOptions.required != undefined ? Boolean(statementOptions.required) : false;
     this._protected  = statementOptions.protected != undefined ? Boolean(statementOptions.protected) : false;
+    this._graph      = statementOptions.graph != undefined ? String(statementOptions.graph) : null;
     
     // the human-readable string representing the property 
     if (statementOptions.title && typeof statementOptions.title == 'string' && '' != statementOptions.title) {
@@ -227,10 +228,18 @@ Statement.prototype = {
     }, 
     
     /**
+     * Returns the graph to which this statement belongs or null.
+     * @return {String|null}
+     */
+    graphURI: function () {
+        return this._graph;
+    }, 
+    
+    /**
      * Returns the subject of this statement.
      * @return {string}
      */
-    subjectURI: function() {
+    subjectURI: function () {
         return this._subject.value;
     }, 
     
