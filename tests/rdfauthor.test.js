@@ -195,9 +195,9 @@ $(document).ready(function() {
     });
     
     test('registerInfoPredicate', 1, function() {
-        this.fixture.registerInfoPredicate('http://www.w3.org/2000/01/rdf-schema#label', 'label');
+        this.fixture.registerInfoPredicate('http://www.w3.org/2000/01/rdf-schema#label', 'labelaaaa');
         try {
-            this.fixture.registerInfoPredicate('http://www.w3.org/2000/01/rdf-schema#ttt', 'label');
+            this.fixture.registerInfoPredicate('http://www.w3.org/2000/01/rdf-schema#ttt', 'labelaaaa');
         } catch (e) {
             ok(true, 'Exception should be thrown.');
         }

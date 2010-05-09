@@ -60,17 +60,17 @@ RDFauthor = (function () {
     /** Initial ID */
     var _idSeed = Math.round(Math.random() * 1000);
     
-    /** Info predicates */
-    var _infoPredicates = {};
-    
     /** Mapping of info shortcuts to predicate URIs. */
     var _infoShortcuts = {};
+    
+    /** Info predicates */
+    var _infoPredicates = {};
     
     /** Denotes whether the page has been parsed */
     var _pageParsed = false;
     
     /** Predicate info */
-    var _predicateInfo = {};
+    var _predicateInfo = null;
     
     /** Loaded JavaScript URIs */
     var _loadedScripts = {};
@@ -103,12 +103,27 @@ RDFauthor = (function () {
     };
     
     /**
+     * Adds a predicate that is queried for
+     * @private
+     */
+    function _addInfoPredicate(infoPredicateURI, shortcut) {
+        _infoPredicates[infoPredicateURI] = {};
+        if (arguments.length > 1) {
+            _infoShortcuts[shortcut] = infoPredicateURI;
+        }
+    };
+    
+    /**
      * Adds a new RDFA triple
      * @private
      */
     function _addTriple(element, triple, graph) {
         if (undefined !== triple) {
             var statement;
+            /* blank graph means page graph */
+            if (graph instanceof RDFBlankNode) {
+                graph = _pageGraph();
+            }
             try {
                 statement = new Statement(triple, {'graph': graph});
             } catch (e) {
@@ -126,6 +141,16 @@ RDFauthor = (function () {
             }
         }
     };
+    
+    /**
+     * Calls its parameter if it is of type funtion.
+     * @private
+     */
+    function _callIfIsFunction(functionSpec) {
+        if (jQuery.isFunction(functionSpec)) {
+            functionSpec();
+        }
+    }
     
     /**
      * Checks whether object implementes interface if
@@ -176,6 +201,64 @@ RDFauthor = (function () {
             /* TODO: what about hidden/protected triples hack */
         }
     };
+    
+    /**
+     * Loads info predicates for all predicates
+     * @private
+     */ 
+    function _fetchPredicateInfo(callback) {        
+        if (null === _predicateInfo) {
+            var selects  = '';
+            var filters  = [];
+            var patterns = [];
+            
+            for (infoPredicateURI in _infoPredicates) {
+                var variableName = _shortcutForInfoPredicate(infoPredicateURI);
+                selects += (' ?' + variableName);
+                filters.push('sameTerm(?predicate, <' + infoPredicateURI + '>)');
+                patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
+            }
+            /* init */
+            _predicateInfo = {};
+            
+            /* query */
+            if (patterns.length > 0) {
+                var query = '\
+                    SELECT DISTINCT ?predicate ' + selects + '\
+                    WHERE {' + patterns.join(' UNION ') + ' FILTER(' + filters.join(' || ') + ')}';
+                // query = query.replace(/\s+/g, ' ');
+                
+                /* TODO: for each graph */
+                RDFauthor.queryGraph(/* RDFauthor.defaultGraphURI() */'http://ns.ontowiki.net/SysBase/', query, function(result) {
+                    if (result['results'] && result['results']['bindings']) {
+                        for (var r in result['results']['bindings']) {
+                            /* build  */
+                            var predicate, infoPredicate, infoValue;
+                            for (var current in result['results']['bindings'][r]) {
+                                switch (current) {
+                                    case 'predicate': 
+                                        predicate = result['results']['bindings'][r][current].value;
+                                        break;
+                                    default:
+                                        infoPredicate = _infoShortcuts[current];
+                                        infoValue     = result['results']['bindings'][r][current].value;
+                                }
+                            }
+                            
+                            /* build info structure */
+                            if (undefined === _predicateInfo[predicate]) {
+                                _predicateInfo[predicate] = {};
+                            }
+                            if (undefined === _predicateInfo[predicate][infoPredicate]) {
+                                _predicateInfo[predicate][infoPredicate] = [];
+                            }
+                            _predicateInfo[predicate][infoPredicate].push(infoValue);
+                        }
+                    }
+                });
+            }
+        }
+    }
     
     /**
      * Adds an update vocabulary statement to the internal store
@@ -231,9 +314,7 @@ RDFauthor = (function () {
             _loadedScripts[scriptURI] = true;
         } else {
             // script was already loaded, so execute callback immediately
-            if (typeof callback == 'function') {
-                callback();
-            }
+            _callIfIsFunction(callback);
         }
     };
     
@@ -267,10 +348,99 @@ RDFauthor = (function () {
      * Parses the current page for RDFa triples
      * @private
      */
-    function _parse() {
+    function _parse(callback) {        
         if (!_pageParsed) {
+            // set parsing callback
+            RDFA.CALLBACK_DONE_PARSING = function () {
+                _pageParsed = true;
+                _callIfIsFunction(callback);
+            };
+            // parse
             RDFA.parse();
+        } else {
+            // already parsed, execute callback immediately
+            _callIfIsFunction(callback);
         }
+    };
+    
+    /**
+     * Parses a URL string and returns an object similar to the internal Location object.
+     * based on http://blog.stevenlevithan.com/archives/parseuri
+     * @private
+     */
+    function _parseURL(str) {
+        var o = {
+        	strictMode: false, 
+        	key: ['source', 'protocol', 'authority', 'userInfo', 'user', 'password', 'hostname', 
+        	      'port', 'relative', 'path', 'directory', 'file','query','anchor'],
+        	q: {
+        	    name:   'queryKey',
+        	    parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+        	},
+        	parser: {
+        		strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+        		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+        	}
+        };
+        
+        var	m   = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str), 
+    		uri = {}, 
+    		i   = 14;
+
+    	while (i--) {
+    	    uri[o.key[i]] = m[i] || '';
+    	}
+    	
+    	uri[o.q.name] = {};
+    	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+    		if ($1) {
+    		    uri[o.q.name][$1] = $2;
+    		}
+    	});
+    	
+    	return uri;
+    };
+    
+    /**
+     * Called when RDFauthor is ready loading all its dependencies
+     */
+    function _ready() {
+        if (typeof RDFAUTHOR_READY_CALLBACK !== 'undefined') {
+            RDFAUTHOR_READY_CALLBACK();
+        }
+    };
+    
+    /**
+     * Returns the shortcut registered for the info predicate or
+     * creates and registers a new one if none had been registered before.
+     * @private
+     */
+    function _shortcutForInfoPredicate(infoPredicateURI) {
+        var count = 1
+        for (var shortcut in _infoShortcuts) {
+            if (_infoShortcuts[shortcut] === infoPredicateURI) {
+                return shortcut;
+            }
+            count++;
+        }
+        
+        /* not found, create new one */
+        shortcut = 'info' + count;
+        _infoShortcuts[shortcut] = infoPredicateURI;
+        
+        return shortcut;
+    }
+    
+    /**
+     * Shows the property editing view, creating it if necessary.
+     * @private
+     */
+    function _showView() {
+        /* make sure, view has predicate info available */
+        _fetchPredicateInfo(function() {
+            var view = that.getView();
+            view.display();
+        });
     };
     
     /**
@@ -305,9 +475,14 @@ RDFauthor = (function () {
     };
     
     // load required scripts
-    _loadScript(__RDFA_BASE + 'rdfa.js');                       /* RDFA */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js'); /* Statement */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.widget.js');    /* Widget */
+    _loadScript(__RDFA_BASE + 'rdfa.js', _ready);               /* RDFA */
+    
+    /* default info predicates */
+    _addInfoPredicate(RDF_NS + 'type', 'type');
+    _addInfoPredicate(RDFS_NS + 'range', 'range');
+    _addInfoPredicate(RDFS_NS + 'label', 'label');
     
     // return uninstantiable singleton
     /** @lends RDFauthor */
@@ -346,7 +521,7 @@ RDFauthor = (function () {
             _cloneDatabanks();
             this.eventTarget().trigger('rdfauthor.commit');
             _updateSources();
-        },
+        }, 
         
         /**
          * Creates a new widget base object ensuring it uses the abstract 
@@ -458,7 +633,8 @@ RDFauthor = (function () {
         },
         
         /**
-         * Returns an info predicate value for the predicate given by predicateURI.
+         * Returns info predicate values for the predicate given by predicateURI.
+         * An array is alsways return, even if there is only one value in it.
          * @param {string} predicateURI
          * @param {string} infoSpec
          * @return {Array}
@@ -468,7 +644,11 @@ RDFauthor = (function () {
                 infoSpec = _infoShortcuts[infoSpec];
             }
             
-            return _predicateInfo[predicateURI][infoSpec];
+            if ((undefined !== _predicateInfo[predicateURI]) && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
+                return _predicateInfo[predicateURI][infoSpec];
+            }
+            
+            return [];
         },
         
         /**
@@ -575,7 +755,7 @@ RDFauthor = (function () {
          * @throws An exception if the graph queried has no associated SPARQL endpoint.
          */
         queryGraph: function (graphURI, query, callbackSuccess, callbackError, asynchronous) {
-            var seviceURI = this.serviceURIForGraph(graphURI);
+            var serviceURI = this.serviceURIForGraph(graphURI);
             if (undefined === serviceURI) {
                 throw 'Graph has no SPARQL endpoint defined.';
             }
@@ -607,16 +787,16 @@ RDFauthor = (function () {
                 ajaxOptions.error = function (request, status, error) {callbackError(status, error);}
             }
             
-            var uriLocation     = new Location(serviceURI);
+            var serviceLocation = _parseURL(serviceURI);
             var currentLocation = window.location;
             
             /* 
              * Check whether JSONp is necessary 
              * http://en.wikipedia.org/wiki/Same_origin_policy#Origin_determination_rules
              */
-            if (!(currentLocation.protocol === uriLocation.protocol && 
-                  currentLocation.hostname === uriLocation.hostname &&
-                  currentLocation.port     === uriLocation.port)) {
+            if (!(currentLocation.protocol.replace(':', '') === serviceLocation.protocol && 
+                currentLocation.hostname === serviceLocation.hostname /*&&
+                currentLocation.port     === serviceLocation.port*/)) {
                 
                 /* not same origin, use JSONp and modify ajax options accordingly */
                 var JSONpOptions = {
@@ -625,6 +805,8 @@ RDFauthor = (function () {
                 }
                 jQuery.extend(ajaxOptions, JSONpOptions);
             }
+            
+            jQuery.ajax(ajaxOptions);
         },
         
         /**
@@ -635,17 +817,11 @@ RDFauthor = (function () {
          * @throws An exception if shortcut has already been registered .
          */
         registerInfoPredicate: function (infoPredicateURI, shortcut) {
-            if (undefined === _infoPredicates[infoPredicateURI]) {
-                _infoPredicates[infoPredicateURI] = true;
+            if ((arguments.length > 1) && (undefined !== _infoShortcuts[shortcut])) {
+                throw 'Shortcut has already been registered.';
             }
             
-            if (arguments.length > 1) {
-                if (undefined !== _infoShortcuts[shortcut]) {
-                    throw 'Shortcut has already been registered.';
-                }
-                
-                _infoShortcuts[shortcut] = infoPredicateURI;
-            }
+            _addInfoPredicate(infoPredicateURI, shortcut);
         },
         
         /**
@@ -701,14 +877,18 @@ RDFauthor = (function () {
          * @return {string}
          */
         serviceURIForGraph: function (graphURI) {
-            return _graphInfo[graphURI].queryEndpoint;
+            if (graphURI && graphURI in _graphInfo) {
+                return _graphInfo[graphURI].queryEndpoint;
+            }
+            
+            return undefined;
         }, 
         
         /**
          * Sets RDFauthor options
          * @param {object} optionSpec
          */
-        setOptions: function(optionSpec) {
+        setOptions: function (optionSpec) {
             _options = $.extend(_options, optionSpec);
         }, 
         
@@ -720,7 +900,15 @@ RDFauthor = (function () {
         start: function (root) {
             this.eventTarget().trigger('rdfauthor.start');
             if (_options.autoParse) {
-                _parse();
+                var that = this;
+                /* parse */
+                _parse(function() {
+                    /* display view */
+                    _showView();
+                });
+            } else {
+                /* auto-parsing off, triples were added manually */
+                _showView();
             }
         }
     }

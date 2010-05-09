@@ -232,7 +232,7 @@ Statement.prototype = {
      * @return {String|null}
      */
     graphURI: function () {
-        return this._graph;
+        return String(this._graph);
     }, 
     
     /**
@@ -240,7 +240,7 @@ Statement.prototype = {
      * @return {string}
      */
     subjectURI: function () {
-        return this._subject.value;
+        return String(this._subject.value);
     }, 
     
     /**
@@ -249,7 +249,7 @@ Statement.prototype = {
      * @return {string}
      */
     predicateLabel: function () {
-        return this._predicateLabel;
+        return String(this._predicateLabel);
     }, 
     
     /**
@@ -257,7 +257,7 @@ Statement.prototype = {
      * @return {string}
      */
     predicateURI: function () {
-        return this._predicate.value;
+        return String(this._predicate.value);
     }, 
     
     /**
@@ -265,7 +265,7 @@ Statement.prototype = {
      * @return {string}
      */
     objectValue: function() {
-        return this._object.value;
+        return String(this._object.value);
     }, 
     
     /**
