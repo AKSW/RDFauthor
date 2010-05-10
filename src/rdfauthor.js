@@ -229,30 +229,32 @@ RDFauthor = (function () {
                 // query = query.replace(/\s+/g, ' ');
                 
                 /* TODO: for each graph */
-                RDFauthor.queryGraph(/* RDFauthor.defaultGraphURI() */'http://ns.ontowiki.net/SysBase/', query, function(result) {
-                    if (result['results'] && result['results']['bindings']) {
-                        for (var r in result['results']['bindings']) {
-                            /* build  */
-                            var predicate, infoPredicate, infoValue;
-                            for (var current in result['results']['bindings'][r]) {
-                                switch (current) {
-                                    case 'predicate': 
-                                        predicate = result['results']['bindings'][r][current].value;
-                                        break;
-                                    default:
-                                        infoPredicate = _infoShortcuts[current];
-                                        infoValue     = result['results']['bindings'][r][current].value;
+                RDFauthor.queryGraph(/* RDFauthor.defaultGraphURI() */'http://ns.ontowiki.net/SysBase/', query, {
+                    callbackSuccess: function(result) {
+                        if (result['results'] && result['results']['bindings']) {
+                            for (var r in result['results']['bindings']) {
+                                /* build  */
+                                var predicate, infoPredicate, infoValue;
+                                for (var current in result['results']['bindings'][r]) {
+                                    switch (current) {
+                                        case 'predicate': 
+                                            predicate = result['results']['bindings'][r][current].value;
+                                            break;
+                                        default:
+                                            infoPredicate = _infoShortcuts[current];
+                                            infoValue     = result['results']['bindings'][r][current].value;
+                                    }
                                 }
+
+                                /* build info structure */
+                                if (undefined === _predicateInfo[predicate]) {
+                                    _predicateInfo[predicate] = {};
+                                }
+                                if (undefined === _predicateInfo[predicate][infoPredicate]) {
+                                    _predicateInfo[predicate][infoPredicate] = [];
+                                }
+                                _predicateInfo[predicate][infoPredicate].push(infoValue);
                             }
-                            
-                            /* build info structure */
-                            if (undefined === _predicateInfo[predicate]) {
-                                _predicateInfo[predicate] = {};
-                            }
-                            if (undefined === _predicateInfo[predicate][infoPredicate]) {
-                                _predicateInfo[predicate][infoPredicate] = [];
-                            }
-                            _predicateInfo[predicate][infoPredicate].push(infoValue);
                         }
                     }
                 });
@@ -745,17 +747,29 @@ RDFauthor = (function () {
          * Sends a SPARQL query to the endpoint for graph denoted by graphURI.
          * @param {string} graphURI The graph to be queried
          * @param {string} query the SPARQL query
-         * @param {function} callbackSuccess Function to be called when the query 
-         * was executed sucessfully (implies asynchronous = true). 
-         * The function should accept one parameter which is a 
-         * <a href="http://www.w3.org/TR/rdf-sparql-json-res/">SPARQL Results JSON</a> object.
-         * @param {function} callbackError Function to be called if an error occurs.
-         * @param {boolean} asynchronous If false, the query result will be returned. Otherwise, 
-         * callbackSuccess must be supplied.
+         * @param {object} options An object with optional parameters. The following key are recognized:
+         *  <ul>
+         *    <li>{function} <code>callbackSuccess</code> Function to be called when the query 
+         *        was executed sucessfully (implies asynchronous = true). The function 
+         *        should accept one parameter which is a 
+         *        <a href="http://www.w3.org/TR/rdf-sparql-json-res/">SPARQL Results JSON</a> object.</li>
+         *    <li>{function} <code>callbackError</code> Function to be called if an error occurs.</li>
+         *    <li>{boolean} <code>async</code> Function to be called if an error occurs. If false, the 
+         *        query result will be returned. Otherwise, callbackSuccess must be supplied and will be called.</li>
+         *    <li>{string} <code>sparqlEndpoint</code> The URI for the SPARQL endpoint to be used.</li>
+         *  </ul>  
          * @throws An exception if the graph queried has no associated SPARQL endpoint.
          */
-        queryGraph: function (graphURI, query, callbackSuccess, callbackError, asynchronous) {
-            var serviceURI = this.serviceURIForGraph(graphURI);
+        queryGraph: function (graphURI, query, options) {
+            var defaults = {
+                callbackSuccess: null, 
+                callbackError: null, 
+                async: true, 
+                sparqlEndpoint: null 
+            };
+            var o = jQuery.extend(defaults, options);
+            
+            var serviceURI = o.sparqlEndpoint ? o.sparqlEndpoint : this.serviceURIForGraph(graphURI);
             if (undefined === serviceURI) {
                 throw 'Graph has no SPARQL endpoint defined.';
             }
@@ -772,19 +786,19 @@ RDFauthor = (function () {
                 dataType: 'json', 
                 url: serviceURI, 
                 data: parameters, 
-                async: asynchronous, 
+                async: o.async, 
                 /* request application/sparql-results+json */
                 beforeSend: function (XMLHTTPRequest) {XMLHTTPRequest.setRequestHeader('Accept', 'application/sparql-results+json');}
             };
             
             /* Success callback */
-            if (typeof callbackSuccess == 'function') {
-                ajaxOptions.success = function (data, status) {callbackSuccess(data);}
+            if (typeof o.callbackSuccess == 'function') {
+                ajaxOptions.success = function (data, status) {o.callbackSuccess(data);}
             }
             
             /* Error callback */
-            if (typeof callbackError == 'function') {
-                ajaxOptions.error = function (request, status, error) {callbackError(status, error);}
+            if (typeof o.callbackError == 'function') {
+                ajaxOptions.error = function (request, status, error) {o.callbackError(status, error);}
             }
             
             var serviceLocation = _parseURL(serviceURI);
