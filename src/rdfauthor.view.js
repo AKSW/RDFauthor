@@ -38,6 +38,8 @@ function View(options) {
         replaceContainerContent: false*/
     };
     
+    this.activeSubject = null;
+    
     // overwrite defaults if supplied
     this._options   = jQuery.extend(defaultOptions, options);
     this._container = this._options.container instanceof jQuery 
@@ -61,11 +63,6 @@ function View(options) {
         return html;
     };
     
-    if ($('#' + this.cssID()).length < 1) {
-        // append chrome        
-        this._container.append(getChrome());
-    }
-    
     function getButtons() {
         var buttonHTML = '';
         if (instance._options.showButtons) {
@@ -77,6 +74,18 @@ function View(options) {
         }
         
         return buttonHTML;
+    }
+    
+    // view initialization
+    if (jQuery('#' + this.cssID()).length < 1) {
+        // append chrome        
+        this._container.append(getChrome());
+        
+        // make draggable if jQuery UI loaded
+        if (typeof jQuery.ui != 'undefined' && !jQuery('#' + this.cssID()).hasClass('ui-draggable')) {
+            jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
+            jQuery('#' + this.cssID()).resizable();
+        }
     }
 }
 
@@ -95,9 +104,22 @@ View.prototype = {
             subjectGroup = new SubjectGroup(subjectURI, subjectURI, this.getContentContainer(), RDFauthor.nextID());
             this._subjects[subjectURI] = subjectGroup;
             this._subjectCount++;
+            
+            // save the first group as the initially active group
+            if (null === this.activeSubject) {
+                this.activeSubject = subjectURI;
+            }
         }
         
         subjectGroup.addWidget(statement, constructor);
+    }, 
+    
+    /** 
+     * Returns the currently active subject group.
+     * @return SubjectGroup
+     */
+    activeSubjectGroup: function() {
+        return this.getSubjectGroup(this.activeSubject);
     }, 
     
     /**
@@ -106,7 +128,7 @@ View.prototype = {
      * @return {jQuery}
      */
     getContentContainer: function () {
-        return $(this.getElement()).children('.' + this._options.contentContainerClass).eq(0);
+        return jQuery(this.getElement()).children('.' + this._options.contentContainerClass).eq(0);
     }, 
     
     /**
@@ -114,7 +136,7 @@ View.prototype = {
      * @return {jQuery}
      */
     getElement: function () {
-        return $('#' + this.cssID()).get(0);
+        return jQuery('#' + this.cssID()).get(0);
     }, 
     
     /**
@@ -144,17 +166,28 @@ View.prototype = {
     }, 
     
     /**
+     * Resets this view instance
+     */
+    reset: function () {
+        // unique subjects
+        this._subjects     = {};
+        this._subjectCount = 0;
+    }, 
+    
+    /**
      * Shows this view instance if currently hidden.
      * @param {boolean} animated Whether to appear animatedly
      */
     show: function (animated) {
-        if (!animated) {
-            $(this.getElement()).show();
+        if (arguments.length === 0 || !animated) {
+            jQuery(this.getElement()).show();
+            this.activeSubjectGroup().show();
+            this._container.show();
             // TODO: trigger event
         } else {
-            $(this.getElement()).css('opacity', 0.0).show();
+            jQuery(this.getElement()).css('opacity', 0.0).show();
             this._container.show();
-            $(this.getElement()).fadeIn(function() {
+            jQuery(this.getElement()).fadeIn(function() {
                 // TODO: trigger event
             });
         }
@@ -167,12 +200,12 @@ View.prototype = {
      */
     hide: function (animated) {
         if (!animated) {
-            $(this.getElement()).hide();
+            jQuery(this.getElement()).hide();
             this._container.hide();
         } else {
             var instance = this;
-            $(this.getElement()).fadeOut(function() {
-                $(instance.getElement()).hide();
+            jQuery(this.getElement()).fadeOut(function() {
+                jQuery(instance.getElement()).hide();
                 instance._container.hide();
             });
         }

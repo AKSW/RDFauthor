@@ -19,6 +19,8 @@
 - different view types (global, inline) via factory pattern
 - make sure, views can be used interchangeably and at the same time
 - widget hierarchy (not necessarily by means of a class hierarchy) and widget replacement with more general one (suffice to be built based on hook hierarchy)
+- how to deal with xml:lang attribute in header (inherited)
+- graph defined on the same element as a statement before
 
 ## Usage Variants ##
 - Overlay

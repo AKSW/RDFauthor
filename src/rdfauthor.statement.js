@@ -85,7 +85,7 @@ function Statement(statementSpec, statementOptions) {
         this._predicate = jQuery.rdf.resource(predicateSpec, predicateOpts);
         
         this._object = null;
-        // specified object
+        // specified object: if object is given, it must be valid
         if (statementSpec.hasOwnProperty('object') && statementSpec.object) {
             var quote = true;
             var objectSpec = typeof statementSpec.object == 'object' ? statementSpec.object.value : statementSpec.object;
@@ -166,6 +166,14 @@ Statement.prototype = {
     toString: function () {
         return String(this.asRdfQueryTriple());
     }, 
+    
+    /**
+     * Returns a string that uniquelly identifies this statement's parts.
+     * @return {string}
+     */
+    hash: function () {
+        
+    },
     
     /**
      * Returns whether the statement has its 'hidden' attribute set.
@@ -260,12 +268,46 @@ Statement.prototype = {
         return String(this._predicate.value);
     }, 
     
+    objectDatatype: function () {        
+        if (this.hasObject()) {
+            if (this._object.datatype) {
+                return this._object.datatype;
+            }
+        }
+        
+        return null;
+    }, 
+    
+    objectLang: function () {
+        if (this.hasObject()) {
+            if (this._object.lang) {
+                return this.object.lang;
+            }
+        }
+        
+        return null;
+    }, 
+    
+    objectType: function() {
+        if (this.hasObject()) {
+            if (this._object instanceof jQuery.rdf.resource) {
+                return 'uri';
+            } else {
+                return 'literal';
+            }
+        }
+    },
+    
     /**
      * Returns the object of this statement.
      * @return {string}
      */
     objectValue: function() {
-        return String(this._object.value);
+        if (this.hasObject()) {
+            return String(this._object.value);
+        }
+        
+        return null;
     }, 
     
     /**

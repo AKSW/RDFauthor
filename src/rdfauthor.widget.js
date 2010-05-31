@@ -4,7 +4,9 @@
  * <code>MyWidget.prototype = Widget;</code> or make sure you implement all 
  * the functions yourself.
  */
-Widget = {    
+Widget = {
+    removeOnSubmit: false, 
+    
     /**
      * Default widget constructor.
      */

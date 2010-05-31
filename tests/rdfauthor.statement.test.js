@@ -13,18 +13,21 @@ $(document).ready(function() {
         }
     });
     
-    test('initSimple', 2, function() {
-       var s1 = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: '<http://example.com/o1>'});
-       equal(
-           String(s1), 
-           '<http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .', 
-           'Statement should be <http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .');
+    test('initSimple', 3, function() {
+        var s1 = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: '<http://example.com/o1>'});
+        equal(
+            String(s1), 
+            '<http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .', 
+            'Statement should be <http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .');
        
-       var s2 = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: 'Bar'});
-       equal(
-           String(s2), 
-           '<http://example.com/r1> <http://example.com/p1> "Bar" .', 
-           'Statement should be <http://example.com/r1> <http://example.com/p1> "Bar" .');
+        var s2 = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: 'Bar'});
+        equal(
+            String(s2), 
+            '<http://example.com/r1> <http://example.com/p1> "Bar" .', 
+            'Statement should be <http://example.com/r1> <http://example.com/p1> "Bar" .');
+        
+        var s3 = new Statement({subject: '<http://example.com/r3>', predicate: '<http://example.com/p3>'});
+        ok(!s3.hasObject(), 'Statment should not have an object set.');
     });
     
     test('initComlex', 3, function() {        

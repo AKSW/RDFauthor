@@ -81,6 +81,9 @@ RDFauthor = (function () {
     /** Statements index by element id */
     var _statementsByElemendID = {};
     
+    /** View instance */
+    var _view = null;
+    
     /** Default options */
     var _options = {
         title: 'Title', 
@@ -93,9 +96,9 @@ RDFauthor = (function () {
     
     /** Hash registered widgets */
     var _registeredWidgets = {
-        OBJECT_HOOK:  {},
-        LITERAL_HOOK: {}, 
-        DEFAULT_HOOK: {}, 
+        '__LITERAL__':  {},
+        '__OBJECT__': {}, 
+        '__DEFAULT__': {}, 
         'resource':   {}, 
         'property':   {}, 
         'range':      {}, 
@@ -229,7 +232,7 @@ RDFauthor = (function () {
                 // query = query.replace(/\s+/g, ' ');
                 
                 /* TODO: for each graph */
-                RDFauthor.queryGraph(/* RDFauthor.defaultGraphURI() */'http://ns.ontowiki.net/SysBase/', query, {
+                RDFauthor.queryGraph(RDFauthor.defaultGraphURI(), query, {
                     callbackSuccess: function(result) {
                         if (result['results'] && result['results']['bindings']) {
                             for (var r in result['results']['bindings']) {
@@ -256,7 +259,10 @@ RDFauthor = (function () {
                                 _predicateInfo[predicate][infoPredicate].push(infoValue);
                             }
                         }
-                    }
+                        
+                        _callIfIsFunction(callback);
+                    }, 
+                    async: false
                 });
             }
         }
@@ -321,6 +327,34 @@ RDFauthor = (function () {
     };
     
     /**
+     * Loads a Stylesheet file by including a <code>&lt;script&gt;</code> tag in the page header.
+     * @private
+     * @param {string} stylesheetURI
+     */
+    function _loadStylesheet(stylesheetURI) {
+        var stylesheetLoaded = false;
+        var links = document.getElementsByTagName('link');
+        
+        for (var i = 0, max = links.length; i < max; i++) {
+            var uri = links[i].getAttribute('href');
+            if ((uri && uri == stylesheetURI)) {
+                stylesheetLoaded = true;
+                break;
+            }
+        }
+        
+        if (!stylesheetLoaded) {
+            var l   = document.createElement('link');
+            l.rel   = 'stylesheet';
+            l.type  = 'text/css';
+            l.media = 'screen';
+            l.href  = stylesheetURI;
+            
+            document.getElementsByTagName('head')[0].appendChild(l);
+        }
+    };
+    
+    /**
      * Makes an element's triples (from children and self) editable
      * @private
      */
@@ -329,10 +363,10 @@ RDFauthor = (function () {
          * add hash id
          * store id => statement
          */
-         var id = $(element).attr('id');
+         var id = jQuery(element).attr('id');
          if (undefined === id) {
              id = RDFauthor.nextID(ELEMENT_ID_PREFIX);
-             $(element).attr('id', id);
+             jQuery(element).attr('id', id);
          }
          
          _statementsByElemendID[id] = statement;
@@ -381,7 +415,7 @@ RDFauthor = (function () {
         	},
         	parser: {
         		strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-        		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+        		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|jQuery)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
         	}
         };
         
@@ -394,13 +428,36 @@ RDFauthor = (function () {
     	}
     	
     	uri[o.q.name] = {};
-    	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-    		if ($1) {
-    		    uri[o.q.name][$1] = $2;
+    	uri[o.key[12]].replace(o.q.parser, function (jQuery0, jQuery1, jQuery2) {
+    		if (jQuery1) {
+    		    uri[o.q.name][jQuery1] = jQuery2;
     		}
     	});
     	
     	return uri;
+    };
+    
+    /**
+     * Populates the given view with statements.
+     * @private
+     */
+    function _populateView(view) {
+        if (arguments.length == 0) {
+            view = RDFauthor.getView();
+        }
+        view.reset();
+        
+        for (var graph in _databanksByGraph) {
+            var updateEndpoint = RDFauthor.serviceURIForGraph(graph);
+            if (undefined !== updateEndpoint) {
+                var triples = _databanksByGraph[graph].triples();
+                for (var i = 0, length = triples.length; i < length; i++) {
+                    // init statement
+                    var statement = new Statement(triples[i], {'graph': graph});
+                    view.addWidget(statement);
+                }
+            }
+        }
     };
     
     /**
@@ -440,8 +497,8 @@ RDFauthor = (function () {
     function _showView() {
         /* make sure, view has predicate info available */
         _fetchPredicateInfo(function() {
-            var view = that.getView();
-            view.display();
+            var view = RDFauthor.getView();
+            view.show();
         });
     };
     
@@ -477,11 +534,17 @@ RDFauthor = (function () {
     };
     
     // load required scripts
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js'); /* Statement */
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.widget.js');    /* Widget */
-    _loadScript(__RDFA_BASE + 'rdfa.js', _ready);               /* RDFA */
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');     /* Statement */
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js');  /* Predicate Row */
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js');  /* Subject Group */
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');          /* View */
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.widget.js');        /* Widget */
+    _loadScript(__RDFA_BASE + 'rdfa.js', _ready);                   /* RDFA */
     
-    /* default info predicates */
+    // load stylesheets
+    _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
+    
+    // default info predicates
     _addInfoPredicate(RDF_NS + 'type', 'type');
     _addInfoPredicate(RDFS_NS + 'range', 'range');
     _addInfoPredicate(RDFS_NS + 'label', 'label');
@@ -610,6 +673,43 @@ RDFauthor = (function () {
         },
         
         /**
+         * Returns the current view instance
+         */
+        getView: function () {
+            if (null === _view) {
+                if (jQuery('.modal-wrapper').length < 1) {
+                    jQuery('body').append('<div class="modal-wrapper" style="display:none"></div>');
+                }
+                
+                var that = this;
+                var jModalWrapper = jQuery('.modal-wrapper').eq(0);
+                var options = jQuery.extend(this.options, {
+                    beforeSubmit: function () {
+                        // keep db before changes
+                        that.cloneDatabanks();
+                    }, 
+                    afterSubmit: function () {
+                        that.updateSources();
+                        that.view = null;
+                    }, 
+                    afterCancel: function () {
+                        that.cancelEditing();
+                        if (typeof instance.options.onCancel == 'function') {
+                            that.options.onCancel();
+                        }
+                        that.view = null;
+                    }, 
+                    container: jModalWrapper
+                });
+                
+                // init view
+                _view = new View(options);
+            }
+            
+            return _view;
+        }, 
+        
+        /**
          * Returns an instance of the widget that has been registered for <code>hookName</code> and <code>hookValue</code>.
          * @param {string} hookName
          * @param {mixed} hookValue
@@ -631,7 +731,30 @@ RDFauthor = (function () {
          * @param {Statement} statement
          */
         getWidgetForStatement: function (statement) {
+            var widgetConstructor = null;
             
+            /* ... */
+            
+            // fallback to default widgets
+            if (null === widgetConstructor) {
+                if (statement.hasObject()) {
+                    var ot = statement.objectType();
+                    if (ot == 'literal') {
+                        widgetConstructor = _registeredWidgets[LITERAL_HOOK][''];
+                    } else {
+                        widgetConstructor = _registeredWidgets[OBJECT_HOOK][''];
+                    }
+                } else {
+                    widgetConstructor = _registeredWidgets[DEFAULT_HOOK][''];
+                }
+            }
+
+            var widgetInstance = null;
+            if (typeof widgetConstructor == 'function') {
+                widgetInstance = new widgetConstructor(statement);
+            }
+
+            return widgetInstance;
         },
         
         /**
@@ -711,27 +834,17 @@ RDFauthor = (function () {
          * @param {string} stylesheetURI
          */
         loadStylesheet: function (stylesheetURI) {
-            var stylesheetLoaded = false;
-            var links = document.getElementsByTagName('link');
-            
-            for (var i = 0, max = links.length; i < max; i++) {
-                var uri = links[i].getAttribute('href');
-                if ((uri && uri == stylesheetURI)) {
-                    stylesheetLoaded = true;
-                    break;
-                }
-            }
-            
-            if (!stylesheetLoaded) {
-                var l   = document.createElement('link');
-                l.rel   = 'stylesheet';
-                l.type  = 'text/css';
-                l.media = 'screen';
-                l.href  = stylesheetURI;
-                
-                document.getElementsByTagName('head')[0].appendChild(l);
-            }
+            _loadStylesheet(stylesheetURI);
         },
+        
+        namespaces: function () {
+            return {
+                'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#', 
+                'rdfs': 'http://www.w3.org/2000/01/rdf-schema#', 
+                'owl': 'http://www.w3.org/2002/07/owl#', 
+                'xsd': 'http://www.w3.org/2001/XMLSchema#'
+            }
+        }, 
         
         /**
          * With every call, returns a unique ID that can be used to build id attributes
@@ -855,6 +968,8 @@ RDFauthor = (function () {
                 throw "Registered object does not conform to 'Widget' interface.";
             }
             
+            widgetSpec = jQuery.extend({hookValues: ['']}, widgetSpec);
+            
             if (_registeredWidgets[widgetSpec.hookName]) {
                 // Register for all hook values
                 for (var i = 0; i < widgetSpec.hookValues.length; i++) {
@@ -903,7 +1018,7 @@ RDFauthor = (function () {
          * @param {object} optionSpec
          */
         setOptions: function (optionSpec) {
-            _options = $.extend(_options, optionSpec);
+            _options = jQuery.extend(_options, optionSpec);
         }, 
         
         /**
@@ -918,12 +1033,17 @@ RDFauthor = (function () {
                 /* parse */
                 _parse(function() {
                     /* display view */
+                    _populateView();
                     _showView();
                 });
             } else {
-                /* auto-parsing off, triples were added manually */
+                /* auto-parsing off, statements were added manually */
+                _populateView();
                 _showView();
             }
         }
     }
 })();
+
+RDFauthor.loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editliteral.js');
+RDFauthor.loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.js');
