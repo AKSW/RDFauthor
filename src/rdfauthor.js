@@ -13,28 +13,28 @@
  */
 RDFauthor = (function () {
     /** Namespace for update predicates */
-    const UPDATE_NS = 'http://ns.aksw.org/update/';
+    var UPDATE_NS = 'http://ns.aksw.org/update/';
     
     /** RDF namespace */
-    const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+    var RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
     
     /** RDFS namespace */
-    const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
+    var RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
     
     /** OWL namespace */
-    const OWL_NS = 'http://www.w3.org/2002/07/owl#';
+    var OWL_NS = 'http://www.w3.org/2002/07/owl#';
     
     /** Default generic hook name */
-    const DEFAULT_HOOK = '__DEFAULT__';
+    var DEFAULT_HOOK = '__DEFAULT__';
     
     /** Default hook name for objects */
-    const OBJECT_HOOK  = '__OBJECT__';
+    var OBJECT_HOOK  = '__OBJECT__';
     
     /** Default hook name for literals */
-    const LITERAL_HOOK = '__LITERAL__';
+    var LITERAL_HOOK = '__LITERAL__';
     
     /** Prefix for ad-hoc IDs */
-    const ELEMENT_ID_PREFIX = 'el-';
+    var ELEMENT_ID_PREFIX = 'el-';
     
     /** Databanks indexed by graph URI. */
     var _databanksByGraph = {};
@@ -338,7 +338,16 @@ RDFauthor = (function () {
             s.src  = scriptURI;
             
             if (typeof callback == 'function') {
-                s.onload = callback;
+                if (s.all) {
+                    s.onreadystatechange = function () {
+                        if (this.readyState === 'loaded' || this.readyState === 'complete') {
+                            callback();
+                        }
+                    }
+                } else {
+                    // works: Safari, Chrome, Firefox
+                    s.onload = callback;
+                }
             }
             
             document.getElementsByTagName('head')[0].appendChild(s);
