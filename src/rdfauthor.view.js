@@ -86,6 +86,14 @@ function View(options) {
             jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
             jQuery('#' + this.cssID()).resizable();
         }
+        
+        jQuery('#' + this.cssID()).find('#rdfAuthorButtonCancel').live('click', function () {
+            alert('Cancel');
+        });
+
+        jQuery('#' + this.cssID()).find('#rdfAuthorButtonSubmit').live('click', function () {
+            alert('Submit');
+        });
     }
 }
 

@@ -277,7 +277,7 @@ div.modal-wrapper {
 }
 
 #rdfAuthorView .add-button, #rdfAuthorView .delete-button, 
-.rdfAuthorInline    .add-button, .rdfAuthorInline    .delete-button {
+.rdfAuthorInline .add-button, .rdfAuthorInline .delete-button {
     width: 16px;
     height: 16px;
 /*    margin: 1px 0;*/
@@ -287,7 +287,7 @@ div.modal-wrapper {
     background-image: url('./../img/badge-add.png');
 }
 
-#rdfAuthorView .add-button: hover, .rdfAuthorInline .add-button: hover {
+#rdfAuthorView .add-button:hover, .rdfAuthorInline .add-button:hover {
     background-position: -16px;
 }
 
@@ -295,7 +295,7 @@ div.modal-wrapper {
     background-image: url('./../img/badge-delete.png');
 }
 
-#rdfAuthorView .delete-button: hover, .rdfAuthorInline .delete-button: hover {
+#rdfAuthorView .delete-button:hover, .rdfAuthorInline .delete-button:hover {
     background-position: -16px;
 }
 
@@ -320,7 +320,7 @@ div.modal-wrapper {
     border-top-color: #ccc;
 }
 
-.disclosure-button-horizontal: hover {
+.disclosure-button-horizontal:hover {
     background-position: -30px center !important;
 }
 
@@ -328,7 +328,7 @@ div.modal-wrapper {
     background-position: 0px center !important;
 }
 
-.disclosure-button-horizontal.open: hover {
+.disclosure-button-horizontal.open:hover {
     background-position: -10px center !important;
 }
 
@@ -349,7 +349,7 @@ div.modal-wrapper {
     border-top-color: #ccc;
 }
 
-.disclosure-button-vertical: hover {
+.disclosure-button-vertical:hover {
     background-position: center -30px !important;
 }
 
@@ -357,7 +357,7 @@ div.modal-wrapper {
     background-position: center 0px !important;
 }
 
-.disclosure-button-vertical.open: hover {
+.disclosure-button-vertical.open:hover {
     background-position: center -10px !important;
 }
 

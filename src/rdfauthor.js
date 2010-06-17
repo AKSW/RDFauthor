@@ -206,6 +206,29 @@ RDFauthor = (function () {
     };
     
     /**
+     * Creates a new widget base object ensuring it uses the abstract 
+     * Widget as its prototype object.
+     * @return {Object}
+     */
+    function _createWidget(widgetSpec) {
+        // 1. establish prototype chain
+        // 2. check interface
+        // 3. return instantiable widget
+        
+        var F = function () {};
+        F.prototype = Widget;
+        
+        var W = function (statement) {
+            this.ID = RDFauthor.nextID();
+            this.statement = statement;
+        };
+        W.prototype = jQuery.extend(new F(), widgetSpec);
+        W.prototype.constructor = W;
+        
+        return W;
+    };
+    
+    /**
      * Loads info predicates for all predicates
      * @private
      */ 
@@ -589,20 +612,6 @@ RDFauthor = (function () {
         }, 
         
         /**
-         * Creates a new widget base object ensuring it uses the abstract 
-         * Widget as its prototype object.
-         * @return {Object}
-         */
-        createWidget: function() {
-            var F = function () {
-                this.ID = RDFauthor.nextID();
-                Widget.construct.apply(this, arguments);
-            };
-            F.prototype = Widget;
-            return F;
-        }, 
-        
-        /**
          * Returns the jQuery.rdf.databank that stores statements for graph denoted by <code>graphURI</code>.
          * @param {string} graphURI
          * @return {jQuery.rdf.databank}
@@ -613,7 +622,7 @@ RDFauthor = (function () {
             }
             
             return _databanksByGraph[graphURI];
-        },
+        }, 
         
         /**
          * Returns the default graph URI.
@@ -953,29 +962,30 @@ RDFauthor = (function () {
         
         /**
          * Registers a new widget type.
+         * @param {object} widgetObject An object conforming the the widget specification.
          * @param {object} widgetSpec An object with the following keys:
          *  <ul>
-         *  <li><code>constructorFunction</code> A reference to or the name of the constructor function 
-         *                            for instances of that widget</li>
-         *  <li><code>hookName</code> One of <code>resource</code>, <code>property</code>, <code>range</code>, 
+         *  <li><code>widgetSpec</code> One of <code>resource</code>, <code>property</code>, <code>range</code>, 
          *                            <code>datatype</code></li>
-         *  <li><code>hookValues</code> An array of possible values for hookName that trigger the widget</li>
+         *  <li><code>hookSpec</code> An array of possible values for hookName that trigger the widget</li>
          *  </ul>
          */
-        registerWidget: function (widgetSpec) {
+        registerWidget: function (widgetSpec, hookSpec) {
             // Check interface conformance
-            if (!_checkInterface(widgetSpec, Widget)) {
-                throw "Registered object does not conform to 'Widget' interface.";
-            }
+            // if (!_checkInterface(widgetSpec, Widget)) {
+            //     throw "Registered object does not conform to 'Widget' interface.";
+            // }
             
-            widgetSpec = jQuery.extend({hookValues: ['']}, widgetSpec);
+            // the default hook value is an empty string (any value)
+            hookSpec = jQuery.extend({hookValues: ['']}, hookSpec);
             
-            if (_registeredWidgets[widgetSpec.hookName]) {
+            // is the hook supported for which the widget attemps to register?
+            if (_registeredWidgets[hookSpec.hookName]) {
                 // Register for all hook values
-                for (var i = 0; i < widgetSpec.hookValues.length; i++) {
-                    var value = widgetSpec.hookValues[i];
-                    if (!_registeredWidgets[widgetSpec.hookName][value]) {
-                        _registeredWidgets[widgetSpec.hookName][value] = widgetSpec.constructorFunction;
+                for (var i = 0; i < hookSpec.hookValues.length; i++) {
+                    var value = hookSpec.hookValues[i];
+                    if (!_registeredWidgets[hookSpec.hookName][value]) {
+                        _registeredWidgets[hookSpec.hookName][value] = _createWidget(widgetSpec);
                     }
                 }
             }

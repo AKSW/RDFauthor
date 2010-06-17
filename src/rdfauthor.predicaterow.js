@@ -139,6 +139,9 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         // append HTML
         jQuery('#' + this._idPrefix + this._id).children('fieldset').append(widgetHTML);
         
+        // widget markup ready
+        widgetInstance.ready();
+        
         return this._widgetIDPrefix + widgetID;
     }
 }

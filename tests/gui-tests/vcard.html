@@ -9,14 +9,17 @@
     <link about="" rel="u:queryEndpoint" href="http://localhost/OntoWiki/sparql" />
     <link about="" rel="u:updateEndpoint" href="http://localhost/OntoWiki/update/" />
     
-    <!--script type="text/javascript" src="../../libraries/jquery.js"></script>
+    <script type="text/javascript" src="../../libraries/jquery.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.3/jquery-ui.min.js"></script>
     <script type="text/javascript" src="../../libraries/jquery.rdfquery.core.js"></script>
     
     <script type="text/javascript">
         var RDFAUTHOR_BASE = 'http://localhost/rdfauthor';
+        RDFAUTHOR_READY_CALLBACK = function() {
+            RDFauthor.start();
+        }
     </script>
-    <script type="text/javascript" src="../../src/rdfauthor.js"></script-->
+    <script type="text/javascript" src="../../src/rdfauthor.js"></script>
     
     <style type="text/css">
         /* semantic css :) */
@@ -28,14 +31,6 @@
 </head>
 
 <body>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            // RDFAUTHOR_READY_CALLBACK = function() {
-            //     RDFauthor.start();
-            // }
-        });
-    </script>
-    
     <div xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ldap="http://purl.net/net/ldap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" class="vcard" about="http://bis.ontowiki.net/ThomasRiechert" typeof="foaf:Person">
         
         <span rel="foaf:depiction">

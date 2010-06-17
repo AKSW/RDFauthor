@@ -4,8 +4,8 @@
  * <code>MyWidget.prototype = Widget;</code> or make sure you implement all 
  * the functions yourself.
  */
-Widget = {
-    removeOnSubmit: false, 
+var Widget = {
+    removeOnSubmit: false,  
     
     /**
      * Default widget constructor.
@@ -16,11 +16,18 @@ Widget = {
     
     /**
      * This function gets called by the framework once a widget is used.
-     * You can rely on the widget's markup to already be in the DOM.
      */
     init: function () {
         
     }, 
+    
+    /**
+     * This function gets called by the framework once a widget is ready.
+     * You can rely on the widget's markup to already be in the DOM.
+     */
+    ready: function () {
+        
+    },
     
     /**
      * Returns the widget's markup code.
