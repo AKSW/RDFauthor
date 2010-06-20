@@ -254,39 +254,56 @@ RDFauthor = (function () {
                     WHERE {' + patterns.join(' UNION ') + ' FILTER(' + filters.join(' || ') + ')}';
                 // query = query.replace(/\s+/g, ' ');
                 
+                // use first graph for now
+                var graph;
+                for (var g in _graphInfo) {
+                    graph = g;
+                    break;
+                }
+                
+                // fallback to default graph
+                if (undefined === graph) {
+                    graph = RDFauthor.defaultGraphURI();
+                }
+                
                 /* TODO: for each graph */
-                RDFauthor.queryGraph(RDFauthor.defaultGraphURI(), query, {
-                    callbackSuccess: function(result) {
-                        if (result['results'] && result['results']['bindings']) {
-                            for (var r in result['results']['bindings']) {
-                                /* build  */
-                                var predicate, infoPredicate, infoValue;
-                                for (var current in result['results']['bindings'][r]) {
-                                    switch (current) {
-                                        case 'predicate': 
-                                            predicate = result['results']['bindings'][r][current].value;
-                                            break;
-                                        default:
-                                            infoPredicate = _infoShortcuts[current];
-                                            infoValue     = result['results']['bindings'][r][current].value;
+                try {
+                    RDFauthor.queryGraph(graph, query, {
+                        callbackSuccess: function(result) {
+                            if (result['results'] && result['results']['bindings']) {
+                                for (var r in result['results']['bindings']) {
+                                    /* build  */
+                                    var predicate, infoPredicate, infoValue;
+                                    for (var current in result['results']['bindings'][r]) {
+                                        switch (current) {
+                                            case 'predicate': 
+                                                predicate = result['results']['bindings'][r][current].value;
+                                                break;
+                                            default:
+                                                infoPredicate = _infoShortcuts[current];
+                                                infoValue     = result['results']['bindings'][r][current].value;
+                                        }
                                     }
-                                }
 
-                                /* build info structure */
-                                if (undefined === _predicateInfo[predicate]) {
-                                    _predicateInfo[predicate] = {};
+                                    /* build info structure */
+                                    if (undefined === _predicateInfo[predicate]) {
+                                        _predicateInfo[predicate] = {};
+                                    }
+                                    if (undefined === _predicateInfo[predicate][infoPredicate]) {
+                                        _predicateInfo[predicate][infoPredicate] = [];
+                                    }
+                                    _predicateInfo[predicate][infoPredicate].push(infoValue);
                                 }
-                                if (undefined === _predicateInfo[predicate][infoPredicate]) {
-                                    _predicateInfo[predicate][infoPredicate] = [];
-                                }
-                                _predicateInfo[predicate][infoPredicate].push(infoValue);
                             }
-                        }
-                        
-                        _callIfIsFunction(callback);
-                    }, 
-                    async: false
-                });
+
+                            _callIfIsFunction(callback);
+                        }, 
+                        async: false
+                    })
+                } catch (e) {
+                    // TODO: 
+                    _callIfIsFunction(callback);
+                }
             }
         }
     }
@@ -566,12 +583,17 @@ RDFauthor = (function () {
     };
     
     // load required scripts
+    // FIXME: Widget sometimes not loaded
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.widget.js');        /* Widget */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');     /* Statement */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js');  /* Predicate Row */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js');  /* Subject Group */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');          /* View */
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.widget.js');        /* Widget */
-    _loadScript(__RDFA_BASE + 'rdfa.js', _ready);                   /* RDFA */
+    _loadScript(__RDFA_BASE + 'rdfa.js'/*, _ready*/);                   /* RDFA */
+    
+    // load widgets
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editliteral.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.js', _ready);
     
     // load stylesheets
     _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
@@ -1063,6 +1085,3 @@ RDFauthor = (function () {
         }
     }
 })();
-
-RDFauthor.loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editliteral.js');
-RDFauthor.loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.js');

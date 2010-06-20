@@ -68,8 +68,8 @@ function View(options) {
         if (instance._options.showButtons) {
             buttonHTML = '\
                 <div id="rdfAuthorButtons">\
-                    <button type="button" class="rdfAuthorButtonCancel">' + instance._options.cancelButtonTitle + '</button>\
-                    <button type="button" class="rdfAuthorButtonSave">' + instance._options.saveButtonTitle + '</button>\
+                    <button type="button" id="rdfauthor-button-cancel">' + instance._options.cancelButtonTitle + '</button>\
+                    <button type="button" id="rdfauthor-button-submit">' + instance._options.saveButtonTitle + '</button>\
                 </div>';
         }
         
@@ -84,15 +84,15 @@ function View(options) {
         // make draggable if jQuery UI loaded
         if (typeof jQuery.ui != 'undefined' && !jQuery('#' + this.cssID()).hasClass('ui-draggable')) {
             jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
-            jQuery('#' + this.cssID()).resizable();
+            // jQuery('#' + this.cssID()).resizable();
         }
         
-        jQuery('#' + this.cssID()).find('#rdfAuthorButtonCancel').live('click', function () {
-            alert('Cancel');
+        jQuery('#rdfauthor-button-cancel').live('click', function () {
+            jQuery('body').trigger('rdfauthor.view.cancel');
         });
 
-        jQuery('#' + this.cssID()).find('#rdfAuthorButtonSubmit').live('click', function () {
-            alert('Submit');
+        jQuery('#rdfauthor-button-submit').live('click', function () {
+            jQuery('body').trigger('rdfauthor.view.submit');
         });
     }
 }
@@ -126,7 +126,7 @@ View.prototype = {
      * Returns the currently active subject group.
      * @return SubjectGroup
      */
-    activeSubjectGroup: function() {
+    activeSubjectGroup: function () {
         return this.getSubjectGroup(this.activeSubject);
     }, 
     
@@ -173,6 +173,13 @@ View.prototype = {
         return this._subjectCount;
     }, 
     
+    position: function () {
+        var cw = this._container.width();
+        var w  = jQuery(this.getElement()).width();
+        
+        jQuery(this.getElement()).css('left', 0.5 * (cw - w) + 'px');
+    }, 
+    
     /**
      * Resets this view instance
      */
@@ -199,6 +206,8 @@ View.prototype = {
                 // TODO: trigger event
             });
         }
+        
+        this.position();
     }, 
     
     /**

@@ -2,15 +2,15 @@
     "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
-<head xmlns:u="http://ns.aksw.org/update/">
+<head xmlns:update="http://ns.aksw.org/update/">
     <title>RDFauthor vCard Test Page</title>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     
-    <link about="" rel="u:queryEndpoint" href="http://localhost/OntoWiki/sparql" />
-    <link about="" rel="u:updateEndpoint" href="http://localhost/OntoWiki/update/" />
+    <link about="http://localhost/rdfauthor/test/" rel="update:queryEndpoint" href="http://localhost/OntoWiki/sparql" />
+    <link about="http://localhost/rdfauthor/test/" rel="update:updateEndpoint" href="http://localhost/OntoWiki/update/" />
     
     <script type="text/javascript" src="../../libraries/jquery.js"></script>
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../../libraries/jquery-ui.js"></script>
     <script type="text/javascript" src="../../libraries/jquery.rdfquery.core.js"></script>
     
     <script type="text/javascript">
@@ -30,8 +30,8 @@
     </style>
 </head>
 
-<body>
-    <div xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ldap="http://purl.net/net/ldap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" class="vcard" about="http://bis.ontowiki.net/ThomasRiechert" typeof="foaf:Person">
+<body xmlns:update="http://ns.aksw.org/update/">
+    <div update:from="http://localhost/rdfauthor/test/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ldap="http://purl.net/net/ldap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" class="vcard" about="http://bis.ontowiki.net/ThomasRiechert" typeof="foaf:Person">
         
         <span rel="foaf:depiction">
             <img src="http://bis.informatik.uni-leipzig.de/images/jpegPhoto.php?name=sn&amp;value=Riechert" alt="depiction of Thomas Riechert"/>

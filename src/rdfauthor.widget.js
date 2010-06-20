@@ -5,14 +5,7 @@
  * the functions yourself.
  */
 var Widget = {
-    removeOnSubmit: false,  
-    
-    /**
-     * Default widget constructor.
-     */
-    construct: function (statement) {
-        this.statement = statement;
-    }, 
+    removeOnSubmit: false, 
     
     /**
      * This function gets called by the framework once a widget is used.
@@ -42,8 +35,8 @@ var Widget = {
      */
     focus: function () {
         var el = this.element();
-        if (el && (el.tagName == 'input' || el.tagName == 'textarea')) {
-            jQuery(el).focus();
+        if (el && (el.get(0).tagName.toLowerCase() == 'input' || el.get(0).tagName.toLowerCase() == 'textarea')) {
+            el.focus();
         };
     }, 
     
@@ -74,7 +67,7 @@ var Widget = {
     }, 
     
     /**
-     * Returns a reference to the widgets main input element.
+     * Returns a reference to the widget's jQuery-wrapped main input element.
      * If the widget has more than one main input elements, a reference to the first
      * one in DOM order should be returned.
      */

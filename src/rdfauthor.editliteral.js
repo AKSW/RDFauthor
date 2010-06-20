@@ -4,27 +4,63 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 RDFauthor.registerWidget({
-    name: 'LiteralEdit', 
-    
     init: function () {
-        this.disclosureID = RDFauthor.nextID();
+        this.disclosureID = 'disclosure-' + RDFauthor.nextID();
         this.languages    = RDFauthor.literalLanguages();
         this.datatypes    = RDFauthor.literalDatatypes();
         this.namespaces   = RDFauthor.namespaces();
 
         this.languages.unshift('');
         
-        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/autoresize.jquery.min.js');
+        // RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/autoresize.jquery.min.js');
     }, 
     
     ready: function () {
+        var widget = this;
+        
+        // disclosure button
+        jQuery('#' + widget.disclosureID).click(function () {
+            var close = $(this).hasClass('open') ? true : false;
+
+            // update UI accordingly
+            var button = this;
+            if (close) {
+                $('.' + widget.disclosureID).fadeIn(250, function() {
+                    $(button).removeClass('open').addClass('closed');
+                });
+            } else {
+                $('.' + widget.disclosureID).fadeOut(250, function() {
+                    $(button).removeClass('cosed').addClass('open');
+                });
+            }
+        });
+        
+        // literal options
+        $('.literal-type .radio').click(function() {
+            var jDatatypeSelect = $('#' + $(this).attr('name').replace('literal-type', 'literal-datatype')).eq(0);
+            var jLangSelect     = $('#' + $(this).attr('name').replace('literal-type', 'literal-lang')).eq(0);
+
+            if ($(this).val() == 'plain') {
+                jDatatypeSelect.closest('div').hide();
+                jLangSelect.closest('div').show();
+                // clear datatype
+                jDatatypeSelect.val('');
+            } else {
+                jDatatypeSelect.closest('div').show();
+                jLangSelect.closest('div').hide();
+                // clear lang
+                jLangSelect.val('');
+            }
+        });
         
     }, 
     
     isLarge: function () {
-        var objectValue = this.statement.objectValue();
-        if (objectValue.search) {
-            return ((objectValue.length >= 50) || 0 <= objectValue.search(/\n/));
+        if (this.statement.hasObject()) {
+            var objectValue = this.statement.objectValue();
+            if (objectValue.search) {
+                return ((objectValue.length >= 50) || 0 <= objectValue.search(/\n/));
+            }
         }
 
         return false;
@@ -68,14 +104,14 @@ RDFauthor.registerWidget({
     markup: function () {
         var areaConfig = {
             rows: (this.isLarge() ? '3' : '1'), 
-            style: (this.isLarge() ? 'width:29em' : 'width:16em;height:1.4em;padding-top:0.2em'), 
+            style: (this.isLarge() ? 'width:29em' : 'width:16em;height:1.3em;padding-top:0.2em'), 
             buttonClass: (this.isLarge()) ? 'disclosure-button-horizontal' : 'disclosure-button-vertical'
         }
 
         var areaMarkup = '\
             <div class="container literal-value">\
                 <textarea rows="' + String(areaConfig.rows) + '" cols="20" style="' + areaConfig.style + '" id="literal-value-' + 
-                    this.ID + '">' + this.statement.objectValue() + '</textarea>\
+                    this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
             </div>\
             <div class="container util" style="clear:left">\
                 <a class="disclosure-button ' + areaConfig.buttonClass + ' open" id="' + this.disclosureID 
@@ -86,9 +122,9 @@ RDFauthor.registerWidget({
             ' + areaMarkup + '\
             <div class="container literal-type util ' + this.disclosureID + '" style="display:none">\
                 <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"' 
-                        + (this.statement.objectDatatype ? '' : ' checked="checked"') + ' value="plain" />Plain</label>\
+                        + (this.statement.objectDatatype() ? '' : ' checked="checked"') + ' value="plain" />Plain</label>\
                 <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"' 
-                        + (this.statement.objectDatatype ? ' checked="checked"' : '') + ' value="typed" />Typed</label>\
+                        + (this.statement.objectDatatype() ? ' checked="checked"' : '') + ' value="typed" />Typed</label>\
             </div>\
             <div class="container util ' + this.disclosureID + '" style="display:none">\
                 <div class="literal-lang"' + (this.statement.objectDatatype() ? ' style="display:none"' : '') + '>\
@@ -98,10 +134,10 @@ RDFauthor.registerWidget({
                         </select>\
                     </label>\
                 </div>\
-                <div class="literal-datatype"' + (this.statement.objectDatatype ? '' : ' style="display:none"') + '>\
+                <div class="literal-datatype"' + (this.statement.objectDatatype() ? '' : ' style="display:none"') + '>\
                     <label>Datatype:\
                         <select id="literal-datatype-' + this.ID + '" name="literal-datatype-' + this.ID + '">\
-                            ' + this.makeOptionString(this.datatypes, this.statement.objectDatatype, true) + '\
+                            ' + this.makeOptionString(this.datatypes, this.statement.objectDatatype(), true) + '\
                         </select>\
                     </label>\
                 </div>\
@@ -115,7 +151,7 @@ RDFauthor.registerWidget({
     }, 
     
     submit: function () {
-        alert('Submit');
+        alert('Literal: Submit');
     }
 }, {
     hookName: '__LITERAL__'

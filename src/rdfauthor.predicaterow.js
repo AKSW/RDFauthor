@@ -5,7 +5,7 @@
  */
 
 /**
- * Constructs a PredicateRow object that manages a number of widgets sharing 
+ * Constructs a PredicateRow object self manages a number of widgets sharing 
  * same subject and predicate.
  *
  * @param {string} subjectURI
@@ -33,14 +33,14 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     this._widgetIndicesByID = {};               // widgets indexed by id
     this._allowOverride     = allowOverride | false;    // whether to show override GUI (0.8 feature)
     
-    var that = this;
+    var self = this;
     
-    // local method that returns the basic HTML code for the row
+    // local method self returns the basic HTML code for the row
     function getChrome() {
         var html = '\
-            <div class="property-row" id="' + that.cssID() + '">\
+            <div class="property-row" id="' + self.cssID() + '">\
                 <fieldset>\
-                    <legend>' + that._title + '</legend>\
+                    <legend>' + self._title + '</legend>\
                 </fieldset>\
             </div>';
         
@@ -69,7 +69,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     // returns the widget HTML + widget chrome
     function getWidgetChrome(widgetID, widgetHTML) {
         var html = '\
-            <div class="widget" id="' + that._widgetIDPrefix + widgetID + '">\
+            <div class="widget" id="' + self._widgetIDPrefix + widgetID + '">\
                 <div class="container actions right">\
                     <a class="delete-button" title="Remove widget and data."></a>\
                     <a class="add-button" title="Add another widget of the same type."></a>\
@@ -82,7 +82,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     
     // Returns the next widget's index
     function nextWidgetIndex() {
-        return that._widgetCount++;
+        return self._widgetCount++;
     }
     
     // append chrome
@@ -90,14 +90,31 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     
     jQuery('#' + this.cssID() + ' .actions .delete-button').live('click', function () {
         var widgetID = $(this).closest('.widget').attr('id');
-        that.removeWidgetForID(widgetID);
+        self.removeWidgetForID(widgetID);
     });
     
     jQuery('#' + this.cssID() + ' .actions .add-button').live('click', function () {
         var widgetID = $(this).closest('.widget').attr('id');
-        var widget   = that.getWidgetForID(widgetID);
+        var widget   = self.getWidgetForID(widgetID);
         
-        that.addWidget(null, widget.construct);
+        var statement    = widget.statement;
+        var newStatement = new Statement({
+            subject: '<' + statement.subjectURI() + '>', 
+            predicate: '<' + statement.predicateURI() + '>'
+        }, {
+            graph: statement.graphURI()
+        });
+        self.addWidget(newStatement, widget.constructor, true);
+    });
+    
+    // attach to submit event
+    jQuery('body').bind('rdfauthor.view.submit', function () {
+        self.onSubmit();
+    });
+    
+    // attach to cancel event
+    jQuery('body').bind('rdfauthor.view.cancel', function () {
+        self.onCancel();
     });
     
     /**
@@ -105,12 +122,13 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
      * @param {Statement} statement
      * @param {function} constructor The widget's constructor function (optional)
      */
-    this.addWidget = function (statement, constructor) {
+    this.addWidget = function (statement, constructor, activate) {
         var widgetInstance = null;
         
         // instantiate widget
         if ((constructor != undefined) && (typeof constructor == 'function')) {
             widgetInstance = new constructor(statement);
+            widgetInstance.constructor = constructor;
         } else {
             widgetInstance = RDFauthor.getWidgetForStatement(statement);
         }
@@ -141,6 +159,11 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         
         // widget markup ready
         widgetInstance.ready();
+        
+        // focus widget
+        if ((arguments.length >= 3) && activate) {
+            widgetInstance.focus();
+        }
         
         return this._widgetIDPrefix + widgetID;
     }
@@ -231,7 +254,7 @@ PredicateRow.prototype = {
         for (var i = 0; i < this.numberOfWidgets(); i++) {
             var widgetInstance = this.getWidget(i);
             if (widgetInstance) {
-                widgetInstance.onCancel();
+                widgetInstance.cancel();
             }
         }
     }, 
@@ -247,7 +270,7 @@ PredicateRow.prototype = {
         for (var i = 0; i < this.numberOfWidgets(); i++) {
             var widgetInstance = this.getWidget(i);
             if (widgetInstance) {
-                submitOk = widgetInstance.onSubmit() && submitOk;
+                submitOk = widgetInstance.submit() && submitOk;
             }
         }
 
