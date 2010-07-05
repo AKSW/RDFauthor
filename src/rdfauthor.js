@@ -594,7 +594,8 @@ RDFauthor = (function () {
     // load widgets
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editliteral.js');
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editxmlliteral.js', _ready);
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editxmlliteral.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editdate.js', _ready);
     
     // load stylesheets
     _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
@@ -1024,6 +1025,11 @@ RDFauthor = (function () {
             // if (!_checkInterface(widgetSpec, Widget)) {
             //     throw "Registered object does not conform to 'Widget' interface.";
             // }
+            
+            // ensure array
+            if (!jQuery.isArray(hooks)) {
+                hooks = [hooks];
+            }
             
             for (var i = 0, max = hooks.length; i < max; i++) {
                 // the default hook value is an empty string (any value)

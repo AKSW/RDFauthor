@@ -153,7 +153,7 @@ RDFauthor.registerWidget({
     submit: function () {
         alert('Literal: Submit');
     }
-}, [{
+}, {
         name: '__LITERAL__'
-    }]
+    }
 );
