@@ -240,6 +240,7 @@ RDFauthor.registerWidget({
         var ttt = text.replace(RegExp(term, 'i'), '<em>$&</em>');
         return ttt;
     }
-}, {
-    hookName: '__OBJECT__'
-});
+}, [{
+        name: '__OBJECT__'
+    }]
+);

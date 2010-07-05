@@ -1,0 +1,12 @@
+.xmlliteral-edit-panel {
+    width: 40em;
+}
+
+.xmlliteral-edit-input {
+    width: 39.4em;
+    border: 1px solid #ccc;
+    border-top: 0px;
+    padding: 0.4em;
+    margin: 0;
+    background-color: #fff;
+}

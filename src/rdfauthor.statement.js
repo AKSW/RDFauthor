@@ -271,7 +271,7 @@ Statement.prototype = {
     objectDatatype: function () {        
         if (this.hasObject()) {
             if (this._object.datatype) {
-                return this._object.datatype;
+                return String(this._object.datatype);
             }
         }
         
@@ -281,7 +281,7 @@ Statement.prototype = {
     objectLang: function () {
         if (this.hasObject()) {
             if (this._object.lang) {
-                return this.object.lang;
+                return String(this.object.lang);
             }
         }
         

@@ -17,7 +17,7 @@ RDFauthor.registerWidget({
     
     /*
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
-    // e.g. load jQuery plug-ins, attache event handlers etc.
+    // e.g. load jQuery plug-ins, attach event handlers etc.
     ready: function () {},
     */ 
     
@@ -28,7 +28,8 @@ RDFauthor.registerWidget({
     
     /*
     // Uncomment to give focus to your widget.
-    // Default implementation will giver focus to the return value of element().
+    // The default implementation will give focus to the first match in the 
+    // return value of element().
     focus: function () {},
     */ 
     
@@ -49,6 +50,12 @@ RDFauthor.registerWidget({
 }, {
     // hooks to register your widget for
     hooks: [{
+        /*
+        // Uncomment this if your widgets binds to the property hook, 
+        // and denote the type of property (ObjectProperty or DatatypeProperty).
+        // For other hooks this can be inferred automatically.
+        type: 'DatatypeProperty', 
+        */
         // name of first hook
         name: 'datatype',
         // array of values for first hook 

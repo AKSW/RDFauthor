@@ -593,7 +593,8 @@ RDFauthor = (function () {
     
     // load widgets
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editliteral.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.js', _ready);
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editxmlliteral.js', _ready);
     
     // load stylesheets
     _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
@@ -773,7 +774,21 @@ RDFauthor = (function () {
         getWidgetForStatement: function (statement) {
             var widgetConstructor = null;
             
-            /* ... */
+            var subjectURI   = statement.subjectURI();
+            var predicateURI = statement.predicateURI();
+            var rangeURI     = this.infoForPredicate(predicateURI, 'range');
+            var datatypeURI  = statement.hasObject() ? statement.objectDatatype() : null;
+            
+            // local widget selection
+            if (subjectURI in _registeredWidgets.resource) {
+                widgetConstructor = _registeredWidgets.resource[subjectURI];
+            } else if (predicateURI in _registeredWidgets.property) {
+                widgetConstructor = _registeredWidgets.property[predicateURI];
+            } else if (rangeURI in _registeredWidgets.range) {
+                widgetConstructor = _registeredWidgets.range[rangeURI];
+            } else if (datatypeURI in _registeredWidgets.datatype) {
+                widgetConstructor = _registeredWidgets.datatype[datatypeURI];
+            }
             
             // fallback to default widgets
             if (null === widgetConstructor) {
@@ -805,12 +820,15 @@ RDFauthor = (function () {
          * @return {Array}
          */
         infoForPredicate: function (predicateURI, infoSpec) {
-            if (undefined !== _infoShortcuts[infoSpec]) {
-                infoSpec = _infoShortcuts[infoSpec];
-            }
-            
-            if ((undefined !== _predicateInfo[predicateURI]) && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
-                return _predicateInfo[predicateURI][infoSpec];
+            // predicate info not yet loaded
+            if (null !== _predicateInfo) {
+                if (undefined !== _infoShortcuts[infoSpec]) {
+                    infoSpec = _infoShortcuts[infoSpec];
+                }
+
+                if ((undefined !== _predicateInfo[predicateURI]) && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
+                    return _predicateInfo[predicateURI][infoSpec];
+                }
             }
             
             return [];
@@ -1001,22 +1019,24 @@ RDFauthor = (function () {
          *  <li><code>hookSpec</code> An array of possible values for hookName that trigger the widget</li>
          *  </ul>
          */
-        registerWidget: function (widgetSpec, hookSpec) {
+        registerWidget: function (widgetSpec, hooks) {
             // Check interface conformance
             // if (!_checkInterface(widgetSpec, Widget)) {
             //     throw "Registered object does not conform to 'Widget' interface.";
             // }
             
-            // the default hook value is an empty string (any value)
-            hookSpec = jQuery.extend({hookValues: ['']}, hookSpec);
-            
-            // is the hook supported for which the widget attemps to register?
-            if (_registeredWidgets[hookSpec.hookName]) {
-                // Register for all hook values
-                for (var i = 0; i < hookSpec.hookValues.length; i++) {
-                    var value = hookSpec.hookValues[i];
-                    if (!_registeredWidgets[hookSpec.hookName][value]) {
-                        _registeredWidgets[hookSpec.hookName][value] = _createWidget(widgetSpec);
+            for (var i = 0, max = hooks.length; i < max; i++) {
+                // the default hook value is an empty string (any value)
+                var hookSpec = jQuery.extend({values: ['']}, hooks[i]);
+                
+                // is the hook supported for which the widget attemps to register?
+                if (_registeredWidgets[hookSpec.name]) {
+                    // Register for all hook values
+                    for (var i = 0; i < hookSpec.values.length; i++) {
+                        var value = hookSpec.values[i];
+                        if (!_registeredWidgets[hookSpec.name][value]) {
+                            _registeredWidgets[hookSpec.name][value] = _createWidget(widgetSpec);
+                        }
                     }
                 }
             }

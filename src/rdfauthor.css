@@ -123,12 +123,14 @@ div.modal-wrapper {
     background: #fff;
 }
 
-/*#rdfAuthorView textarea {
+/*
+#rdfAuthorView textarea {
     min-width: 30em;
     min-height: 18.5em;
     line-height: 1.5;
     font-size: 1em;
-}*/
+}
+*/
 
 #rdfAuthorView select {
     min-width: 20em;
