@@ -47,9 +47,8 @@ RDFauthor.registerWidget({
     submit: function () {
         
     }
-}, {
+}, [{
     // hooks to register your widget for
-    hooks: [{
         /*
         // Uncomment this if your widgets binds to the property hook, 
         // and denote the type of property (ObjectProperty or DatatypeProperty).
@@ -61,4 +60,4 @@ RDFauthor.registerWidget({
         // array of values for first hook 
         values: ['http://www.w3.org/2001/XMLSchema#string']
     }/* add more hooks here */]
-});
+);
