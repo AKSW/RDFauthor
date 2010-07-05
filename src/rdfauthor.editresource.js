@@ -116,9 +116,17 @@ RDFauthor.registerWidget({
         this.searchResults = [];
         var self = this;
         
+        var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
+        var rangePattern = '';
+        if (range.length > 0) {
+            // TODO: use all ranges
+            rangePattern = '?s a <' + range[0] + '> .';
+        }
+        
         // SPARQL endpoint
         var query = 'SELECT DISTINCT ?s ?o WHERE {\
             ?s ?p ?o .\
+            ' + rangePattern + '\
             FILTER (ISLITERAL(?o) && REGEX(?o, "' + searchTerm + '", "i"))\
         }\
         LIMIT ' + this.maxResults;
