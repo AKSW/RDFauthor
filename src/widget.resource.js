@@ -13,6 +13,9 @@ RDFauthor.registerWidget({
         this.ongoingSearches       = 0;
         this.searchResults         = [];
         
+        this._autocompleteLoaded = false;
+        this._domReady           = false;
+        
         // search sources appearence config
         this.sources = {
             sparql:     {label: 'Local Search',         color: '#efe', border: '#e3ffe3', rank:  1}, 
@@ -21,7 +24,12 @@ RDFauthor.registerWidget({
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  3}
         }
         
-        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js');
+        var self = this;
+        // http://localhost/OntoWiki/libraries/RDFauthor/libraries/jquery.ui.autocomplete.js
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js', function () {
+            self._autocompleteLoaded = true;
+            self._initAutocomplete();
+        });
         
         // loac stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
@@ -29,67 +37,8 @@ RDFauthor.registerWidget({
     }, 
     
     ready: function () {
-        // must be URI
-        if (this.statement.hasObject()) {
-            this.element().addClass('resource-autocomplete-uri');
-        }
-        
-        var self = this;
-        this.element().autocomplete({
-            minChars: 3,
-            delay: 1000,
-            max: 20, 
-            search: function (event, ui) {
-                var value = self.element().val();
-                // cancel search if URI entered
-                if (self.isURI(value)) {
-                    self.element().addClass('resource-autocomplete-uri');
-                    self.element().data('autocomplete').close();
-                    
-                    self.selectedResource      = value;
-                    self.selectedResourceLabel = undefined;
-                    
-                    return false;
-                }
-                
-                self.element().removeClass('resource-autocomplete-uri');
-                return true;
-            }, 
-            source: function (request, response) {
-                // keep for later
-                self.searchTerm = request.term;
-                
-                // search
-                self.performSearch(request.term, response);
-            }, 
-            select: function (event, ui) {
-                self.selectedResource      = ui.item.value;
-                self.selectedResourceLabel = ui.item.label;
-                
-                self.element().val(this.selectedResourceLabel);
-                
-                // prevent jQuery UI default
-                return false;
-            }, 
-            focus: function (event, ui) {
-                self.element().val(ui.item.label)
-                
-                // prevent jQuery UI default
-                return false;
-            }
-        })
-        .data('autocomplete')._renderItem = function(ul, item) {
-            return $('<li></li>')
-                .data('item.autocomplete', item)
-                .append('<a class="resource-edit-item" style="background-color: ' + self.sources[item.source]['color'] + ';\
-                        border:1px solid ' + self.sources[item.source]['border'] + ';">\
-                    <span class="resource-edit-source">' + self.sources[item.source]['label'] + '</span>\
-                    <span class="resource-edit-label">' + self.highlight(item.label, self.searchTerm) + '</span>\
-                    <span class="resource-edit-uri">' + self.highlight(item.value, self.searchTerm) + '</span>\
-                </a>')
-                .css('width', self.element().innerWidth() - 4)
-                .appendTo(ul);
-        };
+        this._domReady = true;
+        this._initAutocomplete();
     },
     
     element: function () {
@@ -241,6 +190,72 @@ RDFauthor.registerWidget({
     highlight: function (text, term) {
         var ttt = text.replace(RegExp(term, 'i'), '<em>$&</em>');
         return ttt;
+    }, 
+    
+    _initAutocomplete: function () {
+        if (this._autocompleteLoaded && this._domReady) {
+            // must be URI
+            if (this.statement.hasObject()) {
+                this.element().addClass('resource-autocomplete-uri');
+            }
+            
+            var self = this;
+            this.element().autocomplete({
+                minChars: 3,
+                delay: 1000,
+                max: 20, 
+                search: function (event, ui) {
+                    var value = self.element().val();
+                    // cancel search if URI entered
+                    if (self.isURI(value)) {
+                        self.element().addClass('resource-autocomplete-uri');
+                        self.element().data('autocomplete').close();
+
+                        self.selectedResource      = value;
+                        self.selectedResourceLabel = undefined;
+
+                        return false;
+                    }
+
+                    self.element().removeClass('resource-autocomplete-uri');
+                    return true;
+                }, 
+                source: function (request, response) {
+                    // keep for later
+                    self.searchTerm = request.term;
+
+                    // search
+                    self.performSearch(request.term, response);
+                }, 
+                select: function (event, ui) {
+                    self.selectedResource      = ui.item.value;
+                    self.selectedResourceLabel = ui.item.label;
+
+                    self.element().val(this.selectedResourceLabel);
+
+                    // prevent jQuery UI default
+                    return false;
+                }, 
+                focus: function (event, ui) {
+                    self.element().val(ui.item.label)
+
+                    // prevent jQuery UI default
+                    return false;
+                }
+            })
+            .data('autocomplete')._renderItem = function(ul, item) {
+                return $('<li></li>')
+                    .data('item.autocomplete', item)
+                    .append('<a class="resource-edit-item" style="background-color: ' + self.sources[item.source]['color'] + ';\
+                            border:1px solid ' + self.sources[item.source]['border'] + ';">\
+                        <span class="resource-edit-source">' + self.sources[item.source]['label'] + '</span>\
+                        <span class="resource-edit-label">' + self.highlight(item.label, self.searchTerm) + '</span>\
+                        <span class="resource-edit-uri">' + self.highlight(item.value, self.searchTerm) + '</span>\
+                    </a>')
+                    .css('width', self.element().innerWidth() - 4)
+                    .appendTo(ul);
+            };
+        }
     }
 }, [{
         name: '__OBJECT__'

@@ -36,6 +36,15 @@ RDFauthor = (function () {
     /** Prefix for ad-hoc IDs */
     var ELEMENT_ID_PREFIX = 'el-';
     
+    /** unknown state */
+    var SCRIPT_STATE_UNKNOWN = undefined;
+    
+    /** script is currently loading */
+    var SCRIPT_STATE_LOADING = 1;
+    
+    /** script is ready */
+    var SCRIPT_STATE_READY   = 2;
+    
     /** Databanks indexed by graph URI. */
     var _databanksByGraph = {};
     
@@ -71,6 +80,9 @@ RDFauthor = (function () {
     
     /** Predicate info */
     var _predicateInfo = null;
+    
+    /**  Callbacks to be executed when script loading finishes */
+    var _scriptCallbacks = {};
     
     /** Loaded JavaScript URIs */
     var _loadedScripts = {};
@@ -363,28 +375,56 @@ RDFauthor = (function () {
      * @param {function} function that will be called when the script finished loading (optional)
      */
     function _loadScript(scriptURI, callback) {
-        if (undefined === _loadedScripts[scriptURI]) {
+        if (_loadedScripts[scriptURI] === SCRIPT_STATE_UNKNOWN) {
+            // load script
             var s  = document.createElement('script');
             s.type = 'text/javascript';
             s.src  = scriptURI;
             
-            if (typeof callback == 'function') {
-                if (s.all) {
-                    s.onreadystatechange = function () {
-                        if (this.readyState === 'loaded' || this.readyState === 'complete') {
-                            callback();
-                        }
+            // callback handler fro loaded scripts
+            var _scriptReady = function () {
+                // now its ready
+                _loadedScripts[scriptURI] = SCRIPT_STATE_READY;
+
+                // script is ready, call all callbacks
+                if (jQuery.isArray(_scriptCallbacks[scriptURI])) {
+                    var callbacks = _scriptCallbacks[scriptURI];
+                    for (var i = 0, max = callbacks.length; i < max; i++) {
+                        callbacks[i]();
                     }
-                } else {
-                    // works: Safari, Chrome, Firefox
-                    s.onload = callback;
+                    _scriptCallbacks[scriptURI] = [];
                 }
             }
             
+            // set callback handler
+            if (s.all) {
+                s.onreadystatechange = function () {
+                    if (this.readyState === 'loaded' || this.readyState === 'complete') {
+                        _scriptReady();
+                    }
+                }
+            } else {
+                // works: Safari, Chrome, Firefox
+                s.onload = _scriptReady;
+            }
+            
+            // init callback store
+            _scriptCallbacks[scriptURI] = [];
+            // store callback if it is a function
+            if (arguments.length >= 2 && typeof callback == 'function') {
+                _scriptCallbacks[scriptURI].push(callback);
+            }
+            
             document.getElementsByTagName('head')[0].appendChild(s);
-            _loadedScripts[scriptURI] = true;
-        } else {
-            // script was already loaded, so execute callback immediately
+            
+            // set script to loading
+            _loadedScripts[scriptURI] = SCRIPT_STATE_LOADING;
+        } else if (_loadedScripts[scriptURI] === SCRIPT_STATE_LOADING) {
+            // script has been added, but still loading
+            // add callback to script's ready callback list
+            _scriptCallbacks[scriptURI].push(callback);
+        } else if (_loadedScripts[scriptURI] === SCRIPT_STATE_READY) {
+            // script is ready, execute callback immediately
             _callIfIsFunction(callback);
         }
     };
