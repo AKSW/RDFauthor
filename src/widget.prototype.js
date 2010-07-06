@@ -6,6 +6,15 @@
  */
 var Widget = {
     removeOnSubmit: false, 
+    options: {}, 
+    _maxWidth: 481, 
+    
+    /**
+     * Returns the available space the widget can use in pixels.
+     */
+    availableWidth: function () {
+        return this._maxWidth;
+    }, 
     
     /**
      * This function gets called by the framework once a widget is used.

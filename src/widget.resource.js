@@ -23,7 +23,7 @@ RDFauthor.registerWidget({
         
         // loac stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.css');
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
     }, 
     
     ready: function () {

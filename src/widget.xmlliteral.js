@@ -31,7 +31,7 @@ RDFauthor.registerWidget({
             self._loadNicEditor();
         });
         
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.editxmlliteral.css');
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.xmlliteral.css');
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 

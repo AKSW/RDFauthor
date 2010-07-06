@@ -7,7 +7,7 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
     init: function () {
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.editdate.css');
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.date.css');
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
@@ -37,8 +37,8 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup = 
-            '<div class="container">\
-                <input type="text" class="text" id="date-edit-' + this.ID + '" value="' 
+            '<div class="container" style="width:' + this.availableWidth() + 'px;">\
+                <input type="text" style="width:50%" class="text" id="date-edit-' + this.ID + '" value="' 
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
             </div>';
 

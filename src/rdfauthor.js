@@ -91,7 +91,8 @@ RDFauthor = (function () {
         cancelButtonTitle: 'cancelButtonTitle', 
         showButtons: true, 
         useAnimations: true, 
-        autoParse: true
+        autoParse: true, 
+        usePredicateInfo: true
     };
     
     /** Hash registered widgets */
@@ -218,9 +219,14 @@ RDFauthor = (function () {
         var F = function () {};
         F.prototype = Widget;
         
-        var W = function (statement) {
+        var W = function (statement, options) {
             this.ID = RDFauthor.nextID();
             this.statement = statement;
+            
+            // widget has options
+            if (arguments.length >= 2) {
+                this.options = jQuery.extend(this.options, options);
+            }
         };
         W.prototype = jQuery.extend(new F(), widgetSpec);
         W.prototype.constructor = W;
@@ -234,76 +240,81 @@ RDFauthor = (function () {
      */ 
     function _fetchPredicateInfo(callback) {        
         if (null === _predicateInfo) {
-            var selects  = '';
-            var filters  = [];
-            var patterns = [];
-            
-            for (infoPredicateURI in _infoPredicates) {
-                var variableName = _shortcutForInfoPredicate(infoPredicateURI);
-                selects += (' ?' + variableName);
-                filters.push('sameTerm(?predicate, <' + infoPredicateURI + '>)');
-                patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
-            }
-            /* init */
-            _predicateInfo = {};
-            
-            /* query */
-            if (patterns.length > 0) {
-                var query = '\
-                    SELECT DISTINCT ?predicate ' + selects + '\
-                    WHERE {' + patterns.join(' UNION ') + ' FILTER(' + filters.join(' || ') + ')}';
-                // query = query.replace(/\s+/g, ' ');
-                
-                // use first graph for now
-                var graph;
-                for (var g in _graphInfo) {
-                    graph = g;
-                    break;
+            if (_options.usePredicateInfo) {
+                var selects  = '';
+                var filters  = [];
+                var patterns = [];
+
+                for (infoPredicateURI in _infoPredicates) {
+                    var variableName = _shortcutForInfoPredicate(infoPredicateURI);
+                    selects += (' ?' + variableName);
+                    filters.push('sameTerm(?predicate, <' + infoPredicateURI + '>)');
+                    patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
                 }
-                
-                // fallback to default graph
-                if (undefined === graph) {
-                    graph = RDFauthor.defaultGraphURI();
-                }
-                
-                /* TODO: for each graph */
-                try {
-                    RDFauthor.queryGraph(graph, query, {
-                        callbackSuccess: function(result) {
-                            if (result['results'] && result['results']['bindings']) {
-                                for (var r in result['results']['bindings']) {
-                                    /* build  */
-                                    var predicate, infoPredicate, infoValue;
-                                    for (var current in result['results']['bindings'][r]) {
-                                        switch (current) {
-                                            case 'predicate': 
-                                                predicate = result['results']['bindings'][r][current].value;
-                                                break;
-                                            default:
-                                                infoPredicate = _infoShortcuts[current];
-                                                infoValue     = result['results']['bindings'][r][current].value;
+                /* init */
+                _predicateInfo = {};
+
+                /* query */
+                if (patterns.length > 0) {
+                    var query = '\
+                        SELECT DISTINCT ?predicate ' + selects + '\
+                        WHERE {' + patterns.join(' UNION ') + ' FILTER(' + filters.join(' || ') + ')}';
+                    // query = query.replace(/\s+/g, ' ');
+
+                    // use first graph for now
+                    var graph;
+                    for (var g in _graphInfo) {
+                        graph = g;
+                        break;
+                    }
+
+                    // fallback to default graph
+                    if (undefined === graph) {
+                        graph = RDFauthor.defaultGraphURI();
+                    }
+
+                    /* TODO: for each graph */
+                    try {
+                        RDFauthor.queryGraph(graph, query, {
+                            callbackSuccess: function(result) {
+                                if (result['results'] && result['results']['bindings']) {
+                                    for (var r in result['results']['bindings']) {
+                                        /* build  */
+                                        var predicate, infoPredicate, infoValue;
+                                        for (var current in result['results']['bindings'][r]) {
+                                            switch (current) {
+                                                case 'predicate': 
+                                                    predicate = result['results']['bindings'][r][current].value;
+                                                    break;
+                                                default:
+                                                    infoPredicate = _infoShortcuts[current];
+                                                    infoValue     = result['results']['bindings'][r][current].value;
+                                            }
                                         }
-                                    }
 
-                                    /* build info structure */
-                                    if (undefined === _predicateInfo[predicate]) {
-                                        _predicateInfo[predicate] = {};
+                                        /* build info structure */
+                                        if (undefined === _predicateInfo[predicate]) {
+                                            _predicateInfo[predicate] = {};
+                                        }
+                                        if (undefined === _predicateInfo[predicate][infoPredicate]) {
+                                            _predicateInfo[predicate][infoPredicate] = [];
+                                        }
+                                        _predicateInfo[predicate][infoPredicate].push(infoValue);
                                     }
-                                    if (undefined === _predicateInfo[predicate][infoPredicate]) {
-                                        _predicateInfo[predicate][infoPredicate] = [];
-                                    }
-                                    _predicateInfo[predicate][infoPredicate].push(infoValue);
                                 }
-                            }
 
-                            _callIfIsFunction(callback);
-                        }, 
-                        async: false
-                    })
-                } catch (e) {
-                    // TODO: 
-                    _callIfIsFunction(callback);
+                                _callIfIsFunction(callback);
+                            }, 
+                            async: false
+                        })
+                    } catch (e) {
+                        // TODO: 
+                        _callIfIsFunction(callback);
+                    }
                 }
+            } else {
+                _predicateInfo = {};
+                _callIfIsFunction(callback);
             }
         }
     }
@@ -589,7 +600,7 @@ RDFauthor = (function () {
     
     // load required scripts
     // FIXME: Widget sometimes not loaded
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.widget.js');        /* Widget */
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.prototype.js');        /* Widget */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');     /* Statement */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js');  /* Predicate Row */
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js');  /* Subject Group */
@@ -597,10 +608,13 @@ RDFauthor = (function () {
     _loadScript(__RDFA_BASE + 'rdfa.js'/*, _ready*/);                   /* RDFA */
     
     // load widgets
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editliteral.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editresource.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editxmlliteral.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.editdate.js', _ready);
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.literal.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.resource.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.meta.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.date.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.mailto.js');
+    _loadScript(RDFAUTHOR_BASE + 'src/widget.tel.js', _ready);
     
     // load stylesheets
     _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
