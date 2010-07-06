@@ -7,6 +7,7 @@
 /*
  * RDFauthor widget template.
  * Use this as a base for your own widget implementations.
+ * All methods not uncommented are mandatory to be implemented.
  */
 RDFauthor.registerWidget({
     /*
@@ -21,7 +22,7 @@ RDFauthor.registerWidget({
     ready: function () {},
     */ 
     
-    // return your jQuery-wrapped main input element here
+    // Return your jQuery-wrapped main input element here
     element: function () {
         
     }, 
@@ -33,31 +34,38 @@ RDFauthor.registerWidget({
     focus: function () {},
     */ 
     
-    // return your widget's markup code here
+    // Return your widget's markup code here using this.ID for an
+    // identifier. See widget.prototype.js for other variables/methods
+    // you can use.
     markup: function () {
         
     }, 
     
-    // perform widget and triple removal here
+    // Mark the current triple for removal here.
+    // Actual databank writes should be done in submit().
+    // Removing the widget markup from the DOM is done by RDFauthor.
     remove: function () {
         
     }, 
     
-    // commit changes here (add/remove/change)
+    // Commit changes to databank here (add/remove/change).
+    // You can retrieve the databank containing the graph your widget's 
+    // triple belongs to from RDFauthor by calling
+    //   var databank = RDFauthor.databankForGraph(this.statement.graphURI());
     submit: function () {
         
     }
 }, [{
-    // hooks to register your widget for
+    // Hooks to register your widget for
         /*
         // Uncomment this if your widgets binds to the property hook, 
         // and denote the type of property (ObjectProperty or DatatypeProperty).
         // For other hooks this can be inferred automatically.
         type: 'DatatypeProperty', 
         */
-        // name of first hook
+        // Name of first hook
         name: 'datatype',
-        // array of values for first hook 
+        // Array of values for first hook 
         values: ['http://www.w3.org/2001/XMLSchema#string']
     }/* add more hooks here */]
 );
