@@ -7,6 +7,7 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
     init: function () {
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.datepicker.js');
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.date.css');
     },
     

@@ -21,6 +21,8 @@ RDFauthor.registerWidget({
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  3}
         }
         
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js');
+        
         // loac stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
