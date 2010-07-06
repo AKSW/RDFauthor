@@ -18,11 +18,11 @@ $(document).ready(function() {
     
     module('rdfauthor.widget');
     
-    test('instantiation', 1, function() {
-        MyWidget = RDFauthor.createWidget();
-        
-        var w1 = new MyWidget('foo');
-        var w2 = new MyWidget('bar');
-        ok(w1.ID != w2.ID, 'Two widget instances should have different IDs.');
-    });
+    // test('instantiation', 1, function() {
+    //     MyWidget = new Widget();
+    //     
+    //     var w1 = new MyWidget('foo');
+    //     var w2 = new MyWidget('bar');
+    //     ok(w1.ID != w2.ID, 'Two widget instances should have different IDs.');
+    // });
 });

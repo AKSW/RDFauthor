@@ -1,55 +1,47 @@
-$(document).ready(function() {
+$(document).ready(function() {    
+    // dummy RDFauthor
+    RDFauthor = {
+        nextID: function() {return Math.round(Math.random() * 1000)}, 
+        getWidgetForHook: function () {return new _Widget}. 
+        getWidgetForStatement: function () {return new _Widget}
+    }
+    
     // dummy statements
     var statement1 = {
         subjectURI: function () {return 'http://example.com/subject1'}, 
         predicateURI: function () {return 'http://example.com/predicate1'}, 
-        predicateLabel: function () {return 'Predicate 1'}
+        predicateLabel: function () {return 'Predicate 1'}, 
+        hasObject: function () {return false}, 
+        objectDatatype: function () {return null}, 
+        objectLang: function () {return null}, 
+        objectType: function () {return 'uri'}
     };
-    var statement2 = {
-        subjectURI: function () {return 'http://example.com/s1'}, 
-        predicateURI: function () {return 'http://example.com/p2'}, 
-        predicateLabel: function () {return 'Predicate 2'}
-    };
-    var statement1 = {
-        subjectURI: function () {return 'http://example.com/subject1'}, 
-        predicateURI: function () {return 'http://example.com/predicate1'}, 
-        predicateLabel: function () {return 'Predicate 1\''}
-    };
-    
-    // dummy RDFauthor
-    if (RDFauthor == undefined) {
-        RDFauthor = {
-            nextID: function() {return Math.round(Math.random() * 1000)}
-        }
-    }
-    
+
     // dummy widget
-    // if (Widget == undefined) {
-        _Widget = function(s) {
-            this.s = s;
-            this.remove = false;
-            this.cancel = false;
-            this.submit = false;
+    _Widget = function(s) {
+        this.s = s;
+        this.remove = false;
+        this.cancel = false;
+        this.submit = false;
+    }
+    // dummy widget prototype
+    _Widget.prototype = {
+        init: function () {
+            // do nothing
+        }, 
+        markup: function () {
+            return '<span>I am a widget!</span>';
+        }, 
+        remove: function() {
+            this.remove = true;
+        }, 
+        cancel: function() {
+            this.cancel = true;
+        }, 
+        submit: function() {
+            this.submit = true;
         }
-        // dummy widget prototype
-        _Widget.prototype = {
-            init: function () {
-                // do nothing
-            }, 
-            getHTML: function () {
-                return '<span>I am a widget!</span>';
-            }, 
-            onRemove: function() {
-                this.remove = true;
-            }, 
-            onCancel: function() {
-                this.cancel = true;
-            }, 
-            onSubmit: function() {
-                this.submit = true;
-            }
-        };
-    // }
+    };
     
     if (PredicateRow == undefined) {
         PredicateRow = function (sub, pred, tit, cont, id) {};
@@ -77,7 +69,7 @@ $(document).ready(function() {
     test('addWidget', function() {
         expect(2);
         
-        this.fixture.addWidget(statement1, _Widget);
+        this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture.numberOfRows(), 1, 'Should have 1 row.');
         
         // add wrong statement
@@ -94,7 +86,7 @@ $(document).ready(function() {
     
     test('getRowByPredicate', function() {
         expect(2);
-        this.fixture.addWidget(statement1, _Widget);
+        this.fixture.addWidget(statement1, new _Widget);
         var r = this.fixture.getRowByPredicate('http://example.com/predicate1');
         ok(r instanceof PredicateRow, 'Should be an instanceof PredicateRow');
         this.fixture.addWidget(statement1, _Widget);

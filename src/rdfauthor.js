@@ -84,6 +84,9 @@ RDFauthor = (function () {
     /** View instance */
     var _view = null;
     
+    /** Number of pending scripts */
+    var _requirePending = 0;
+    
     /** Default options */
     var _options = {
         title: 'Title', 
@@ -530,6 +533,20 @@ RDFauthor = (function () {
     };
     
     /**
+     *
+     */
+    function _require(scriptURI) {
+        _requirePending++;
+        _loadScript(scriptURI, function () {
+            _requirePending--;
+            if (_requirePending == 0) {
+                // alert('ready');
+                _ready();
+            }
+        });
+    }
+    
+    /**
      * Returns the shortcut registered for the info predicate or
      * creates and registers a new one if none had been registered before.
      * @private
@@ -595,26 +612,27 @@ RDFauthor = (function () {
     
     // rdfQuery
     if (undefined === jQuery.rdf) {
-        _loadScript(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
+        _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
     }
     
     // load required scripts
-    // FIXME: Widget sometimes not loaded
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.prototype.js');        /* Widget */
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');     /* Statement */
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js');  /* Predicate Row */
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js');  /* Subject Group */
-    _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');          /* View */
-    _loadScript(__RDFA_BASE + 'rdfa.js'/*, _ready*/);                   /* RDFA */
+    _requirePending++;
+    _require(RDFAUTHOR_BASE + 'src/widget.prototype.js');        /* Widget */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');     /* Statement */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js');  /* Predicate Row */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js');  /* Subject Group */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');          /* View */
+    _require(__RDFA_BASE + 'rdfa.js');                           /* RDFA */
     
     // load widgets
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.literal.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.resource.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.meta.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.date.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.mailto.js');
-    _loadScript(RDFAUTHOR_BASE + 'src/widget.tel.js', _ready);
+    _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
+    _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
+    _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
+    _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
+    _require(RDFAUTHOR_BASE + 'src/widget.date.js');
+    _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
+    _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
+    _requirePending--;
     
     // load stylesheets
     _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');

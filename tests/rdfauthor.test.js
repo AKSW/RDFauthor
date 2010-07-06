@@ -178,16 +178,24 @@ $(document).ready(function() {
         equal(this.fixture.nextID('prefix'), 'prefix' + (Number(first) + 2));
     });
     
-    test('registerWidget', 3, function() {
-        var W = {};
-        try {
-            this.fixture.registerWidget({constructorFunction: W, hookName: 'datatype', hookValue: ''});
-        } catch (e) {
-            ok(true, 'Exception should be thrown.');
-        }
+    test('registerWidget', 2, function() {        
+        // try {
+        //     this.fixture.registerWidget({
+        //         element: function () {}, 
+        //         markup:  function () {}, 
+        //         remove:  function () {}, 
+        //         submit:  function () {}
+        //     }, [{name: 'datatype', values: ['']}]);
+        // } catch (e) {
+        //     ok(true, 'Exception should be thrown.');
+        // }
         
-        var W2 = this.fixture.createWidget();
-        this.fixture.registerWidget({constructorFunction: W2, hookName: 'datatype', hookValues: ['ttt']});
+        this.fixture.registerWidget({
+            element: function () {}, 
+            markup:  function () {}, 
+            remove:  function () {}, 
+            submit:  function () {}
+        }, [{name: 'datatype', values: ['ttt']}]);
         
         var w = this.fixture.getWidgetForHook('datatype', 'ttt', '__statement__');
         ok(Widget.isPrototypeOf(w), 'Widget should be prototype of widget instance.');
@@ -201,13 +209,6 @@ $(document).ready(function() {
         } catch (e) {
             ok(true, 'Exception should be thrown.');
         }
-    });
-    
-    test('createWidget', 2, function() {
-        var WidgetClass = this.fixture.createWidget();
-        var w = new WidgetClass('__statement__');
-        ok(Widget.isPrototypeOf(w), 'Widget base should be prototype of newly created one.');
-        equal(w.statement, '__statement__', 'Constructor should have been called');
     });
     
     test('setOptions', 2, function() {

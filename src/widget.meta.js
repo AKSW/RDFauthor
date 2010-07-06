@@ -12,8 +12,8 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
     init: function () {
-        this.resourceWidget = RDFauthor.widgetForHook('__OBJECT__', null, this.statement);
-        this.literalWidget  = RDFauthor.widgetForHook('__LITERAL__', null, this.statement);
+        this.resourceWidget = RDFauthor.getWidgetForHook('__OBJECT__', null, this.statement);
+        this.literalWidget  = RDFauthor.getWidgetForHook('__LITERAL__', null, this.statement);
         
         this.resourceWidget.init();
         this.literalWidget.init();

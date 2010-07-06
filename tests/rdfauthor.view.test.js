@@ -1,50 +1,47 @@
 $(document).ready(function() {
+    // dummy RDFauthor
+    RDFauthor = {
+        nextID: function() {return Math.round(Math.random() * 1000)}, 
+        getWidgetForHook: function () {return new _Widget}. 
+        getWidgetForStatement: function () {return new _Widget}
+    }
+    
     // dummy statements
     var statement1 = {
         subjectURI: function () {return 'http://example.com/subject1'}, 
         predicateURI: function () {return 'http://example.com/predicate1'}, 
-        predicateLabel: function () {return 'Predicate 1'}
+        predicateLabel: function () {return 'Predicate 1'}, 
+        hasObject: function () {return false}, 
+        objectDatatype: function () {return null}, 
+        objectLang: function () {return null}, 
+        objectType: function () {return 'uri'}
     };
-    var statement2 = {
-        subjectURI: function () {return 'http://example.com/s1'}, 
-        predicateURI: function () {return 'http://example.com/p2'}, 
-        predicateLabel: function () {return 'Predicate 2'}
-    };
-    
-    // dummy RDFauthor
-    if (RDFauthor == undefined) {
-        RDFauthor = {
-            nextID: function() {return Math.round(Math.random() * 1000)}
-        }
-    }
-    
+
     // dummy widget
-    // if (Widget == undefined) {
-        _Widget = function(s) {
-            this.s = s;
-            this.remove = false;
-            this.cancel = false;
-            this.submit = false;
+    _Widget = function(s) {
+        this.s = s;
+        this.remove = false;
+        this.cancel = false;
+        this.submit = false;
+    }
+    // dummy widget prototype
+    _Widget.prototype = {
+        init: function () {
+            // do nothing
+        }, 
+        markup: function () {
+            return '<span>I am a widget!</span>';
+        }, 
+        remove: function() {
+            this.remove = true;
+        }, 
+        cancel: function() {
+            this.cancel = true;
+        }, 
+        submit: function() {
+            this.submit = true;
         }
-        // dummy widget prototype
-        _Widget.prototype = {
-            init: function () {
-                // do nothing
-            }, 
-            getHTML: function () {
-                return '<span>I am a widget!</span>';
-            }, 
-            onRemove: function() {
-                this.remove = true;
-            }, 
-            onCancel: function() {
-                this.cancel = true;
-            }, 
-            onSubmit: function() {
-                this.submit = true;
-            }
-        };
-    // }
+    };
     
     if (SubjectGroup == undefined) {
         SubjectGroup = function (uri, title, container, id) {};
@@ -82,11 +79,11 @@ $(document).ready(function() {
     
     test('addWidget', function() {
         expect(3);
-        this.fixture.addWidget(statement1, _Widget);
+        this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
-        this.fixture.addWidget(statement2, _Widget);
+        this.fixture.addWidget(statement2, new _Widget);
         equal(this.fixture._subjectCount, 2, 'Should have 2 subjects.');
-        this.fixture.addWidget(statement1, _Widget);
+        this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture._subjectCount, 2, 'Should have 2 subjects.');
     });
     
@@ -105,7 +102,7 @@ $(document).ready(function() {
     
     test('getSubjectGroup', function() {
         expect(2);
-        this.fixture.addWidget(statement1, _Widget);
+        this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
         ok(this.fixture.getSubjectGroup('http://example.com/subject1') instanceof SubjectGroup, 
             'Returned subject group should be an instance of SubjectGroup.');
@@ -119,11 +116,11 @@ $(document).ready(function() {
     test('numberOfSubjects', function() {
         expect(4);
         equal(this.fixture.numberOfSubjects(), 0, 'Should have 0 subjects.');
-        this.fixture.addWidget(statement1, _Widget);
+        this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture.numberOfSubjects(), 1, 'Should have 1 subject.');
-        this.fixture.addWidget(statement2, _Widget);
+        this.fixture.addWidget(statement2, new _Widget);
         equal(this.fixture.numberOfSubjects(), 2, 'Should have 2 subjects.');
-        this.fixture.addWidget(statement1, _Widget);
+        this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture.numberOfSubjects(), 2, 'Should still have 2 subjects.');
     });
     

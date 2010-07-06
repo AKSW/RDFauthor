@@ -104,12 +104,12 @@ RDFauthor.registerWidget({
     markup: function () {
         var areaConfig = {
             rows: (this.isLarge() ? '3' : '1'), 
-            style: (this.isLarge() ? 'width:29em' : 'width:16em;height:1.3em;padding-top:0.2em'), 
+            style: (this.isLarge() ? 'width:100%' : 'width:50%;height:1.3em;padding-top:0.2em'), 
             buttonClass: (this.isLarge()) ? 'disclosure-button-horizontal' : 'disclosure-button-vertical'
         }
 
         var areaMarkup = '\
-            <div class="container literal-value">\
+            <div class="container literal-value" style="width:' + this.availableWidth() + 'px">\
                 <textarea rows="' + String(areaConfig.rows) + '" cols="20" style="' + areaConfig.style + '" id="literal-value-' + 
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
             </div>\
