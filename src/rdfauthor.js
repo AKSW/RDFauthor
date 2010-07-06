@@ -582,6 +582,11 @@ RDFauthor = (function () {
         CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
     };
     
+    // rdfQuery
+    if (undefined === jQuery.rdf) {
+        _loadScript(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
+    }
+    
     // load required scripts
     // FIXME: Widget sometimes not loaded
     _loadScript(RDFAUTHOR_BASE + 'src/rdfauthor.widget.js');        /* Widget */

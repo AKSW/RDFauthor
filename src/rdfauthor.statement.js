@@ -281,7 +281,7 @@ Statement.prototype = {
     objectLang: function () {
         if (this.hasObject()) {
             if (this._object.lang) {
-                return String(this.object.lang);
+                return String(this._object.lang);
             }
         }
         
