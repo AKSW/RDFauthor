@@ -107,7 +107,8 @@ RDFauthor = (function () {
         showButtons: true, 
         useAnimations: true, 
         autoParse: true, 
-        usePredicateInfo: true
+        usePredicateInfo: true, 
+        useSPARQL11: true
     };
     
     /** Hash registered widgets */
@@ -628,36 +629,43 @@ RDFauthor = (function () {
      * @private
      */
     function _updateSources() {
-        /*
-         * 1. calculate diffs
-         * 2. serialize changes
-         * 3. send updates
-         */
         for (g in _graphInfo) {
-            var serviceURI = RDFauthor.updateURIForGraph(g);
-            var databank   = RDFauthor.databankForGraph(g);
-            var original   = _extractedByGraph[g];
+            var updateURI = RDFauthor.updateURIForGraph(g);
+            var databank  = RDFauthor.databankForGraph(g);
+            var original  = _extractedByGraph[g];
             
-            if (undefined !== serviceURI && undefined !== databank) {
-                var added = databank.except(original);
-                var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json'});
-                
+            if (undefined !== updateURI && undefined !== databank) {
+                var added   = databank.except(original);
                 var removed = original.except(databank);
-                var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json'});
                 
-                // alert('Adding to: ' + g + ' (' + serviceURI + ')' + 
-                // '\nAdded: ' + jQuery.toJSON(addedJSON ? addedJSON : {}) +
-                // '\nRemoved: ' + jQuery.toJSON(removedJSON ? removedJSON : {}));
-                
-                if (addedJSON || removedJSON) {
-                    // x-domain request sending works w/ $.get only
-                    jQuery.get(serviceURI, {
-                        'named-graph-uri': g, 
-                        'insert': jQuery.toJSON(addedJSON ? addedJSON : {}), 
-                        'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
-                    }, function () {
-                        _callIfIsFunction(_options.onSubmitSuccess);
-                    });
+                if (_options.useSPARQL11) {
+                    // SPARQL/Update
+                    var addedArray = jQuery.makeArray(added.triples());
+                    if (addedArray.length > 0) {
+                        var insertQuery = 'INSERT DATA INTO <' + g + '> {' + addedArray.join('\n') + '}';
+                        jQuery.get(updateURI, {query: insertQuery});
+                    }
+                    
+                    var removedArray = jQuery.makeArray(removed.triples());
+                    if (removedArray.length > 0) {
+                        var deleteQuery = 'DELETE DATA FROM <' + g + '> {' + removedArray.join('\n') + '}';
+                        jQuery.get(updateURI, {query: deleteQuery});
+                    }
+                } else {
+                    // REST style
+                    var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json'});
+                    var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json'});
+                    
+                    if (addedJSON || removedJSON) {
+                        // x-domain request sending works w/ $.get only
+                        jQuery.get(updateURI, {
+                            'named-graph-uri': g, 
+                            'insert': jQuery.toJSON(addedJSON ? addedJSON : {}), 
+                            'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
+                        }, function () {
+                            _callIfIsFunction(_options.onSubmitSuccess);
+                        });
+                    }
                 }
             }
         }
