@@ -36,7 +36,7 @@ RDFauthor = (function () {
     /** Prefix for ad-hoc IDs */
     var ELEMENT_ID_PREFIX = 'el-';
     
-    /** unknown state */
+    /** script is in unknown state */
     var SCRIPT_STATE_UNKNOWN = undefined;
     
     /** script is currently loading */
@@ -195,15 +195,17 @@ RDFauthor = (function () {
      * @private
      */
     function _cloneDatabanks() {
-        for (g in _graphInfo) {
+        for (g in _graphInfo) {            
             if (undefined !== _databanksByGraph[g] &&
                 _databanksByGraph[g] instanceof jQuery.rdf.databank) {
                 
                 var databank  = _databanksByGraph[g];
                 var extracted = jQuery.rdf.databank();
                 
-                databank.each.triples().each(function() {
-                    if (this instanceof jQuery.rdf.triple) {
+                databank.triples().each(function() {
+                    if (this instanceof jQuery.rdf.triple 
+                        && this.object instanceof jQuery.rdf.literal
+                        && (typeof this.object.value == 'string')) {
                         /* HACK: reverse HTML escaping in literals */
                         this.object.value = this.object.value.replace(/&lt;/, '<').replace(/&gt;/, '>');
                     }
@@ -518,7 +520,7 @@ RDFauthor = (function () {
         	},
         	parser: {
         		strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-        		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|jQuery)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+        		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
         	}
         };
         
@@ -531,9 +533,9 @@ RDFauthor = (function () {
     	}
     	
     	uri[o.q.name] = {};
-    	uri[o.key[12]].replace(o.q.parser, function (jQuery0, jQuery1, jQuery2) {
-    		if (jQuery1) {
-    		    uri[o.q.name][jQuery1] = jQuery2;
+    	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+    		if ($1) {
+    		    uri[o.q.name][$1] = $2;
     		}
     	});
     	
@@ -551,7 +553,7 @@ RDFauthor = (function () {
         view.reset();
         
         for (var graph in _databanksByGraph) {
-            var updateEndpoint = RDFauthor.serviceURIForGraph(graph);
+            var updateEndpoint = RDFauthor.updateURIForGraph(graph);
             if (undefined !== updateEndpoint) {
                 var triples = _databanksByGraph[graph].triples();
                 for (var i = 0, length = triples.length; i < length; i++) {
@@ -573,14 +575,16 @@ RDFauthor = (function () {
     };
     
     /**
-     *
+     * Used internally for script requirements. For each pending script, 
+     * a counter is increased and decreased when the script has finished 
+     * loading. Readyness is announced when all pending scripts are loaded.
      */
-    function _require(scriptURI) {
+    function _require(scriptURI, callback) {
         _requirePending++;
         _loadScript(scriptURI, function () {
+            _callIfIsFunction(callback);
             _requirePending--;
             if (_requirePending == 0) {
-                // alert('ready');
                 _ready();
             }
         });
@@ -629,9 +633,34 @@ RDFauthor = (function () {
          * 2. serialize changes
          * 3. send updates
          */
-         for (g in _graphInfo) {
-             
-         }
+        for (g in _graphInfo) {
+            var serviceURI = RDFauthor.updateURIForGraph(g);
+            var databank   = RDFauthor.databankForGraph(g);
+            var original   = _extractedByGraph[g];
+            
+            if (undefined !== serviceURI && undefined !== databank) {
+                var added = databank.except(original);
+                var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json'});
+                
+                var removed = original.except(databank);
+                var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json'});
+                
+                // alert('Adding to: ' + g + ' (' + serviceURI + ')' + 
+                // '\nAdded: ' + jQuery.toJSON(addedJSON ? addedJSON : {}) +
+                // '\nRemoved: ' + jQuery.toJSON(removedJSON ? removedJSON : {}));
+                
+                if (addedJSON || removedJSON) {
+                    // x-domain request sending works w/ $.get only
+                    jQuery.get(serviceURI, {
+                        'named-graph-uri': g, 
+                        'insert': jQuery.toJSON(addedJSON ? addedJSON : {}), 
+                        'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
+                    }, function () {
+                        _callIfIsFunction(_options.onSubmitSuccess);
+                    });
+                }
+            }
+        }
     };
     
     // RDFauthor setup code ///////////////////////////////////////////////////
@@ -655,24 +684,30 @@ RDFauthor = (function () {
         _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
     }
     
+    // toJSON
+    if (undefined === jQuery.toJSON) {
+        _require(RDFAUTHOR_BASE + 'libraries/jquery.json.js');
+    }
+    
     // load required scripts
     _requirePending++;
-    _require(RDFAUTHOR_BASE + 'src/widget.prototype.js');        /* Widget */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');     /* Statement */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js');  /* Predicate Row */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js');  /* Subject Group */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');          /* View */
     _require(__RDFA_BASE + 'rdfa.js');                           /* RDFA */
     
-    // load widgets
-    _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
-    _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
-    _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
-    _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
-    _require(RDFAUTHOR_BASE + 'src/widget.date.js');
-    _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
-    _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
-    _requirePending--;
+    // load widgets; widget prototype is required before all other widgets
+    _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
+        _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.date.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
+        _requirePending--;
+    });
     
     // load stylesheets
     _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
@@ -703,10 +738,13 @@ RDFauthor = (function () {
          * Cancels the editing process.
          */
         cancel: function () {
-            /*
+            /* 
+             * TODO:
              * - inform/dismiss view
              * - restore state (parsed or unparsed?)
              */
+             var view = RDFauthor.getView();
+             view.hide(true);
              this.eventTarget().trigger('rdfauthor.cancel');
         }, 
         
@@ -799,26 +837,23 @@ RDFauthor = (function () {
                 if (jQuery('.modal-wrapper').length < 1) {
                     jQuery('body').append('<div class="modal-wrapper" style="display:none"></div>');
                 }
-                
-                var that = this;
-                var jModalWrapper = jQuery('.modal-wrapper').eq(0);
-                var options = jQuery.extend(this.options, {
-                    beforeSubmit: function () {
+                                
+                var self = this;
+                var options = jQuery.extend(_options, {
+                    onBeforeSubmit: function () {
                         // keep db before changes
-                        that.cloneDatabanks();
+                        _cloneDatabanks();
                     }, 
-                    afterSubmit: function () {
-                        that.updateSources();
-                        that.view = null;
+                    onAfterSubmit: function () {
+                        _updateSources();
                     }, 
-                    afterCancel: function () {
-                        that.cancelEditing();
-                        if (typeof instance.options.onCancel == 'function') {
-                            that.options.onCancel();
+                    onAfterCancel: function () {
+                        RDFauthor.cancel();
+                        if (typeof _options.onCancel == 'function') {
+                            _options.onCancel();
                         }
-                        that.view = null;
                     }, 
-                    container: jModalWrapper
+                    container: jQuery('.modal-wrapper').eq(0)
                 });
                 
                 // init view
@@ -1156,6 +1191,19 @@ RDFauthor = (function () {
             
             return undefined;
         }, 
+        
+        /**
+         * Returns the SPARQL query service URI for graph denoted by graphURI.
+         * @param {string} graphURI
+         * @return {string}
+         */
+        updateURIForGraph: function (graphURI) {
+            if (graphURI && graphURI in _graphInfo) {
+                return _graphInfo[graphURI].updateEndpoint;
+            }
+            
+            return undefined;
+        },
         
         /**
          * Sets RDFauthor options

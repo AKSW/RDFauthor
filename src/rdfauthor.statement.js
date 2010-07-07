@@ -159,6 +159,23 @@ Statement.prototype = {
         return jQuery.rdf.triple(this._subject, this._predicate, this._object);
     }, 
     
+    copyWithObject: function (objectSpec) {
+        var copy = new Statement({
+            subject: '<' + this.subjectURI() + '>', 
+            predicate: '<' + this.predicateURI() + '>', 
+            object: objectSpec
+        }, {
+            hidden: this.isHidden(), 
+            ignored: this.isIgnored(), 
+            required: this.isRequired(), 
+            protected: this.isProtected(), 
+            graph: this.graphURI(), 
+            title: this.predicateLabel()
+        });
+        
+        return copy;
+    }, 
+    
     /**
      * Returns a string representation of the statement.
      * @return {string}

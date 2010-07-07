@@ -50,13 +50,13 @@ function View(options) {
     this._subjects     = {};
     this._subjectCount = 0;
     
-    var instance = this;
+    var self = this;
     
     function getChrome() {
         html = '\
-            <div class="window" id="' + instance.cssID() + '" style="display:none">\
-                <h2 class="title">' + instance._options.title + '</h2>\
-                <div class="' + instance._options.contentContainerClass + '">\
+            <div class="window" id="' + self.cssID() + '" style="display:none">\
+                <h2 class="title">' + self._options.title + '</h2>\
+                <div class="' + self._options.contentContainerClass + '">\
                 </div>' + getButtons() + '<div style="clear:both"></div>\
             </div>';
         
@@ -65,11 +65,11 @@ function View(options) {
     
     function getButtons() {
         var buttonHTML = '';
-        if (instance._options.showButtons) {
+        if (self._options.showButtons) {
             buttonHTML = '\
                 <div id="rdfAuthorButtons">\
-                    <button type="button" id="rdfauthor-button-cancel">' + instance._options.cancelButtonTitle + '</button>\
-                    <button type="button" id="rdfauthor-button-submit">' + instance._options.saveButtonTitle + '</button>\
+                    <button type="button" id="rdfauthor-button-cancel">' + self._options.cancelButtonTitle + '</button>\
+                    <button type="button" id="rdfauthor-button-submit">' + self._options.saveButtonTitle + '</button>\
                 </div>';
         }
         
@@ -89,17 +89,29 @@ function View(options) {
         
         jQuery('#rdfauthor-button-cancel').live('click', function () {
             jQuery('body').trigger('rdfauthor.view.cancel');
+            
+            if (typeof self._options.onAfterCancel == 'function') {
+                self._options.onAfterCancel();
+            }
         });
 
-        jQuery('#rdfauthor-button-submit').live('click', function () {
+        jQuery('#rdfauthor-button-submit').live('click', function () {            
+            if (typeof self._options.onBeforeSubmit == 'function') {
+                self._options.onBeforeSubmit();
+            }
+            
             jQuery('body').trigger('rdfauthor.view.submit');
+            
+            if (typeof self._options.onAfterSubmit == 'function') {
+                self._options.onAfterSubmit();
+            }
         });
     }
 }
 
 View.prototype = {
     /**
-     * Adds a new widget to the view instance.
+     * Adds a new widget to the view self.
      * @param {Statement} statement object
      * @param {function} Constructor function to be used for widget instantiation
      */
@@ -140,7 +152,7 @@ View.prototype = {
     }, 
     
     /**
-     * Returns the DOM element associated with this view instance.
+     * Returns the DOM element associated with this view self.
      * @return {jQuery}
      */
     getElement: function () {
@@ -148,7 +160,7 @@ View.prototype = {
     }, 
     
     /**
-     * Returns the subject group instance identified by URI.
+     * Returns the subject group self identified by URI.
      * @param subjectURI The subject URI for which to return the {@link SubjectGroup} (string)
      * @return {SubjectGroup}
      */
@@ -157,7 +169,7 @@ View.prototype = {
     }, 
     
     /**
-     * Returns the CSS id of this view instance's associated DOM element.
+     * Returns the CSS id of this view self's associated DOM element.
      * @return {string}
      */
     cssID: function () {
@@ -166,7 +178,7 @@ View.prototype = {
     
     /**
      * Returns the number of dsitinguished subjects currently managed by the
-     * view instance.
+     * view self.
      * @return {number}
      */
     numberOfSubjects: function () {
@@ -181,7 +193,7 @@ View.prototype = {
     }, 
     
     /**
-     * Resets this view instance
+     * Resets this view self
      */
     reset: function () {
         // unique subjects
@@ -190,7 +202,7 @@ View.prototype = {
     }, 
     
     /**
-     * Shows this view instance if currently hidden.
+     * Shows this view self if currently hidden.
      * @param {boolean} animated Whether to appear animatedly
      */
     show: function (animated) {
@@ -211,7 +223,7 @@ View.prototype = {
     }, 
     
     /**
-     * Hides this view instance if currently visible.
+     * Hides this view self if currently visible.
      * @member
      * @param {boolean} animated Whether to disappear animatedly
      */
@@ -220,10 +232,10 @@ View.prototype = {
             jQuery(this.getElement()).hide();
             this._container.hide();
         } else {
-            var instance = this;
+            var self = this;
             jQuery(this.getElement()).fadeOut(function() {
-                jQuery(instance.getElement()).hide();
-                instance._container.hide();
+                jQuery(self.getElement()).hide();
+                self._container.hide();
             });
         }
     }

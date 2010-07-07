@@ -57,11 +57,11 @@ var Widget = {
     }, 
     
     /**
-     * Is called if the user removes a widget indicating he aims to delete the
-     * statement that this widget represents.
+     * Is called if the user removes a widget indicating the aim to delete the
+     * statement this widget represents.
      */
     remove: function () {
-        
+        this.removeOnSubmit = true;
     }, 
     
     /**

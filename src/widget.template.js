@@ -41,12 +41,16 @@ RDFauthor.registerWidget({
         
     }, 
     
-    // Mark the current triple for removal here.
+    /*
+    // Uncomment to mark the current triple for removal here.
     // Actual databank writes should be done in submit().
     // Removing the widget markup from the DOM is done by RDFauthor.
+    // The default implementation sets 
+    //   this.removeOnSubmit = true;
     remove: function () {
         
-    }, 
+    },
+    */ 
     
     // Commit changes to databank here (add/remove/change).
     // You can retrieve the databank containing the graph your widget's 

@@ -18,7 +18,11 @@ RDFauthor.registerWidget({
         this.resourceWidget.init();
         this.literalWidget.init();
         
-        this.options.active == 'literal';
+        if (this.statement.hasObject() && this.statement.objectType() == 'uri') {
+            this.options.active = 'resource';
+        } else {
+            this.options.active = 'literal';
+        }
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
@@ -26,6 +30,19 @@ RDFauthor.registerWidget({
     ready: function () {
         this.resourceWidget.ready();
         this.literalWidget.ready();
+        
+        jQuery('#meta-select-' + this.ID + ' .meta-type .radio').click(function () {
+            var jResourceDiv = $(this).closest('.meta-select').children('.meta-resource');
+            var jLiteralDiv  = $(this).closest('.meta-select').children('.meta-literal');
+
+            if ($(this).val() == 'resource') {
+                jResourceDiv.show();
+                jLiteralDiv.hide();
+            } else {
+                jResourceDiv.hide();
+                jLiteralDiv.show();
+            }
+        });
     },
     
     // return your jQuery-wrapped main input element here
@@ -40,10 +57,14 @@ RDFauthor.registerWidget({
                    : 'resource';
         
         var markup = '\
-            <div class="meta-select">\
+            <div class="meta-select" id="meta-select-' + this.ID + '">\
                 <div class="inline-container meta-type util">\
-                    <label><input type="radio" class="radio" ' + (active == 'resource' ? 'checked="checked"' : '') + ' name="meta-type-' + this.ID + '"' + ' value="resource" />Resource</label>\
-                    <label><input type="radio" class="radio" ' + (active == 'literal' ? 'checked="checked"' : '') + ' name="meta-type-' + this.ID + '"' + ' value="literal" />Literal</label>\
+                    <label><input type="radio" class="radio" ' 
+                        + (active == 'resource' ? 'checked="checked"' : '') 
+                        + ' name="meta-type-' + this.ID + '" id="meta-rselect-' + this.ID + '" value="resource" />Resource</label>\
+                    <label><input type="radio" class="radio" ' 
+                        + (active == 'literal' ? 'checked="checked"' : '') 
+                        + ' name="meta-type-' + this.ID + '" id="meta-lselect-' + this.ID + '" value="literal" />Literal</label>\
                 </div>\
                 <hr style="clear:left; height:0; border:none" />\
                 <div class="meta-resource" id="meta-resource-' + this.ID + '"' + (active == 'resource' ? '' : 'style="display:none"') + '>\

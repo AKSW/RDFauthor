@@ -15,11 +15,21 @@ RDFauthor is a JavaScript library, hence no installation is needed.
 ## Using RDFauthor within your Project ##
 Three steps are required in order to use RDFauthor within your project.
 
-1. Include `loader.js` file into you main template (so it is available on every page).
-2. Embed provenance information (as RDFa) for named graphs in your page. If you don't use
+1. Embed provenance information (as RDFa) for named graphs in your page. If you don't use
    named graphs, the URI of the page is used as the graph URI.
-3. Define a global JavaScript variable named `RDFAUTHOR_BASE` that contains the URI of 
-   RDFauthor on you web server (e.g. `http://example.com/MyWebApp/lib/rdfauthor/`).
+2. Define a global JavaScript variable named `RDFAUTHOR_BASE` that contains the URI of 
+   RDFauthor on your web server (e.g. `http://example.com/MyWebApp/lib/rdfauthor/`).
+3. Define another global variable called `RDFAUTHOR_READY_CALLBACK` which contains a function
+   to be executed when RDFauthor has finished loading. Typical usage is calling 
+   `setOptions()` and `start()`:
+   
+        RDFAUTHOR_READY_CALLBACK = function () {
+            // RDFauthor is now loaded and ready to use
+            RDFauthor.setOptions({});
+            RDFauthor.start();
+        };
+
+4. Include `rdfauthor.js` (found under `RDFAUTHOR_BASE`) lazily.
 
 ## API Documentation ##
 RDFauthor's API documentation can be built with 

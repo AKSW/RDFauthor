@@ -55,12 +55,53 @@ RDFauthor.registerWidget({
         return markup;
     }, 
     
-    remove: function () {
-        this.removeOnSubmit = true;
+    submit: function () {
+        if (this.shouldProcessSubmit()) {
+            // get databank
+            var databank   = RDFauthor.databankForGraph(this.statement.graphURI());
+            var hasChanged = (
+                this.statement.hasObject() 
+                && this.statement.objectValue() !== this.value()
+            );
+            
+            if (hasChanged || this.removeOnSubmit) {
+                databank.remove(this.statement.asRdfQueryTriple());
+            }
+            
+            if (!this.removeOnSubmit) {
+                try {
+                    var newStatement = this.statement.copyWithObject({value: '<' + this.value() + '>'});
+                    databank.add(newStatement.asRdfQueryTriple());
+                } catch (e) {
+                    var msg = e.message ? e.message : e;
+                    alert('Could not save resource for the following reason: \n' + msg);
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }, 
     
-    submit: function () {
-        alert('Resource: Submit');
+    shouldProcessSubmit: function () {
+        var t1 = !this.statement.hasObject();
+        var t2 = null === this.value();
+        var t3 = this.removeOnSubmit;
+        
+        return (!(t1 && t2) || t3);
+    }, 
+    
+    value: function () {
+        if (null !== this.selectedResource) {
+            return this.selectedResource;
+        }
+        
+        var typedValue = this.element().val();
+        if ('' !== typedValue) {
+            return typedValue;
+        }
+        
+        return null;
     }, 
     
     performSearch: function (searchTerm, responseCallback) {

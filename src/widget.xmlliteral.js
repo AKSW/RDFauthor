@@ -16,6 +16,7 @@ RDFauthor.registerWidget({
             var editor = new nicEditor(editorOptions);
             editor.setPanel('xmlliteral-edit-panel-' + this.ID);
             editor.addInstance('xmlliteral-edit-input-' + this.ID);
+            this._editor = editor;
         }
     }, 
     
@@ -23,7 +24,9 @@ RDFauthor.registerWidget({
     // e.g. load scripts/stylesheets etc.
     init: function () {
         this._nicEditLoaded = false;
+        this._editor        = null;
         this._domReady      = false;
+        this._datatype      = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral';
         
         var self = this;
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/nicEdit.js', function () {
@@ -43,7 +46,7 @@ RDFauthor.registerWidget({
     
     // return your jQuery-wrapped main input element here
     element: function () {
-        return jQuery(this.ID);
+        return jQuery('#xmlliteral-edit-input-' + this.ID);
     }, 
     
     /*
@@ -65,14 +68,51 @@ RDFauthor.registerWidget({
         return markup;
     }, 
     
-    // perform widget and triple removal here
-    remove: function () {
-        
-    }, 
-    
     // commit changes here (add/remove/change)
     submit: function () {
+        if (this.shouldProcessSubmit()) {
+            // get databank
+            var databank = RDFauthor.databankForGraph(this.statement.graphURI());
+            
+            var somethingChanged = (
+                this.statement.hasObject() 
+                && this.statement.objectValue() !== this.value()
+            );
+            
+            if (somethingChanged || this.removeOnSubmit) {
+                databank.remove(this.statement.asRdfQueryTriple());
+            }
+            
+            if ((null !== this.value()) && !this.removeOnSubmit) {
+                try {
+                    var newStatement = this.statement.copyWithObject({value: this.value(), options: {datatype: this._datatype}});
+                    databank.add(newStatement.asRdfQueryTriple());
+                } catch (e) {
+                    var msg = e.message ? e.message : e;
+                    alert('Could not save literal for the following reason: \n' + msg);
+                    return false;
+                }
+            }
+        }
         
+        return true;
+    }, 
+    
+    shouldProcessSubmit: function () {
+        var t1 = !this.statement.hasObject();
+        var t2 = null === this.value();
+        var t3 = this.removeOnSubmit;
+        
+        return (!(t1 && t2) || t3);
+    },
+    
+    value: function () {
+        var editor = this._editor.instanceById('xmlliteral-edit-input-' + this.ID);        
+        if (editor && ('' !== editor.getContent())) {
+            return editor.getContent();
+        }
+        
+        return null;
     }
 }, {
         name: 'datatype',

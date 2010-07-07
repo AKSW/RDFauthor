@@ -146,12 +146,87 @@ RDFauthor.registerWidget({
         return markup;
     }, 
     
-    remove: function () {
-        this.removeOnSubmit = true;
+    submit: function () {        
+        if (this.shouldProcessSubmit()) {
+            // get databank
+            var databank = RDFauthor.databankForGraph(this.statement.graphURI());
+            
+            var somethingChanged = (
+                this.statement.hasObject() && (
+                    this.statement.objectValue() !== this.value()
+                    || this.statement.objectLang() !== this.lang()
+                    || this.statement.objectDatatype() !== this.datatype()
+                )
+            );
+            
+            if (somethingChanged || this.removeOnSubmit) {
+                databank.remove(this.statement.asRdfQueryTriple());
+            }
+            
+            if ((null !== this.value()) && !this.removeOnSubmit) {
+                try {
+                    var objectOptions = {};
+                    if (null !== this.lang()) {
+                        objectOptions.lang = this.lang();
+                    } else if (null !== this.datatype()) {
+                        objectOptions.datatype = this.datatype();
+                    }
+                    var newStatement = this.statement.copyWithObject({value: this.value(), options: objectOptions});
+                    databank.add(newStatement.asRdfQueryTriple());
+                } catch (e) {
+                    var msg = e.message ? e.message : e;
+                    alert('Could not save literal for the following reason: \n' + msg);
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }, 
     
-    submit: function () {
-        alert('Literal: Submit');
+    shouldProcessSubmit: function () {
+        var t1 = !this.statement.hasObject();
+        var t2 = null === this.value();
+        var t3 = this.removeOnSubmit;
+        
+        return (!(t1 && t2) || t3);
+    },
+    
+    type: function () {
+        var type = $('input[name=literal-type-' + this.ID + ']:checked').eq(0).val();
+        
+        if ('' !== type) {
+            return type;
+        }
+        
+        return null;
+    }, 
+    
+    lang: function () {
+        var lang = $('#literal-lang-' + this.ID + ' option:selected').eq(0).val();
+        if ((this.type() == 'plain') && ('' !== lang)) {
+            return lang;
+        }
+        
+        return null;
+    }, 
+    
+    datatype: function () {
+        var datatype = $('#literal-datatype-' + this.ID + ' option:selected').eq(0).val();
+        if ((this.type() == 'typed') && ('' !== datatype)) {
+            return datatype;
+        }
+        
+        return null;
+    }, 
+    
+    value: function () {
+        var value = $('#literal-value-' + this.ID).val();
+        if ('' !== value) {
+            return value;
+        }
+        
+        return null;
     }
 }, {
         name: '__LITERAL__'
