@@ -206,20 +206,20 @@ View.prototype = {
      * @param {boolean} animated Whether to appear animatedly
      */
     show: function (animated) {
+        var self = this;
         if (arguments.length === 0 || !animated) {
             jQuery(this.getElement()).show();
             this.activeSubjectGroup().show();
             this._container.show();
+            this.position();
             // TODO: trigger event
         } else {
-            jQuery(this.getElement()).css('opacity', 0.0).show();
-            this._container.show();
-            jQuery(this.getElement()).fadeIn(function() {
-                // TODO: trigger event
+            this.activeSubjectGroup().show();
+            this._container.fadeIn(100, function () {
+                self.position();
+                jQuery(self.getElement()).fadeIn();
             });
         }
-        
-        this.position();
     }, 
     
     /**
@@ -228,7 +228,7 @@ View.prototype = {
      * @param {boolean} animated Whether to disappear animatedly
      */
     hide: function (animated) {
-        if (!animated) {
+        if (arguments.length === 0 || !animated) {
             jQuery(this.getElement()).hide();
             this._container.hide();
         } else {

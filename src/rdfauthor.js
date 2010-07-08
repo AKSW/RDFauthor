@@ -620,7 +620,7 @@ RDFauthor = (function () {
         /* make sure, view has predicate info available */
         _fetchPredicateInfo(function() {
             var view = RDFauthor.getView();
-            view.show();
+            view.show(true);
         });
     };
     
@@ -640,17 +640,22 @@ RDFauthor = (function () {
                 
                 if (_options.useSPARQL11) {
                     // SPARQL/Update
+                    var updateQuery = '';
+                    
                     var addedArray = jQuery.makeArray(added.triples());
                     if (addedArray.length > 0) {
-                        var insertQuery = 'INSERT DATA INTO <' + g + '> {' + addedArray.join('\n') + '}';
-                        jQuery.get(updateURI, {query: insertQuery});
+                        updateQuery += '\nINSERT DATA INTO <' + g + '> {' + addedArray.join('\n') + '}';
                     }
                     
                     var removedArray = jQuery.makeArray(removed.triples());
                     if (removedArray.length > 0) {
-                        var deleteQuery = 'DELETE DATA FROM <' + g + '> {' + removedArray.join('\n') + '}';
-                        jQuery.get(updateURI, {query: deleteQuery});
+                        updateQuery += '\nDELETE DATA FROM <' + g + '> {' + removedArray.join('\n') + '}';
                     }
+                    
+                    jQuery.get(updateURI, {query: updateQuery, success: function () {
+                        _view.hide(true);
+                        _callIfIsFunction(_options.onSubmitSuccess);
+                    }});
                 } else {
                     // REST style
                     var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json'});
@@ -663,6 +668,7 @@ RDFauthor = (function () {
                             'insert': jQuery.toJSON(addedJSON ? addedJSON : {}), 
                             'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
                         }, function () {
+                            _view.hide(true);
                             _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }

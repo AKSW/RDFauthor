@@ -49,11 +49,11 @@ RDFauthor.registerWidget({
         return jQuery('#xmlliteral-edit-input-' + this.ID);
     }, 
     
-    /*
     // Uncomment to give focus to your widget.
     // Default implementation will giver focus to the return value of element().
-    focus: function () {},
-    */ 
+    focus: function () {
+        jQuery('#xmlliteral-edit-input-' + this.ID).focus();
+    },
     
     // return your widget's markup code here
     markup: function () {
