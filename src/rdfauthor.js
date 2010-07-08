@@ -229,11 +229,7 @@ RDFauthor = (function () {
      * Widget as its prototype object.
      * @return {Object}
      */
-    function _createWidget(widgetSpec) {
-        // 1. establish prototype chain
-        // 2. check interface
-        // 3. return instantiable widget
-        
+    function _createWidget(widgetSpec) {        
         var F = function () {};
         F.prototype = Widget;
         
@@ -363,9 +359,13 @@ RDFauthor = (function () {
      * @param {Statement} statement
      * @return {Widget}
      */
-    function _instantiateWidget(constructor, statement) {
+    function _instantiateWidget(constructor, statement, options) {
         if (typeof constructor === 'function') {
-            return new constructor(statement);
+            if (arguments.length >= 3) {
+                return new constructor(statement, options);
+            } else {
+                return new constructor(statement);
+            }
         }
         
         return null;
@@ -884,21 +884,21 @@ RDFauthor = (function () {
          * @param {Statement} statement The statement with which to initialize the widget
          * @return {Widget} An object conforming to the Widget interface
          */
-        getWidgetForHook: function (hookName, hookValue, statement) {
+        getWidgetForHook: function (hookName, hookValue, statement, options) {
             if (!hookValue) {
                 hookValue = '';
             }
             var widgetConstructor = _registeredWidgets[hookName][hookValue];
             
             /* initialize widget */
-            return _instantiateWidget(widgetConstructor, statement);
+            return _instantiateWidget(widgetConstructor, statement, options);
         }, 
         
         /**
          * Returns an instance of the widget most suitable for editing statement.
          * @param {Statement} statement
          */
-        getWidgetForStatement: function (statement) {
+        getWidgetForStatement: function (statement, options) {
             var widgetConstructor = null;
             
             var subjectURI   = statement.subjectURI();
@@ -930,13 +930,9 @@ RDFauthor = (function () {
                     widgetConstructor = _registeredWidgets[DEFAULT_HOOK][''];
                 }
             }
-
-            var widgetInstance = null;
-            if (typeof widgetConstructor == 'function') {
-                widgetInstance = new widgetConstructor(statement);
-            }
-
-            return widgetInstance;
+            
+            /* initialize widget */
+            return _instantiateWidget(widgetConstructor, statement, options);
         },
         
         /**

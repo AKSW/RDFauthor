@@ -4,28 +4,34 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+const MAX_TITLE_LENGTH = 50;
+
 RDFauthor.registerWidget({
     init: function () {
-        this.maxResults            = 3;
         this.selectedResource      = null;
         this.selectedResourceLabel = null;
         this.searchTerm            = '';
         this.ongoingSearches       = 0;
         this.searchResults         = [];
         
-        this._autocompleteLoaded = false;
         this._domReady           = false;
+        this._autocompleteLoaded = false;
+        
+        this._options = $.extend({
+            minChars: 3, 
+            delay: 1000, 
+            max: 30, 
+            maxResults: 3
+        }, this.options);
         
         // search sources appearence config
         this.sources = {
             sparql:     {label: 'Local Search',         color: '#efe', border: '#e3ffe3', rank:  1}, 
             sindice:    {label: 'Sindice Search',       color: '#eef', border: '#e3e3ff', rank:  2}, 
-        /*  watson:     {label: 'Watson Search',        color: '#ffe', border: '#ffffe3', rank: -1}, */
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  3}
         }
         
         var self = this;
-        // http://localhost/OntoWiki/libraries/RDFauthor/libraries/jquery.ui.autocomplete.js
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js', function () {
             self._autocompleteLoaded = true;
             self._initAutocomplete();
@@ -109,11 +115,7 @@ RDFauthor.registerWidget({
         var self = this;
         
         var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
-        var rangePattern = '';
-        if (range.length > 0) {
-            // TODO: use all ranges
-            rangePattern = '?s a <' + range[0] + '> .';
-        }
+        var rangePattern = '?s a <' + range.join('> .\n?s a <') + '> .';
         
         // SPARQL endpoint
         var query = 'SELECT DISTINCT ?s ?o WHERE {\
@@ -121,7 +123,7 @@ RDFauthor.registerWidget({
             ' + rangePattern + '\
             FILTER (ISLITERAL(?o) && REGEX(?o, "' + searchTerm + '", "i"))\
         }\
-        LIMIT ' + this.maxResults;
+        LIMIT ' + this._options.maxResults;
         
         RDFauthor.queryGraph(this.statement.graphURI(), query, {
             callbackSuccess: function (data) {                
@@ -176,12 +178,23 @@ RDFauthor.registerWidget({
             }, 
             success: function (data, status) {
                 var sindiceResults = [];
-                for (var i = 0; i < Math.min(data.entries.length, self.maxResults); ++i) {
+                for (var i = 0; i < Math.min(data.entries.length, self._options.maxResults); ++i) {
                     var current = data.entries[i];
+                    var title   = String(current.title);
+                    
+                    if (title.length > MAX_TITLE_LENGTH) {
+                        var searchPos = title.search(RegExp(self.searchTerm, 'i'));
+                        if (searchPos > -1) {
+                            var leftSplit  = Math.max(title.lastIndexOf(',', searchPos) + 1, 0);
+                            var rightSplit = title.indexOf(',', searchPos);
+                            title = title.substring(leftSplit, rightSplit > -1 ? rightSplit : title.length);
+                        }
+                    }
+                    
                     sindiceResults.push({
                         source: 'sindice', 
                         value: String(current.link), 
-                        label: String(current.title)
+                        label: title
                     });
                 }
 
@@ -225,6 +238,7 @@ RDFauthor.registerWidget({
     }, 
     
     isURI: function (term) {
+        // TODO: more advanced URI check
         return (/(https?:\/\/|mailto:|tel:)/.exec(term) !== null);
     }, 
     
@@ -242,9 +256,9 @@ RDFauthor.registerWidget({
             
             var self = this;
             this.element().autocomplete({
-                minChars: 3,
-                delay: 1000,
-                max: 20, 
+                minLength: self._options.minChars,
+                delay: self._options.delay,
+                max: self._options.max, 
                 search: function (event, ui) {
                     var value = self.element().val();
                     // cancel search if URI entered

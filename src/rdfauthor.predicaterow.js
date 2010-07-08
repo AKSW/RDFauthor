@@ -126,7 +126,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         var widgetInstance = null;
         
         // instantiate widget
-        if ((constructor != undefined) && (typeof constructor == 'function')) {
+        if ((undefined !== constructor) && (typeof constructor == 'function')) {
             widgetInstance = new constructor(statement);
             widgetInstance.constructor = constructor;
         } else {
