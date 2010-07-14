@@ -14,26 +14,52 @@ RDFauthor.registerWidget({
         this.ongoingSearches       = 0;
         this.searchResults         = [];
         
-        this._domReady           = false;
-        this._autocompleteLoaded = false;
+        this._domReady     = false;
+        this._pluginLoaded = false;
+        this._initialized  = false;
         
-        this._options = $.extend({
-            minChars: 3, 
-            delay: 1000, 
-            max: 30, 
-            maxResults: 3
+        /* default options */
+        this._options = jQuery.extend({
+            // Autocomplete options:
+            minChars:         3,      /* minmum chars needed to be typed before search starts */
+            delay:            1000,   /* delay in ms before search starts */
+            max:              9,      /* maximum number of results */
+            maxResults:       3,      /* maximum number of results per source */
+            // Source options:
+            sparql:           true,   /* use SPARQL endpoint */
+            sindice:          true,   /* use Sindice semantic search */
+            uri:              true,   /* provide generated URI */
+            // Filter options:
+            filterRange:      true,   /* show only resources in the rdfs:range of the statement's property */
+            filterDomain:     false,  /* show only properties whose domain matches the statement's subject */
+            filterProperties: false,  /* show only resources used as properties */
+            // Callbacks
+            selectionCallback: null
+            
         }, this.options);
+        
+        
+        
+        // check conflicting and implied options
+        if (this._options.filterRange) {
+            this._options.filterDomain     = false;
+            this._options.filterProperties = false;
+        } else if (this._options.filterDomain) {
+            this._options.filterRange      = false;
+            this._options.filterProperties = true;
+        }
         
         // search sources appearence config
         this.sources = {
             sparql:     {label: 'Local Search',         color: '#efe', border: '#e3ffe3', rank:  1}, 
-            sindice:    {label: 'Sindice Search',       color: '#eef', border: '#e3e3ff', rank:  2}, 
-            uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  3}
+            sparqlmm:   {label: 'Domain Mismatch',      color: '#fee', border: '#ffe3e3', rank:  2}, 
+            sindice:    {label: 'Sindice Search',       color: '#eef', border: '#e3e3ff', rank:  6}, 
+            uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  8}
         }
         
         var self = this;
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js', function () {
-            self._autocompleteLoaded = true;
+            self._pluginLoaded = true;
             self._initAutocomplete();
         });
         
@@ -57,7 +83,7 @@ RDFauthor.registerWidget({
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input" \
                        value="' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
             </div>';
-
+        
         return markup;
     }, 
     
@@ -114,105 +140,159 @@ RDFauthor.registerWidget({
         this.searchResults = [];
         var self = this;
         
-        var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
-        var rangePattern = '?s a <' + range.join('> .\n?s a <') + '> .';
-        
-        // SPARQL endpoint
-        var query = 'SELECT DISTINCT ?s ?o WHERE {\
-            ?s ?p ?o .\
-            ' + rangePattern + '\
-            FILTER (ISLITERAL(?o) && REGEX(?o, "' + searchTerm + '", "i"))\
-        }\
-        LIMIT ' + this._options.maxResults;
-        
-        RDFauthor.queryGraph(this.statement.graphURI(), query, {
-            callbackSuccess: function (data) {                
-                var sparqlResults = [];
-                if (data['results'] && data['results']['bindings']) {
-                    var bindings  = data['results']['bindings'];
-                    var resources = {};
-                    
-                    for (var i = 0, max = bindings.length; i < max; i++) {
-                        var binding = bindings[i];
-                        if (binding['s']) {
-                            var current = binding['s'];
-                            if (current.type == 'uri') {
-                                var uri = current.value;
-                                var label;
-                                
-                                if (binding['o']) {
-                                    label = binding['o']['value'];
-                                }
-                                
-                                if (undefined == resources[uri]) {
-                                    resources[uri] = true;
-                                    sparqlResults.push({
-                                        source: 'sparql', 
-                                        value:  uri, 
-                                        label:  label
-                                    })
+        if (this._options.sparql) {
+            // SPARQL endpoint    
+            var prologue      = '\
+                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>';
+            var uriPattern    = '?uri ?v1 ?literal .\n';
+            var propertyPattern = '';
+            var domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
+            var rangePattern  = '';
+            var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
+            
+            if (this._options.filterProperties) {
+                propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
+            }
+            
+            if (this._options.filterRange) {
+                var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
+                if (range.length > 0) {
+                    rangePattern = '?uri a <' + range.join('> .\n?uri a <') + '> .\n';
+                }
+            }
+            
+            var query = prologue + 'SELECT DISTINCT ?uri ?literal ?domain ?type\
+                FROM <' + this.statement.graphURI() + '>\
+                WHERE {\
+                    ' + uriPattern + '\
+                    ' + propertyPattern + '\
+                    ' + domainPattern + '\
+                    ' + rangePattern + '\
+                    ' + typePattern + '\
+                    FILTER (\
+                        isURI(?uri) \
+                        && isLITERAL(?literal) \
+                        && REGEX(?literal, "' + searchTerm + '", "i") \
+                        && REGEX(?literal, "^.{1,' + MAX_TITLE_LENGTH + '}$"))\
+                }\
+                LIMIT ' + this._options.maxResults;
+            
+            // TODO: if domain is bound, check if current subject is an instance of it
+
+            RDFauthor.queryGraph(this.statement.graphURI(), query, {
+                callbackSuccess: function (data) {                
+                    var sparqlResults = [];
+                    if (data['results'] && data['results']['bindings']) {
+                        var bindings  = data['results']['bindings'];
+                        var resources = {};
+
+                        for (var i = 0, max = bindings.length; i < max; i++) {
+                            var binding = bindings[i];
+                            if (binding['uri']) {
+                                var current = binding['uri'];
+                                if (current.type == 'uri') {
+                                    var uri = current.value;
+                                    var label;
+
+                                    if (binding['literal']) {
+                                        label = binding['literal']['value'];
+                                    }
+                                    
+                                    if (undefined == resources[uri]) {
+                                        resources[uri] = true;
+                                        
+                                        var domain = binding['domain'];
+                                        var type   = binding['type'];
+                                        
+                                        if (undefined !== domain && undefined !== type) {
+                                            if (domain['value'] != type['value']) {
+                                                sparqlResults.push({
+                                                    source: 'sparqlmm', 
+                                                    value:  uri, 
+                                                    label:  label
+                                                });
+                                            } else {
+                                                sparqlResults.push({
+                                                    source: 'sparql', 
+                                                    value:  uri, 
+                                                    label:  label
+                                                });
+                                            }
+                                        } else {
+                                            sparqlResults.push({
+                                                source: 'sparql', 
+                                                value:  uri, 
+                                                label:  label
+                                            });
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+
+                    self.results(sparqlResults, responseCallback, 'sparql');
                 }
-                
-                self.results(sparqlResults, responseCallback, 'sparql');
-            }
-        });
-        this.ongoingSearches++;
+            });
+            this.ongoingSearches++;
+        }
         
         // Sindice search
-        $.ajax({
-            timeout: 10, 
-            dataType: 'json', 
-            url: 'http://api.sindice.com/v2/search?callback=?', 
-            data: {
-                qt: 'term', 
-                page: 1, 
-                format: 'json', 
-                q: encodeURIComponent(searchTerm)
-            }, 
-            error: function (request, status, error) {
-                self.results([], responseCallback);
-            }, 
-            success: function (data, status) {
-                var sindiceResults = [];
-                for (var i = 0; i < Math.min(data.entries.length, self._options.maxResults); ++i) {
-                    var current = data.entries[i];
-                    var title   = String(current.title);
-                    
-                    if (title.length > MAX_TITLE_LENGTH) {
-                        var searchPos = title.search(RegExp(self.searchTerm, 'i'));
-                        if (searchPos > -1) {
-                            var leftSplit  = Math.max(title.lastIndexOf(',', searchPos) + 1, 0);
-                            var rightSplit = title.indexOf(',', searchPos);
-                            title = title.substring(leftSplit, rightSplit > -1 ? rightSplit : title.length);
-                        }
-                    }
-                    
-                    sindiceResults.push({
-                        source: 'sindice', 
-                        value: String(current.link), 
-                        label: title
-                    });
-                }
+        if (this._options.sindice) {
+            jQuery.ajax({
+                timeout: 10, 
+                dataType: 'json', 
+                url: 'http://api.sindice.com/v2/search?callback=?', 
+                data: {
+                    qt: 'term', 
+                    page: 1, 
+                    format: 'json', 
+                    q: encodeURIComponent(searchTerm)
+                }, 
+                error: function (request, status, error) {
+                    self.results([], responseCallback);
+                }, 
+                success: function (data, status) {
+                    var sindiceResults = [];
+                    for (var i = 0; i < Math.min(data.entries.length, self._options.maxResults); ++i) {
+                        var current = data.entries[i];
+                        var title   = String(current.title);
 
-                self.results(sindiceResults, responseCallback, 'sindice');
-            }
-        })
-        this.ongoingSearches++;
+                        if (title.length > MAX_TITLE_LENGTH) {
+                            var searchPos = title.search(RegExp(self.searchTerm, 'i'));
+                            if (searchPos > -1) {
+                                var leftSplit  = Math.max(title.lastIndexOf(',', searchPos) + 1, 0);
+                                var rightSplit = title.indexOf(',', searchPos);
+                                title = title.substring(leftSplit, rightSplit > -1 ? rightSplit : title.length);
+                            }
+                        }
+
+                        sindiceResults.push({
+                            source: 'sindice', 
+                            value: String(current.link), 
+                            label: title
+                        });
+                    }
+
+                    self.results(sindiceResults, responseCallback, 'sindice');
+                }
+            })
+            this.ongoingSearches++;
+        }
         
         // static URI
-        this.ongoingSearches++;
-        this.results([{
-            source: 'uri', 
-            value: this.generateURI(searchTerm, this.statement.graphURI()), 
-            label: searchTerm
-        }], responseCallback, 'uri');
+        if (this._options.uri) {
+            this.ongoingSearches++;
+            this.results([{
+                source: 'uri', 
+                value: this.generateURI(searchTerm, this.statement.graphURI()), 
+                label: searchTerm
+            }], responseCallback, 'uri');
+        }
     }, 
     
-    results: function (partialResult, responseCallback, sourceKey) {
+    results: function (partialResult, responseCallback, sourceKey) {        
         var rank = this.sources[sourceKey].rank;
         this.searchResults[rank] = partialResult;
         this.ongoingSearches--;
@@ -221,7 +301,9 @@ RDFauthor.registerWidget({
             var combinedResults = [];
             
             for (var i = 1, max = this.searchResults.length; i < max; i++) {
-                combinedResults = combinedResults.concat(this.searchResults[i]);
+                if (undefined !== this.searchResults[i]) {
+                    combinedResults = combinedResults.concat(this.searchResults[i]);
+                }
             }
             
             responseCallback(combinedResults);
@@ -248,7 +330,7 @@ RDFauthor.registerWidget({
     }, 
     
     _initAutocomplete: function () {
-        if (this._autocompleteLoaded && this._domReady) {
+        if (this._pluginLoaded && this._domReady && !this._initialized) {
             // must be URI
             if (this.statement.hasObject()) {
                 this.element().addClass('resource-autocomplete-uri');
@@ -285,8 +367,12 @@ RDFauthor.registerWidget({
                 select: function (event, ui) {
                     self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
-
                     self.element().val(this.selectedResourceLabel);
+                    
+                    // callback
+                    if (typeof self._options.selectionCallback == 'function') {
+                        self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
+                    }
 
                     // prevent jQuery UI default
                     return false;
@@ -299,17 +385,22 @@ RDFauthor.registerWidget({
                 }
             })
             .data('autocomplete')._renderItem = function(ul, item) {
-                return $('<li></li>')
-                    .data('item.autocomplete', item)
-                    .append('<a class="resource-edit-item" style="background-color: ' + self.sources[item.source]['color'] + ';\
-                            border:1px solid ' + self.sources[item.source]['border'] + ';">\
-                        <span class="resource-edit-source">' + self.sources[item.source]['label'] + '</span>\
-                        <span class="resource-edit-label">' + self.highlight(item.label, self.searchTerm) + '</span>\
-                        <span class="resource-edit-uri">' + self.highlight(item.value, self.searchTerm) + '</span>\
-                    </a>')
-                    .css('width', self.element().innerWidth() - 4)
-                    .appendTo(ul);
+                // TODO: item sometimes undefiend
+                if (item) {
+                    return jQuery('<li></li>')
+                        .data('item.autocomplete', item)
+                        .append('<a class="resource-edit-item" style="background-color: ' + self.sources[item.source]['color'] + ';\
+                                border:1px solid ' + self.sources[item.source]['border'] + ';">\
+                            <span class="resource-edit-source">' + self.sources[item.source]['label'] + '</span>\
+                            <span class="resource-edit-label">' + self.highlight(item.label, self.searchTerm) + '</span>\
+                            <span class="resource-edit-uri">' + self.highlight(item.value, self.searchTerm) + '</span>\
+                        </a>')
+                        .css('width', self.element().innerWidth() - 4)
+                        .appendTo(ul);
+                }
             };
+            
+            this._initialized = true;
         }
     }
 }, [{

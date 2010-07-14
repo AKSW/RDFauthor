@@ -275,11 +275,13 @@ RDFauthor = (function () {
                         WHERE {' + patterns.join(' UNION ') + ' FILTER(' + filters.join(' || ') + ')}';
                     // query = query.replace(/\s+/g, ' ');
 
-                    // use first graph for now
+                    // use first graph w/ update info for now
                     var graph;
                     for (var g in _graphInfo) {
-                        graph = g;
-                        break;
+                        if (undefined !== RDFauthor.serviceURIForGraph(g)) {
+                            graph = g;
+                            break;
+                        }
                     }
 
                     // fallback to default graph
@@ -330,6 +332,8 @@ RDFauthor = (function () {
                 _predicateInfo = {};
                 _callIfIsFunction(callback);
             }
+        } else {
+            _callIfIsFunction(callback);
         }
     }
     
@@ -553,17 +557,20 @@ RDFauthor = (function () {
         }
         view.reset();
         
-        for (var graph in _databanksByGraph) {
-            var updateEndpoint = RDFauthor.updateURIForGraph(graph);
-            if (undefined !== updateEndpoint) {
-                var triples = _databanksByGraph[graph].triples();
-                for (var i = 0, length = triples.length; i < length; i++) {
-                    // init statement
-                    var statement = new Statement(triples[i], {'graph': graph});
-                    view.addWidget(statement);
+        /* make sure, view has predicate info available */
+        _fetchPredicateInfo(function() {
+            for (var graph in _databanksByGraph) {
+                var updateEndpoint = RDFauthor.updateURIForGraph(graph);
+                if (undefined !== updateEndpoint) {
+                    var triples = _databanksByGraph[graph].triples();
+                    for (var i = 0, length = triples.length; i < length; i++) {
+                        // init statement
+                        var statement = new Statement(triples[i], {'graph': graph});
+                        view.addWidget(statement);
+                    }
                 }
             }
-        }
+        });
     };
     
     /**
@@ -654,7 +661,7 @@ RDFauthor = (function () {
                     
                     jQuery.get(updateURI, {query: updateQuery, success: function () {
                         _view.hide(true);
-                        _callIfIsFunction(_options.onSubmitSuccess);
+                        // _callIfIsFunction(_options.onSubmitSuccess);
                     }});
                 } else {
                     // REST style
@@ -669,7 +676,7 @@ RDFauthor = (function () {
                             'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
                         }, function () {
                             _view.hide(true);
-                            _callIfIsFunction(_options.onSubmitSuccess);
+                            // _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }
                 }
@@ -705,11 +712,12 @@ RDFauthor = (function () {
     
     // load required scripts
     _requirePending++;
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');     /* Statement */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js');  /* Predicate Row */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js');  /* Subject Group */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');          /* View */
-    _require(__RDFA_BASE + 'rdfa.js');                           /* RDFA */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');    /* Statement */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js'); /* Predicate Row */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.selector.js');     /* Property selector */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js'); /* Subject Group */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');         /* View */
+    _require(__RDFA_BASE + 'rdfa.js');                          /* RDFA */
     
     // load widgets; widget prototype is required before all other widgets
     _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
@@ -903,18 +911,32 @@ RDFauthor = (function () {
             
             var subjectURI   = statement.subjectURI();
             var predicateURI = statement.predicateURI();
-            var rangeURI     = this.infoForPredicate(predicateURI, 'range');
             var datatypeURI  = statement.hasObject() ? statement.objectDatatype() : null;
+            var ranges       = this.infoForPredicate(predicateURI, 'range');
+            var types        = this.infoForPredicate(predicateURI, 'type');
             
             // local widget selection
             if (subjectURI in _registeredWidgets.resource) {
                 widgetConstructor = _registeredWidgets.resource[subjectURI];
             } else if (predicateURI in _registeredWidgets.property) {
                 widgetConstructor = _registeredWidgets.property[predicateURI];
-            } else if (rangeURI in _registeredWidgets.range) {
-                widgetConstructor = _registeredWidgets.range[rangeURI];
+            } else if (ranges[0] in _registeredWidgets.range) {
+                widgetConstructor = _registeredWidgets.range[ranges[0]];
             } else if (datatypeURI in _registeredWidgets.datatype) {
                 widgetConstructor = _registeredWidgets.datatype[datatypeURI];
+            }
+            
+            // try property axioms (property type, property range)
+            if (null === widgetConstructor) {
+                if ((jQuery.inArray(OWL_NS + 'DatatypeProperty', types) >= 0) 
+                    || (jQuery.inArray(RDFS_NS + 'Literal', ranges) >= 0)) {
+                    
+                    widgetConstructor = _registeredWidgets[LITERAL_HOOK][''];
+                } else if ((jQuery.inArray(OWL_NS + 'ObjectProperty', types) >= 0)
+                    || (jQuery.inArray(RDFS_NS + 'Resource', ranges) >= 0)) {
+                    
+                    widgetConstructor = _registeredWidgets[OBJECT_HOOK][''];
+                }
             }
             
             // fallback to default widgets

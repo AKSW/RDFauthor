@@ -17,7 +17,8 @@
  * @requires RDFauthor
  * @requires PredicateRow
  */
-function SubjectGroup(subjectURI, title, container, id) {
+function SubjectGroup(graphURI, subjectURI, title, container, id) {
+    this._graphURI   = graphURI;
     this._subjectURI = subjectURI;
     this._title      = title;
     this._container  = container instanceof jQuery   // jQuery-wrapped container DOM element
@@ -29,6 +30,7 @@ function SubjectGroup(subjectURI, title, container, id) {
     this._rows     = {};                // Hash map for property rows
     this._rowsByID = {};
     this._rowCount = 0;
+    this._propertySelector = null;
     
     var instance = this;
     
@@ -95,6 +97,41 @@ SubjectGroup.prototype = {
      */
     numberOfRows: function () {
        return this._rowCount; 
+    }, 
+    
+    /**
+     * Returns the property selector instance for this subject group.
+     */
+    getPropertySelector: function (callback) {
+        if (null === this._propertySelector) {
+            var self = this;
+            var selectorOptions = {
+                container: jQuery(this.getElement()), 
+                selectionCallback: function (uri, label) {
+                    var statement = new Statement({
+                        subject: '<' + self._subjectURI + '>', 
+                        predicate: '<' + uri + '>'}, {
+                            title: label, 
+                            graph: self._graphURI
+                        });
+                    self._propertySelector.dismiss(false);
+                    
+                    var ID = self.addWidget(statement);
+                    
+                    if (typeof callback == 'function') {
+                        callback(ID);
+                    }
+                    
+                    var row    = self.getRowByPredicate(uri);
+                    var widget = row.getWidgetForID(ID);
+                    widget.focus();
+                }
+            };
+            
+            this._propertySelector = new Selector(this._graphURI, this._subjectURI, selectorOptions);
+        }
+        
+        return this._propertySelector;
     }, 
     
     /**

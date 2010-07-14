@@ -30,8 +30,10 @@ function View(options) {
         title: 'Edit Properties', 
         saveButtonTitle: 'Save', 
         cancelButtonTitle: 'Cancel', 
+        propertyButtonTitle: 'Add Property', 
         container: 'body', 
         showButtons: true, 
+        showPropertyButton: true, 
         animationTime: 250, // ms
         id: 'rdfAuthorView', 
         contentContainerClass: 'rdfAuthorViewContent'/*, 
@@ -66,8 +68,14 @@ function View(options) {
     function getButtons() {
         var buttonHTML = '';
         if (self._options.showButtons) {
+            var propertyButton = '';
+            if (self._options.showPropertyButton) {
+                propertyButton = '<button type="button" id="rdfauthor-button-property">' + self._options.propertyButtonTitle + '</button>';
+            }
+            
             buttonHTML = '\
                 <div id="rdfAuthorButtons">\
+                    ' + propertyButton + '\
                     <button type="button" id="rdfauthor-button-cancel">' + self._options.cancelButtonTitle + '</button>\
                     <button type="button" id="rdfauthor-button-submit">' + self._options.saveButtonTitle + '</button>\
                 </div>';
@@ -86,14 +94,6 @@ function View(options) {
             jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
             // jQuery('#' + this.cssID()).resizable();
         }
-        
-        jQuery('#rdfauthor-button-cancel').live('click', function () {
-            jQuery('body').trigger('rdfauthor.view.cancel');
-            
-            if (typeof self._options.onAfterCancel == 'function') {
-                self._options.onAfterCancel();
-            }
-        });
 
         jQuery('#rdfauthor-button-submit').live('click', function () {            
             if (typeof self._options.onBeforeSubmit == 'function') {
@@ -106,6 +106,29 @@ function View(options) {
                 self._options.onAfterSubmit();
             }
         });
+        
+        jQuery('#rdfauthor-button-cancel').live('click', function () {
+            jQuery('body').trigger('rdfauthor.view.cancel');
+            
+            if (typeof self._options.onAfterCancel == 'function') {
+                self._options.onAfterCancel();
+            }
+        });
+        
+        jQuery('#rdfauthor-button-property').live('click', function () {
+            jQuery('body').trigger('rdfauthor.view.property');
+            var subjectGroup = self.activeSubjectGroup();
+            var propertySelector = subjectGroup.getPropertySelector(function (widgetID) {
+                var rowTop          = jQuery('#' + widgetID).closest('.property-row').offset().top;
+                var containerTop    = jQuery('.' + self._options.contentContainerClass).offset().top;
+                var containerScroll = jQuery('.' + self._options.contentContainerClass).scrollTop();
+                
+                // TODO: seems to not work properly
+                var scrollTo = containerScroll - (containerTop - rowTop);
+                jQuery('.' + self._options.contentContainerClass).animate({scrollTop: scrollTo}, 250);
+            });
+            propertySelector.presentInContainer(true);
+        });
     }
 }
 
@@ -116,22 +139,29 @@ View.prototype = {
      * @param {function} Constructor function to be used for widget instantiation
      */
     addWidget: function (statement, constructor) {
-        var subjectURI = statement.subjectURI();
+        var graphURI     = statement.graphURI();
+        var subjectURI   = statement.subjectURI();
+        var subjectGroup = this.getSubjectGroup(graphURI, subjectURI);
+        
+        return subjectGroup.addWidget(statement, constructor);
+    }, 
+    
+    getSubjectGroup: function (graphURI, subjectURI) {
         var subjectGroup;
-        if (this._subjects.hasOwnProperty(subjectURI)) {
+        if (undefined !== this._subjects[subjectURI]) {
             subjectGroup = this._subjects[subjectURI];
         } else {
-            subjectGroup = new SubjectGroup(subjectURI, subjectURI, this.getContentContainer(), RDFauthor.nextID());
+            subjectGroup = new SubjectGroup(graphURI, subjectURI, subjectURI, this.getContentContainer(), RDFauthor.nextID());
             this._subjects[subjectURI] = subjectGroup;
             this._subjectCount++;
-            
+
             // save the first group as the initially active group
             if (null === this.activeSubject) {
                 this.activeSubject = subjectURI;
             }
         }
         
-        subjectGroup.addWidget(statement, constructor);
+        return subjectGroup;
     }, 
     
     /** 
@@ -139,7 +169,13 @@ View.prototype = {
      * @return SubjectGroup
      */
     activeSubjectGroup: function () {
-        return this.getSubjectGroup(this.activeSubject);
+        if (null === this.activeSubject) {
+            this.activeSubject = RDFauthor.defaultSubjectURI();
+            var activeGraph = RDFauthor.defaultGraphURI();
+            var subjectGroup = this.getSubjectGroup(activeGraph, this.activeSubject);
+        }
+        
+        return this.subjectGroup(this.activeSubject);
     }, 
     
     /**
@@ -164,7 +200,7 @@ View.prototype = {
      * @param subjectURI The subject URI for which to return the {@link SubjectGroup} (string)
      * @return {SubjectGroup}
      */
-    getSubjectGroup: function (subjectURI) {
+    subjectGroup: function (subjectURI) {
         return this._subjects[subjectURI];
     }, 
     
@@ -214,7 +250,9 @@ View.prototype = {
             this.position();
             // TODO: trigger event
         } else {
-            this.activeSubjectGroup().show();
+            if (this.activeSubjectGroup()) {
+                this.activeSubjectGroup().show();
+            }
             this._container.fadeIn(100, function () {
                 self.position();
                 jQuery(self.getElement()).fadeIn();

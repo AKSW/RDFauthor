@@ -64,7 +64,7 @@ function Statement(statementSpec, statementOptions) {
             
             this._object = jQuery.rdf.literal(statementSpec.object.value, literalOpts);
         }
-    } else if (statementSpec.hasOwnProperty('subject') && statementSpec.hasOwnProperty('predicate')) {
+    } else if (statementSpec.hasOwnProperty('subject')) {
         // s, p, o
         // create rdfQuery triple parts and store them
         var subjectSpec = typeof statementSpec.subject == 'object' ? statementSpec.subject.value : statementSpec.subject;
@@ -80,9 +80,12 @@ function Statement(statementSpec, statementOptions) {
             }
         }
         
-        var predicateSpec = typeof statementSpec.predicate == 'object' ? statementSpec.predicate.value : statementSpec.predicate;
-        var predicateOpts = statementSpec.predicate.options ? statementSpec.predicate.options : null;
-        this._predicate = jQuery.rdf.resource(predicateSpec, predicateOpts);
+        this._predicate = null;
+        if (statementSpec.hasOwnProperty('predicate')) {
+            var predicateSpec = typeof statementSpec.predicate == 'object' ? statementSpec.predicate.value : statementSpec.predicate;
+            var predicateOpts = statementSpec.predicate.options ? statementSpec.predicate.options : null;
+            this._predicate = jQuery.rdf.resource(predicateSpec, predicateOpts);
+        }
         
         this._object = null;
         // specified object: if object is given, it must be valid
@@ -159,6 +162,10 @@ Statement.prototype = {
         return jQuery.rdf.triple(this._subject, this._predicate, this._object);
     }, 
     
+    /**
+     * Returns a new statement based on the current statement where the object is changed
+     * 
+     */
     copyWithObject: function (objectSpec) {
         var copy = new Statement({
             subject: '<' + this.subjectURI() + '>', 
@@ -285,6 +292,10 @@ Statement.prototype = {
         return String(this._predicate.value);
     }, 
     
+    /**
+     * Returns the datatype of the statement's literal object (if any) or null.
+     * @return {string}
+     */
     objectDatatype: function () {        
         if (this.hasObject()) {
             if (this._object.datatype) {
@@ -295,6 +306,10 @@ Statement.prototype = {
         return null;
     }, 
     
+    /**
+     * Returns the language of the statement's literal object (if any) or null.
+     * @return {string}
+     */
     objectLang: function () {
         if (this.hasObject()) {
             if (this._object.lang) {
@@ -305,6 +320,12 @@ Statement.prototype = {
         return null;
     }, 
     
+    /**
+     * Returns the type of the statement's object.
+     * For a URI object the string 'uri' is returned, for a literal
+     * object, 'literal'.
+     * @return {string}
+     */
     objectType: function() {
         if (this.hasObject()) {
             if (this._object instanceof jQuery.rdf.resource) {
