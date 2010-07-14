@@ -51,9 +51,9 @@ RDFauthor.registerWidget({
         
         // search sources appearence config
         this.sources = {
-            sparql:     {label: 'Local Search',         color: '#efe', border: '#e3ffe3', rank:  1}, 
-            sparqlmm:   {label: 'Domain Mismatch',      color: '#fee', border: '#ffe3e3', rank:  2}, 
-            sindice:    {label: 'Sindice Search',       color: '#eef', border: '#e3e3ff', rank:  6}, 
+            sparql:     {label: 'Local result',         color: '#efe', border: '#e3ffe3', rank:  1}, 
+            sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2}, 
+            sindice:    {label: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6}, 
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  8}
         }
         
