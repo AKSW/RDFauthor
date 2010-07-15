@@ -44,13 +44,12 @@ function Statement(statementSpec, statementOptions) {
         } else {
             var literalOpts  = {};
             var quoteLiteral = true;
+            var containsQuotes = (String(statementSpec.object.value).indexOf('\'') > -1);
             
             if (statementSpec.object.lang) {
                 literalOpts.lang = statementSpec.object.lang;
-                quoteLiteral = false;
-            } else if (statementSpec.object.datatype) {
+            } else if (!containsQuotes && statementSpec.object.datatype) {
                 literalOpts.datatype = statementSpec.object.datatype.uri;
-                quoteLiteral = false;
                 
                 // register user-defined datatype
                 if (!this.isDatatypeValid(literalOpts.datatype)) {
@@ -58,8 +57,11 @@ function Statement(statementSpec, statementOptions) {
                 }
             }
             
-            if (quoteLiteral) {
-                statementSpec.object.value = '"' + statementSpec.object.value + '"';
+            var longLiteral = (String(statementSpec.object.value).search(/[\t\b\n\r\f\\\"\\\']/) > -1);
+            var quoteChars  = longLiteral ? '"""' : '"';
+            
+            if (quoteLiteral || longLiteral) {
+                statementSpec.object.value = quoteChars + statementSpec.object.value + quoteChars;
             }
             
             this._object = jQuery.rdf.literal(statementSpec.object.value, literalOpts);
