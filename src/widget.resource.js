@@ -162,7 +162,7 @@ RDFauthor.registerWidget({
                 }
             }
             
-            var query = prologue + 'SELECT DISTINCT ?uri ?literal ?domain ?type\
+            var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
                 FROM <' + this.statement.graphURI() + '>\
                 WHERE {\
                     ' + uriPattern + '\
