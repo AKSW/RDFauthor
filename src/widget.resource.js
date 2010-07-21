@@ -205,7 +205,7 @@ RDFauthor.registerWidget({
                                         var domain = binding['domain'];
                                         var type   = binding['type'];
                                         
-                                        if (undefined !== domain && undefined !== type) {
+                                        if (domain && type) {
                                             if (domain['value'] != type['value']) {
                                                 sparqlResults.push({
                                                     source: 'sparqlmm', 
