@@ -48,8 +48,10 @@ function Statement(statementSpec, statementOptions) {
             
             if (statementSpec.object.lang) {
                 literalOpts.lang = statementSpec.object.lang;
+                quoteLiteral = false;
             } else if (!containsQuotes && statementSpec.object.datatype) {
                 literalOpts.datatype = statementSpec.object.datatype.uri;
+                quoteLiteral = false;
                 
                 // register user-defined datatype
                 if (!this.isDatatypeValid(literalOpts.datatype)) {
