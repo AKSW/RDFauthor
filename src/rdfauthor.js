@@ -1226,6 +1226,15 @@ RDFauthor = (function () {
         }, 
         
         /**
+         * Sets the infor predicates for the graph denoted by graphURI.
+         * Currently the info keys 'queryEndpoint' and 'updateEndpoint' 
+         * (both pointing to a URI) are recodgnized.
+         */
+        setInforForGraph: function (graphURI, infoSpec, infoValue) {
+            _graphInfo[graphURI][infoSpec] = infoValue;
+        }, 
+        
+        /**
          * Returns the SPARQL query service URI for graph denoted by graphURI.
          * @param {string} graphURI
          * @return {string}
