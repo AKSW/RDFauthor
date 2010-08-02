@@ -1231,6 +1231,10 @@ RDFauthor = (function () {
          * (both pointing to a URI) are recodgnized.
          */
         setInforForGraph: function (graphURI, infoSpec, infoValue) {
+            if (!(graphURI in _graphInfo)) {
+                _graphInfo[graphURI] = {};
+            }
+            
             _graphInfo[graphURI][infoSpec] = infoValue;
         }, 
         
