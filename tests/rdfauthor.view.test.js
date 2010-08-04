@@ -1,55 +1,4 @@
-$(document).ready(function() {
-    // dummy RDFauthor
-    RDFauthor = {
-        nextID: function() {return Math.round(Math.random() * 1000)}, 
-        getWidgetForHook: function () {return new _Widget}. 
-        getWidgetForStatement: function () {return new _Widget}
-    }
-    
-    // dummy statements
-    var statement1 = {
-        subjectURI: function () {return 'http://example.com/subject1'}, 
-        predicateURI: function () {return 'http://example.com/predicate1'}, 
-        predicateLabel: function () {return 'Predicate 1'}, 
-        hasObject: function () {return false}, 
-        objectDatatype: function () {return null}, 
-        objectLang: function () {return null}, 
-        objectType: function () {return 'uri'}
-    };
-
-    // dummy widget
-    _Widget = function(s) {
-        this.s = s;
-        this.remove = false;
-        this.cancel = false;
-        this.submit = false;
-    }
-    // dummy widget prototype
-    _Widget.prototype = {
-        init: function () {
-            // do nothing
-        }, 
-        markup: function () {
-            return '<span>I am a widget!</span>';
-        }, 
-        remove: function() {
-            this.remove = true;
-        }, 
-        cancel: function() {
-            this.cancel = true;
-        }, 
-        submit: function() {
-            this.submit = true;
-        }
-    };
-    
-    if (SubjectGroup == undefined) {
-        SubjectGroup = function (uri, title, container, id) {};
-        SubjectGroup.prototype = {
-            addWidget: function (s) {}
-        }
-    }
-    
+$(document).ready(function() {    
     module('rdfauthor.view', {
         setup: function () {
             this.fixtureID = 'rdfAuthorViewTest';
@@ -68,8 +17,7 @@ $(document).ready(function() {
         }
     });
     
-    test('init', function() {
-        expect(4);
+    test('init', 4, function() {
         ok(this.fixture instanceof View, 'Should be instance of View.');
         equal($('#' + TEST_CONTAINER_ID).children('#' + this.fixtureID).length, 1, 'Container should have 1 child with view\'s id.');
         ok($('#' + TEST_CONTAINER_ID).children('#' + this.fixtureID).hasClass('window'), 'View should have class window.');
@@ -77,8 +25,7 @@ $(document).ready(function() {
               'View window should have the title that was set on instantiation.');
     });
     
-    test('addWidget', function() {
-        expect(3);
+    test('addWidget', 3, function() {
         this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
         this.fixture.addWidget(statement2, new _Widget);
@@ -87,34 +34,29 @@ $(document).ready(function() {
         equal(this.fixture._subjectCount, 2, 'Should have 2 subjects.');
     });
     
-    test('getContentContainer', function() {
-        expect(1);
+    test('getContentContainer', 1, function() {
         equal(this.fixture.getContentContainer().get(0), 
             $('#' + TEST_CONTAINER_ID).children('#' + this.fixtureID).children('.' + this.fixtureContentContainerClass).get(0), 
             'Returned DOM element should match container set on instantiation.');
     });
     
-    test('getElement', function() {
-        expect(1);
+    test('getElement', 1, function() {
         // ok(this.fixture.getElement() instanceof HTMLElement, 'Element returned should be an instance of HTMLElement.');
         equal($(this.fixture.getElement()).attr('id'), 'rdfAuthorViewTest', 'Should have the id given on initialization.');
     });
     
-    test('getSubjectGroup', function() {
-        expect(2);
+    test('getSubjectGroup', 2, function() {
         this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
         ok(this.fixture.getSubjectGroup('http://example.com/subject1') instanceof SubjectGroup, 
             'Returned subject group should be an instance of SubjectGroup.');
     });
     
-    test('cssID', function() {
-        expect(1);
+    test('cssID', 1, function() {
         equal(this.fixture.cssID(), this.fixtureID, 'Should return CSS id passed on initialization.');
     });
     
-    test('numberOfSubjects', function() {
-        expect(4);
+    test('numberOfSubjects', 4, function() {
         equal(this.fixture.numberOfSubjects(), 0, 'Should have 0 subjects.');
         this.fixture.addWidget(statement1, new _Widget);
         equal(this.fixture.numberOfSubjects(), 1, 'Should have 1 subject.');
@@ -124,8 +66,7 @@ $(document).ready(function() {
         equal(this.fixture.numberOfSubjects(), 2, 'Should still have 2 subjects.');
     });
     
-    test('show', function() {
-        expect(2);
+    test('show', 2, function() {
         var el = this.fixture.getElement();
         $(el).hide();
         equal($(el).css('display'), 'none', 'Element should not be visible before');
@@ -133,8 +74,7 @@ $(document).ready(function() {
         ok($(el).css('display') != 'none', 'Element should be visible afterwards.');
     });
     
-    test('hide', function() {
-        expect(2);
+    test('hide', 2, function() {
         var el = this.fixture.getElement();
         $(el).show();
         ok($(el).css('display') != 'none', 'Element should be visible before.');

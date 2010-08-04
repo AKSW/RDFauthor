@@ -35,41 +35,28 @@ function Statement(statementSpec, statementOptions) {
         this._object    = statementSpec.object;
     } else if (typeof RDFStatement != 'undefined' && statementSpec.constructor == RDFStatement) {
         // RDFA triple, create rdfQuery truple parts and store them
-        this._subject   = jQuery.rdf.resource('<' + statementSpec.subject.uri + '>');
+        
+        if (statementSpec.subject instanceof RDFSymbol) {
+            this._subject = jQuery.rdf.resource('<' + statementSpec.subject.uri + '>');
+        } else if (statementSpec.subject instanceof RDFBlankNode) {
+            this._subject = jQuery.rdf.blank(statementSpec.subject.id);
+        }
+        
         this._predicate = jQuery.rdf.resource('<' + statementSpec.predicate.uri + '>');
         
-        // TODO: blank nodes
-        if (statementSpec.object.uri) {
+        if (statementSpec.object instanceof RDFSymbol) {
             this._object = jQuery.rdf.resource('<' + statementSpec.object.uri + '>');
+        } else if (statementSpec.object instanceof RDFBlankNode) {
+            this._subject = jQuery.rdf.blank(statementSpec.object.id);
         } else {
-            var literalOpts  = {};
-            var quoteLiteral = true;
-            var containsQuotes = (String(statementSpec.object.value).indexOf('\'') > -1);
-            
-            if (statementSpec.object.lang) {
-                literalOpts.lang = statementSpec.object.lang;
-                quoteLiteral = false;
-            } else if (!containsQuotes && statementSpec.object.datatype) {
-                literalOpts.datatype = statementSpec.object.datatype.uri;
-                quoteLiteral = false;
-                
-                // register user-defined datatype
-                if (!this.isDatatypeValid(literalOpts.datatype)) {
-                    this.registerDatatype(literalOpts.datatype);
-                }
-            }
-            
-            var longLiteral = (String(statementSpec.object.value).search(/[\t\b\n\r\f\\\"\\\']/) > -1);
-            var quoteChars  = longLiteral ? '"""' : '"';
-            
-            if (quoteLiteral || longLiteral) {
-                statementSpec.object.value = quoteChars + statementSpec.object.value + quoteChars;
-            }
-            
-            this._object = jQuery.rdf.literal(statementSpec.object.value, literalOpts);
+            this._object = this.createLiteral({
+                value:    statementSpec.object.value, 
+                datatype: statementSpec.datatype ? statementSpec.datatype.uri : null, 
+                lang:     statementSpec.lang ? statementSpec.lang : null
+            });
         }
-    } else if (statementSpec.hasOwnProperty('subject')) {
-        // s, p, o
+    } else if (statementSpec.subject) {
+        // s, p, o; o can be either simple or complex
         // create rdfQuery triple parts and store them
         var subjectSpec = typeof statementSpec.subject == 'object' ? statementSpec.subject.value : statementSpec.subject;
         var subjectOpts = statementSpec.subject.options ? statementSpec.subject.options : null;
@@ -85,7 +72,7 @@ function Statement(statementSpec, statementOptions) {
         }
         
         this._predicate = null;
-        if (statementSpec.hasOwnProperty('predicate')) {
+        if (statementSpec.predicate) {
             var predicateSpec = typeof statementSpec.predicate == 'object' ? statementSpec.predicate.value : statementSpec.predicate;
             var predicateOpts = statementSpec.predicate.options ? statementSpec.predicate.options : null;
             this._predicate = jQuery.rdf.resource(predicateSpec, predicateOpts);
@@ -93,33 +80,50 @@ function Statement(statementSpec, statementOptions) {
         
         this._object = null;
         // specified object: if object is given, it must be valid
-        if (statementSpec.hasOwnProperty('object') && statementSpec.object) {
-            var quote = true;
+        if (statementSpec.object) {            
             var objectSpec = typeof statementSpec.object == 'object' ? statementSpec.object.value : statementSpec.object;
-            var objectOpts = statementSpec.object.options ? statementSpec.object.options : null;
+            var objectOpts = statementSpec.object.options ? statementSpec.object.options : {};
             
-            if (objectOpts && (objectOpts.hasOwnProperty('lang') || objectOpts.hasOwnProperty('datatype'))) {
-                quote = false;
-            }
-            
-            try {
+            if ((typeof objectSpec == 'string') && (objectSpec.charAt(0) == '<') && (objectSpec.charAt(objectSpec.length-1) == '>')) {
                 this._object = jQuery.rdf.resource(objectSpec, objectOpts);
-            } catch (e) {
-                try {
-                    this._object = jQuery.rdf.blank(objectSpec, objectOpts);
-                } catch (f) {
-                    try {
-                        // quote if necessary
-                        if (quote) {
-                            objectSpec = '"' + objectSpec + '"';
-                        }
-                        this._object = jQuery.rdf.literal(objectSpec, objectOpts);
-                    } catch (g) {
-                        // error
-                        throw 'Invalid object spec';
-                    }
-                }
+            } else {
+                this._object = this.createLiteral({
+                    value:    objectSpec, 
+                    datatype: objectOpts.datatype ? objectOpts.datatype : null, 
+                    lang:     objectOpts.lang ? objectOpts.lang : null
+                });
             }
+            
+            
+            // var quote = true;
+            // 
+            // if (objectOpts && (objectOpts.hasOwnProperty('lang') || objectOpts.hasOwnProperty('datatype'))) {
+            //     quote = false;
+            // }
+            // 
+            // try {
+            //     this._object = jQuery.rdf.resource(objectSpec, objectOpts);
+            // } catch (e) {
+            //     try {
+            //         this._object = jQuery.rdf.blank(objectSpec, objectOpts);
+            //     } catch (f) {
+            //         try {
+            //             // quote if necessary
+            //             if (quote) {
+            //                 objectSpec = '"' + objectSpec + '"';
+            //             }
+            //             this._object = jQuery.rdf.literal(objectSpec, objectOpts);
+            //         } catch (g) {
+            //             // error
+            //             throw 'Invalid object spec';
+            //         }
+            //     }
+            // }
+            
+            /*
+            var objectOpts = statementSpec.object.options ? statementSpec.object.options : {};        
+
+            */
         }
     } else {
         // error
@@ -185,6 +189,41 @@ Statement.prototype = {
         });
         
         return copy;
+    }, 
+    
+    createLiteral: function (objectSpec) {
+        var literalOpts = {};
+        var quoteLiteral = true;
+        var containsSingleQuotes = (String(objectSpec.value).indexOf('\'') > -1);
+        var containsDoubleQuotes = (String(objectSpec.value).indexOf('"') > -1);
+        var containsQuotes = (containsSingleQuotes || containsDoubleQuotes);
+        
+        if (objectSpec.lang) {
+            literalOpts.lang = objectSpec.lang;
+            quoteLiteral = false;
+        } else if (objectSpec.datatype) {
+            literalOpts.datatype = objectSpec.datatype;
+            quoteLiteral = containsQuotes ? true : false;
+            
+            // register user-defined datatype
+            if (!this.isDatatypeValid(literalOpts.datatype)) {
+                this.registerDatatype(literalOpts.datatype);
+            }
+        }
+        
+        var longLiteral = (String(objectSpec.value).search(/[\t\b\n\r\f\\\"\\\']/) > -1);
+        var quoteChars  = longLiteral ? '"""' : '"';
+        
+        if (quoteLiteral || longLiteral) {
+            if (containsDoubleQuotes) {
+                // escape double quotes
+                objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');
+            }
+            
+            objectSpec.value = quoteChars + objectSpec.value + quoteChars;
+        }
+        
+        return jQuery.rdf.literal(objectSpec.value, literalOpts);
     }, 
     
     /**

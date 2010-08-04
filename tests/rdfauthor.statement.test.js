@@ -1,6 +1,7 @@
 $(document).ready(function() {
     module('rdfauthor.statement', {
         setup: function () {
+            RDFauthor.reset();
             this.fixture = new Statement({
                 subject: '<http://example.com/r1>', 
                 predicate: '<http://ns.aksw.org/update/p1>', 
@@ -32,14 +33,14 @@ $(document).ready(function() {
     
     test('initComlex', 3, function() {        
         var s1 = new Statement({
-            subject: {value: '<http://example.com/r1>'}, 
-            predicate: {value: 'ex:p1', options: {namespaces: {'ex': 'http://example.com/'}}}, 
-            object: {value: '<http://example.com/o1>'}
+            subject: {value: '<http://example.com/cr1>'}, 
+            predicate: {value: 'ex:cp1', options: {namespaces: {'ex': 'http://example.com/'}}}, 
+            object: {value: '<http://example.com/co1>'}
         });
         equal(
             String(s1), 
-            '<http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .', 
-            'Statement should be <http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .');
+            '<http://example.com/cr1> <http://example.com/cp1> <http://example.com/co1> .', 
+            'Statement should be <http://example.com/cr1> <http://example.com/cp1> <http://example.com/co1> .');
 
         var s2 = new Statement({
             subject: '<http://example.com/r1>', 
@@ -58,6 +59,58 @@ $(document).ready(function() {
             String(s3), 
             '<http://example.com/r1> <http://example.com/p1> "ttt"@de .', 
             'Statement should be <http://example.com/r1> <http://example.com/p1> "ttt"@de .');
+    });
+    
+    test('initWithLongLiteral', 5, function() {        
+        var s1 = new Statement({
+            subject: {value: '<http://example.com/r1>'}, 
+            predicate: {value: 'ex:p1', options: {namespaces: {'ex': 'http://example.com/'}}}, 
+            object: {value: 'literal with \' single quote.'}
+        });
+        equal(
+            String(s1), 
+            '<http://example.com/r1> <http://example.com/p1> "literal with \' single quote." .', 
+            'Statement should be <http://example.com/r1> <http://example.com/p1> "literal with \' single quote." .');
+        
+        var s2 = new Statement({
+            subject: {value: '<http://example.com/r2>'}, 
+            predicate: {value: 'ex:p2', options: {namespaces: {'ex': 'http://example.com/'}}}, 
+            object: {value: 'literal with "double" quote.'}
+        });
+        equal(
+            String(s2), 
+            '<http://example.com/r2> <http://example.com/p2> "literal with "double" quote." .', 
+            'Statement should be <http://example.com/r2> <http://example.com/p2> "literal with "double" quote." .');
+        
+        var s3 = new Statement({
+            subject: {value: '<http://example.com/r3>'}, 
+            predicate: {value: 'ex:p3', options: {namespaces: {'ex': 'http://example.com/'}}}, 
+            object: {value: 'literal with \n line break.'}
+        });
+        equal(
+            String(s3), 
+            '<http://example.com/r3> <http://example.com/p3> "literal with \n line break." .', 
+            'Statement should be <http://example.com/r3> <http://example.com/p3> "literal with \n line break." .');
+
+        var s4 = new Statement({
+            subject: {value: '<http://example.com/r4>'}, 
+            predicate: {value: 'ex:p4', options: {namespaces: {'ex': 'http://example.com/'}}}, 
+            object: {value: 'literal with \t tab.'}
+        });
+        equal(
+            String(s4), 
+            '<http://example.com/r4> <http://example.com/p4> "literal with \t tab." .', 
+            'Statement should be <http://example.com/r4> <http://example.com/p4> "literal with \t tab." .');
+        
+        var s5 = new Statement({
+            subject: {value: '<http://example.com/r5>'}, 
+            predicate: {value: 'ex:p5', options: {namespaces: {'ex': 'http://example.com/'}}}, 
+            object: {value: 'literal with ünícóde.'}
+        });
+        equal(
+            String(s5), 
+            '<http://example.com/r5> <http://example.com/p5> "literal with ünícóde." .', 
+            'Statement should be <http://example.com/r5> <http://example.com/p5> "literal with ünícóde." .');
     });
     
     test('asRdfQueryTriple', 2, function() {

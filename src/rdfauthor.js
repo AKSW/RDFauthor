@@ -24,6 +24,9 @@ RDFauthor = (function () {
     /** OWL namespace */
     var OWL_NS = 'http://www.w3.org/2002/07/owl#';
     
+    /** Debug hook, has prevalence over all other hooks */
+    var DEBUG_HOOK = '__DEBUG__';
+    
     /** Default generic hook name */
     var DEFAULT_HOOK = '__DEFAULT__';
     
@@ -116,6 +119,7 @@ RDFauthor = (function () {
         '__LITERAL__':  {},
         '__OBJECT__': {}, 
         '__DEFAULT__': {}, 
+        '__DEBUG__': {}, 
         'resource':   {}, 
         'property':   {}, 
         'range':      {}, 
@@ -795,6 +799,10 @@ RDFauthor = (function () {
             return _databanksByGraph[graphURI];
         }, 
         
+        debug: function (privateFuncSpec, parameters) {
+            
+        }, 
+        
         /**
          * Returns the default graph URI.
          * The default graph is the graph, to which newly created statements 
@@ -1230,7 +1238,7 @@ RDFauthor = (function () {
          * Currently the info keys 'queryEndpoint' and 'updateEndpoint' 
          * (both pointing to a URI) are recodgnized.
          */
-        setInforForGraph: function (graphURI, infoSpec, infoValue) {
+        setInfoForGraph: function (graphURI, infoSpec, infoValue) {
             if (!(graphURI in _graphInfo)) {
                 _graphInfo[graphURI] = {};
             }

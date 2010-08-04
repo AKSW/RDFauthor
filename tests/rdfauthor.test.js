@@ -11,11 +11,12 @@ $(document).ready(function() {
         }
     });
     
-    test('setup', function() {
-        ok(typeof this.fixture == 'object', 'RDFauthor should be of type \'object\'.');
+    test('setup', 2, function() {
+        ok(typeof RDFauthor == 'object', 'RDFauthor should be of type \'object\'.');
+        equal(this.fixture, RDFauthor, 'RDFauthor should be the same object as test fixture.');
     });
     
-    test('addStatement', 0, function() {
+    test('addStatement', 3, function() {
         var db = this.fixture.databankForGraph('http://example.com/g1/');
         equal(db.size(), 0, 'Databank should have 0 triples');
         
@@ -82,7 +83,8 @@ $(document).ready(function() {
     });
     
     test('eventTarget', 1, function() {
-        equal(this.fixture.eventTarget().get(0), document.body, 'Event target should be <code>body</code> element');
+        ok(this.fixture.eventTarget().get(0) === document.body, 'Event target should be <code>body</code> element');
+        // equal(this.fixture.eventTarget().get(0), document.body, 'Event target should be <code>body</code> element');
     });
     
     test('literalDatatypes', 2, function() {
@@ -178,30 +180,6 @@ $(document).ready(function() {
         equal(this.fixture.nextID('prefix'), 'prefix' + (Number(first) + 2));
     });
     
-    test('registerWidget', 2, function() {        
-        // try {
-        //     this.fixture.registerWidget({
-        //         element: function () {}, 
-        //         markup:  function () {}, 
-        //         remove:  function () {}, 
-        //         submit:  function () {}
-        //     }, [{name: 'datatype', values: ['']}]);
-        // } catch (e) {
-        //     ok(true, 'Exception should be thrown.');
-        // }
-        
-        this.fixture.registerWidget({
-            element: function () {}, 
-            markup:  function () {}, 
-            remove:  function () {}, 
-            submit:  function () {}
-        }, [{name: 'datatype', values: ['ttt']}]);
-        
-        var w = this.fixture.getWidgetForHook('datatype', 'ttt', '__statement__');
-        ok(Widget.isPrototypeOf(w), 'Widget should be prototype of widget instance.');
-        equal(w.statement, '__statement__', 'Constructor should have been called.');
-    });
-    
     test('registerInfoPredicate', 1, function() {
         this.fixture.registerInfoPredicate('http://www.w3.org/2000/01/rdf-schema#label', 'labelaaaa');
         try {
@@ -225,10 +203,84 @@ $(document).ready(function() {
               'Default graph should equal the one set.');
     });
     
-    test('serviceURIForGraph', 0, function() {
-        
+    test('serviceURIForGraph', 2, function() {
+        this.fixture.reset();
+        var g = this.fixture.defaultGraphURI();
+        this.fixture.setInfoForGraph(g, 'queryEndpoint', 'http://example.com/sparql');
+        equal(this.fixture.serviceURIForGraph(g), 'http://example.com/sparql', 'Service URI should match the one set.');
+        ok(this.fixture.updateURIForGraph(g) != 'http://example.com/sparql', 'Service URI should not match update URI.');
     });
     
+    test('updateURIForGraph', 2, function() {
+        this.fixture.reset();
+        var g = this.fixture.defaultGraphURI();
+        this.fixture.setInfoForGraph(g, 'updateEndpoint', 'http://example.com/update');
+        equal(this.fixture.updateURIForGraph(g), 'http://example.com/update', 'Update URI should match the one set.');
+        ok(this.fixture.serviceURIForGraph(g) != 'http://example.com/update', 'Update URI should not match service URI.');
+    });
+    
+    test('reset', 2, function() {
+        var g = this.fixture.defaultGraphURI();
+        RDFAUTHOR_DEFAULT_GRAPH = 'http://example.com/';
+        ok(this.fixture.defaultGraphURI() != RDFAUTHOR_DEFAULT_GRAPH, 'Default graph should not match.');
+        this.fixture.reset();
+        equal(this.fixture.defaultGraphURI(), RDFAUTHOR_DEFAULT_GRAPH, 'Default graph should now match.');
+    });
+    
+    test('namespaces', 3, function() {
+        ok('rdf' in this.fixture.namespaces(), 'Namespaces should contain RDF');
+        ok('rdfs' in this.fixture.namespaces(), 'Namespaces should contain RDFS');
+        ok('owl' in this.fixture.namespaces(), 'Namespaces should contain OWL');
+    });
+    
+    test('infoForPredicate', 1, function() {
+        same([], this.fixture.infoForPredicate('http://example.com/p1', 'ttt'), 'Info for unknown predicate should be empty');
+    });
+    
+    // skip this test in IE
+    if (!jQuery.browser.msie) {
+        test('commit', 1, function() {
+            this.fixture.eventTarget().bind('rdfauthor.commit', function () {
+                ok(true, 'Commit event should have been triggered.');
+            });
+            stop(2000); /* stop and make test fail after 2000 ms */
+            this.fixture.commit();
+            start();
+        });
+    }
+    
+    test('cancel', 1, function() {
+        this.fixture.eventTarget().bind('rdfauthor.cancel', function () {
+            ok(true, 'Cancel event should have been triggered.');
+        });
+        stop(2000); /* stop and make test fail after 2000 ms */
+        this.fixture.cancel();
+        start();
+    });
+    
+    test('start', 1, function() {
+        this.fixture.eventTarget().bind('rdfauthor.start', function () {
+            ok(true, 'Start event should have been triggered.');
+        });
+        stop(2000); /* stop and make test fail after 2000 ms */
+        this.fixture.cancel();
+        start();        
+    });
+    
+    test('registerWidget', 2, function() {        
+        this.fixture.registerWidget({
+            element: function () {}, 
+            markup:  function () {}, 
+            remove:  function () {}, 
+            submit:  function () {}
+        }, [{name: '__DEBUG__'}]);
+        
+        var w = this.fixture.getWidgetForHook('__DEBUG__', null, '__statement__');
+        ok(Widget.isPrototypeOf(w), 'Widget should be prototype of widget instance.');
+        equal(w.statement, '__statement__', 'Constructor should have been called.');
+    });
+    
+    /*    
     test('getWidgetForHook', 0, function() {
         
     });
@@ -241,15 +293,8 @@ $(document).ready(function() {
         
     });
     
-    test('cancel', 0, function() {
-        
+    test('getView', 0, function() {
+
     });
-    
-    test('commit', 0, function() {
-        
-    });
-    
-    test('start', 0, function() {
-        
-    });
+    */
 });
