@@ -24,9 +24,6 @@ RDFauthor = (function () {
     /** OWL namespace */
     var OWL_NS = 'http://www.w3.org/2002/07/owl#';
     
-    /** Debug hook, has prevalence over all other hooks */
-    var DEBUG_HOOK = '__DEBUG__';
-    
     /** Default generic hook name */
     var DEFAULT_HOOK = '__DEFAULT__';
     
