@@ -196,7 +196,7 @@ Statement.prototype = {
         var quoteLiteral = true;
         var containsSingleQuotes = (String(objectSpec.value).indexOf('\'') > -1);
         var containsDoubleQuotes = (String(objectSpec.value).indexOf('"') > -1);
-        var containsQuotes = (containsSingleQuotes || containsDoubleQuotes);
+        var containsQuotes = (containsSingleQuotes || containsDoubleQuotes);
         
         if (objectSpec.lang) {
             literalOpts.lang = objectSpec.lang;
@@ -214,7 +214,7 @@ Statement.prototype = {
         var longLiteral = (String(objectSpec.value).search(/[\t\b\n\r\f\\\"\\\']/) > -1);
         var quoteChars  = longLiteral ? '"""' : '"';
         
-        if (quoteLiteral || longLiteral) {
+        if (quoteLiteral || longLiteral) {
             if (containsDoubleQuotes) {
                 // escape double quotes
                 objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');

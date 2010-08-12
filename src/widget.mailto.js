@@ -71,7 +71,7 @@ RDFauthor.registerWidget({
                 && this.statement.objectValue() !== this.value()
             );
             
-            if (hasChanged || this.removeOnSubmit) {
+            if (hasChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             

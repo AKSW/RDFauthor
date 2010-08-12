@@ -243,7 +243,7 @@ View.prototype = {
      */
     show: function (animated) {
         var self = this;
-        if (arguments.length === 0 || !animated) {
+        if (arguments.length === 0 || !animated) {
             jQuery(this.getElement()).show();
             this.activeSubjectGroup().show();
             this._container.show();

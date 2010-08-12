@@ -754,8 +754,15 @@ RDFauthor = (function () {
             var graphURI = statement.graphURI() || this.defaultGraphURI();
             var databank = this.databankForGraph(graphURI);
             /* TODO: error counting */
-            databank.add(statement.asRdfQueryTriple());
-            _makeElementEditable(element, statement);
+            if (!statement.isProtected()) {
+                databank.add(statement.asRdfQueryTriple());
+                // make editable
+                if (arguments.length > 1) {
+                    _makeElementEditable(element, statement);
+                }
+            } else {
+                
+            }
         }, 
         
         /**
