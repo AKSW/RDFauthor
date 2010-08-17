@@ -48,6 +48,19 @@ RDFauthor = (function () {
     /** Databanks indexed by graph URI. */
     var _databanksByGraph = {};
     
+    /**
+     * Object to hold statements treated in a special way.
+     * Those are essentially protected and hidden statements.
+     * Explicit statements have been added to the view manually (as opposed to 
+     * by parsing) and will be sent to sources even if not changed.
+     * Hidden statements are not shown in the view and can thus not be edited 
+     * by the user.
+     */
+    var _specialStatements = {
+        'explicit': [], 
+        'hidden': []
+    };
+    
     /** Original databanks as extracted by graph URI. */
     var _extractedByGraph = {};
     
@@ -132,7 +145,7 @@ RDFauthor = (function () {
         if (arguments.length > 1) {
             _infoShortcuts[shortcut] = infoPredicateURI;
         }
-    };
+    }
     
     /**
      * Adds a new RDFA triple
@@ -157,11 +170,46 @@ RDFauthor = (function () {
                 if (statement.isUpdateVocab()) {
                     _handleUpdateStatement(statement);
                 } else {
-                    RDFauthor.addStatement(statement, element);
+                    if (_options.autoParse) {
+                        RDFauthor.addStatement(statement, element);
+                    }
                 }
             }
         }
-    };
+    }
+    
+    /**
+     * Adds a special statement to the store with name given.
+     * @private
+     */
+    function _addSpecialStatement(statement, specialSpec) {
+        var graphURI = statement.graphURI() || this.defaultGraphURI();
+        if (specialSpec in _specialStatements) {
+            if (!(graphURI in _specialStatements[specialSpec])) {
+                _specialStatements[specialSpec][graphURI] = [];
+            }
+            
+            _specialStatements[specialSpec][graphURI].push(statement);
+        } else {
+            // error
+        }
+    }
+    
+    /**
+     * Adds special statements for graph denoted by graphURI to the databank given.
+     * @private
+     */
+    function _insertSpecialStatements(databank, graphURI) {
+        for (var specialSpec in _specialStatements) {
+            for (var i = 0; i < _specialStatements[specialSpec].length; i++) {
+                var currentStatement = _specialStatements[specialSpec][i];
+                // only add complete statements
+                if (currentStatement.hasObject()) {
+                    databank.add(currentStatement.asRdfQueryTriple());
+                }
+            }
+        }
+    }
     
     /**
      * Calls its parameter if it is of type funtion.
@@ -221,7 +269,13 @@ RDFauthor = (function () {
                 _extractedByGraph[g] = jQuery.rdf.databank();
             }
             
-            /* TODO: what about hidden/protected triples hack */
+            /* TODO: what about hidden/explicit triples hack */
+            if (g in _specialStatements['explicit']) {
+                for (var i = 0; i < _specialStatements['explicit'][g].length; i++) {
+                    var specialStatement = _specialStatements['explicit'][g][i];
+                    _extractedByGraph[g].remove(specialStatement.asRdfQueryTriple());
+                }
+            }
         }
     };
     
@@ -646,6 +700,8 @@ RDFauthor = (function () {
                 var added   = databank.except(original);
                 var removed = original.except(databank);
                 
+                _insertSpecialStatements(added, g);
+                
                 if (_options.useSPARQL11) {
                     // SPARQL/Update
                     var updateQuery = '';
@@ -660,10 +716,12 @@ RDFauthor = (function () {
                         updateQuery += '\nDELETE DATA FROM <' + g + '> {' + removedArray.join('\n') + '}';
                     }
                     
-                    jQuery.get(updateURI, {query: updateQuery, success: function () {
+                    jQuery.get(updateURI, {
+                        'query': updateQuery
+                    }, function () {
                         _view.hide(true);
                         // _callIfIsFunction(_options.onSubmitSuccess);
-                    }});
+                    });
                 } else {
                     // REST style
                     var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json'});
@@ -751,17 +809,23 @@ RDFauthor = (function () {
          * @param {HTMLElement} element
          */
         addStatement: function (statement, element) {
-            var graphURI = statement.graphURI() || this.defaultGraphURI();
-            var databank = this.databankForGraph(graphURI);
-            /* TODO: error counting */
-            if (!statement.isProtected()) {
+            if (statement.isHidden()) {
+                _addSpecialStatement(statement, 'hidden');
+            } else {
+                var graphURI = statement.graphURI() || this.defaultGraphURI();
+                var databank = this.databankForGraph(graphURI);
+                
                 databank.add(statement.asRdfQueryTriple());
+                
+                // explicit statements are editable
+                if (statement.isProtected()) {
+                    _addSpecialStatement(statement, 'explicit');
+                }
+                
                 // make editable
                 if (arguments.length > 1) {
                     _makeElementEditable(element, statement);
                 }
-            } else {
-                
             }
         }, 
         
@@ -1278,19 +1342,25 @@ RDFauthor = (function () {
          */
         start: function (root) {
             this.eventTarget().trigger('rdfauthor.start');
-            if (_options.autoParse) {
-                var that = this;
-                /* parse */
-                _parse(function() {
-                    /* display view */
-                    _populateView();
-                    _showView();
-                });
-            } else {
-                /* auto-parsing off, statements were added manually */
+            /* parse */
+            _parse(function() {
+                /* display view */
                 _populateView();
                 _showView();
-            }
+            });            
+            // if (_options.autoParse) {
+            //     var that = this;
+            //     /* parse */
+            //     _parse(function() {
+            //         /* display view */
+            //         _populateView();
+            //         _showView();
+            //     });
+            // } else {
+            //     /* auto-parsing off, statements were added manually */
+            //     _populateView();
+            //     _showView();
+            // }
         }
     }
 })();

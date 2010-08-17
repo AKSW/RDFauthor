@@ -51,8 +51,8 @@ function Statement(statementSpec, statementOptions) {
         } else {
             this._object = this.createLiteral({
                 value:    statementSpec.object.value, 
-                datatype: statementSpec.datatype ? statementSpec.datatype.uri : null, 
-                lang:     statementSpec.lang ? statementSpec.lang : null
+                datatype: statementSpec.object.datatype ? statementSpec.object.datatype.uri : null, 
+                lang:     statementSpec.object.lang ? statementSpec.object.lang : null
             });
         }
     } else if (statementSpec.subject) {
@@ -86,44 +86,13 @@ function Statement(statementSpec, statementOptions) {
             
             if ((typeof objectSpec == 'string') && (objectSpec.charAt(0) == '<') && (objectSpec.charAt(objectSpec.length-1) == '>')) {
                 this._object = jQuery.rdf.resource(objectSpec, objectOpts);
-            } else {
+            } else {                
                 this._object = this.createLiteral({
                     value:    objectSpec, 
                     datatype: objectOpts.datatype ? objectOpts.datatype : null, 
                     lang:     objectOpts.lang ? objectOpts.lang : null
                 });
             }
-            
-            
-            // var quote = true;
-            // 
-            // if (objectOpts && (objectOpts.hasOwnProperty('lang') || objectOpts.hasOwnProperty('datatype'))) {
-            //     quote = false;
-            // }
-            // 
-            // try {
-            //     this._object = jQuery.rdf.resource(objectSpec, objectOpts);
-            // } catch (e) {
-            //     try {
-            //         this._object = jQuery.rdf.blank(objectSpec, objectOpts);
-            //     } catch (f) {
-            //         try {
-            //             // quote if necessary
-            //             if (quote) {
-            //                 objectSpec = '"' + objectSpec + '"';
-            //             }
-            //             this._object = jQuery.rdf.literal(objectSpec, objectOpts);
-            //         } catch (g) {
-            //             // error
-            //             throw 'Invalid object spec';
-            //         }
-            //     }
-            // }
-            
-            /*
-            var objectOpts = statementSpec.object.options ? statementSpec.object.options : {};        
-
-            */
         }
     } else {
         // error
