@@ -25,13 +25,23 @@ RDFauthor.registerWidget({
             // update UI accordingly
             var button = this;
             if (close) {
-                $('.' + widget.disclosureID).fadeIn(250, function() {
+                if (this.animate) {
+                    $('.' + widget.disclosureID).fadeIn(250, function() {
+                        $(button).removeClass('open').addClass('closed');
+                    });
+                } else {
+                    $('.' + widget.disclosureID).show();
                     $(button).removeClass('open').addClass('closed');
-                });
+                }
             } else {
-                $('.' + widget.disclosureID).fadeOut(250, function() {
+                if (this.animate) {
+                    $('.' + widget.disclosureID).fadeOut(250, function() {
+                        $(button).removeClass('cosed').addClass('open');
+                    });
+                } else {
+                    $('.' + widget.disclosureID).hide();
                     $(button).removeClass('cosed').addClass('open');
-                });
+                }
             }
         });
         

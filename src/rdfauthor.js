@@ -313,6 +313,7 @@ RDFauthor = (function () {
         };
         W.prototype = jQuery.extend(new F(), widgetSpec);
         W.prototype.constructor = W;
+        W.prototype.animate = _options.useAnimations;
         
         return W;
     };
@@ -966,7 +967,8 @@ RDFauthor = (function () {
                             _options.onCancel();
                         }
                     }, 
-                    container: _options.container ? _options.container : jQuery('.modal-wrapper').eq(0)
+                    container: _options.container ? _options.container : jQuery('.modal-wrapper').eq(0), 
+                    useAnimations: _options.useAnimations
                 });
                 
                 // init view

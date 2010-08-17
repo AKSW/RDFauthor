@@ -34,6 +34,7 @@ function View(options) {
         container: 'body', 
         showButtons: true, 
         showPropertyButton: true, 
+        useAnimations: true, 
         animationTime: 250, // ms
         id: 'rdfAuthorView', 
         contentContainerClass: 'rdfAuthorViewContent'/*, 
@@ -44,6 +45,7 @@ function View(options) {
     
     // overwrite defaults if supplied
     this._options   = jQuery.extend(defaultOptions, options);
+    this._options.animationTime = this._options.useAnimations ? this._options.animationTime : 0;
     this._container = this._options.container instanceof jQuery 
                     ? this._options.container 
                     : $(this._options.container);
@@ -125,9 +127,9 @@ function View(options) {
                 
                 // TODO: seems to not work properly
                 var scrollTo = containerScroll - (containerTop - rowTop);
-                jQuery('.' + self._options.contentContainerClass).animate({scrollTop: scrollTo}, 250);
+                jQuery('.' + self._options.contentContainerClass).animate({scrollTop: scrollTo}, self._options.animationTime);
             });
-            propertySelector.presentInContainer(true);
+            propertySelector.presentInContainer(selfFix._options.useAnimations);
         });
     }
 }
@@ -243,7 +245,7 @@ View.prototype = {
      */
     show: function (animated) {
         var self = this;
-        if (arguments.length === 0 || !animated) {
+        if (arguments.length === 0 || !animated || !this._options.useAnimations) {
             jQuery(this.getElement()).show();
             this.activeSubjectGroup().show();
             this._container.show();
@@ -266,7 +268,7 @@ View.prototype = {
      * @param {boolean} animated Whether to disappear animatedly
      */
     hide: function (animated) {
-        if (arguments.length === 0 || !animated) {
+        if (arguments.length === 0 || !animated || !this._options.useAnimations) {
             jQuery(this.getElement()).hide();
             this._container.hide();
         } else {

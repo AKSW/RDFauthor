@@ -3522,9 +3522,6 @@
         datatype = $.safeCurie(opts.datatype, { namespaces: opts.namespaces });
         $.extend(this, $.typedValue(value.toString(), datatype));
       } else if (opts.lang !== undefined) {
-          
-          debugger;
-          
         this.value = value.toString();
         this.lang = opts.lang;
       } else if (typeof value === 'boolean') {

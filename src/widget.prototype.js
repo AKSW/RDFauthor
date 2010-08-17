@@ -6,6 +6,7 @@
  */
 var Widget = {
     removeOnSubmit: false, 
+    animate: false, 
     options: {}, 
     _maxWidth: 481, 
     
