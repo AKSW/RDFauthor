@@ -95,7 +95,7 @@ function View(options) {
             // jQuery('#' + this.cssID()).resizable();
         }
 
-        jQuery('#rdfauthor-button-submit').live('click', function () {            
+        jQuery('#rdfauthor-button-submit').live('click', function () {
             if (typeof self._options.onBeforeSubmit == 'function') {
                 self._options.onBeforeSubmit();
             }

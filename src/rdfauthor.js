@@ -269,11 +269,19 @@ RDFauthor = (function () {
                 _extractedByGraph[g] = jQuery.rdf.databank();
             }
             
-            /* TODO: what about hidden/explicit triples hack */
+            /* FIXME: explicit triples hack */
             if (g in _specialStatements['explicit']) {
                 for (var i = 0; i < _specialStatements['explicit'][g].length; i++) {
                     var specialStatement = _specialStatements['explicit'][g][i];
                     _extractedByGraph[g].remove(specialStatement.asRdfQueryTriple());
+                }
+            }
+            
+            /* FIXME: hidden triples hack */
+            if (g in _specialStatements['hidden']) {
+                for (var i = 0; i < _specialStatements['hidden'][g].length; i++) {
+                    var specialStatement = _specialStatements['hidden'][g][i];
+                    databank.add(specialStatement.asRdfQueryTriple());
                 }
             }
         }
@@ -952,7 +960,7 @@ RDFauthor = (function () {
                             _options.onCancel();
                         }
                     }, 
-                    container: jQuery('.modal-wrapper').eq(0)
+                    container: _options.container ? _options.container : jQuery('.modal-wrapper').eq(0)
                 });
                 
                 // init view
