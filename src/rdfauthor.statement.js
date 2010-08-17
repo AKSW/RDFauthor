@@ -34,7 +34,9 @@ function Statement(statementSpec, statementOptions) {
         this._predicate = statementSpec.property;
         
         // FIXME: rdfQuery no-object hack
-        if (statementSpec.object.value == 'undefined') {
+        if (statementSpec.object.value == this.objectPlaceholder 
+            || statementSpec.object.value == 'undefined') {
+            
             this._object = null;
         } else {
             this._object = statementSpec.object;
@@ -137,12 +139,14 @@ Statement.prototype = {
      */
     ignoreNS: ['http://www.w3.org/1999/xhtml/vocab#'], 
     
+    objectPlaceholder: '"__rdfauthor_no_value_"', 
+    
     /**
      * Returns the statement as an rdfQuery triple object (jQuery.rdf.triple).
      * @return {object}
      */
     asRdfQueryTriple: function () {
-        return jQuery.rdf.triple(this._subject, this._predicate, this._object);
+        return jQuery.rdf.triple(this._subject, this._predicate, this._object ? this._object : this.objectPlaceholder);
     }, 
     
     /**

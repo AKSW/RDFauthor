@@ -882,7 +882,7 @@ RDFauthor = (function () {
         }, 
         
         debug: function (privateFuncSpec, parameters) {
-            
+            this.call(privateFuncSpec, parameters);
         }, 
         
         /**
