@@ -32,7 +32,13 @@ function Statement(statementSpec, statementOptions) {
         // rdfQuery triple, we store the parts directly
         this._subject   = statementSpec.subject;
         this._predicate = statementSpec.property;
-        this._object    = statementSpec.object;
+        
+        // FIXME: rdfQuery no-object hack
+        if (statementSpec.object.value == 'undefined') {
+            this._object = null;
+        } else {
+            this._object = statementSpec.object;
+        }
     } else if (typeof RDFStatement != 'undefined' && statementSpec.constructor == RDFStatement) {
         // RDFA triple, create rdfQuery truple parts and store them
         

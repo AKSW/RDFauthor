@@ -259,7 +259,13 @@ RDFauthor = (function () {
                         /* HACK: reverse HTML escaping in literals */
                         this.object.value = this.object.value.replace(/&lt;/, '<').replace(/&gt;/, '>');
                     }
-                    extracted.add(this);
+                    
+                    // FIXME: rdfQuery no-object hack
+                    if (this.object.value == 'undefined') {
+                        databank.remove(this);
+                    } else {
+                        extracted.add(this);
+                    }
                 });
                 
                 /* store original as extracted */
