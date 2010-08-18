@@ -25,7 +25,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
                             ? container 
                             : jQuery(container);
                             
-    this._idPrefix          = 'property-row-';  // CSS id prefix
+    this._idPrefix          = 'property-row-'   // CSS id prefix
     this._id                = id;               // id for this row
     this._widgetIDPrefix    = 'widget-';        // CSS id prefix for widgets
     this._widgetCount       = 0;                // nbumber of widgets

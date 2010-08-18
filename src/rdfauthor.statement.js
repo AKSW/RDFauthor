@@ -259,11 +259,9 @@ Statement.prototype = {
             this.ignored = false;
             
             for (var i in this.ignoreNS) {
-                if (this.ignoreNS.hasOwnProperty(i)) {
-                    if (String(this._predicate.value).search(RegExp('^' + this.ignoreNS[i])) > -1) {
-                        this.ignored = true;
-                        break;
-                    }
+                if (String(this._predicate.value).search(RegExp('^' + this.ignoreNS[i])) > -1) {
+                    this.ignored = true;
+                    break;
                 }
             }
         }

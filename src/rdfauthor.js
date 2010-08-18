@@ -11,7 +11,7 @@
  * @namespace
  * @requires Statement
  */
-RDFauthor = (function () {    
+RDFauthor = (function () {
     /** Namespace for update predicates */
     var UPDATE_NS = 'http://ns.aksw.org/update/';
     
@@ -37,19 +37,16 @@ RDFauthor = (function () {
     var ELEMENT_ID_PREFIX = 'el-';
     
     /** script is in unknown state */
-    var SCRIPT_STATE_UNKNOWN;
+    var SCRIPT_STATE_UNKNOWN = undefined;
     
     /** script is currently loading */
     var SCRIPT_STATE_LOADING = 1;
     
     /** script is ready */
-    var SCRIPT_STATE_READY = 2;
+    var SCRIPT_STATE_READY   = 2;
     
     /** Databanks indexed by graph URI. */
     var _databanksByGraph = {};
-    
-    /** Object of special statements by graph */
-    var _specialStatements = {};
     
     /** Original databanks as extracted by graph URI. */
     var _extractedByGraph = {};
@@ -135,7 +132,7 @@ RDFauthor = (function () {
         if (arguments.length > 1) {
             _infoShortcuts[shortcut] = infoPredicateURI;
         }
-    }
+    };
     
     /**
      * Adds a new RDFA triple
@@ -164,58 +161,7 @@ RDFauthor = (function () {
                 }
             }
         }
-    }
-    
-    /**
-     * Adds a special statement to the store with name given.
-     * @private
-     */
-    function _addSpecialStatement(statement, specialSpec) {
-        var graphURI = statement.graphURI() || this.defaultGraphURI();
-        if (specialSpec in _specialStatements) {
-            if (!graphURI in _specialStatements[specialSpec]) {
-                _specialStatements[specialSpec][graphURI] = [];
-            }
-            
-            _specialStatements[specialSpec][graphURI].push(statement);
-        } else {
-            // error
-        }
-    }
-    
-    /**
-     * Adds special statements for graph denoted by graphURI to the databank given.
-     * @private
-     */
-    function _insertSpecialStatements(databank, graphURI) {
-        
-    }
-    
-    /**
-     * Adds a hidden statement
-     * @private
-     */
-    function _addHidden(statement) {
-        var graphURI = statement.graphURI() || this.defaultGraphURI();
-        if (!graphURI in _hiddenStatements) {
-            _hiddenStatements[graphURI] = [];
-        }
-        
-        _hiddenStatements[graphURI].push(statement);
-    }
-    
-    /**
-     * Adds a protected statement
-     * @private
-     */
-    function _addProtected() {
-        var graphURI = statement.graphURI() || this.defaultGraphURI();
-        if (!graphURI in _protectedStatements) {
-            _protectedStatements[graphURI] = [];
-        }
-        
-        _protectedStatements[graphURI].push(statement);
-    }
+    };
     
     /**
      * Calls its parameter if it is of type funtion.
@@ -232,20 +178,18 @@ RDFauthor = (function () {
      * @private
      */
     function _checkInterface(object, interf) {
-        for (var member in interf) {
-            if (interf.hasOwnProperty(member)) {
-                if ((typeof member !== 'function')) {
-                    continue;
-                }
-
-                if (!object[member] || (typeof object[member] !== 'function')) {
-                    return false;
-                }
+        for (member in interf) {
+            if (typeof member !== 'function') {
+                continue;
+            }
+            
+            if (!object[member] || (typeof object[member] !== 'function')) {
+                return false;
             }
         }
         
         return true;
-    }
+    };
     
     /**
      * Clones databank for each graph before calling 
@@ -253,15 +197,14 @@ RDFauthor = (function () {
      * @private
      */
     function _cloneDatabanks() {
-        for (var g in _graphInfo) {            
-            if (_graphInfo.hasOwnProperty(g)
-                && undefined !== _databanksByGraph[g] 
-                && _databanksByGraph[g] instanceof jQuery.rdf.databank) {
+        for (g in _graphInfo) {            
+            if (undefined !== _databanksByGraph[g] &&
+                _databanksByGraph[g] instanceof jQuery.rdf.databank) {
                 
                 var databank  = _databanksByGraph[g];
                 var extracted = jQuery.rdf.databank();
                 
-                databank.triples().each(function () {
+                databank.triples().each(function() {
                     if (this instanceof jQuery.rdf.triple 
                         && this.object instanceof jQuery.rdf.literal
                         && (typeof this.object.value == 'string')) {
@@ -280,14 +223,14 @@ RDFauthor = (function () {
             
             /* TODO: what about hidden/protected triples hack */
         }
-    }
+    };
     
     /**
      * Creates a new widget base object ensuring it uses the abstract 
      * Widget as its prototype object.
      * @return {Object}
      */
-    function _createWidget(widgetSpec) {
+    function _createWidget(widgetSpec) {        
         var F = function () {};
         F.prototype = Widget;
         
@@ -304,28 +247,25 @@ RDFauthor = (function () {
         W.prototype.constructor = W;
         
         return W;
-    }
+    };
     
     /**
      * Loads info predicates for all predicates
      * @private
      */ 
-    function _fetchPredicateInfo(callback) {
+    function _fetchPredicateInfo(callback) {        
         if (null === _predicateInfo) {
             if (_options.usePredicateInfo) {
                 var selects  = '';
                 var filters  = [];
                 var patterns = [];
 
-                for (var infoPredicateURI in _infoPredicates) {
-                    if (_infoPredicates.hasOwnProperty(infoPredicateURI)) {
-                        var variableName = _shortcutForInfoPredicate(infoPredicateURI);
-                        selects += (' ?' + variableName);
-                        filters.push('sameTerm(?predicate, <' + infoPredicateURI + '>)');
-                        patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
-                    }
+                for (infoPredicateURI in _infoPredicates) {
+                    var variableName = _shortcutForInfoPredicate(infoPredicateURI);
+                    selects += (' ?' + variableName);
+                    filters.push('sameTerm(?predicate, <' + infoPredicateURI + '>)');
+                    patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
                 }
-                
                 /* init */
                 _predicateInfo = {};
 
@@ -416,7 +356,7 @@ RDFauthor = (function () {
         }
         
         _graphInfo[subject][key] = statement.objectValue();
-    }
+    };
     
     /**
      * Instantiates and returns a widget object
@@ -434,7 +374,7 @@ RDFauthor = (function () {
         }
         
         return null;
-    }
+    };
     
     /**
      * Loads a JavaScript file by including a <code>&lt;script&gt;</code> tag in the page header.
@@ -447,7 +387,7 @@ RDFauthor = (function () {
             // load script
             var s  = document.createElement('script');
             s.type = 'text/javascript';
-            s.src  = scriptURI + RDFAUTHOR_DEBUG ? '?id=' + (Math.floor(Math.random() * 999999) + 1) : '';
+            s.src  = scriptURI;
             
             // callback handler fro loaded scripts
             var _scriptReady = function () {
@@ -495,7 +435,7 @@ RDFauthor = (function () {
             // script is ready, execute callback immediately
             _callIfIsFunction(callback);
         }
-    }
+    };
     
     /**
      * Loads a Stylesheet file by including a <code>&lt;script&gt;</code> tag in the page header.
@@ -523,7 +463,7 @@ RDFauthor = (function () {
             
             document.getElementsByTagName('head')[0].appendChild(l);
         }
-    }
+    };
     
     /**
      * Makes an element's triples (from children and self) editable
@@ -541,7 +481,7 @@ RDFauthor = (function () {
          }
          
          _statementsByElemendID[id] = statement;
-    }
+    };
     
     /**
      * Returns the name (URI) of the current document's graph.
@@ -549,7 +489,7 @@ RDFauthor = (function () {
      */
     function _pageGraph() {
         return document.location.href;
-    }
+    };
     
     /**
      * Parses the current page for RDFa triples
@@ -568,7 +508,7 @@ RDFauthor = (function () {
             // already parsed, execute callback immediately
             _callIfIsFunction(callback);
         }
-    }
+    };
     
     /**
      * Parses a URL string and returns an object similar to the internal Location object.
@@ -577,36 +517,36 @@ RDFauthor = (function () {
      */
     function _parseURL(str) {
         var o = {
-            strictMode: false, 
-            key: ['source', 'protocol', 'authority', 'userInfo', 'user', 'password', 'hostname', 
-                  'port', 'relative', 'path', 'directory', 'file','query','anchor'],
-            q: {
-                name:   'queryKey',
-                parser: /(?:^|&)([^&=]*)=?([^&]*)/g
-            },
-            parser: {
-                strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-                loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
-            }
+        	strictMode: false, 
+        	key: ['source', 'protocol', 'authority', 'userInfo', 'user', 'password', 'hostname', 
+        	      'port', 'relative', 'path', 'directory', 'file','query','anchor'],
+        	q: {
+        	    name:   'queryKey',
+        	    parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+        	},
+        	parser: {
+        		strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+        		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+        	}
         };
         
-        var m   = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str), 
-            uri = {}, 
-            i   = 14;
+        var	m   = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str), 
+    		uri = {}, 
+    		i   = 14;
 
-        while (i--) {
-            uri[o.key[i]] = m[i] || '';
-        }
-        
-        uri[o.q.name] = {};
-        uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-            if ($1) {
-                uri[o.q.name][$1] = $2;
-            }
-        });
-        
-        return uri;
-    }
+    	while (i--) {
+    	    uri[o.key[i]] = m[i] || '';
+    	}
+    	
+    	uri[o.q.name] = {};
+    	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+    		if ($1) {
+    		    uri[o.q.name][$1] = $2;
+    		}
+    	});
+    	
+    	return uri;
+    };
     
     /**
      * Populates the given view with statements.
@@ -632,7 +572,7 @@ RDFauthor = (function () {
                 }
             }
         });
-    }
+    };
     
     /**
      * Called when RDFauthor is ready loading all its dependencies
@@ -641,7 +581,7 @@ RDFauthor = (function () {
         if (typeof RDFAUTHOR_READY_CALLBACK !== 'undefined') {
             RDFAUTHOR_READY_CALLBACK();
         }
-    }
+    };
     
     /**
      * Used internally for script requirements. For each pending script, 
@@ -690,7 +630,7 @@ RDFauthor = (function () {
             var view = RDFauthor.getView();
             view.show(true);
         });
-    }
+    };
     
     /**
      * Updates all sources via SPARQL/Update
@@ -705,8 +645,6 @@ RDFauthor = (function () {
             if (undefined !== updateURI && undefined !== databank) {
                 var added   = databank.except(original);
                 var removed = original.except(databank);
-                
-                _insertSpecialStatements(added, g);
                 
                 if (_options.useSPARQL11) {
                     // SPARQL/Update
@@ -724,7 +662,7 @@ RDFauthor = (function () {
                     
                     jQuery.get(updateURI, {query: updateQuery, success: function () {
                         _view.hide(true);
-                        _callIfIsFunction(_options.onSubmitSuccess);
+                        // _callIfIsFunction(_options.onSubmitSuccess);
                     }});
                 } else {
                     // REST style
@@ -739,13 +677,13 @@ RDFauthor = (function () {
                             'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
                         }, function () {
                             _view.hide(true);
-                            _callIfIsFunction(_options.onSubmitSuccess);
+                            // _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }
                 }
             }
         }
-    }
+    };
     
     // RDFauthor setup code ///////////////////////////////////////////////////
     
@@ -813,21 +751,17 @@ RDFauthor = (function () {
          * @param {HTMLElement} element
          */
         addStatement: function (statement, element) {
-            if (statement.isProtected()) {
-                // TODO: handle protected stmt
-                _addProtectedStatement(statement);
-            } else if (statement.isHidden()) {
-                // TODO: handle hidden stmt
-                _addHiddenStatement(statement);
-            } else {
-                var graphURI = statement.graphURI() || this.defaultGraphURI();
-                var databank = this.databankForGraph(graphURI);
-                
+            var graphURI = statement.graphURI() || this.defaultGraphURI();
+            var databank = this.databankForGraph(graphURI);
+            /* TODO: error counting */
+            if (!statement.isProtected()) {
                 databank.add(statement.asRdfQueryTriple());
                 // make editable
                 if (arguments.length > 1) {
                     _makeElementEditable(element, statement);
                 }
+            } else {
+                
             }
         }, 
         
