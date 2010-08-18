@@ -129,7 +129,7 @@ function View(options) {
                 var scrollTo = containerScroll - (containerTop - rowTop);
                 jQuery('.' + self._options.contentContainerClass).animate({scrollTop: scrollTo}, self._options.animationTime);
             });
-            propertySelector.presentInContainer(selfFix._options.useAnimations);
+            propertySelector.presentInContainer(self._options.useAnimations);
         });
     }
 }
