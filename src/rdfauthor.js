@@ -734,7 +734,7 @@ RDFauthor = (function () {
                         'query': updateQuery
                     }, function () {
                         _view.hide(true);
-                        // _callIfIsFunction(_options.onSubmitSuccess);
+                        _callIfIsFunction(_options.onSubmitSuccess);
                     });
                 } else {
                     // REST style
@@ -749,7 +749,7 @@ RDFauthor = (function () {
                             'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
                         }, function () {
                             _view.hide(true);
-                            // _callIfIsFunction(_options.onSubmitSuccess);
+                            _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }
                 }
@@ -796,7 +796,7 @@ RDFauthor = (function () {
     _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
         _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
         _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.alida.js');
+        /* _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); */
         _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
         _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
         _require(RDFAUTHOR_BASE + 'src/widget.date.js');
