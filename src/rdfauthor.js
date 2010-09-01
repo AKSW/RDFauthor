@@ -723,15 +723,15 @@ RDFauthor = (function () {
                     
                     var addedArray = jQuery.makeArray(added.triples());
                     if (addedArray.length > 0) {
-                        updateQuery += '\nINSERT DATA INTO <' + g + '> {' + addedArray.join('\n') + '}';
+                        updateQuery += '\nINSERT DATA INTO <' + g + '> {' + addedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
                     var removedArray = jQuery.makeArray(removed.triples());
                     if (removedArray.length > 0) {
-                        updateQuery += '\nDELETE DATA FROM <' + g + '> {' + removedArray.join('\n') + '}';
+                        updateQuery += '\nDELETE DATA FROM <' + g + '> {' + removedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
-                    jQuery.get(updateURI, {
+                    jQuery.post(updateURI, {
                         'query': updateQuery
                     }, function () {
                         _view.hide(true);
@@ -744,7 +744,7 @@ RDFauthor = (function () {
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
-                        jQuery.get(updateURI, {
+                        jQuery.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': jQuery.toJSON(addedJSON ? addedJSON : {}), 
                             'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
