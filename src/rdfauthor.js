@@ -94,6 +94,9 @@ RDFauthor = (function () {
     /** Predicate info */
     var _predicateInfo = null;
     
+    /** predicates to be queried for */
+    var _predicates = {};
+    
     /**  Callbacks to be executed when script loading finishes */
     var _scriptCallbacks = {};
     
@@ -332,9 +335,13 @@ RDFauthor = (function () {
                 for (infoPredicateURI in _infoPredicates) {
                     var variableName = _shortcutForInfoPredicate(infoPredicateURI);
                     selects += (' ?' + variableName);
-                    filters.push('sameTerm(?predicate, <' + infoPredicateURI + '>)');
                     patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
                 }
+                
+                for (var predicate in _predicates) {
+                    filters.push('sameTerm(?predicate, <' + predicate + '>)');
+                }
+                
                 /* init */
                 _predicateInfo = {};
 
@@ -832,6 +839,10 @@ RDFauthor = (function () {
                 
                 databank.add(statement.asRdfQueryTriple());
                 
+                if (!(statement.predicateURI() in _predicates)) {
+                    _predicates[statement.predicateURI()] = 1;
+                }
+                
                 // explicit statements are editable
                 if (statement.isProtected()) {
                     _addSpecialStatement(statement, 'explicit');
@@ -1029,6 +1040,9 @@ RDFauthor = (function () {
                     || (jQuery.inArray(RDFS_NS + 'Resource', ranges) >= 0)) {
                     
                     widgetConstructor = _registeredWidgets[OBJECT_HOOK][''];
+                } else if (jQuery.inArray(RDF_NS + 'XMLLiteral', ranges) >= 0) {
+                    var range = RDFauthor.infoForPredicate(statement.predicateURI(), 'range');
+                    widgetConstructor = _registeredWidgets['range'][range];
                 }
             }
             

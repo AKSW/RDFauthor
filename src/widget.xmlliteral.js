@@ -107,15 +107,18 @@ RDFauthor.registerWidget({
     },
     
     value: function () {
-        var editor = this._editor.instanceById('xmlliteral-edit-input-' + this.ID);        
+        var editor = this._editor.instanceById('xmlliteral-edit-input-' + this.ID);
         if (editor && ('' !== editor.getContent())) {
             return editor.getContent();
         }
         
         return null;
     }
-}, {
+}, [{
+        name: 'range', 
+        values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
+    }, {
         name: 'datatype',
         values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
-    }
+    }]
 );
