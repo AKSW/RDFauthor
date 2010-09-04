@@ -124,7 +124,7 @@ RDFauthor = (function () {
         useAnimations: true, 
         autoParse: true, 
         usePredicateInfo: true, 
-        useSPARQL11: true
+        useSPARQL11: false
     };
     
     /** Hash registered widgets */
