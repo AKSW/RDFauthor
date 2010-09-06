@@ -749,6 +749,7 @@ RDFauthor = (function () {
                     var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
                     var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
                     
+                    // alert(addedJSON); /*
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
                         jQuery.post(updateURI, {
@@ -760,6 +761,7 @@ RDFauthor = (function () {
                             _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }
+                    // */
                 }
             }
         }

@@ -394,7 +394,7 @@ Statement.prototype = {
      */
     objectValue: function() {
         if (this.hasObject()) {
-            return String(this._object.value);
+            return String(this._object.value).replace('&amp;', '&');
         }
         
         return null;

@@ -17,6 +17,11 @@ RDFauthor.registerWidget({
             editor.setPanel('xmlliteral-edit-panel-' + this.ID);
             editor.addInstance('xmlliteral-edit-input-' + this.ID);
             this._editor = editor;
+            
+            // event
+            jQuery('#xmlliteral-edit-input-' + this.ID).change(function () {
+                alert('changed');
+            });
         }
     }, 
     
@@ -76,16 +81,25 @@ RDFauthor.registerWidget({
             
             var somethingChanged = (
                 this.statement.hasObject() 
-                && this.statement.objectValue() !== this.value()
+                && (this.statement.objectValue() != this.value())
             );
+            
+            if (somethingChanged) {
+                alert('orig: ' + this.statement.objectValue());
+                alert('new: ' + this.value());
+            }
             
             if (somethingChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             
-            if ((null !== this.value()) && !this.removeOnSubmit) {
+            if ((null !== this.value()) && !this.removeOnSubmit && somethingChanged) {
                 try {
-                    var newStatement = this.statement.copyWithObject({value: this.value(), options: {datatype: this._datatype}});
+                    var newStatementOptions = {};
+                    if (this._datatype) {
+                        newStatementOptions.datatype = this._datatype;
+                    }
+                    var newStatement = this.statement.copyWithObject({value: this.value(), options: newStatementOptions});
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;
@@ -109,10 +123,24 @@ RDFauthor.registerWidget({
     value: function () {
         var editor = this._editor.instanceById('xmlliteral-edit-input-' + this.ID);
         if (editor && ('' !== editor.getContent())) {
-            return editor.getContent();
+            return editor.getContent().replace('&amp;amp;', '&amp;');
         }
         
         return null;
+    }, 
+    
+    encodeTags: function (stringContainingTags) {
+        var replace = {
+            '<': '&lt;', 
+            '>': '&gt;', 
+            '&': '&amp;'
+        }
+        
+        var re = new RegExp('[<>&]', 'g');
+        
+        return stringContainingTags.replace(re, function (match, offset, s) {
+            return replacement = replace[match];
+        });
     }
 }, [{
         name: 'range', 

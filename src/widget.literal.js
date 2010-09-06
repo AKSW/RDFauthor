@@ -173,7 +173,7 @@ RDFauthor.registerWidget({
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             
-            if ((null !== this.value()) && !this.removeOnSubmit) {
+            if ((null !== this.value()) && !this.removeOnSubmit && somethingChanged) {
                 try {
                     var objectOptions = {};
                     if (null !== this.lang()) {
