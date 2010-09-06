@@ -84,10 +84,10 @@ RDFauthor.registerWidget({
                 && (this.statement.objectValue() != this.value())
             );
             
-            if (somethingChanged) {
-                alert('orig: ' + this.statement.objectValue());
-                alert('new: ' + this.value());
-            }
+            // if (somethingChanged) {
+            //     alert('orig: ' + this.statement.objectValue());
+            //     alert('new: ' + this.value());
+            // }
             
             if (somethingChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
@@ -96,8 +96,8 @@ RDFauthor.registerWidget({
             if ((null !== this.value()) && !this.removeOnSubmit && somethingChanged) {
                 try {
                     var newStatementOptions = {};
-                    if (this._datatype) {
-                        newStatementOptions.datatype = this._datatype;
+                    if (this.statement.objectDatatype()) {
+                        newStatementOptions.datatype = this.statement.objectDatatype();
                     }
                     var newStatement = this.statement.copyWithObject({value: this.value(), options: newStatementOptions});
                     databank.add(newStatement.asRdfQueryTriple());

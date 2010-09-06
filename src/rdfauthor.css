@@ -203,7 +203,7 @@ div.modal-wrapper {
 
 #rdfAuthorView .rdfAuthorViewContent {
     padding: 0;
-    max-height: 30em;
+    max-height: 40em;
     overflow-x: hidden;
     overflow-y: auto;
     background: #fff;
