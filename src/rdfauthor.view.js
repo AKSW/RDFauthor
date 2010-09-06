@@ -237,6 +237,7 @@ View.prototype = {
         // unique subjects
         this._subjects     = {};
         this._subjectCount = 0;
+        jQuery('.' + this._options.contentContainerClass).empty();
     }, 
     
     /**

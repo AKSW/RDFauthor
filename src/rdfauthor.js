@@ -229,7 +229,7 @@ RDFauthor = (function () {
      * @private
      */
     function _checkInterface(object, interf) {
-        for (member in interf) {
+        for (var member in interf) {
             if (typeof member !== 'function') {
                 continue;
             }
@@ -248,7 +248,7 @@ RDFauthor = (function () {
      * @private
      */
     function _cloneDatabanks() {
-        for (g in _graphInfo) {            
+        for (var g in _graphInfo) {            
             if (undefined !== _databanksByGraph[g] &&
                 _databanksByGraph[g] instanceof jQuery.rdf.databank) {
                 
@@ -332,7 +332,7 @@ RDFauthor = (function () {
                 var filters  = [];
                 var patterns = [];
 
-                for (infoPredicateURI in _infoPredicates) {
+                for (var infoPredicateURI in _infoPredicates) {
                     var variableName = _shortcutForInfoPredicate(infoPredicateURI);
                     selects += (' ?' + variableName);
                     patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
@@ -593,35 +593,35 @@ RDFauthor = (function () {
      */
     function _parseURL(str) {
         var o = {
-        	strictMode: false, 
-        	key: ['source', 'protocol', 'authority', 'userInfo', 'user', 'password', 'hostname', 
-        	      'port', 'relative', 'path', 'directory', 'file','query','anchor'],
-        	q: {
-        	    name:   'queryKey',
-        	    parser: /(?:^|&)([^&=]*)=?([^&]*)/g
-        	},
-        	parser: {
-        		strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-        		loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
-        	}
+            strictMode: false, 
+            key: ['source', 'protocol', 'authority', 'userInfo', 'user', 'password', 'hostname', 
+                  'port', 'relative', 'path', 'directory', 'file','query','anchor'],
+            q: {
+                name:   'queryKey',
+                parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+            },
+            parser: {
+                strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+                loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+            }
         };
         
-        var	m   = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str), 
-    		uri = {}, 
-    		i   = 14;
+        var m   = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str), 
+            uri = {}, 
+            i   = 14;
 
-    	while (i--) {
-    	    uri[o.key[i]] = m[i] || '';
-    	}
-    	
-    	uri[o.q.name] = {};
-    	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-    		if ($1) {
-    		    uri[o.q.name][$1] = $2;
-    		}
-    	});
-    	
-    	return uri;
+        while (i--) {
+            uri[o.key[i]] = m[i] || '';
+        }
+        
+        uri[o.q.name] = {};
+        uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+            if ($1) {
+                uri[o.q.name][$1] = $2;
+            }
+        });
+        
+        return uri;
     };
     
     /**
@@ -713,7 +713,7 @@ RDFauthor = (function () {
      * @private
      */
     function _updateSources() {
-        for (g in _graphInfo) {
+        for (var g in _graphInfo) {
             var updateURI = RDFauthor.updateURIForGraph(g);
             var databank  = RDFauthor.databankForGraph(g);
             var original  = _extractedByGraph[g];
@@ -746,15 +746,15 @@ RDFauthor = (function () {
                     });
                 } else {
                     // REST style
-                    var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json'});
-                    var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json'});
+                    var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
+                    var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
                         jQuery.post(updateURI, {
                             'named-graph-uri': g, 
-                            'insert': jQuery.toJSON(addedJSON ? addedJSON : {}), 
-                            'delete': jQuery.toJSON(removedJSON ? removedJSON : {})
+                            'insert': addedJSON ? addedJSON : '{}', 
+                            'delete': removedJSON ? removedJSON : '{}'
                         }, function () {
                             _view.hide(true);
                             _callIfIsFunction(_options.onSubmitSuccess);

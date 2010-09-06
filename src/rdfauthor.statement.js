@@ -141,6 +141,8 @@ Statement.prototype = {
     
     objectPlaceholder: '"__rdfauthor_no_value_"', 
     
+    longLiteralRegEx: /[\\\n\r]/, 
+    
     /**
      * Returns the statement as an rdfQuery triple object (jQuery.rdf.triple).
      * @return {object}
@@ -182,7 +184,8 @@ Statement.prototype = {
             quoteLiteral = false;
         } else if (objectSpec.datatype) {
             literalOpts.datatype = objectSpec.datatype;
-            quoteLiteral = containsQuotes ? true : false;
+            quoteLiteral = false;
+            // quoteLiteral = containsQuotes ? true : false;
             
             // register user-defined datatype
             if (!this.isDatatypeValid(literalOpts.datatype)) {
@@ -190,15 +193,21 @@ Statement.prototype = {
             }
         }
         
-        var longLiteral = (String(objectSpec.value).search(/[\t\b\n\r\f\\\"\\\']/) > -1);
+        /*
+         * rdfQuery literal RegEx:
+         * /^("""((\\"|[^"])*)"""|"((\\"|[^"])*)")(@([a-z]+(-[a-z0-9]+)*)|\^\^(.+))?$/
+         */
+        
+        var longLiteralRegEx = /[\\\n\r]/
+        var longLiteral = (String(objectSpec.value).search(longLiteralRegEx) > -1);
         var quoteChars  = longLiteral ? '"""' : '"';
         
-        if (quoteLiteral || longLiteral) {
-            if (containsDoubleQuotes) {
-                // escape double quotes
-                objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');
-            }
-            
+        if (containsDoubleQuotes) {
+            // escape double quotes
+            objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');
+        }
+        
+        if (quoteLiteral/* || longLiteral*/) {            
             objectSpec.value = quoteChars + objectSpec.value + quoteChars;
         }
         
@@ -210,7 +219,28 @@ Statement.prototype = {
      * @return {string}
      */
     toString: function () {
-        return String(this.asRdfQueryTriple());
+        var subjectString   = String(this._subject);
+        var predicateString = String(this._predicate);
+        
+        var objectString;
+        if (this._object instanceof jQuery.rdf.literal) {
+            objectString = String(this._object.value);
+            
+            // fix long literals in turtle string
+            var quoteChars = (objectString.search(this.longLiteralRegEx) > -1) ? '"""' : '"';
+            
+            objectString = quoteChars + objectString + quoteChars;
+            
+            if (this._object.lang != undefined) {
+                objectString += '@' + this._object.lang;
+            } else if (this._object.datatype != undefined) {
+                objectString += '^^<' + this._object.datatype + '>';
+            }
+        } else {
+            objectString = String(this._object);
+        }
+        
+        return subjectString + ' ' + predicateString + ' ' + objectString + ' .';
     }, 
     
     /**
