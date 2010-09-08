@@ -71,7 +71,7 @@ Selector.prototype = {
         }
     }, 
     
-    selection: function () {        
+    selection: function () {
         return {
             uri: this._widget.selectedResource, 
             label: this.widget.selectedResourcelabel
