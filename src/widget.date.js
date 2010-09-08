@@ -64,7 +64,11 @@ RDFauthor.registerWidget({
             
             if ((null !== this.value()) && !this.removeOnSubmit) {
                 try {
-                    var newStatement = this.statement.copyWithObject({value: this.value(), options: {datatype: this.datatype}});
+                    var newStatement = this.statement.copyWithObject({
+                        value: this.value(), 
+                        options: {datatype: this.datatype}, 
+                        type: 'literal'
+                    });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;

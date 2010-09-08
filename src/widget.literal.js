@@ -181,7 +181,11 @@ RDFauthor.registerWidget({
                     } else if (null !== this.datatype()) {
                         objectOptions.datatype = this.datatype();
                     }
-                    var newStatement = this.statement.copyWithObject({value: this.value(), options: objectOptions});
+                    var newStatement = this.statement.copyWithObject({
+                        value: this.value(), 
+                        options: objectOptions, 
+                        type: 'literal'
+                    });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;

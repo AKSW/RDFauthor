@@ -101,8 +101,12 @@ RDFauthor.registerWidget({
             }
             
             if (!this.removeOnSubmit) {
+                var self = this;
                 try {
-                    var newStatement = this.statement.copyWithObject({value: '<' + this.value() + '>'});
+                    var newStatement = this.statement.copyWithObject({
+                        value: '<' + this.value() + '>', 
+                        type: this.statement.objectType()
+                    });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;

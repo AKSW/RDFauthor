@@ -6,6 +6,7 @@ $(document).ready(function() {
                 subject: '<http://example.com/r1>', 
                 predicate: '<http://ns.aksw.org/update/p1>', 
                 object: {
+                    type: 'literal'
                     value: 'Foo'
                 }}, {graph:'http://example.com/g1/', hidden: true, required: true, protected: true, title: 'Property One'});
         }, 
@@ -15,13 +16,20 @@ $(document).ready(function() {
     });
     
     test('initSimple', 3, function() {
-        var s1 = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: '<http://example.com/o1>'});
+        var s1 = new Statement({
+            subject: '<http://example.com/r1>', 
+            predicate: '<http://example.com/p1>', 
+            object: {
+                type: 'uri', 
+                value '<http://example.com/o1>'
+            }});
         equal(
             String(s1), 
             '<http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .', 
             'Statement should be <http://example.com/r1> <http://example.com/p1> <http://example.com/o1> .');
        
-        var s2 = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: 'Bar'});
+        var s2 = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', 
+        object: {value: 'Bar', type: 'literal'}});
         equal(
             String(s2), 
             '<http://example.com/r1> <http://example.com/p1> "Bar" .', 
@@ -35,7 +43,7 @@ $(document).ready(function() {
         var s1 = new Statement({
             subject: {value: '<http://example.com/cr1>'}, 
             predicate: {value: 'ex:cp1', options: {namespaces: {'ex': 'http://example.com/'}}}, 
-            object: {value: '<http://example.com/co1>'}
+            object: {value: '<http://example.com/co1>', type: 'uri'}
         });
         equal(
             String(s1), 
@@ -45,7 +53,7 @@ $(document).ready(function() {
         var s2 = new Statement({
             subject: '<http://example.com/r1>', 
             predicate: '<http://example.com/p1>', 
-            object: {value: 'Bar', options: {datatype: 'http://www.w3.org/2001/XMLSchema#string'}}});
+            object: {type: 'literal', value: 'Bar', options: {datatype: 'http://www.w3.org/2001/XMLSchema#string'}}});
         equal(
             String(s2), 
             '<http://example.com/r1> <http://example.com/p1> "Bar"^^<http://www.w3.org/2001/XMLSchema#string> .', 
@@ -54,7 +62,7 @@ $(document).ready(function() {
         var s3 = new Statement({
             subject: '<http://example.com/r1>', 
             predicate: '<http://example.com/p1>', 
-            object: {value: 'ttt', options: {lang: 'de'}}});
+            object: {type: 'literal', value: 'ttt', options: {lang: 'de'}}});
         equal(
             String(s3), 
             '<http://example.com/r1> <http://example.com/p1> "ttt"@de .', 
@@ -65,7 +73,7 @@ $(document).ready(function() {
         var s1 = new Statement({
             subject: {value: '<http://example.com/r1>'}, 
             predicate: {value: 'ex:p1', options: {namespaces: {'ex': 'http://example.com/'}}}, 
-            object: {value: 'literal with \' single quote.'}
+            object: {value: 'literal with \' single quote.', type: 'literal'}
         });
         equal(
             String(s1), 
@@ -75,7 +83,7 @@ $(document).ready(function() {
         var s2 = new Statement({
             subject: {value: '<http://example.com/r2>'}, 
             predicate: {value: 'ex:p2', options: {namespaces: {'ex': 'http://example.com/'}}}, 
-            object: {value: 'literal with "double" quote.'}
+            object: {value: 'literal with "double" quote.', type: 'literal'}
         });
         equal(
             String(s2), 
@@ -85,7 +93,7 @@ $(document).ready(function() {
         var s3 = new Statement({
             subject: {value: '<http://example.com/r3>'}, 
             predicate: {value: 'ex:p3', options: {namespaces: {'ex': 'http://example.com/'}}}, 
-            object: {value: 'literal with \n line break.'}
+            object: {value: 'literal with \n line break.', type: 'literal'}
         });
         equal(
             String(s3), 
@@ -95,7 +103,7 @@ $(document).ready(function() {
         var s4 = new Statement({
             subject: {value: '<http://example.com/r4>'}, 
             predicate: {value: 'ex:p4', options: {namespaces: {'ex': 'http://example.com/'}}}, 
-            object: {value: 'literal with \t tab.'}
+            object: {value: 'literal with \t tab.', type: 'literal'}
         });
         equal(
             String(s4), 
@@ -105,7 +113,7 @@ $(document).ready(function() {
         var s5 = new Statement({
             subject: {value: '<http://example.com/r5>'}, 
             predicate: {value: 'ex:p5', options: {namespaces: {'ex': 'http://example.com/'}}}, 
-            object: {value: 'literal with ünícóde.'}
+            object: {value: 'literal with ünícóde.', type: 'literal'}
         });
         equal(
             String(s5), 
@@ -115,7 +123,7 @@ $(document).ready(function() {
         var s6 = new Statement({
             subject: {value: '<http://example.com/1>'}, 
             predicate: {value: '<http://example.com/2>'}, 
-            object: {value: 'Over the past 3 years, the semantic web activity has gained momentum with the widespread publishing of structured data as RDF. The Linked Data paradigm has therefore evolved from a practical research idea into a very promising candidate for addressing one of the biggest challenges in the area of intelligent information management: the exploitation of the Web as a platform for data and information integration in addition to document search. To translate this initial success into a world-scale disruptive reality, encompassing the Web 2.0 world and enterprise data alike, the following research challenges need to be addressed: improve coherence and quality of data published on the Web, close the performance gap between relational and RDF data management, establish trust on the Linked Data Web and generally lower the entrance barrier for data publishers and users. With partners among those who initiated and strongly supported the Linked Open Data initiative, the LOD2 project aims at tackling these challenges by developing:\n<ol>\n<li>enterprise-ready tools and methodologies for exposing and managing very large amounts of structured information on the Data Web,</li>\n<li>a testbed and bootstrap network of high-quality multi-domain, multi-lingual ontologies from sources such as Wikipedia and OpenStreetMap.</li>\n<li>algorithms based on machine learning for automatically interlinking and fusing data from the Web.</li>\n<li>standards and methods for reliably tracking provenance, ensuring privacy and data security as well as for assessing the quality of information.</li>\n<li>adaptive tools for searching, browsing, and authoring of Linked Data.</li>\n</ol>\nWe will integrate and syndicate linked data with large-scale, existing applications and showcase the benefits in the three application scenarios of media & publishing, corporate data intranets and eGovernment. The resulting tools, methods and data sets have the potential to change the Web as we know it today.'}
+            object: {type: 'literal', value: 'Over the past 3 years, the semantic web activity has gained momentum with the widespread publishing of structured data as RDF. The Linked Data paradigm has therefore evolved from a practical research idea into a very promising candidate for addressing one of the biggest challenges in the area of intelligent information management: the exploitation of the Web as a platform for data and information integration in addition to document search. To translate this initial success into a world-scale disruptive reality, encompassing the Web 2.0 world and enterprise data alike, the following research challenges need to be addressed: improve coherence and quality of data published on the Web, close the performance gap between relational and RDF data management, establish trust on the Linked Data Web and generally lower the entrance barrier for data publishers and users. With partners among those who initiated and strongly supported the Linked Open Data initiative, the LOD2 project aims at tackling these challenges by developing:\n<ol>\n<li>enterprise-ready tools and methodologies for exposing and managing very large amounts of structured information on the Data Web,</li>\n<li>a testbed and bootstrap network of high-quality multi-domain, multi-lingual ontologies from sources such as Wikipedia and OpenStreetMap.</li>\n<li>algorithms based on machine learning for automatically interlinking and fusing data from the Web.</li>\n<li>standards and methods for reliably tracking provenance, ensuring privacy and data security as well as for assessing the quality of information.</li>\n<li>adaptive tools for searching, browsing, and authoring of Linked Data.</li>\n</ol>\nWe will integrate and syndicate linked data with large-scale, existing applications and showcase the benefits in the three application scenarios of media & publishing, corporate data intranets and eGovernment. The resulting tools, methods and data sets have the potential to change the Web as we know it today.'}
         });
         equal(
             String(s6), 
@@ -165,10 +173,10 @@ $(document).ready(function() {
         equal(this.fixture.predicateLabel(), 'Property One', 'predicate label should be Property One.');
         
         // if no label given, URI should be used
-        var s = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: '<http://example.com/o1>'});
+        var s = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: {value: '<http://example.com/o1>', type: 'uri'}});
         equal(s.predicateLabel(), 'p1', 'predicate label should be p1');
         
-        var s = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com#ttt>', object: '<http://example.com#abc>'});
+        var s = new Statement({subject: '<http://example.com/r1>', predicate: '<http://example.com#ttt>', object: {value: '<http://example.com#abc>', type: 'literal'}});
         equal(s.predicateLabel(), 'ttt', 'predicate label should be ttt.');
     });
     

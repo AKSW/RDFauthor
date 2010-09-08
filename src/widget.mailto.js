@@ -77,7 +77,10 @@ RDFauthor.registerWidget({
             
             if (!this.removeOnSubmit) {
                 try {
-                    var newStatement = this.statement.copyWithObject({value: '<' + this.value() + '>'});
+                    var newStatement = this.statement.copyWithObject({
+                        value: '<' + this.value() + '>', 
+                        type: 'uri'
+                    });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;

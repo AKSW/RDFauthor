@@ -21,14 +21,14 @@ $(document).ready(function() {
         equal(db.size(), 0, 'Databank should have 0 triples');
         
         var s1 = new Statement(
-            {subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: '<http://example.com/o1>'}, 
+            {subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: {value: '<http://example.com/o1>', type: 'literal'}}, 
             {graph: 'http://example.com/g1/'});
         
         this.fixture.addStatement(s1);
         equal(db.size(), 1, 'Databank should now have 1 triple');
 
         var s2 = new Statement(
-            {subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: 'Bar'}, 
+            {subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: {value: 'Bar', type: 'literal'}}, 
             {graph: 'http://example.com/g1/'});
         this.fixture.addStatement(s2);
         equal(db.size(), 2, 'Databank should now have 2 triples');
@@ -72,7 +72,7 @@ $(document).ready(function() {
         
         // add a statement
         var s1 = new Statement(
-            {subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: '<http://example.com/o1>'}, 
+            {subject: '<http://example.com/r1>', predicate: '<http://example.com/p1>', object: {value: '<http://example.com/o1>', type: 'literal'}}, 
             {graph: 'http://example.com/g1/'});
         
         this.fixture.addStatement(s1);

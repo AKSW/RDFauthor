@@ -111,6 +111,7 @@ SubjectGroup.prototype = {
                     var statement = new Statement({
                         subject: '<' + self._subjectURI + '>', 
                         predicate: '<' + uri + '>'}, {
+                            type: 'uri', 
                             title: label, 
                             graph: self._graphURI
                         });

@@ -99,7 +99,13 @@ RDFauthor.registerWidget({
                     if (this.statement.objectDatatype()) {
                         newStatementOptions.datatype = this.statement.objectDatatype();
                     }
-                    var newStatement = this.statement.copyWithObject({value: this.value(), options: newStatementOptions});
+                    
+                    var val = this.value();
+                    var newStatement = this.statement.copyWithObject({
+                        value: val, 
+                        options: newStatementOptions, 
+                        type: 'literal'
+                    });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;

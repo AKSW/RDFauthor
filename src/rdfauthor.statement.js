@@ -92,14 +92,21 @@ function Statement(statementSpec, statementOptions) {
             var objectSpec = typeof statementSpec.object == 'object' ? statementSpec.object.value : statementSpec.object;
             var objectOpts = statementSpec.object.options ? statementSpec.object.options : {};
             
-            if ((typeof objectSpec == 'string') && (objectSpec.charAt(0) == '<') && (objectSpec.charAt(objectSpec.length-1) == '>')) {
-                this._object = jQuery.rdf.resource(objectSpec, objectOpts);
-            } else {                
-                this._object = this.createLiteral({
-                    value:    objectSpec, 
-                    datatype: objectOpts.datatype ? objectOpts.datatype : null, 
-                    lang:     objectOpts.lang ? objectOpts.lang : null
-                });
+            switch (statementSpec.object.type) {
+                case 'uri':
+                    this._object = jQuery.rdf.resource(objectSpec, objectOpts);
+                break;
+                case 'bnode':
+                    this._object = jQuery.rdf.blank(objectSpec, objectOpts);
+                break;
+                case 'literal': /* fallthrough */
+                default:
+                    this._object = this.createLiteral({
+                        value:    objectSpec, 
+                        datatype: objectOpts.datatype ? objectOpts.datatype : null, 
+                        lang:     objectOpts.lang ? objectOpts.lang : null
+                    });
+                break;
             }
         }
     } else {
@@ -159,7 +166,9 @@ Statement.prototype = {
      * Returns a new statement based on the current statement where the object is changed
      * 
      */
-    copyWithObject: function (objectSpec) {
+    copyWithObject: function (objectSpec) {        
+        objectSpec = jQuery.extend(objectSpec, {type: this.objectType()});
+        
         var copy = new Statement({
             subject: '<' + this.subjectURI() + '>', 
             predicate: '<' + this.predicateURI() + '>', 
@@ -211,7 +220,7 @@ Statement.prototype = {
             objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');
         }
         
-        if (quoteLiteral/* || longLiteral*/) {            
+        if (quoteLiteral/* || longLiteral*/) {
             objectSpec.value = quoteChars + objectSpec.value + quoteChars;
         }
         
@@ -386,9 +395,11 @@ Statement.prototype = {
         if (this.hasObject()) {
             if (this._object instanceof jQuery.rdf.resource) {
                 return 'uri';
-            } else {
-                return 'literal';
+            } else if (this._object instanceof jQuery.rdf.blank) {
+                return 'bnode';
             }
+            
+            return 'literal';
         }
     },
     
