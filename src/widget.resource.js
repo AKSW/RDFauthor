@@ -105,7 +105,7 @@ RDFauthor.registerWidget({
                 try {
                     var newStatement = this.statement.copyWithObject({
                         value: '<' + this.value() + '>', 
-                        type: this.statement.objectType()
+                        type: 'uri'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {

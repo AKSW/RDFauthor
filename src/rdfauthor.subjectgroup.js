@@ -110,11 +110,11 @@ SubjectGroup.prototype = {
                 selectionCallback: function (uri, label) {
                     var statement = new Statement({
                         subject: '<' + self._subjectURI + '>', 
-                        predicate: '<' + uri + '>'}, {
-                            type: 'uri', 
-                            title: label, 
-                            graph: self._graphURI
-                        });
+                        predicate: '<' + uri + '>'
+                    }, {
+                        title: label, 
+                        graph: self._graphURI
+                    });
                     self._propertySelector.dismiss(false);
                     
                     var ID = self.addWidget(statement);
