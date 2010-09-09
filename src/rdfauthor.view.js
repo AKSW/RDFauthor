@@ -59,10 +59,17 @@ function View(options) {
     function getChrome() {
         html = '\
             <div class="window" id="' + self.cssID() + '" style="display:none">\
-                <h2 class="title">' + self._options.title + '</h2>\
-                <div class="' + self._options.contentContainerClass + '">\
-                </div>' + getButtons() + '<div style="clear:both"></div>\
+                ' + getContent() + '\
             </div>';
+        
+        return html;
+    };
+    
+    function getContent() {
+        html = '\
+            <h2 class="title">' + self._options.title + '</h2>\
+            <div class="' + self._options.contentContainerClass + '">\
+            </div>' + getButtons() + '<div style="clear:both"></div>';
         
         return html;
     };
@@ -131,6 +138,9 @@ function View(options) {
             });
             propertySelector.presentInContainer(self._options.useAnimations);
         });
+    } else {
+        // append content only
+        jQuery('#' + this.cssID()).html(getContent());
     }
 }
 
@@ -237,7 +247,9 @@ View.prototype = {
         // unique subjects
         this._subjects     = {};
         this._subjectCount = 0;
-        jQuery('.' + this._options.contentContainerClass).empty();
+        // this._container.empty();
+        jQuery('#' + this.cssID()).empty();
+        jQuery(RDFauthor.eventTarget()).unbind('rdfauthor.view');
     }, 
     
     /**
@@ -268,7 +280,7 @@ View.prototype = {
      * @member
      * @param {boolean} animated Whether to disappear animatedly
      */
-    hide: function (animated) {
+    hide: function (animated, callback) {
         if (arguments.length === 0 || !animated || !this._options.useAnimations) {
             jQuery(this.getElement()).hide();
             this._container.hide();
@@ -277,6 +289,9 @@ View.prototype = {
             jQuery(this.getElement()).fadeOut(function() {
                 jQuery(self.getElement()).hide();
                 self._container.hide();
+                if (typeof callback == 'function') {
+                    callback();
+                }
             });
         }
     }

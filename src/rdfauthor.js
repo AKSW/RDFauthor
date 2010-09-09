@@ -301,7 +301,7 @@ RDFauthor = (function () {
      * Widget as its prototype object.
      * @return {Object}
      */
-    function _createWidget(widgetSpec) {        
+    function _createWidget(widgetSpec) {
         var F = function () {};
         F.prototype = Widget;
         
@@ -632,7 +632,6 @@ RDFauthor = (function () {
         if (arguments.length == 0) {
             view = RDFauthor.getView();
         }
-        view.reset();
         
         /* make sure, view has predicate info available */
         _fetchPredicateInfo(function() {
@@ -868,7 +867,10 @@ RDFauthor = (function () {
              * - restore state (parsed or unparsed?)
              */
              var view = RDFauthor.getView();
-             view.hide(true);
+             view.hide(true, function () {
+                 view.reset();
+                 _view = null;
+             });
              this.eventTarget().trigger('rdfauthor.cancel');
         }, 
         
@@ -876,12 +878,12 @@ RDFauthor = (function () {
          * Commits changes from an ongoing editing process.
          * All pending changes will be sent to sources.
          * @todo inform on error
-         */
+         *//*
         commit: function () {
             _cloneDatabanks();
             this.eventTarget().trigger('rdfauthor.commit');
             _updateSources();
-        }, 
+        }, */
         
         /**
          * Returns the jQuery.rdf.databank that stores statements for graph denoted by <code>graphURI</code>.
@@ -1319,6 +1321,8 @@ RDFauthor = (function () {
                 useAnimations: true, 
                 autoParse: true
             }
+            // remove events
+            jQuery(this.eventTarget()).unbind();
         }, 
         
         /**
@@ -1380,20 +1384,7 @@ RDFauthor = (function () {
                 /* display view */
                 _populateView();
                 _showView();
-            });            
-            // if (_options.autoParse) {
-            //     var that = this;
-            //     /* parse */
-            //     _parse(function() {
-            //         /* display view */
-            //         _populateView();
-            //         _showView();
-            //     });
-            // } else {
-            //     /* auto-parsing off, statements were added manually */
-            //     _populateView();
-            //     _showView();
-            // }
+            });
         }
     }
 })();

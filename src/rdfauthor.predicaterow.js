@@ -107,13 +107,15 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         self.addWidget(newStatement, widget.constructor, true);
     });
     
+    var target = RDFauthor.eventTarget();
+    
     // attach to submit event
-    jQuery('body').bind('rdfauthor.view.submit', function () {
+    jQuery(target).bind('rdfauthor.view.submit', function () {
         self.onSubmit();
     });
     
     // attach to cancel event
-    jQuery('body').bind('rdfauthor.view.cancel', function () {
+    jQuery(target).bind('rdfauthor.view.cancel', function () {
         self.onCancel();
     });
     
