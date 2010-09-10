@@ -548,7 +548,7 @@ RDFauthor = (function () {
     function _makeElementEditable(element, statement) {
         /*
          * add hash id
-         * store id => statement
+         * store id => statement index
          */
          var id = jQuery(element).attr('id');
          if (undefined === id) {
@@ -571,8 +571,9 @@ RDFauthor = (function () {
      * Parses the current page for RDFa triples
      * @private
      */
-    function _parse(callback) {        
+    function _parse(callback) {
         if (!_pageParsed) {
+            _resetDatabanks();
             // set parsing callback
             RDFA.CALLBACK_DONE_PARSING = function () {
                 _pageParsed = true;
@@ -629,6 +630,9 @@ RDFauthor = (function () {
      * @private
      */
     function _populateView(view) {
+        /* reset old view */
+        _resetView();
+        
         if (arguments.length == 0) {
             view = RDFauthor.getView();
         }
@@ -672,6 +676,24 @@ RDFauthor = (function () {
                 _ready();
             }
         });
+    }
+    
+    function _resetDatabanks() {
+        _pageParsed = false;
+        _databanksByGraph  = {};
+        _extractedByGraph  = {};
+        _specialStatements = {
+            'explicit': [], 
+            'hidden': []
+        };
+    }
+    
+    function _resetView() {
+        if (_view instanceof View) {
+            _view.reset();
+        }
+        
+        _view = null;
     }
     
     /**
@@ -748,8 +770,8 @@ RDFauthor = (function () {
                     var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
                     var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
                     
-                    // alert('Added: ' + addedJSON);
-                    // alert('Removed: ' + removedJSON); /*
+                    alert('Added: ' + addedJSON);
+                    alert('Removed: ' + removedJSON); /*
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
                         jQuery.post(updateURI, {
@@ -761,7 +783,7 @@ RDFauthor = (function () {
                             _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }
-                    // */
+                    */
                 }
             }
         }
@@ -867,10 +889,11 @@ RDFauthor = (function () {
              * - restore state (parsed or unparsed?)
              */
              var view = RDFauthor.getView();
-             view.hide(true, function () {
-                 view.reset();
-                 _view = null;
-             });
+             view.hide(true);/*, function () {
+                 _resetDatabanks();
+                 // view.reset();
+                 // _view = null;
+             });*/
              this.eventTarget().trigger('rdfauthor.cancel');
         }, 
         
@@ -1308,7 +1331,6 @@ RDFauthor = (function () {
          * Resets private variables (mainly used for testing).
          */
         reset: function () {
-            _databanksByGraph  = {};
             _defaultGraphURI   = null;
             _defaultSubjectURI = null;
             _loadedScripts     = {};

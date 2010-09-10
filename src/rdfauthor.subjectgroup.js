@@ -103,7 +103,7 @@ SubjectGroup.prototype = {
      * Returns the property selector instance for this subject group.
      */
     getPropertySelector: function (callback) {
-        if (null === this._propertySelector) {
+        // if (null === this._propertySelector) {
             var self = this;
             var selectorOptions = {
                 container: jQuery(this.getElement()), 
@@ -130,7 +130,7 @@ SubjectGroup.prototype = {
             };
             
             this._propertySelector = new Selector(this._graphURI, this._subjectURI, selectorOptions);
-        }
+        // }
         
         return this._propertySelector;
     }, 
