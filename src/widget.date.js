@@ -54,15 +54,17 @@ RDFauthor.registerWidget({
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
             
             var somethingChanged = (
-                this.statement.hasObject() 
-                && this.statement.objectValue() !== this.value()
+                this.statement.hasObject() && 
+                    this.statement.objectValue() !== this.value() || 
+                !this.statement.hasObject() &&
+                    this.value()
             );
             
             if (somethingChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             
-            if ((null !== this.value()) && !this.removeOnSubmit) {
+            if ((null !== this.value()) && !this.removeOnSubmit && somethingChanged) {
                 try {
                     var newStatement = this.statement.copyWithObject({
                         value: this.value(), 
@@ -91,7 +93,7 @@ RDFauthor.registerWidget({
     
     value: function () {
         var value = $('#date-edit-' + this.ID).val();
-        if ('' !== value) {
+        if (String(value) > 0) {
             return value;
         }
         

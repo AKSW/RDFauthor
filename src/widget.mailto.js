@@ -103,7 +103,7 @@ RDFauthor.registerWidget({
     
     value: function() {
         var typedValue = this.element().val();
-        if ('' !== typedValue) {
+        if (String(typedValue).length > 0) {
             return this.URIForLabel(typedValue);
         }
         

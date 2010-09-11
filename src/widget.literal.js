@@ -156,16 +156,20 @@ RDFauthor.registerWidget({
         return markup;
     }, 
     
-    submit: function () {        
+    submit: function () {
         if (this.shouldProcessSubmit()) {
             // get databank
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
             
             var somethingChanged = (
                 this.statement.hasObject() && (
-                    this.statement.objectValue() !== this.value()
-                    || this.statement.objectLang() !== this.lang()
-                    || this.statement.objectDatatype() !== this.datatype()
+                    // existing statement should have been edited
+                    this.statement.objectValue() !== this.value() || 
+                    this.statement.objectLang() !== this.lang() || 
+                    this.statement.objectDatatype() !== this.datatype()
+                ) || (
+                    // new statement must not be empty
+                    !this.statement.hasObject() && this.value()
                 )
             );
             
@@ -236,7 +240,7 @@ RDFauthor.registerWidget({
     
     value: function () {
         var value = $('#literal-value-' + this.ID).val();
-        if ('' !== value) {
+        if (String(value).length > 0) {
             return value;
         }
         

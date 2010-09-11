@@ -80,14 +80,11 @@ RDFauthor.registerWidget({
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
             
             var somethingChanged = (
-                this.statement.hasObject() 
-                && (this.statement.objectValue() != this.value())
+                this.statement.hasObject() && 
+                    (this.statement.objectValue() !== this.value()) || 
+                !this.statement.hasObject() && 
+                    this.value()
             );
-            
-            // if (somethingChanged) {
-            //     alert('orig: ' + this.statement.objectValue());
-            //     alert('new: ' + this.value());
-            // }
             
             if (somethingChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
