@@ -161,23 +161,27 @@ RDFauthor.registerWidget({
             // get databank
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
             
+            // /* 
+            var v = this.value();
+            // */
+            
             var somethingChanged = (
                 this.statement.hasObject() && (
                     // existing statement should have been edited
                     this.statement.objectValue() !== this.value() || 
                     this.statement.objectLang() !== this.lang() || 
                     this.statement.objectDatatype() !== this.datatype()
-                ) || (
-                    // new statement must not be empty
-                    !this.statement.hasObject() && this.value()
                 )
             );
+            
+            // new statement must not be empty
+            var isNew = !this.statement.hasObject() && (null !== this.value());
             
             if (somethingChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             
-            if ((null !== this.value()) && !this.removeOnSubmit && somethingChanged) {
+            if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
                 try {
                     var objectOptions = {};
                     if (null !== this.lang()) {

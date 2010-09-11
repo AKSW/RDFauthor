@@ -55,16 +55,16 @@ RDFauthor.registerWidget({
             
             var somethingChanged = (
                 this.statement.hasObject() && 
-                    this.statement.objectValue() !== this.value() || 
-                !this.statement.hasObject() &&
-                    this.value()
+                    this.statement.objectValue() !== this.value()
             );
+            
+            var isNew = !this.statement.hasObject() && (null !== this.value());
             
             if (somethingChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             
-            if ((null !== this.value()) && !this.removeOnSubmit && somethingChanged) {
+            if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
                 try {
                     var newStatement = this.statement.copyWithObject({
                         value: this.value(), 

@@ -51,7 +51,9 @@ Selector.prototype = {
         // scroll the container to the selector's top
         var offset = jQuery(this.cssID()).offset();
         var selectorTop = jQuery(this.cssID()).offset().top;
-        this._options.container.animate({scrollTop: (selectorTop/* - containerTop*/)}, animated ? this._options.animationTime : 0);
+        this._options.container.animate(
+            {scrollTop: (selectorTop/* - containerTop*/)}, 
+            animated ? this._options.animationTime : 0);
         
         // give focus to widget
         this._widget.focus();

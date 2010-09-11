@@ -148,7 +148,7 @@ RDFauthor = (function () {
      */
     function _addInfoPredicate(infoPredicateURI, shortcut) {
         _infoPredicates[infoPredicateURI] = {};
-        if (arguments.length > 1) {
+        if (undefined !== shortcut) {
             _infoShortcuts[shortcut] = infoPredicateURI;
         }
     }
@@ -309,11 +309,16 @@ RDFauthor = (function () {
         F.prototype = Widget;
         
         var W = function (statement, options) {
-            this.ID = RDFauthor.nextID();
-            this.statement = statement;
+            /* widget defaults */
+            this.removeOnSubmit = false;
+            this.animate        = false;
+            this.ID             = RDFauthor.nextID();
+            this.statement      = statement;
+            this.options        = {};
+            this._maxWidth      = 481;
             
             // widget has options
-            if (arguments.length >= 2) {
+            if (undefined !== options) {
                 this.options = jQuery.extend(this.options, options);
             }
         };
@@ -445,7 +450,7 @@ RDFauthor = (function () {
      */
     function _instantiateWidget(constructor, statement, options) {
         if (typeof constructor === 'function') {
-            if (arguments.length >= 3) {
+            if (undefined !== options) {
                 return new constructor(statement, options);
             } else {
                 return new constructor(statement);
@@ -636,7 +641,7 @@ RDFauthor = (function () {
         /* reset old view */
         _resetView();
         
-        if (arguments.length == 0) {
+        if (undefined === view) {
             view = RDFauthor.getView();
         }
         
@@ -784,8 +789,11 @@ RDFauthor = (function () {
                     var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
                     var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
                     
-                    // alert('Added: ' + addedJSON);
-                    // alert('Removed: ' + removedJSON); /*
+                    // /*
+                    alert('Added: ' + addedJSON);
+                    alert('Removed: ' + removedJSON);
+                    return;
+                    // */
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
                         jQuery.post(updateURI, {
@@ -797,7 +805,6 @@ RDFauthor = (function () {
                             _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }
-                    // */
                 }
             }
         }
@@ -890,7 +897,7 @@ RDFauthor = (function () {
                 }
                 
                 // make editable
-                if (arguments.length > 1) {
+                if (undefined !== element) {
                     _makeElementEditable(element, statement);
                 }
             }
