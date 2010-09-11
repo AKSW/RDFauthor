@@ -4,7 +4,12 @@
  * <code>MyWidget.prototype = Widget;</code> or make sure you implement all 
  * the functions yourself.
  */
-var Widget = {    
+var Widget = {
+    removeOnSubmit: false, 
+    animate: false, 
+    options: {}, 
+    _maxWidth: 481,
+    
     /**
      * Returns the available space the widget can use in pixels.
      */
