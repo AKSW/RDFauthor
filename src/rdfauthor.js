@@ -309,17 +309,16 @@ RDFauthor = (function () {
         F.prototype = Widget;
         
         var W = function (statement, options) {
-            /* widget defaults */
-            this.removeOnSubmit = false;
-            this.animate        = false;
-            this.ID             = RDFauthor.nextID();
-            this.statement      = statement;
-            this.options        = {};
-            this._maxWidth      = 481;
+            this.ID = RDFauthor.nextID();
+            this.statement = statement;
             
             // widget has options
             if (undefined !== options) {
-                this.options = jQuery.extend(this.options, options);
+                this.options = jQuery.extend(
+                    {},             /* empty base */
+                    this.options,   /* options from prototype chain */
+                    options         /* user-provided options */
+                );
             }
         };
         W.prototype = jQuery.extend(new F(), widgetSpec);
@@ -789,7 +788,7 @@ RDFauthor = (function () {
                     var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
                     var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
                     
-                    // /*
+                    /*
                     alert('Added: ' + addedJSON);
                     alert('Removed: ' + removedJSON);
                     return;
@@ -1015,7 +1014,7 @@ RDFauthor = (function () {
                 }
                                 
                 var self = this;
-                var options = jQuery.extend(_options, {
+                var options = jQuery.extend({}, _options, {
                     onBeforeSubmit: function () {
                         // keep db before changes
                         _cloneDatabanks();
@@ -1407,7 +1406,7 @@ RDFauthor = (function () {
          * @param {object} optionSpec
          */
         setOptions: function (optionSpec) {
-            _options = jQuery.extend(_options, optionSpec);
+            jQuery.extend(_options, optionSpec);
         }, 
         
         /**

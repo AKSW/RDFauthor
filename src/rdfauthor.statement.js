@@ -167,7 +167,7 @@ Statement.prototype = {
      * 
      */
     copyWithObject: function (objectSpec) {        
-        objectSpec = jQuery.extend(objectSpec, {type: this.objectType()});
+        jQuery.extend(objectSpec, {type: this.objectType()});
         
         var copy = new Statement({
             subject: '<' + this.subjectURI() + '>', 
