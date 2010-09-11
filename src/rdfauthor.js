@@ -116,7 +116,7 @@ RDFauthor = (function () {
     var _requirePending = 0;
     
     /** Default options */
-    var _options = {
+    var _defaultOptions = {
         title: 'Title', 
         saveButtonTitle: 'saveButtonTitle', 
         cancelButtonTitle: 'cancelButtonTitle', 
@@ -126,6 +126,9 @@ RDFauthor = (function () {
         usePredicateInfo: true, 
         useSPARQL11: false
     };
+    
+    /** actual options initialized to defaults */
+    var _options = {};
     
     /** Hash registered widgets */
     var _registeredWidgets = {
@@ -573,7 +576,7 @@ RDFauthor = (function () {
      */
     function _parse(callback) {
         if (!_pageParsed) {
-            _resetDatabanks();
+            // _resetDatabanks();
             // set parsing callback
             RDFA.CALLBACK_DONE_PARSING = function () {
                 _pageParsed = true;
@@ -688,12 +691,23 @@ RDFauthor = (function () {
         };
     }
     
+    function _resetParser() {
+        RDFA.reset();
+        _pageParsed = false;
+    }
+    
     function _resetView() {
         if (_view instanceof View) {
             _view.reset();
         }
         
         _view = null;
+    }
+    
+    function _resetOptions() {
+        for (var key in _defaultOptions) {
+            _options[key] = _defaultOptions[key];
+        }
     }
     
     /**
@@ -845,6 +859,9 @@ RDFauthor = (function () {
     _addInfoPredicate(RDFS_NS + 'range', 'range');
     _addInfoPredicate(RDFS_NS + 'label', 'label');
     
+    // load default options
+    _resetOptions();
+    
     // return uninstantiable singleton
     /** @lends RDFauthor */
     return {
@@ -883,18 +900,17 @@ RDFauthor = (function () {
          * Cancels the editing process.
          */
         cancel: function () {
-            /* 
-             * TODO:
-             * - inform/dismiss view
-             * - restore state (parsed or unparsed?)
-             */
-             var view = RDFauthor.getView();
-             view.hide(true);/*, function () {
-                 _resetDatabanks();
-                 // view.reset();
-                 // _view = null;
-             });*/
-             this.eventTarget().trigger('rdfauthor.cancel');
+            var self = this;
+            var view = RDFauthor.getView();
+            view.hide(true, function () {
+                /* clean up */
+                _resetDatabanks();
+                _resetParser();
+                _resetOptions();
+                
+                /* trigger plug-ins */
+                self.eventTarget().trigger('rdfauthor.cancel');
+            });
         }, 
         
         /**
@@ -1335,14 +1351,7 @@ RDFauthor = (function () {
             _defaultSubjectURI = null;
             _loadedScripts     = {};
             _loadedStylesheets = {};
-            _options = {
-                title: 'Title', 
-                saveButtonTitle: 'saveButtonTitle', 
-                cancelButtonTitle: 'cancelButtonTitle', 
-                showButtons: true, 
-                useAnimations: true, 
-                autoParse: true
-            }
+            _resetOptions();
             // remove events
             jQuery(this.eventTarget()).unbind();
         }, 
