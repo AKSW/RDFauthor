@@ -31,6 +31,8 @@ RDFauthor.registerWidget({
         this.resourceWidget.ready();
         this.literalWidget.ready();
         
+        var self = this;
+        
         jQuery('#meta-select-' + this.ID + ' .meta-type .radio').click(function () {
             var jResourceDiv = $(this).closest('.meta-select').children('.meta-resource');
             var jLiteralDiv  = $(this).closest('.meta-select').children('.meta-literal');
@@ -38,9 +40,25 @@ RDFauthor.registerWidget({
             if ($(this).val() == 'resource') {
                 jResourceDiv.show();
                 jLiteralDiv.hide();
+                
+                var val;
+                if (typeof self.literalWidget.value == 'function') {
+                    val = self.literalWidget.value();
+                } else {
+                    val = jQuery(self.literalWidget.element()).val();
+                }
+                jQuery(self.resourceWidget.element()).val(val);
             } else {
                 jResourceDiv.hide();
                 jLiteralDiv.show();
+                
+                var val;
+                if (typeof self.resourceWidget.value == 'function') {
+                    val = self.resourceWidget.value();
+                } else {
+                    val = jQuery(self.resourceWidget.element()).val();
+                }
+                jQuery(self.literalWidget.element()).val(val);
             }
         });
     },
