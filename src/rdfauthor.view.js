@@ -93,6 +93,30 @@ function View(options) {
         return buttonHTML;
     }
     
+    // keybord support
+    function handleKeybordEvent(e) {
+        switch (e.which) {
+            case 27:    // esc
+                jQuery('#rdfauthor-button-cancel').click();
+                break;
+            /*case 13:    // return
+                if (e.shiftKey) {   // shift
+                    jQuery('#rdfauthor-button-submit').click();
+                }
+                break;*/
+            case 65:    // a
+                if (e.shiftKey && e.ctrlKey) {
+                    jQuery('#rdfauthor-button-property').click();
+                }
+                break;
+            default:
+                // alert(e.which);
+                break;
+        }
+    }
+    
+    jQuery(document).bind('keydown.view', handleKeybordEvent);
+    
     // view initialization
     if (jQuery('#' + this.cssID()).length < 1) {
         // append chrome        
@@ -118,6 +142,8 @@ function View(options) {
         
         jQuery('#rdfauthor-button-cancel').live('click', function () {
             jQuery('body').trigger('rdfauthor.view.cancel');
+            
+            jQuery(document).unbind('keydown.view');
             
             if (typeof self._options.onAfterCancel == 'function') {
                 self._options.onAfterCancel();
