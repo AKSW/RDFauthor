@@ -17,27 +17,41 @@ RDFauthor.registerWidget({
         this._domReady     = false;
         this._pluginLoaded = false;
         this._initialized  = false;
+        this._autocomplete = null;
+        
+        this._namespaces = jQuery.extend({
+            foaf: 'http://xmlns.com/foaf/0.1/', 
+            dc:   'http://purl.org/dc/terms/', 
+            owl:  'http://www.w3.org/2002/07/owl#', 
+            rdf:  'http://www.w3.org/1999/02/22-rdf-syntax-ns#', 
+            rdfs: 'http://www.w3.org/2000/01/rdf-schema#', 
+            skos: 'http://www.w3.org/2004/02/skos/core#', 
+            geo:  'http://www.w3.org/2003/01/geo/wgs84_pos#', 
+            dbp:  'http://dbpedia.org/property/',
+            xsd:  'http://www.w3.org/2001/XMLSchema#', 
+            sioc: 'http://rdfs.org/sioc/ns#'
+        }, RDFauthor.namespaces());
         
         /* default options */
         this._options = jQuery.extend({
             // Autocomplete options:
-            minChars:         3,      /* minmum chars needed to be typed before search starts */
-            delay:            1000,   /* delay in ms before search starts */
-            max:              9,      /* maximum number of results */
-            maxResults:       3,      /* maximum number of results per source */
+            minChars:          3,       /* minmum chars needed to be typed before search starts */
+            delay:             1000,    /* delay in ms before search starts */
+            max:               9,       /* maximum number of results */
+            maxResults:        3,       /* maximum number of results per source */
             // Source options:
-            sparql:           true,   /* use SPARQL endpoint */
-            sindice:          true,   /* use Sindice semantic search */
-            uri:              true,   /* provide generated URI */
+            sparql:            true,    /* use SPARQL endpoint */
+            sindice:           true,    /* use Sindice semantic search */
+            uri:               true,    /* provide generated URI */
             // Filter options:
-            filterRange:      true,   /* show only resources in the rdfs:range of the statement's property */
-            filterDomain:     false,  /* show only properties whose domain matches the statement's subject */
-            filterProperties: false,  /* show only resources used as properties */
+            filterRange:       true,    /* show only resources in the rdfs:range of the statement's property */
+            filterDomain:      false,   /* show only properties whose domain matches the statement's subject */
+            filterProperties:  false,   /* show only resources used as properties */
             // Callbacks
-            selectionCallback: null
+            selectionCallback: null,    /* the function to be called when a new selection is made */
+            selectOnReturn:    false    /* executes selection callback if the user hits return in the search field */
             
         }, this.options);
-        
         
         
         // check conflicting and implied options
@@ -333,7 +347,38 @@ RDFauthor.registerWidget({
         return ttt;
     }, 
     
+    localName: function (uri) {
+        var s = String(uri);
+        var l;
+        if (s.lastIndexOf('#') > -1) {
+            l = s.substr(s.lastIndexOf('#') + 1);
+        } else {
+            l = s.substr(s.lastIndexOf('/') + 1);
+        }
+        
+        return (l !== '') ? l : s;
+    }, 
+    
+    expandNamespace: function (prefixedName) {
+        var splits = prefixedName.split(':', 2);
+        if (splits.length >= 2) {
+            if (splits[0] in this._namespaces) {
+                return this._namespaces[splits[0]] + splits[1];
+            }
+        }
+        
+        return prefixedName;
+    }, 
+    
+    _normalizeValue: function (value) {
+        if (!this.selectedResource) {
+            this.selectedResource      = this.expandNamespace(value);
+            this.selectedResourceLabel = this.localName(value);
+        }
+    }, 
+    
     _initAutocomplete: function () {
+        var self = this;
         if (this._pluginLoaded && this._domReady && !this._initialized) {
             // must be URI
             if (this.statement.hasObject()) {
@@ -348,12 +393,11 @@ RDFauthor.registerWidget({
                 search: function (event, ui) {
                     var value = self.element().val();
                     // cancel search if URI entered
-                    if (self.isURI(value)) {
+                    if (self.isURI(value) || (String(value).indexOf(':') > -1)) {
                         self.element().addClass('resource-autocomplete-uri');
                         self.element().data('autocomplete').close();
-
-                        self.selectedResource      = value;
-                        self.selectedResourceLabel = undefined;
+                        
+                        self._normalizeValue(value);
 
                         return false;
                     }
@@ -374,9 +418,9 @@ RDFauthor.registerWidget({
                     self.element().val(this.selectedResourceLabel);
                     
                     // callback
-                    if (typeof self._options.selectionCallback == 'function') {
-                        self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
-                    }
+                    // if (typeof self._options.selectionCallback == 'function') {
+                    //     self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
+                    // }
 
                     // prevent jQuery UI default
                     return false;
@@ -386,6 +430,26 @@ RDFauthor.registerWidget({
 
                     // prevent jQuery UI default
                     return false;
+                }
+            })
+            .keydown(function (e) {
+                if ((e.which === 13) && self._options.selectOnReturn) {
+                    var val = jQuery(e.target).val();
+                    
+                    self._normalizeValue(val);
+                    
+                    var splits = val.split(':', 2);
+                    if (splits.length >= 2 && !self.isURI(val)) {
+                        if (splits[0] in self._namespaces) {
+                            self.selectedResource = self._namespaces[splits[0]] + splits[1];
+                            self.selectedResourceLabel = splits[1];
+                        }
+                    }
+                    
+                    self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
+                    
+                    // prevent newline in new widget field
+                    e.preventDefault();
                 }
             })
             .data('autocomplete')._renderItem = function(ul, item) {
@@ -404,7 +468,8 @@ RDFauthor.registerWidget({
                 }
             };
             
-            this._initialized = true;
+            this._initialized  = true;
+            this._autocomplete = this.element().data('autocomplete');
         }
     }
 }, [{

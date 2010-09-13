@@ -20,7 +20,8 @@ function Selector(graphURI, subjectURI, options) {
         filterRange: false,
         filterDomain: true, 
         filterProperties: true, 
-        selectionCallback: this._options.selectionCallback
+        selectionCallback: this._options.selectionCallback, 
+        selectOnReturn: true
     };
     
     // FIXME: title hack
