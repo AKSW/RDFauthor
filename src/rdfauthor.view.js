@@ -263,6 +263,15 @@ View.prototype = {
         var cw = this._container.width();
         var w  = jQuery(this.getElement()).width();
         
+        // set container height
+        this._container.height(
+            Math.max(
+                jQuery(document).height(),
+                jQuery(window).height(),
+                /* for Opera: */
+                document.documentElement.clientHeight
+            ) + 'px');
+        
         jQuery(this.getElement()).css('left', 0.5 * (cw - w) + 'px');
     }, 
     
