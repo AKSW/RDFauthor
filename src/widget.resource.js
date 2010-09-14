@@ -450,6 +450,8 @@ RDFauthor.registerWidget({
                     
                     // prevent newline in new widget field
                     e.preventDefault();
+                } else if (e.which === 27) {
+                    e.stopPropagation();
                 }
             })
             .data('autocomplete')._renderItem = function(ul, item) {
