@@ -825,6 +825,12 @@ RDFauthor = (function () {
         CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
     };
     
+    // jQuery UI
+    if (undefined === jQuery.ui) {
+        _require(RDFAUTHOR_BASE + 'libraries/jquery-ui.js');
+        _loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui.css');
+    }
+    
     // rdfQuery
     if (undefined === jQuery.rdf) {
         _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
@@ -858,7 +864,11 @@ RDFauthor = (function () {
     });
     
     // load stylesheets
-    _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
+    if ((RDFAUTHOR_MOBILE !== undefined) && RDFAUTHOR_MOBILE) {
+        _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor_mobile.css')
+    } else {
+        _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
+    }
     
     // default info predicates
     _addInfoPredicate(RDF_NS + 'type', 'type');

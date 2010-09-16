@@ -72,13 +72,18 @@ RDFauthor.registerWidget({
         }
         
         var self = this;
-        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js', function () {
+        if (undefined === jQuery.ui.autocomplete) {
+            RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js', function () {
+                self._pluginLoaded = true;
+                self._initAutocomplete();
+            });
+            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
+        } else {
             self._pluginLoaded = true;
             self._initAutocomplete();
-        });
+        }
         
         // loac stylesheets
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
     }, 
     

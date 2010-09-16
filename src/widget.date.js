@@ -8,8 +8,11 @@ RDFauthor.registerWidget({
     // e.g. load scripts/stylesheets etc.
     init: function () {
         this.datatype = 'http://www.w3.org/2001/XMLSchema#date';
-        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.datepicker.js');
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.date.css');
+        
+        if (undefined === jQuery.ui.datepicker) {
+            RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.datepicker.js');
+            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.date.css');
+        }
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
