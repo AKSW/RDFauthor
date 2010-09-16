@@ -10,7 +10,7 @@
 
 /* Autocomplete
 ----------------------------------*/
-.ui-autocomplete { position: absolute; cursor: default; }	
+.ui-autocomplete { position: absolute; cursor: default; }
 .ui-autocomplete-loading { background: white url('../img/spinner.gif') right center no-repeat !important;}
 
 

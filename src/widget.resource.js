@@ -77,13 +77,15 @@ RDFauthor.registerWidget({
                 self._pluginLoaded = true;
                 self._initAutocomplete();
             });
-            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
         } else {
             self._pluginLoaded = true;
             self._initAutocomplete();
         }
         
-        // loac stylesheets
+        // jQuery UI styles
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
+        
+        // load stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
     }, 
     

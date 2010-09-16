@@ -864,7 +864,7 @@ RDFauthor = (function () {
     });
     
     // load stylesheets
-    if ((RDFAUTHOR_MOBILE !== undefined) && RDFAUTHOR_MOBILE) {
+    if ((typeof RDFAUTHOR_MOBILE != 'undefined') && RDFAUTHOR_MOBILE) {
         _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor_mobile.css')
     } else {
         _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
