@@ -5,10 +5,11 @@
  * the functions yourself.
  */
 var Widget = {
-    removeOnSubmit: false, 
     animate: false, 
     options: {}, 
     _maxWidth: 481,
+    predicateRow: null, 
+    removeOnSubmit: false, 
     
     /**
      * Returns the available space the widget can use in pixels.

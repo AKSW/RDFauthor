@@ -142,6 +142,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         
         // initialize widget
         widgetInstance.init();
+        widgetInstance.predicateRow = this;
         
         var widgetID   = RDFauthor.nextID();
         var widgetHTML = getWidgetChrome(widgetID, widgetInstance.markup());
