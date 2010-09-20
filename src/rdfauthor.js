@@ -709,6 +709,7 @@ RDFauthor = (function () {
     }
     
     function _resetOptions() {
+        _options = {};
         for (var key in _defaultOptions) {
             _options[key] = _defaultOptions[key];
         }
@@ -1363,11 +1364,16 @@ RDFauthor = (function () {
          * Resets private variables (mainly used for testing).
          */
         reset: function () {
+            _resetDatabanks();
+            _resetOptions();
+            _resetParser();
+            _resetView();
+            
             _defaultGraphURI   = null;
             _defaultSubjectURI = null;
             _loadedScripts     = {};
             _loadedStylesheets = {};
-            _resetOptions();
+            
             // remove events
             jQuery(this.eventTarget()).unbind();
         }, 

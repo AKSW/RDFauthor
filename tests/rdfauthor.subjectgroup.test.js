@@ -36,7 +36,7 @@ $(document).ready(function() {
         ok(r instanceof PredicateRow, 'Should be an instanceof PredicateRow');
         this.fixture.addWidget(statement1, _Widget);
         var r2 = this.fixture.getRowByPredicate('http://example.com/predicate1');
-        equal(r2, r, 'Rows should be equal.');
+        ok(r === r2, 'Rows should be equal.');
     });
     
     test('show', 2, function() {

@@ -6,7 +6,7 @@ $(document).ready(function() {
                 subject: '<http://example.com/r1>', 
                 predicate: '<http://ns.aksw.org/update/p1>', 
                 object: {
-                    type: 'literal'
+                    type: 'literal', 
                     value: 'Foo'
                 }}, {graph:'http://example.com/g1/', hidden: true, required: true, protected: true, title: 'Property One'});
         }, 
@@ -21,7 +21,7 @@ $(document).ready(function() {
             predicate: '<http://example.com/p1>', 
             object: {
                 type: 'uri', 
-                value '<http://example.com/o1>'
+                value: '<http://example.com/o1>'
             }});
         equal(
             String(s1), 
