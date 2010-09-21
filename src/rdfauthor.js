@@ -125,7 +125,7 @@ RDFauthor = (function($, undefined) {
         autoParse: true, 
         usePredicateInfo: true, 
         useSPARQL11: false, 
-        view: 'inline' /* inline or popover */
+        view: 'popover' /* inline or popover */
     };
     
     /** actual options initialized to defaults */
