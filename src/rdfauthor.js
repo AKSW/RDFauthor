@@ -985,8 +985,9 @@ RDFauthor = (function($, undefined) {
          */
         commit: function () {
             _cloneDatabanks();
-            this.eventTarget().trigger('rdfauthor.commit');
-            _updateSources();
+            if (this.getView().submit()) {
+                _updateSources();
+            }
         },
         
         /**

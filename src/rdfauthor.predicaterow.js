@@ -111,15 +111,15 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     
     var target = RDFauthor.eventTarget();
     
-    // attach to submit event
-    jQuery(target).bind('rdfauthor.view.submit', function () {
-        self.onSubmit();
-    });
-    
-    // attach to cancel event
-    jQuery(target).bind('rdfauthor.view.cancel', function () {
-        self.onCancel();
-    });
+    // // attach to submit event
+    // jQuery(target).bind('rdfauthor.view.submit', function () {
+    //     self.onSubmit();
+    // });
+    // 
+    // // attach to cancel event
+    // jQuery(target).bind('rdfauthor.view.cancel', function () {
+    //     self.onCancel();
+    // });
     
     /**
      * Adds a new widget to this property row object.
@@ -255,7 +255,7 @@ PredicateRow.prototype = {
     /**
      * Calls onCancel on all widget instances subsequently.
      */
-    onCancel: function () {
+    cancel: function () {
         for (var i = 0; i < this.numberOfWidgets(); i++) {
             var widgetInstance = this.getWidget(i);
             if (widgetInstance) {
@@ -269,13 +269,13 @@ PredicateRow.prototype = {
      * conjunctively combined result.
      * @return {boolean}
      */
-    onSubmit: function () {
+    submit: function () {
         var submitOk = true;
 
         for (var i = 0; i < this.numberOfWidgets(); i++) {
             var widgetInstance = this.getWidget(i);
             if (widgetInstance) {
-                submitOk = widgetInstance.submit() && submitOk;
+                submitOk &= widgetInstance.submit();
             }
         }
 

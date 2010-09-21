@@ -81,6 +81,21 @@ InlineController.prototype = {
         
     }, 
     
+    submit: function () {
+        var submitOk = true;
+        for (var index in this._subjects) {
+            submitOk &= this._subjects[index].submit();
+        }
+        
+        return submitOk;
+    }, 
+    
+    cancel: function () {
+        for (var index in this._subjects) {
+            submitOk &= this._subjects[index].cancel();
+        }
+    }, 
+    
     show: function (animated) {
         for (var index in this._subjects) {
             var group = this._subjects[index];

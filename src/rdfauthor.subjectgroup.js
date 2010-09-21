@@ -158,6 +158,21 @@ SubjectGroup.prototype = {
         return this._rows[predicateURI];
     }, 
     
+    submit: function () {
+        var submitOk = true;
+        for (var index in this._rows) {
+            submitOk &= this._rows[index].submit();
+        }
+        
+        return submitOk;
+    }, 
+    
+    cancel: function () {
+        for (var index in this._rows) {
+            result &= this._rows[index].cancel();
+        }
+    }, 
+    
     /**
      * Sets this instance's associated DOM element's display property to 'block'.
      * @param {boolean} animated Whether to appear with an animation

@@ -129,25 +129,27 @@ function View(options) {
         }
 
         jQuery('#rdfauthor-button-submit').live('click', function () {
-            if (typeof self._options.onBeforeSubmit == 'function') {
-                self._options.onBeforeSubmit();
-            }
-            
-            jQuery('body').trigger('rdfauthor.view.submit');
-            
-            if (typeof self._options.onAfterSubmit == 'function') {
-                self._options.onAfterSubmit();
-            }
+            RDFauthor.commit();
+            // if (typeof self._options.onBeforeSubmit == 'function') {
+            //     self._options.onBeforeSubmit();
+            // }
+            // 
+            // jQuery('body').trigger('rdfauthor.view.submit');
+            // 
+            // if (typeof self._options.onAfterSubmit == 'function') {
+            //     self._options.onAfterSubmit();
+            // }
         });
         
         jQuery('#rdfauthor-button-cancel').live('click', function () {
-            jQuery('body').trigger('rdfauthor.view.cancel');
-            
-            jQuery(document).unbind('keydown.view');
-            
-            if (typeof self._options.onAfterCancel == 'function') {
-                self._options.onAfterCancel();
-            }
+            RDFauthor.cancel();
+            // jQuery('body').trigger('rdfauthor.view.cancel');
+            // 
+            // jQuery(document).unbind('keydown.view');
+            // 
+            // if (typeof self._options.onAfterCancel == 'function') {
+            //     self._options.onAfterCancel();
+            // }
         });
         
         jQuery('#rdfauthor-button-property').live('click', function () {
@@ -285,6 +287,21 @@ View.prototype = {
         // this._container.empty();
         jQuery('#' + this.cssID()).empty();
         jQuery(RDFauthor.eventTarget()).unbind('rdfauthor.view');
+    }, 
+    
+    submit: function () {
+        var submitOk = true;
+        for (var index in this._subjects) {
+            submitOk &= this._subjects[index].submit();
+        }
+        
+        return submitOk;
+    }, 
+    
+    cancel: function () {
+        for (var index in this._subjects) {
+            this._subjects[index].cancel();
+        }
     }, 
     
     /**
