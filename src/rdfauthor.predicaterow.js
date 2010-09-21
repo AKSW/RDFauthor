@@ -35,13 +35,15 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     
     var self = this;
     
+    function getLegend() {
+        return self._title ? '<legend>' + self._title + '</legend>' : '';
+    }
+    
     // local method self returns the basic HTML code for the row
     function getChrome() {
         var html = '\
             <div class="property-row" id="' + self.cssID() + '">\
-                <fieldset>\
-                    <legend>' + self._title + '</legend>\
-                </fieldset>\
+                <fieldset>' + getLegend() + '</fieldset>\
             </div>';
         
         return html;

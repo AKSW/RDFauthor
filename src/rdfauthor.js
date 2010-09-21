@@ -301,7 +301,9 @@ RDFauthor = (function($, undefined) {
     };
     
     function _createInlineView() {
+        var view = new InlineController();
         
+        return view;
     }
     
     function _createPopoverView() {
@@ -600,11 +602,11 @@ RDFauthor = (function($, undefined) {
          
          $(element)
             .data('rdfauthor.statement', statement)
-            .addClass('rdfauthor-statement-provider')
+            .addClass('rdfauthor-statement-provider');/*
             .click(function () {
                 alert($(this).data('rdfauthor.statement'));
                 return false;
-            });
+            });*/
          
          _elementsByStatementHash[String(statement)] = element;
     };
@@ -892,6 +894,7 @@ RDFauthor = (function($, undefined) {
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.selector.js');     /* Property selector */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js'); /* Subject Group */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');         /* View */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.inlinecontroller.js'); /* InlineViewController */
     _require(__RDFA_BASE + 'rdfa.js');                          /* RDFA */
     
     // load widgets; widget prototype is required before all other widgets
@@ -1051,6 +1054,13 @@ RDFauthor = (function($, undefined) {
              
              return _defaultSubjectURI;
         },
+        
+        /**
+         * Returns the element a given statement was found on.
+         */
+        elementForStatement: function (statement) {
+            return _elementsByStatementHash[String(statement)];
+        }, 
         
         /**
          * Returns the DOM element to which events are bound

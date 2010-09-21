@@ -17,7 +17,7 @@
  * @requires RDFauthor
  * @requires PredicateRow
  */
-function SubjectGroup(graphURI, subjectURI, title, container, id) {
+function SubjectGroup(graphURI, subjectURI, title, container, id, options) {
     this._graphURI   = graphURI;
     this._subjectURI = subjectURI;
     this._title      = title;
@@ -31,6 +31,10 @@ function SubjectGroup(graphURI, subjectURI, title, container, id) {
     this._rowsByID = {};
     this._rowCount = 0;
     this._propertySelector = null;
+    
+    this._options = jQuery.extend({
+        showLabels: true
+    }, options);
     
     var instance = this;
     
@@ -74,7 +78,8 @@ SubjectGroup.prototype = {
             row = this.getRowByPredicate(predicateURI);
         } else {
             var rowID = RDFauthor.nextID();
-            row = new PredicateRow(this._subjectURI, predicateURI, statement.predicateLabel(), this.getElement(), rowID);
+            var label = this._options.showLabels ? statement.predicateLabel() : null;
+            row = new PredicateRow(this._subjectURI, predicateURI, label, this.getElement(), rowID);
             this._rows[predicateURI] = row;
             this._rowsByID[rowID] = row;
             this._rowCount++;
