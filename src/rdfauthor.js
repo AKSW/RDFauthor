@@ -244,7 +244,7 @@ RDFauthor = (function($, undefined) {
         }
         
         return true;
-    };
+    }
     
     /**
      * Clones databank for each graph before calling 
@@ -298,7 +298,7 @@ RDFauthor = (function($, undefined) {
                 }
             }
         }
-    };
+    }
     
     function _createInlineView() {
         var view = new InlineController();
@@ -363,7 +363,7 @@ RDFauthor = (function($, undefined) {
         W.prototype.animate = _options.useAnimations;
         
         return W;
-    };
+    }
     
     /**
      * Loads info predicates for all predicates
@@ -476,7 +476,7 @@ RDFauthor = (function($, undefined) {
         }
         
         _graphInfo[subject][key] = statement.objectValue();
-    };
+    }
     
     /**
      * Instantiates and returns a widget object
@@ -494,7 +494,7 @@ RDFauthor = (function($, undefined) {
         }
         
         return null;
-    };
+    }
     
     /**
      * Loads a JavaScript file by including a <code>&lt;script&gt;</code> tag in the page header.
@@ -555,7 +555,7 @@ RDFauthor = (function($, undefined) {
             // script is ready, execute callback immediately
             _callIfIsFunction(callback);
         }
-    };
+    }
     
     /**
      * Loads a Stylesheet file by including a <code>&lt;script&gt;</code> tag in the page header.
@@ -583,7 +583,7 @@ RDFauthor = (function($, undefined) {
             
             document.getElementsByTagName('head')[0].appendChild(l);
         }
-    };
+    }
     
     /**
      * Makes an element's triples (from children and self) editable
@@ -617,7 +617,7 @@ RDFauthor = (function($, undefined) {
      */
     function _pageGraph() {
         return document.location.href;
-    };
+    }
     
     /**
      * Parses the current page for RDFa triples
@@ -637,7 +637,7 @@ RDFauthor = (function($, undefined) {
             // already parsed, execute callback immediately
             _callIfIsFunction(callback);
         }
-    };
+    }
     
     /**
      * Parses a URL string and returns an object similar to the internal Location object.
@@ -675,7 +675,7 @@ RDFauthor = (function($, undefined) {
         });
         
         return uri;
-    };
+    }
     
     /**
      * Populates the given view with statements.
@@ -703,7 +703,7 @@ RDFauthor = (function($, undefined) {
                 }
             }
         });
-    };
+    }
     
     /**
      * Called when RDFauthor is ready loading all its dependencies
@@ -712,7 +712,7 @@ RDFauthor = (function($, undefined) {
         if (typeof RDFAUTHOR_READY_CALLBACK !== 'undefined') {
             RDFAUTHOR_READY_CALLBACK();
         }
-    };
+    }
     
     /**
      * Used internally for script requirements. For each pending script, 
@@ -760,6 +760,15 @@ RDFauthor = (function($, undefined) {
         }
     }
     
+    function _restoreDatabanks() {
+        for (var g in _extractedByGraph) {
+            if (undefined !== _extractedByGraph[g] && _extractedByGraph[g] instanceof $.rdf.databank) {
+                // restore databank
+                _databanksByGraph[g] = _extractedByGraph[g];
+            }
+        }
+    }
+    
     /**
      * Returns the shortcut registered for the info predicate or
      * creates and registers a new one if none had been registered before.
@@ -791,7 +800,7 @@ RDFauthor = (function($, undefined) {
             var view = RDFauthor.getView();
             view.show(true);
         });
-    };
+    }
     
     /**
      * Updates all sources via SPARQL/Update
@@ -853,7 +862,7 @@ RDFauthor = (function($, undefined) {
                 }
             }
         }
-    };
+    }
     
     // RDFauthor setup code ///////////////////////////////////////////////////
     
@@ -987,6 +996,8 @@ RDFauthor = (function($, undefined) {
             _cloneDatabanks();
             if (this.getView().submit()) {
                 _updateSources();
+            } else {
+                _restoreDatabanks();
             }
         },
         
