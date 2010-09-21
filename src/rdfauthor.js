@@ -329,7 +329,9 @@ RDFauthor = (function($, undefined) {
         });
         
         // init view
-        _view = new View(options);
+        var view = new View(options);
+        
+        return view;
     }
     
     /**
