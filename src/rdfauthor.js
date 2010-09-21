@@ -11,7 +11,7 @@
  * @namespace
  * @requires Statement
  */
-RDFauthor = (function () {
+RDFauthor = (function($, undefined) {
     /** Namespace for update predicates */
     var UPDATE_NS = 'http://ns.aksw.org/update/';
     
@@ -106,8 +106,8 @@ RDFauthor = (function () {
     /** Loaded stylesheet URIs */
     var _loadedStylesheets = {};
     
-    /** Statements index by element id */
-    var _statementsByElemendID = {};
+    /** Element by statement hash */
+    var _elementsByStatementHash = {};
     
     /** View instance */
     var _view = null;
@@ -124,7 +124,8 @@ RDFauthor = (function () {
         useAnimations: true, 
         autoParse: true, 
         usePredicateInfo: true, 
-        useSPARQL11: false
+        useSPARQL11: false, 
+        view: 'inline' /* inline or popover */
     };
     
     /** actual options initialized to defaults */
@@ -222,7 +223,7 @@ RDFauthor = (function () {
      * @private
      */
     function _callIfIsFunction(functionSpec) {
-        if (jQuery.isFunction(functionSpec)) {
+        if ($.isFunction(functionSpec)) {
             functionSpec();
         }
     }
@@ -253,14 +254,14 @@ RDFauthor = (function () {
     function _cloneDatabanks() {
         for (var g in _graphInfo) {            
             if (undefined !== _databanksByGraph[g] &&
-                _databanksByGraph[g] instanceof jQuery.rdf.databank) {
+                _databanksByGraph[g] instanceof $.rdf.databank) {
                 
                 var databank  = _databanksByGraph[g];
-                var extracted = jQuery.rdf.databank();
+                var extracted = $.rdf.databank();
                 
                 databank.triples().each(function() {
-                    if (this instanceof jQuery.rdf.triple 
-                        && this.object instanceof jQuery.rdf.literal
+                    if (this instanceof $.rdf.triple 
+                        && this.object instanceof $.rdf.literal
                         && (typeof this.object.value == 'string')) {
                         /* HACK: reverse HTML escaping in literals */
                         this.object.value = this.object.value.replace(/&lt;/, '<').replace(/&gt;/, '>');
@@ -278,7 +279,7 @@ RDFauthor = (function () {
                 _extractedByGraph[g] = extracted;
             } else {
                 /* create new empty databank */
-                _extractedByGraph[g] = jQuery.rdf.databank();
+                _extractedByGraph[g] = $.rdf.databank();
             }
             
             /* FIXME: explicit triples hack */
@@ -299,6 +300,38 @@ RDFauthor = (function () {
         }
     };
     
+    function _createInlineView() {
+        
+    }
+    
+    function _createPopoverView() {
+        if ($('.modal-wrapper').length < 1) {
+            $('body').append('<div class="modal-wrapper" style="display:none"></div>');
+        }
+                        
+        var self = this;
+        var options = $.extend({}, _options, {
+            onBeforeSubmit: function () {
+                // keep db before changes
+                _cloneDatabanks();
+            }, 
+            onAfterSubmit: function () {
+                _updateSources();
+            }, 
+            onAfterCancel: function () {
+                RDFauthor.cancel();
+                if (typeof _options.onCancel == 'function') {
+                    _options.onCancel();
+                }
+            }, 
+            container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
+            useAnimations: _options.useAnimations
+        });
+        
+        // init view
+        _view = new View(options);
+    }
+    
     /**
      * Creates a new widget base object ensuring it uses the abstract 
      * Widget as its prototype object.
@@ -314,14 +347,14 @@ RDFauthor = (function () {
             
             // widget has options
             if (undefined !== options) {
-                this.options = jQuery.extend(
+                this.options = $.extend(
                     {},             /* empty base */
                     this.options,   /* options from prototype chain */
                     options         /* user-provided options */
                 );
             }
         };
-        W.prototype = jQuery.extend(new F(), widgetSpec);
+        W.prototype = $.extend(new F(), widgetSpec);
         W.prototype.constructor = W;
         W.prototype.animate = _options.useAnimations;
         
@@ -332,7 +365,7 @@ RDFauthor = (function () {
      * Loads info predicates for all predicates
      * @private
      */ 
-    function _fetchPredicateInfo(callback) {        
+    function _fetchPredicateInfo(callback) {
         if (null === _predicateInfo) {
             if (_options.usePredicateInfo) {
                 var selects  = '';
@@ -478,7 +511,7 @@ RDFauthor = (function () {
                 _loadedScripts[scriptURI] = SCRIPT_STATE_READY;
 
                 // script is ready, call all callbacks
-                if (jQuery.isArray(_scriptCallbacks[scriptURI])) {
+                if ($.isArray(_scriptCallbacks[scriptURI])) {
                     var callbacks = _scriptCallbacks[scriptURI];
                     for (var i = 0, max = callbacks.length; i < max; i++) {
                         callbacks[i]();
@@ -557,13 +590,21 @@ RDFauthor = (function () {
          * add hash id
          * store id => statement index
          */
-         var id = jQuery(element).attr('id');
+         var id = $(element).attr('id');
          if (undefined === id) {
              id = RDFauthor.nextID(ELEMENT_ID_PREFIX);
-             jQuery(element).attr('id', id);
+             $(element).attr('id', id);
          }
          
-         _statementsByElemendID[id] = statement;
+         $(element)
+            .data('rdfauthor.statement', statement)
+            .addClass('rdfauthor-statement-provider')
+            .click(function () {
+                alert($(this).data('rdfauthor.statement'));
+                return false;
+            });
+         
+         _elementsByStatementHash[String(statement)] = element;
     };
     
     /**
@@ -768,17 +809,17 @@ RDFauthor = (function () {
                     // SPARQL/Update
                     var updateQuery = '';
                     
-                    var addedArray = jQuery.makeArray(added.triples());
+                    var addedArray = $.makeArray(added.triples());
                     if (addedArray.length > 0) {
                         updateQuery += '\nINSERT DATA INTO <' + g + '> {' + addedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
-                    var removedArray = jQuery.makeArray(removed.triples());
+                    var removedArray = $.makeArray(removed.triples());
                     if (removedArray.length > 0) {
                         updateQuery += '\nDELETE DATA FROM <' + g + '> {' + removedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
-                    jQuery.post(updateURI, {
+                    $.post(updateURI, {
                         'query': updateQuery
                     }, function () {
                         _view.hide(true);
@@ -786,8 +827,8 @@ RDFauthor = (function () {
                     });
                 } else {
                     // REST style
-                    var addedJSON = jQuery.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
-                    var removedJSON = jQuery.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
+                    var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
+                    var removedJSON = $.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
                     
                     /*
                     alert('Added: ' + addedJSON);
@@ -796,7 +837,7 @@ RDFauthor = (function () {
                     // */
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
-                        jQuery.post(updateURI, {
+                        $.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
                             'delete': removedJSON ? removedJSON : '{}'
@@ -827,18 +868,18 @@ RDFauthor = (function () {
     };
     
     // jQuery UI
-    if (undefined === jQuery.ui) {
+    if (undefined === $.ui) {
         _require(RDFAUTHOR_BASE + 'libraries/jquery-ui.js');
         _loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui.css');
     }
     
     // rdfQuery
-    if (undefined === jQuery.rdf) {
+    if (undefined === $.rdf) {
         _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
     }
     
     // toJSON
-    if (undefined === jQuery.toJSON) {
+    if (undefined === $.toJSON) {
         _require(RDFAUTHOR_BASE + 'libraries/jquery.json.js');
     }
     
@@ -894,8 +935,10 @@ RDFauthor = (function () {
             } else {
                 var graphURI = statement.graphURI() || this.defaultGraphURI();
                 var databank = this.databankForGraph(graphURI);
+                var asTriple = statement.asRdfQueryTriple();
                 
-                databank.add(statement.asRdfQueryTriple());
+                // store triples
+                databank.add(asTriple);
                 
                 if (!(statement.predicateURI() in _predicates)) {
                     _predicates[statement.predicateURI()] = 1;
@@ -944,11 +987,11 @@ RDFauthor = (function () {
         /**
          * Returns the jQuery.rdf.databank that stores statements for graph denoted by <code>graphURI</code>.
          * @param {string} graphURI
-         * @return {jQuery.rdf.databank}
+         * @return {$.rdf.databank}
          */
         databankForGraph: function (graphURI) {
             if (undefined === _databanksByGraph[graphURI]) {
-                _databanksByGraph[graphURI] = jQuery.rdf.databank();
+                _databanksByGraph[graphURI] = $.rdf.databank();
             }
             
             return _databanksByGraph[graphURI];
@@ -1009,10 +1052,10 @@ RDFauthor = (function () {
         
         /**
          * Returns the DOM element to which events are bound
-         * @return {jQuery}
+         * @return {$}
          */
         eventTarget: function () {
-            return jQuery(_eventTarget);
+            return $(_eventTarget);
         },
         
         /**
@@ -1020,31 +1063,11 @@ RDFauthor = (function () {
          */
         getView: function () {
             if (null === _view) {
-                if (jQuery('.modal-wrapper').length < 1) {
-                    jQuery('body').append('<div class="modal-wrapper" style="display:none"></div>');
+                if (_options.view === 'popover') {
+                    _view = _createPopoverView();
+                } else {
+                    _view = _createInlineView();
                 }
-                                
-                var self = this;
-                var options = jQuery.extend({}, _options, {
-                    onBeforeSubmit: function () {
-                        // keep db before changes
-                        _cloneDatabanks();
-                    }, 
-                    onAfterSubmit: function () {
-                        _updateSources();
-                    }, 
-                    onAfterCancel: function () {
-                        RDFauthor.cancel();
-                        if (typeof _options.onCancel == 'function') {
-                            _options.onCancel();
-                        }
-                    }, 
-                    container: _options.container ? _options.container : jQuery('.modal-wrapper').eq(0), 
-                    useAnimations: _options.useAnimations
-                });
-                
-                // init view
-                _view = new View(options);
             }
             
             return _view;
@@ -1093,15 +1116,15 @@ RDFauthor = (function () {
             
             // try property axioms (property type, property range)
             if (null === widgetConstructor) {
-                if ((jQuery.inArray(OWL_NS + 'DatatypeProperty', types) >= 0) 
-                    || (jQuery.inArray(RDFS_NS + 'Literal', ranges) >= 0)) {
+                if (($.inArray(OWL_NS + 'DatatypeProperty', types) >= 0) 
+                    || ($.inArray(RDFS_NS + 'Literal', ranges) >= 0)) {
                     
                     widgetConstructor = _registeredWidgets[LITERAL_HOOK][''];
-                } else if ((jQuery.inArray(OWL_NS + 'ObjectProperty', types) >= 0)
-                    || (jQuery.inArray(RDFS_NS + 'Resource', ranges) >= 0)) {
+                } else if (($.inArray(OWL_NS + 'ObjectProperty', types) >= 0)
+                    || ($.inArray(RDFS_NS + 'Resource', ranges) >= 0)) {
                     
                     widgetConstructor = _registeredWidgets[OBJECT_HOOK][''];
-                } else if (jQuery.inArray(RDF_NS + 'XMLLiteral', ranges) >= 0) {
+                } else if ($.inArray(RDF_NS + 'XMLLiteral', ranges) >= 0) {
                     var range = RDFauthor.infoForPredicate(statement.predicateURI(), 'range');
                     widgetConstructor = _registeredWidgets['range'][range];
                 }
@@ -1153,7 +1176,7 @@ RDFauthor = (function () {
          */
         literalDatatypes: function () {
             var types = [];
-            for (var t in jQuery.typedValue.types) {
+            for (var t in $.typedValue.types) {
                 types.push(t);
             }
             
@@ -1251,7 +1274,7 @@ RDFauthor = (function () {
                 async: true, 
                 sparqlEndpoint: null 
             };
-            var o = jQuery.extend(defaults, options);
+            var o = $.extend(defaults, options);
             
             var serviceURI = o.sparqlEndpoint ? o.sparqlEndpoint : this.serviceURIForGraph(graphURI);
             if (undefined === serviceURI) {
@@ -1301,10 +1324,10 @@ RDFauthor = (function () {
                     dataType: 'jsonp', 
                     callbackParameter: 'callback'
                 }
-                jQuery.extend(ajaxOptions, JSONpOptions);
+                $.extend(ajaxOptions, JSONpOptions);
             }
             
-            jQuery.ajax(ajaxOptions);
+            $.ajax(ajaxOptions);
         },
         
         /**
@@ -1339,13 +1362,13 @@ RDFauthor = (function () {
             // }
             
             // ensure array
-            if (!jQuery.isArray(hooks)) {
+            if (!$.isArray(hooks)) {
                 hooks = [hooks];
             }
             
             for (var i = 0, max = hooks.length; i < max; i++) {
                 // the default hook value is an empty string (any value)
-                var hookSpec = jQuery.extend({values: ['']}, hooks[i]);
+                var hookSpec = $.extend({values: ['']}, hooks[i]);
                 
                 // is the hook supported for which the widget attemps to register?
                 if (_registeredWidgets[hookSpec.name]) {
@@ -1375,7 +1398,7 @@ RDFauthor = (function () {
             _loadedStylesheets = {};
             
             // remove events
-            jQuery(this.eventTarget()).unbind();
+            $(this.eventTarget()).unbind();
         }, 
         
         /**
@@ -1422,7 +1445,7 @@ RDFauthor = (function () {
          * @param {object} optionSpec
          */
         setOptions: function (optionSpec) {
-            jQuery.extend(_options, optionSpec);
+            $.extend(_options, optionSpec);
         }, 
         
         /**
@@ -1440,4 +1463,4 @@ RDFauthor = (function () {
             });
         }
     }
-})();
+})(jQuery);
