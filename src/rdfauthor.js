@@ -982,12 +982,12 @@ RDFauthor = (function($, undefined) {
          * Commits changes from an ongoing editing process.
          * All pending changes will be sent to sources.
          * @todo inform on error
-         *//*
+         */
         commit: function () {
             _cloneDatabanks();
             this.eventTarget().trigger('rdfauthor.commit');
             _updateSources();
-        }, */
+        },
         
         /**
          * Returns the jQuery.rdf.databank that stores statements for graph denoted by <code>graphURI</code>.
