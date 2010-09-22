@@ -1390,15 +1390,15 @@ RDFauthor = (function($, undefined) {
                 hooks = [hooks];
             }
             
-            for (var i = 0, max = hooks.length; i < max; i++) {
+            for (var i = 0; i < hooks.length; i++) {
                 // the default hook value is an empty string (any value)
                 var hookSpec = $.extend({values: ['']}, hooks[i]);
                 
                 // is the hook supported for which the widget attemps to register?
                 if (_registeredWidgets[hookSpec.name]) {
                     // Register for all hook values
-                    for (var i = 0; i < hookSpec.values.length; i++) {
-                        var value = hookSpec.values[i];
+                    for (var j = 0; j < hookSpec.values.length; j++) {
+                        var value = hookSpec.values[j];
                         if (!_registeredWidgets[hookSpec.name][value]) {
                             _registeredWidgets[hookSpec.name][value] = _createWidget(widgetSpec);
                         }
