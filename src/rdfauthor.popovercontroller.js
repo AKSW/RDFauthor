@@ -24,7 +24,7 @@
  * @requires RDFauthor
  * @requires SubjectGroup
  */
-function View(options) {
+function PopoverController(options) {
     // default options
     var defaultOptions = {
         title: 'Edit Properties', 
@@ -123,9 +123,20 @@ function View(options) {
         this._container.append(getChrome());
         
         // make draggable if jQuery UI loaded
-        if (typeof jQuery.ui != 'undefined' && !jQuery('#' + this.cssID()).hasClass('ui-draggable')) {
-            jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
-            // jQuery('#' + this.cssID()).resizable();
+        if (typeof jQuery.ui != 'undefined') {
+            if (!jQuery('#' + this.cssID()).hasClass('ui-draggable')) {
+                jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
+            }
+            
+            jQuery('#' + this.cssID()).resizable({
+                alsoResize: '.subject-group', 
+                stop: function (event, ui) {
+                    var vChange   = ui.size.height - ui.originalSize.height;
+                    var height    = jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height').replace('px', '');
+                    var newHeight = Number(height) + vChange;
+                    jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height', newHeight + 'px');
+                } 
+            });
         }
 
         jQuery('#rdfauthor-button-submit').live('click', function () {
@@ -172,7 +183,7 @@ function View(options) {
     }
 }
 
-View.prototype = {
+PopoverController.prototype = {
     /**
      * Adds a new widget to the view self.
      * @param {Statement} statement object

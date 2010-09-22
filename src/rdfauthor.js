@@ -301,9 +301,9 @@ RDFauthor = (function($, undefined) {
     }
     
     function _createInlineView() {
-        var view = new InlineController();
+        var viewController = new InlineController();
         
-        return view;
+        return viewController;
     }
     
     function _createPopoverView() {
@@ -330,10 +330,10 @@ RDFauthor = (function($, undefined) {
             useAnimations: _options.useAnimations
         });
         
-        // init view
-        var view = new View(options);
+        // init view controller
+        var viewController = new PopoverController(options);
         
-        return view;
+        return viewController;
     }
     
     /**
@@ -746,7 +746,7 @@ RDFauthor = (function($, undefined) {
     }
     
     function _resetView() {
-        if (_view instanceof View) {
+        if (null !== _view && typeof _view.reset == 'function') {
             _view.reset();
         }
         
@@ -902,7 +902,7 @@ RDFauthor = (function($, undefined) {
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js'); /* Predicate Row */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.selector.js');     /* Property selector */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js'); /* Subject Group */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.view.js');         /* View */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.popovercontroller.js');   /* ViewController */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.inlinecontroller.js'); /* InlineViewController */
     _require(__RDFA_BASE + 'rdfa.js');                          /* RDFA */
     
