@@ -127,40 +127,14 @@ function PopoverController(options) {
             if (!jQuery('#' + this.cssID()).hasClass('ui-draggable')) {
                 jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
             }
-            
-            jQuery('#' + this.cssID()).resizable({
-                alsoResize: '.subject-group', 
-                stop: function (event, ui) {
-                    var vChange   = ui.size.height - ui.originalSize.height;
-                    var height    = jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height').replace('px', '');
-                    var newHeight = Number(height) + vChange;
-                    jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height', newHeight + 'px');
-                } 
-            });
         }
 
         jQuery('#rdfauthor-button-submit').live('click', function () {
             RDFauthor.commit();
-            // if (typeof self._options.onBeforeSubmit == 'function') {
-            //     self._options.onBeforeSubmit();
-            // }
-            // 
-            // jQuery('body').trigger('rdfauthor.view.submit');
-            // 
-            // if (typeof self._options.onAfterSubmit == 'function') {
-            //     self._options.onAfterSubmit();
-            // }
         });
         
         jQuery('#rdfauthor-button-cancel').live('click', function () {
             RDFauthor.cancel();
-            // jQuery('body').trigger('rdfauthor.view.cancel');
-            // 
-            // jQuery(document).unbind('keydown.view');
-            // 
-            // if (typeof self._options.onAfterCancel == 'function') {
-            //     self._options.onAfterCancel();
-            // }
         });
         
         jQuery('#rdfauthor-button-property').live('click', function () {
@@ -286,6 +260,25 @@ PopoverController.prototype = {
             ) + 'px');
         
         jQuery(this.getElement()).css('left', 0.5 * (cw - w) + 'px');
+        
+        if (!jQuery('#' + this.cssID()).hasClass('ui-resizable')) {
+            jQuery('#' + this.cssID()).resizable({
+                alsoResize: '.subject-group', 
+                minWidth: jQuery('#rdfAuthorButtons').outerWidth(), 
+                minHeight: Math.min(jQuery('#' + this.cssID()).outerHeight(), 100), 
+                stop: function (event, ui) {
+                    var vChange   = ui.size.height - ui.originalSize.height;
+                    var height    = jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height').replace('px', '');
+                    var newHeight = Number(height) + vChange;
+                    jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height', newHeight + 'px');
+                    self.layout();
+                } 
+            });
+        }
+    }, 
+    
+    layout: function () {
+        
     }, 
     
     /**
@@ -332,8 +325,9 @@ PopoverController.prototype = {
                 this.activeSubjectGroup().show();
             }
             this._container.fadeIn(100, function () {
-                self.position();
-                jQuery(self.getElement()).fadeIn();
+                jQuery(self.getElement()).fadeIn(function () {
+                    self.position();
+                });
             });
         }
     }, 
