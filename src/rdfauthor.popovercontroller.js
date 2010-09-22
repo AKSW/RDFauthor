@@ -249,6 +249,7 @@ PopoverController.prototype = {
     position: function () {
         var cw = this._container.width();
         var w  = jQuery(this.getElement()).width();
+        var self = this;
         
         // set container height
         this._container.height(
