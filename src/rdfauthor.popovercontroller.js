@@ -278,8 +278,8 @@ PopoverController.prototype = {
         }
     }, 
     
-    layout: function () {
-        
+    layout: function (layoutInfo) {
+        this.activeSubjectGroup().getElement().resize();
     }, 
     
     /**

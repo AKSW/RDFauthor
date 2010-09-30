@@ -12,7 +12,10 @@ RDFauthor.registerWidget({
 
         this.languages.unshift('');
         
-        // RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/autoresize.jquery.min.js');
+        // modify Safari input behaviour (CSS3)
+        if ($.browser.webkit) {
+            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.literal.css');
+        }
     }, 
     
     ready: function () {
@@ -115,11 +118,12 @@ RDFauthor.registerWidget({
         var areaConfig = {
             rows: (this.isLarge() ? '3' : '1'), 
             style: (this.isLarge() ? 'width:100%' : 'width:50%;height:1.3em;padding-top:0.2em'), 
-            buttonClass: (this.isLarge()) ? 'disclosure-button-horizontal' : 'disclosure-button-vertical'
+            buttonClass: /*(this.isLarge()) ? 'disclosure-button-horizontal' :*/ 'disclosure-button-vertical', 
+            containerClass: (this.isLarge()) ? 'literal-value literal-value-large' : 'literal-value'
         }
 
         var areaMarkup = '\
-            <div class="container literal-value" style="width:' + this.availableWidth() + 'px">\
+            <div class="container ' + areaConfig.containerClass + '" style="width:100%">\
                 <textarea rows="' + String(areaConfig.rows) + '" cols="20" style="' + areaConfig.style + '" id="literal-value-' + 
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
             </div>\

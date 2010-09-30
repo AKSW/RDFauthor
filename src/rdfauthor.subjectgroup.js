@@ -50,6 +50,14 @@ function SubjectGroup(graphURI, subjectURI, title, container, id, options) {
     
     // append chrome
     this._container.append(getChrome());
+    
+    jQuery('#' + this.cssID).resize(function () {
+        alert('resized');
+        // layout all rows
+        for (var index in this._rows) {
+            this._rows[index].getElement().resize();
+        }
+    });
 }
 
 SubjectGroup.prototype = {
@@ -79,7 +87,7 @@ SubjectGroup.prototype = {
         } else {
             var rowID = RDFauthor.nextID();
             var label = this._options.showLabels ? statement.predicateLabel() : null;
-            row = new PredicateRow(this._subjectURI, predicateURI, label, this.getElement(), rowID);
+            row = new PredicateRow(this._subjectURI, predicateURI, label, this.getElement().get(0), rowID);
             this._rows[predicateURI] = row;
             this._rowsByID[rowID] = row;
             this._rowCount++;
@@ -93,7 +101,17 @@ SubjectGroup.prototype = {
      * @return {HTMLElement}
      */
     getElement: function () {
-        return $('#' + this.cssID()).get(0);
+        return $('#' + this.cssID());
+    }, 
+    
+    layout: function (size) {
+        // set size
+        this.getElement().width(size.width);//.height(size.height);
+        
+        // layout all rows
+        for (var index in this._rows) {
+            this._rows[index].layout(size.width);
+        }
     }, 
     
     /**
@@ -111,7 +129,7 @@ SubjectGroup.prototype = {
         // if (null === this._propertySelector) {
             var self = this;
             var selectorOptions = {
-                container: jQuery(this.getElement()), 
+                container: this.getElement(), 
                 selectionCallback: function (uri, label) {
                     var statement = new Statement({
                         subject: '<' + self._subjectURI + '>', 
@@ -180,9 +198,9 @@ SubjectGroup.prototype = {
     show: function (animated) {
         var element = this.getElement();
         if (!animated) {
-            $(element).show();
+            element.show();
         } else {
-            $(element).css('opacity', 0.0).show().fadeIn();
+            element.css('opacity', 0.0).show().fadeIn();
         }
     }, 
     
@@ -193,10 +211,10 @@ SubjectGroup.prototype = {
     hide: function (animated) {
         var element = this.getElement();
         if (!animated) {
-            $(element).hide();
+            element.hide();
         } else {
-            $(element).fadeOut(function() {
-                $(element).hide();
+            element.fadeOut(function() {
+                element.hide();
             });
         }
     }

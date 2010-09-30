@@ -75,7 +75,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
                 <div class="container actions right">\
                     <a class="delete-button" title="Remove widget and data."></a>\
                     <a class="add-button" title="Add another widget of the same type."></a>\
-                </div>' + getOverride() + widgetHTML + '\
+                </div>' + getOverride() + '<div class="widget-container" style="width:80%">' + widgetHTML + '</div>\
                 <hr style="clear:both;height:0;border:none" />\
             </div>';
         
@@ -109,17 +109,11 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         self.addWidget(newStatement, widget.constructor, true);
     });
     
-    var target = RDFauthor.eventTarget();
+    jQuery('#' + this.cssID()).resize(function () {
+        alert('resized');
+    });
     
-    // // attach to submit event
-    // jQuery(target).bind('rdfauthor.view.submit', function () {
-    //     self.onSubmit();
-    // });
-    // 
-    // // attach to cancel event
-    // jQuery(target).bind('rdfauthor.view.cancel', function () {
-    //     self.onCancel();
-    // });
+    var target = RDFauthor.eventTarget();
     
     /**
      * Adds a new widget to this property row object.
@@ -198,7 +192,11 @@ PredicateRow.prototype = {
      */
     cssID: function () {
         return this._idPrefix + this._id;
-    },
+    }, 
+    
+    getElement: function () {
+        return jQuery('#' + this.cssID());
+    }, 
     
     /**
      * Returns the widet instance for an index
@@ -225,6 +223,18 @@ PredicateRow.prototype = {
      */
     numberOfWidgets: function () {
         return this._widgetCount;
+    }, 
+    
+    layout: function (width) {
+        var element         = jQuery('#' + this.cssID());
+        var widgetContainer = element.find('widget-container');
+        var currentWidth    = element.outerWidth();
+        var deltaWidth      = currentWidth - width;
+        
+        // element.width(width);
+        widgetContainer.each(function () {
+            $(this).width($(this).width() + deltaWidth);
+        });
     }, 
     
     /**

@@ -14,9 +14,17 @@
 .ui-autocomplete-loading { background: white url('../img/spinner.gif') right center no-repeat !important;}
 
 
+.resource-value {
+    width: 100%;
+    overflow: auto;
+}
+
 .resource-edit-input {
     padding-right: 18px !important;
-    width: 32em;
+    width: 100%;
+    box-sizing: border-box;         /* CSS3, Opera */
+    -moz-box-sizing: border-box;    /* Firefox */
+    -webkit-box-sizing: border-box; /* Safari, Chrome */
 }
 
 .resource-autocomplete-uri {
