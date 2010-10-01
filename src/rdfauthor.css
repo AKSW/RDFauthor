@@ -102,9 +102,8 @@ div.modal-wrapper {
     padding-top: .5em;
 }
 
-.property-row input.text,
-.property-row textarea {
-
+.rdfauthor-widget-container input.text,
+.rdfauthor-widget-container textarea {
     display: inline-block;
     border-left-color: #888;
     border-top-color: #888;
@@ -205,7 +204,7 @@ div.modal-wrapper {
     background: #fff;
 }
 
-.property-row * {min-width: 0 !important; min-height: 0 !important;}
+.rdfauthor-widget-container * {min-width: 0 !important; min-height: 0 !important;}
 
 #rdfAuthorView fieldset {
     border: 1px dotted grey;
@@ -231,7 +230,7 @@ div.modal-wrapper {
     padding: 0.3em 0.5em;
 }
 
-.property-row textarea {
+.rdfauthor-widget-container textarea {
     padding-top: 0.2em !important;
 /*    font-size: 1.1em;*/
 }

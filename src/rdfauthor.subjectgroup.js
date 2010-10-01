@@ -50,14 +50,6 @@ function SubjectGroup(graphURI, subjectURI, title, container, id, options) {
     
     // append chrome
     this._container.append(getChrome());
-    
-    jQuery('#' + this.cssID).resize(function () {
-        alert('resized');
-        // layout all rows
-        for (var index in this._rows) {
-            this._rows[index].getElement().resize();
-        }
-    });
 }
 
 SubjectGroup.prototype = {

@@ -75,7 +75,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
                 <div class="container actions right">\
                     <a class="delete-button" title="Remove widget and data."></a>\
                     <a class="add-button" title="Add another widget of the same type."></a>\
-                </div>' + getOverride() + '<div class="widget-container" style="width:80%">' + widgetHTML + '</div>\
+                </div>' + getOverride() + '<div class="rdfauthor-widget-container" style="width:80%">' + widgetHTML + '</div>\
                 <hr style="clear:both;height:0;border:none" />\
             </div>';
         
@@ -107,10 +107,6 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
             graph: statement.graphURI()
         });
         self.addWidget(newStatement, widget.constructor, true);
-    });
-    
-    jQuery('#' + this.cssID()).resize(function () {
-        alert('resized');
     });
     
     var target = RDFauthor.eventTarget();
@@ -160,7 +156,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         widgetInstance.ready();
         
         // focus widget
-        if ((arguments.length >= 3) && activate) {
+        if ((undefined !== activate) && activate) {
             widgetInstance.focus();
         }
         
