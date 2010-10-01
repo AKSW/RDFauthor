@@ -41,7 +41,7 @@ function SubjectGroup(graphURI, subjectURI, title, container, id, options) {
     // local method that returns the basic HTML code for the subject group
     function getChrome() {
         var html = '\
-            <div class="subject-group" id="' + instance.cssID() + '">\
+            <div class="rdfauthor-subject-group" id="' + instance.cssID() + '">\
             </div>\
         ';
         

@@ -1,4 +1,4 @@
-3/**
+/**
  * This file is part of the RDFauthor project.
  * http://code.google.com/p/rdfauthor
  * Author: Norman Heino <norman.heino@gmail.com>

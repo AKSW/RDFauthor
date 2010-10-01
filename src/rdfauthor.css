@@ -8,7 +8,7 @@
 
 /* -- Layout stuff ---------------------------------------------------------- */
 /* -- copies style of relevant classes from OntoWiki's default.css ---------- */
-/* -- straight to #rdfAuthorView --------------------------------------- */
+/* -- straight to #rdfauthor-view --------------------------------------- */
 
 div.modal-wrapper {
     position: absolute;
@@ -22,7 +22,7 @@ div.modal-wrapper {
     z-index: 100;
 }
 
-#rdfAuthorView {
+#rdfauthor-view {
     /* taken from div.window */
     font-size: 12px;
     font-weight: 500;
@@ -45,7 +45,7 @@ div.modal-wrapper {
     top: 10%;
 }
 
-#rdfAuthorView legend {
+#rdfauthor-view legend {
     color: #000;
     padding-left: 0;
     margin-left: 0;
@@ -53,24 +53,24 @@ div.modal-wrapper {
     font-weight: normal;
 }
 
-#rdfAuthorView fieldset legend {
+#rdfauthor-view fieldset legend {
 /*    margin: 0.5em 0;*/
 /*    margin-top: 0.5em;
     margin-bottom: 0.5em;*/
     padding: 0 0.3em;
 }
 
-#rdfAuthorView fieldset fieldset legend {
+#rdfauthor-view fieldset fieldset legend {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
 
-#rdfAuthorView legend {
+#rdfauthor-view legend {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
 
-#rdfAuthorView .title /* taken from div.window .title */
+#rdfauthor-view .title /* taken from div.window .title */
 {
     font-size: 1.2em;
     font-weight: 900;
@@ -83,7 +83,7 @@ div.modal-wrapper {
     background: #999;
 }
 
-#rdfAuthorView fieldset {
+#rdfauthor-view fieldset {
     border-style: none;
     border-width: 0;
     margin-top: 0.5em;
@@ -93,7 +93,7 @@ div.modal-wrapper {
     float: none;
 }
 
-#rdfAuthorView fieldset fieldset {
+#rdfauthor-view fieldset fieldset {
     border-top-style: solid;
     border-color: #999;
     border-width: 1px;
@@ -123,7 +123,7 @@ div.modal-wrapper {
 }
 
 /*
-#rdfAuthorView textarea {
+#rdfauthor-view textarea {
     min-width: 30em;
     min-height: 18.5em;
     line-height: 1.5;
@@ -131,7 +131,12 @@ div.modal-wrapper {
 }
 */
 
-.property-row select {
+.rdfauthor-predicate-row fieldset {
+    padding: 0;
+    margin: 0;
+}
+
+.rdfauthor-predicate-row select {
     min-width: 20em;
     font-size: 1em;
     max-width: 20em;
@@ -148,7 +153,7 @@ div.modal-wrapper {
     vertical-align: middle;
 }
 
-#rdfAuthorView button {
+#rdfauthor-view button {
     display: inline-block;
     margin: 0 0.35em 0.7em 0;
     padding: 0.35em 0.7em 0.3em 0.7em;   /* Links */
@@ -175,14 +180,14 @@ div.modal-wrapper {
 
 /* -- RDFauthor unique stuff ------------------------------------------------ */
 
-#rdfAuthorView {
+#rdfauthor-view {
     /*z-index: 10000 !important; 
     position: absolute;
     background-color: #eee;
     width: 48em;*/
 }
 
-#rdfAuthorButtons {
+#rdfauthor-buttons {
     clear: left;
     float: right;
     padding: 0.5em 0.5em;
@@ -192,11 +197,11 @@ div.modal-wrapper {
     right: 0;
 }
 
-#rdfAuthorButtons * {
+#rdfauthor-buttons * {
     font-size: 1em;
 }
 
-#rdfAuthorView .rdfAuthorViewContent {
+#rdfauthor-view .rdfauthor-view-content {
     padding: 0;
     max-height: 40em;
     overflow-x: hidden;
@@ -206,7 +211,7 @@ div.modal-wrapper {
 
 .rdfauthor-widget-container * {min-width: 0 !important; min-height: 0 !important;}
 
-#rdfAuthorView fieldset {
+#rdfauthor-view fieldset {
     border: 1px dotted grey;
     border-left: none;
     border-right: none;
@@ -216,7 +221,7 @@ div.modal-wrapper {
     padding-bottom: 0.5em !important;
 }
 
-.property-row fieldset .widget-override {
+.rdfauthor-predicate-row fieldset .widget-override {
 /*    position: absolute;*/
     font-size: 75%;
 }
@@ -225,7 +230,7 @@ div.modal-wrapper {
     
 }
 
-.property-row, .property-row .container {
+.rdfauthor-predicate-row, .rdfauthor-predicate-row .container {
 /*    border: 1px dotted red;*/
     padding: 0.3em 0.5em;
 }
@@ -235,26 +240,26 @@ div.modal-wrapper {
 /*    font-size: 1.1em;*/
 }
 
-.property-row .util {
+.rdfauthor-predicate-row .util {
     font-size: 0.85em;
     display: block;
 }
 
-.property-row .literal-lang select, .property-row .literal-datatype select {
+.rdfauthor-predicate-row .literal-lang select, .rdfauthor-predicate-row .literal-datatype select {
     margin-left: 0.5em;
 }
 
-.property-row .container, .property-row .inline-container {
+.rdfauthor-predicate-row .container, .rdfauthor-predicate-row .inline-container {
     float: left;
 /*    border: 1px dotted green;*/
 }
 
-.property-row .widget {
+.rdfauthor-predicate-row .widget {
     min-height: 42px;
 /*    border: 1px solid green;*/
 }
 
-.property-row legend {
+.rdfauthor-predicate-row legend {
     margin: 0 0.3em;
     padding: 0 0.2em;
     font-weight: bold;
@@ -263,31 +268,31 @@ div.modal-wrapper {
     font-size: 100%;
 }
 
-.property-row .add-button, .property-row .delete-button {
+.rdfauthor-predicate-row .add-button, .rdfauthor-predicate-row .delete-button {
     width: 16px;
     height: 16px;
 /*    margin: 1px 0;*/
 }
 
-.property-row .add-button {
+.rdfauthor-predicate-row .add-button {
     background-image: url('./../img/badge-add.png');
 }
 
-.property-row .add-button:hover {
+.rdfauthor-predicate-row .add-button:hover {
     background-position: -16px;
 }
 
-.property-row .delete-button {
+.rdfauthor-predicate-row .delete-button {
     background-image: url('./../img/badge-delete.png');
 }
 
-.property-row .delete-button:hover {
+.rdfauthor-predicate-row .delete-button:hover {
     background-position: -16px;
 }
 
-.property-row .actions.right {float: right !important;}
-.property-row .actions.left {float: left !important;}
-.property-row .container > * {display: block;}
+.rdfauthor-predicate-row .actions.right {float: right !important;}
+.rdfauthor-predicate-row .actions.left {float: left !important;}
+.rdfauthor-predicate-row .container > * {display: block;}
 
 .disclosure-button-horizontal {
     height: 2em !important;
@@ -347,11 +352,11 @@ div.modal-wrapper {
     background-position: center -10px !important;
 }
 
-.subject-group {
+.rdfauthor-subject-group {
     display: none;
 }
 
-.subject-group-selected {
+.rdfauthor-subject-group-selected {
     margin-top: 0.2em;
     margin-bottom: 0.4em; 
     display: block;
@@ -370,10 +375,10 @@ div.modal-wrapper {
     padding: 0.3em 0.6em;
 }
 
-.subject-group-select {
+.rdfauthor-subject-group-select {
     cursor: pointer;
 }
 
-.subject-group-select.selected {
+.rdfauthor-subject-group-select.selected {
     background-color: #fff;
 }

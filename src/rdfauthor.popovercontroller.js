@@ -36,8 +36,8 @@ function PopoverController(options) {
         showPropertyButton: true, 
         useAnimations: true, 
         animationTime: 250, // ms
-        id: 'rdfAuthorView', 
-        contentContainerClass: 'rdfAuthorViewContent'/*, 
+        id: 'rdfauthor-view', 
+        contentContainerClass: 'rdfauthor-view-content'/*, 
         replaceContainerContent: false*/
     };
     
@@ -83,7 +83,7 @@ function PopoverController(options) {
             }
             
             buttonHTML = '\
-                <div id="rdfAuthorButtons">\
+                <div id="rdfauthor-buttons">\
                     ' + propertyButton + '\
                     <button type="button" id="rdfauthor-button-cancel">' + self._options.cancelButtonTitle + '</button>\
                     <button type="button" id="rdfauthor-button-submit">' + self._options.saveButtonTitle + '</button>\
@@ -264,14 +264,14 @@ PopoverController.prototype = {
         
         if (!jQuery('#' + this.cssID()).hasClass('ui-resizable')) {
             jQuery('#' + this.cssID()).resizable({
-                alsoResize: '.subject-group', 
-                minWidth: jQuery('#rdfAuthorButtons').outerWidth(), 
+                alsoResize: '.rdfauthor-subject-group', 
+                minWidth: jQuery('#rdfauthor-buttons').outerWidth(), 
                 minHeight: Math.min(jQuery('#' + this.cssID()).outerHeight(), 100), 
                 stop: function (event, ui) {
                     var vChange   = ui.size.height - ui.originalSize.height;
-                    var height    = jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height').replace('px', '');
+                    var height    = jQuery('#rdfauthor-view .rdfauthor-view-content').css('max-height').replace('px', '');
                     var newHeight = Number(height) + vChange;
-                    jQuery('#rdfAuthorView .rdfAuthorViewContent').css('max-height', newHeight + 'px');
+                    jQuery('#rdfauthor-view .rdfauthor-view-content').css('max-height', newHeight + 'px');
                     self.layout();
                 } 
             });

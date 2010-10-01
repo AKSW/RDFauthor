@@ -1,5 +1,5 @@
 
-#rdfAuthorView {
+#rdfauthor-view {
     /* taken from div.window */
     font-size: 12px;
     font-weight: 500;
@@ -7,7 +7,7 @@
     width: 100%;
 }
 
-#rdfAuthorView legend {
+#rdfauthor-view legend {
     color: #DDD;
     padding-left: 0;
     margin-left: 0;
@@ -15,24 +15,24 @@
     font-weight: normal;
 }
 
-#rdfAuthorView fieldset legend {
+#rdfauthor-view fieldset legend {
 /*    margin: 0.5em 0;*/
 /*    margin-top: 0.5em;
     margin-bottom: 0.5em;*/
     padding: 0 0.3em;
 }
 
-#rdfAuthorView fieldset fieldset legend {
+#rdfauthor-view fieldset fieldset legend {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
 
-#rdfAuthorView legend {
+#rdfauthor-view legend {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
 
-#rdfAuthorView .title /* taken from div.window .title */
+#rdfauthor-view .title /* taken from div.window .title */
 {
     font-size: 1.6em;
     font-weight: 900;
@@ -40,7 +40,7 @@
     line-height: 1.3;
 }
 
-#rdfAuthorView fieldset {
+#rdfauthor-view fieldset {
     border-style: none;
     border-width: 0;
     margin-top: 0.5em;
@@ -50,7 +50,7 @@
     float: none;
 }
 
-#rdfAuthorView fieldset fieldset {
+#rdfauthor-view fieldset fieldset {
     border-top-style: solid;
     border-color: #999;
     border-width: 1px;
@@ -59,8 +59,8 @@
     padding-top: .5em;
 }
 
-#rdfAuthorView input.text,
-#rdfAuthorView textarea {
+#rdfauthor-view input.text,
+#rdfauthor-view textarea {
     display: inline-block;
     line-height: 1.3;
     font-family: sans-serif;
@@ -71,7 +71,7 @@
 }
 
 /*
-#rdfAuthorView textarea {
+#rdfauthor-view textarea {
     min-width: 30em;
     min-height: 18.5em;
     line-height: 1.5;
@@ -79,7 +79,7 @@
 }
 */
 
-#rdfAuthorView select {
+#rdfauthor-view select {
     min-width: 20em;
     font-size: 1em;
     max-width: 20em;
@@ -96,7 +96,7 @@
     vertical-align: middle;
 }
 
-#rdfAuthorView button
+#rdfauthor-view button
 {
   display: inline-block;
   margin: 0 0.35em 0.7em 0;
@@ -118,7 +118,7 @@
 
 /* -- RDFAuthor unique stuff ------------------------------------------------ */
 
-#rdfAuthorView {
+#rdfauthor-view {
     /*z-index: 10000 !important; 
     position: absolute;
     background-color: #eee;
@@ -134,16 +134,16 @@
     font-size: 1em;
 }
 
-#rdfAuthorView .rdfAuthorViewContent {
+#rdfauthor-view .rdfAuthorViewContent {
     max-height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     /*background: #fff;*/
 }
 
-#rdfAuthorView *, .rdfAuthorInline * {min-width: 0 !important; min-height: 0 !important;}
+#rdfauthor-view *, .rdfAuthorInline * {min-width: 0 !important; min-height: 0 !important;}
 
-#rdfAuthorView fieldset {
+#rdfauthor-view fieldset {
     border: 1px dotted grey;
     border-left: none;
     border-right: none;
@@ -153,7 +153,7 @@
     padding-bottom: 0.5em !important;
 }
 
-#rdfAuthorView fieldset .widget-override {
+#rdfauthor-view fieldset .widget-override {
 /*    position: absolute;*/
     font-size: 75%;
 }
@@ -162,28 +162,28 @@
     
 }
 
-#rdfAuthorView .property-row, #rdfAuthorView .container, #rdfAuthorView .inline-container, 
+#rdfauthor-view .rdfauthor-predicate-row, #rdfauthor-view .container, #rdfauthor-view .inline-container, 
 .rdfAuthorInline .container, .rdfAuthorInline .inline-container {
 /*    border: 1px dotted red;*/
     padding: 0.3em 0.5em;
 }
 
-#rdfAuthorView textarea, .rdfAuthorInline textarea {
+#rdfauthor-view textarea, .rdfAuthorInline textarea {
     padding-top: 0.2em !important;
 /*    font-size: 1.1em;*/
 }
 
-#rdfAuthorView .util, .rdfAuthorInline .util {
+#rdfauthor-view .util, .rdfAuthorInline .util {
     font-size: 0.85em;
     display: block;
 }
 
-#rdfAuthorView .literal-lang select, #rdfAuthorView .literal-datatype select, 
+#rdfauthor-view .literal-lang select, #rdfauthor-view .literal-datatype select, 
 .rdfAuthorInline    .literal-lang select, .rdfAuthorInline    .literal-datatype select {
     margin-left: 0.5em;
 }
 
-#rdfAuthorView .container, #rdfAuthorView .inline-container, 
+#rdfauthor-view .container, #rdfauthor-view .inline-container, 
 .rdfAuthorInline    .container, .rdfAuthorInline    .inline-container {
     float: left;
     /* temporary width fix */
@@ -191,13 +191,13 @@
 /*    border: 1px dotted green;*/
 }
 
-#rdfAuthorView .widget, 
+#rdfauthor-view .widget, 
 .rdfAuthorInline    .widget {
     min-height: 42px;
 /*    border: 1px solid green;*/
 }
 
-#rdfAuthorView legend {
+#rdfauthor-view legend {
     margin: 0 0.3em;
     padding: 0 0.2em;
     font-weight: bold;
@@ -210,32 +210,32 @@
     display: none;
 }
 
-#rdfAuthorView .add-button, #rdfAuthorView .delete-button, 
+#rdfauthor-view .add-button, #rdfauthor-view .delete-button, 
 .rdfAuthorInline .add-button, .rdfAuthorInline .delete-button {
     width: 16px;
     height: 16px;
 /*    margin: 1px 0;*/
 }
 
-#rdfAuthorView .add-button, .rdfAuthorInline .add-button {
+#rdfauthor-view .add-button, .rdfAuthorInline .add-button {
     background-image: url('./../img/badge-add.png');
 }
 
-#rdfAuthorView .add-button:hover, .rdfAuthorInline .add-button:hover {
+#rdfauthor-view .add-button:hover, .rdfAuthorInline .add-button:hover {
     background-position: -16px;
 }
 
-#rdfAuthorView .delete-button, .rdfAuthorInline .delete-button {
+#rdfauthor-view .delete-button, .rdfAuthorInline .delete-button {
     background-image: url('./../img/badge-delete.png');
 }
 
-#rdfAuthorView .delete-button:hover, .rdfAuthorInline .delete-button:hover {
+#rdfauthor-view .delete-button:hover, .rdfAuthorInline .delete-button:hover {
     background-position: -16px;
 }
 
-#rdfAuthorView .actions.right, .rdfAuthorInline .actions.right {float: right !important;}
-#rdfAuthorView .actions.left, .rdfAuthorInline .actions.left {float: left !important;}
-#rdfAuthorView .container > *, .rdfAuthorInline .container > * {display: block;}
+#rdfauthor-view .actions.right, .rdfAuthorInline .actions.right {float: right !important;}
+#rdfauthor-view .actions.left, .rdfAuthorInline .actions.left {float: left !important;}
+#rdfauthor-view .container > *, .rdfAuthorInline .container > * {display: block;}
 
 .disclosure-button-horizontal {
     height: 2em !important;
