@@ -68,6 +68,20 @@ RDFauthor.registerWidget({
         
     }, 
     
+    valueClass: function () {
+        var content = this.statement.hasObject() ? this.statement.objectValue() : null;
+        switch (true) {
+            case content.length >= 50:
+                return 'literal-value literal-value-large';
+                break;
+            case content.length >= 25:
+                return 'literal-value literal-value-medium';
+                break;
+            default:
+                return 'literal-value literal-value-short'
+        }
+    }, 
+    
     isLarge: function () {
         if (this.statement.hasObject()) {
             var objectValue = this.statement.objectValue();
@@ -125,14 +139,13 @@ RDFauthor.registerWidget({
     markup: function () {
         var areaConfig = {
             rows: (this.isLarge() ? '3' : '1'), 
-            style: ((this.isLarge() || this.isMedium) ? 'width:100%' : 'width:50%;height:1.3em;padding-top:0.2em'), 
             buttonClass: /*(this.isLarge()) ? 'disclosure-button-horizontal' :*/ 'disclosure-button-vertical', 
-            containerClass: (this.isLarge()) ? 'literal-value literal-value-large' : 'literal-value'
+            containerClass: this.valueClass()
         }
 
         var areaMarkup = '\
             <div class="container ' + areaConfig.containerClass + '" style="width:100%">\
-                <textarea rows="' + String(areaConfig.rows) + '" cols="20" style="' + areaConfig.style + '" id="literal-value-' + 
+                <textarea rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' + 
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
             </div>\
             <div class="container util" style="clear:left">\
