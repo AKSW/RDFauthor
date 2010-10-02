@@ -79,6 +79,14 @@ RDFauthor.registerWidget({
         return false;
     }, 
     
+    isMedium: function () {
+        if (this.statement.hasObject()) {
+            return (this.statement.objectValue().length >= 20);
+        }
+
+        return false;
+    }, 
+    
     makeOptionString: function(options, selected, replaceNS) {
         replaceNS = replaceNS || false;
 
@@ -117,7 +125,7 @@ RDFauthor.registerWidget({
     markup: function () {
         var areaConfig = {
             rows: (this.isLarge() ? '3' : '1'), 
-            style: (this.isLarge() ? 'width:100%' : 'width:50%;height:1.3em;padding-top:0.2em'), 
+            style: ((this.isLarge() || this.isMedium) ? 'width:100%' : 'width:50%;height:1.3em;padding-top:0.2em'), 
             buttonClass: /*(this.isLarge()) ? 'disclosure-button-horizontal' :*/ 'disclosure-button-vertical', 
             containerClass: (this.isLarge()) ? 'literal-value literal-value-large' : 'literal-value'
         }
