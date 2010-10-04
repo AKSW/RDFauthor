@@ -9,7 +9,8 @@ function Selector(graphURI, subjectURI, options) {
         container: 'body', 
         selectionCallback: null, 
         animationTime: 250, 
-        ID: 'rdfAuthorSelector'
+        ID: 'rdfauthor-selector-' + RDFauthor.nextID(), 
+        cssClass: 'rdfauthor-selector'
     }, options);
     
     var widgetOptions = {
@@ -36,7 +37,7 @@ Selector.prototype = {
     }, 
     
     markup: function () {
-       return '<div id="' + this._options.ID + '">' + this._widget.markup() + '</div>'; 
+       return '<div id="' + this._options.ID + '" class="' + this._options.cssClass + '">' + this._widget.markup() + '</div>'; 
     }, 
     
     presentInContainer: function (animated) {

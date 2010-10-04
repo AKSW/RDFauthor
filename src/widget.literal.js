@@ -69,12 +69,12 @@ RDFauthor.registerWidget({
     }, 
     
     valueClass: function () {
-        var content = this.statement.hasObject() ? this.statement.objectValue() : null;
-        switch (true) {
-            case content.length >= 50:
+        var length = this.statement.hasObject() ? this.statement.objectValue().length : null;
+        switch (length) {
+            case length >= 50:
                 return 'literal-value literal-value-large';
                 break;
-            case content.length >= 25:
+            case length >= 25:
                 return 'literal-value literal-value-medium';
                 break;
             default:

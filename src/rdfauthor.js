@@ -125,7 +125,9 @@ RDFauthor = (function($, undefined) {
         autoParse: true, 
         usePredicateInfo: true, 
         useSPARQL11: false, 
-        view: 'popover' /* inline or popover */
+        viewOptions: {
+            type: 'popover' /* inline or popover */
+        }
     };
     
     /** actual options initialized to defaults */
@@ -301,7 +303,7 @@ RDFauthor = (function($, undefined) {
     }
     
     function _createInlineView() {
-        var viewController = new InlineController();
+        var viewController = new InlineController(_options.viewOptions);
         
         return viewController;
     }
@@ -1087,7 +1089,7 @@ RDFauthor = (function($, undefined) {
          */
         getView: function () {
             if (null === _view) {
-                if (_options.view === 'popover') {
+                if (_options.viewOptions.type === 'popover') {
                     _view = _createPopoverView();
                 } else {
                     _view = _createInlineView();

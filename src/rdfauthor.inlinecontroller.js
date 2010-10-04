@@ -3,6 +3,9 @@ function InlineController(options) {
     var defaultOptions = {
         useAnimations: true, 
         animationTime: 250, // ms
+        container: function (statement) {
+            // return RDFauthor.elementForStatement(statement);
+        }
     };
     
     // overwrite defaults if supplied
@@ -12,33 +15,32 @@ function InlineController(options) {
     this._rows     = {};
     this._rowsByID = {};
     
-    this.addWidget = function (statement, constructor) {
-        var predicateURI = statement.predicateURI();
-        var rowID = RDFauthor.nextID();
-        var rowKey = String(statement);
+    this.addWidget = function (statement, constructor, options) {
+        var element  = this._options.container(statement);
+        var _options = $.extend({
+            container: element, 
+            activate: false, 
+        }, options);
         
-        // TODO: move to callback
-        var element = $(this.getContentElement(statement)).parent().empty().get(0);
+        var predicateURI = statement.predicateURI();
+        var rowID        = RDFauthor.nextID();
+        var rowKey       = String(statement);
+        
         var row = new PredicateRow(statement.subjectURI(), 
                                    statement.predicateURI(), 
                                    null, 
-                                   element, 
+                                   _options.container, 
                                    rowID);
         
         this._rows[rowKey] = row;
         this._rowsByID[rowID] = row;
         this._rowCount++;
         
-        return row.addWidget(statement, constructor);
+        return row.addWidget(statement, constructor, _options.activate);
     }
 }
 
-InlineController.prototype = {    
-    getContentElement: function (statement) {
-        var element = RDFauthor.elementForStatement(statement);
-        return element;
-    }, 
-    
+InlineController.prototype = {
     reset: function () {
         
     }, 

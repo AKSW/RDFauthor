@@ -103,7 +103,9 @@ div.modal-wrapper {
 }
 
 .rdfauthor-widget-container input.text,
-.rdfauthor-widget-container textarea {
+.rdfauthor-widget-container textarea, 
+.rdfauthor-selector input.text, 
+.rdfauthor-selector textarea {
     display: inline-block;
     border-left-color: #888;
     border-top-color: #888;

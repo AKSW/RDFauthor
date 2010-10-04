@@ -46,9 +46,11 @@ var Widget = {
      */
     focus: function () {
         var el = this.element();
-        if (el && (el.get(0).tagName.toLowerCase() == 'input' || el.get(0).tagName.toLowerCase() == 'textarea')) {
-            el.focus();
-        };
+        if (el && el.length > 0) {
+            if (el.get(0).tagName.toLowerCase() == 'input' || el.get(0).tagName.toLowerCase() == 'textarea') {
+                el.focus();
+            }
+        }
     }, 
     
     /**

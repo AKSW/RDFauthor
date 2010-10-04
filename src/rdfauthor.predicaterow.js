@@ -21,9 +21,9 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     this._subjectURI        = subjectURI;                   // subject for this row
     this._predicateURI      = predicateURI;                 // the property this row operates on
     this._title             = title;                        // the human-readable string representing the property
-    this._container         = container instanceof jQuery   // jQuery-wrapped container DOM element
-                            ? container 
-                            : jQuery(container);
+    // this._container         = container instanceof jQuery   // jQuery-wrapped container DOM element
+    //                         ? container 
+    //                         : jQuery(container);
                             
     this._idPrefix          = 'rdfauthor-predicate-row-'   // CSS id prefix
     this._id                = id;               // id for this row
@@ -34,6 +34,21 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     this._allowOverride     = allowOverride | false;    // whether to show override GUI (0.8 feature)
     
     var self = this;
+    
+    function append(markup) {
+        var element;
+        if (typeof container == 'function') {
+            element = container();
+        } else {
+            element = container;
+        }
+        
+        if (!(element instanceof jQuery)) {
+            element = $(element);
+        }
+        
+        element.append(markup);
+    }
     
     function getLegend() {
         return self._title ? '<legend>' + self._title + '</legend>' : '';
@@ -88,7 +103,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     }
     
     // append chrome
-    this._container.append(getChrome());
+    append(getChrome());
     
     jQuery('#' + this.cssID() + ' .actions .delete-button').live('click', function () {
         var widgetID = $(this).closest('.widget').attr('id');
