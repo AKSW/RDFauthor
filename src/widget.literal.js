@@ -186,7 +186,7 @@ RDFauthor.registerWidget({
             // get databank
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
             
-            // /* 
+            /* 
             var v = this.value();
             // */
             
@@ -268,7 +268,7 @@ RDFauthor.registerWidget({
     }, 
     
     value: function () {
-        var value = $('#literal-value-' + this.ID).val();
+        var value = this.element().val();
         if (String(value).length > 0) {
             return value;
         }

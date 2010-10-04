@@ -75,18 +75,25 @@ RDFauthor.registerWidget({
             // get databank
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
             
+            /* 
+            var v = this.value();
+            // */
+            
             var somethingChanged = (
-                this.statement.hasObject() && 
-                    (this.statement.objectValue() !== this.value()) || 
-                !this.statement.hasObject() && 
-                    this.value()
+                this.statement.hasObject() && (
+                    // existing statement should have been edited
+                    this.statement.objectValue() !== this.value()
+                )
             );
             
             if (somethingChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             
-            if ((null !== this.value()) && !this.removeOnSubmit && somethingChanged) {
+            // new statement must not be empty
+            var isNew = !this.statement.hasObject() && (null !== this.value());
+            
+            if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
                 try {
                     var newStatementOptions = {};
                     if (this.statement.objectDatatype()) {
@@ -120,7 +127,12 @@ RDFauthor.registerWidget({
     },
     
     value: function () {
-        return this.element().val();
+        var value = this.element().val();
+        if (String(value).length > 0) {
+            return value;
+        }
+        
+        return null;
     }, 
     
     encodeTags: function (stringContainingTags) {
