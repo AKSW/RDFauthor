@@ -425,9 +425,12 @@ RDFauthor.registerWidget({
                     self.element().val(this.selectedResourceLabel);
                     
                     // callback
-                    // if (typeof self._options.selectionCallback == 'function') {
-                    //     self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
-                    // }
+                    if (event.originalEvent.originalEvent.type == 'click' && 
+                        typeof self._options.selectionCallback == 'function') {
+                        
+                        self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
+                        return true;
+                    }
 
                     // prevent jQuery UI default
                     return false;
