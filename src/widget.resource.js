@@ -425,7 +425,8 @@ RDFauthor.registerWidget({
                     self.element().val(this.selectedResourceLabel);
                     
                     // callback
-                    if (event.originalEvent.originalEvent.type == 'click' && 
+                    var originalEvent = event.originalEvent.originalEvent;
+                    if (!(originalEvent.type == 'keydown' && originalEvent.which == 13) && 
                         typeof self._options.selectionCallback == 'function') {
                         
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);

@@ -141,7 +141,7 @@ function PopoverController(options) {
             jQuery('body').trigger('rdfauthor.view.property');
             var subjectGroup = self.activeSubjectGroup();
             var propertySelector = subjectGroup.getPropertySelector(function (widgetID) {
-                var rowTop          = jQuery('#' + widgetID).closest('.property-row').offset().top;
+                var rowTop          = jQuery('#' + widgetID).closest('.rdfauthor-predicate-row').offset().top;
                 var containerTop    = jQuery('.' + self._options.contentContainerClass).offset().top;
                 var containerScroll = jQuery('.' + self._options.contentContainerClass).scrollTop();
                 

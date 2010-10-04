@@ -102,6 +102,10 @@ div.modal-wrapper {
     padding-top: .5em;
 }
 
+#rdfauthor-view .rdfauthor-selector {
+    padding: 0.5em;
+}
+
 .rdfauthor-widget-container input.text,
 .rdfauthor-widget-container textarea, 
 .rdfauthor-selector input.text, 
