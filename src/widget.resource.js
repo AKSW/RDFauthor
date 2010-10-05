@@ -317,7 +317,7 @@ RDFauthor.registerWidget({
         }
     }, 
     
-    results: function (partialResult, responseCallback, sourceKey) {        
+    results: function (partialResult, responseCallback, sourceKey) {
         var rank = this.sources[sourceKey].rank;
         this.searchResults[rank] = partialResult;
         this.ongoingSearches--;
@@ -425,7 +425,10 @@ RDFauthor.registerWidget({
                     self.element().val(this.selectedResourceLabel);
                     
                     // callback
-                    var originalEvent = event.originalEvent.originalEvent;
+                    var originalEvent = event   /* autocompleteselected*/
+                        .originalEvent          /* menuselected */
+                        .originalEvent          /* actual DOM event */;
+                    
                     if (!(originalEvent.type == 'keydown' && originalEvent.which == 13) && 
                         typeof self._options.selectionCallback == 'function') {
                         
@@ -445,8 +448,8 @@ RDFauthor.registerWidget({
             })
             .keydown(function (e) {
                 if ((e.which === 13) && self._options.selectOnReturn) {
+                    self.element().data('autocomplete').destroy();
                     var val = jQuery(e.target).val();
-                    
                     self._normalizeValue(val);
                     
                     var splits = val.split(':', 2);
