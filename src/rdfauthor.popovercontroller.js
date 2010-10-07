@@ -249,6 +249,8 @@ PopoverController.prototype = {
     position: function () {
         var cw = this._container.width();
         var w  = jQuery(this.getElement()).width();
+        var wh = jQuery(window).height();
+        var h  = jQuery(this.getElement()).height();
         var self = this;
         
         // set container height
@@ -260,7 +262,8 @@ PopoverController.prototype = {
                 document.documentElement.clientHeight
             ) + 'px');
         
-        jQuery(this.getElement()).css('left', 0.5 * (cw - w) + 'px');
+        jQuery(this.getElement()).css('left', Math.max(0.5 * (cw - w), 50) + 'px');
+        jQuery(this.getElement()).css('top', 0.5 * (wh - h) + 'px');
         
         if (!jQuery('#' + this.cssID()).hasClass('ui-resizable')) {
             jQuery('#' + this.cssID()).resizable({

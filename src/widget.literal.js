@@ -69,24 +69,27 @@ RDFauthor.registerWidget({
     }, 
     
     valueClass: function () {
-        var length = this.statement.hasObject() ? this.statement.objectValue().length : null;
-        switch (length) {
-            case length >= 50:
-                return 'literal-value literal-value-large';
+        var length = this.statement.hasObject() ? this.statement.objectValue().length : 0;
+        var cls;
+        switch (true) {
+            case length >= 52:
+                cls = 'literal-value literal-value-large';
                 break;
-            case length >= 25:
-                return 'literal-value literal-value-medium';
+            case length >= 26:
+                cls = 'literal-value literal-value-medium';
                 break;
             default:
-                return 'literal-value literal-value-short'
+                cls =  'literal-value literal-value-short';
         }
+        
+        return cls;
     }, 
     
     isLarge: function () {
         if (this.statement.hasObject()) {
             var objectValue = this.statement.objectValue();
             if (objectValue.search) {
-                return ((objectValue.length >= 50) || 0 <= objectValue.search(/\n/));
+                return ((objectValue.length >= 52) || 0 <= objectValue.search(/\n/));
             }
         }
 

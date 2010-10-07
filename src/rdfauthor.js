@@ -1437,6 +1437,10 @@ RDFauthor = (function($, undefined) {
                 return _graphInfo[graphURI].queryEndpoint;
             }
             
+            if (typeof RDFAUTHOR_DEFAULT_SERVICE_ENDPOINT != 'undefined') {
+                return RDFAUTHOR_DEFAULT_SERVICE_ENDPOINT;
+            }
+            
             return undefined;
         }, 
         
@@ -1461,6 +1465,10 @@ RDFauthor = (function($, undefined) {
         updateURIForGraph: function (graphURI) {
             if (graphURI && graphURI in _graphInfo) {
                 return _graphInfo[graphURI].updateEndpoint;
+            }
+            
+            if (typeof RDFAUTHOR_DEFAULT_UPDATE_ENDPOINT != 'undefined') {
+                return RDFAUTHOR_DEFAULT_UPDATE_ENDPOINT;
             }
             
             return undefined;
