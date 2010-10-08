@@ -48,11 +48,14 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup = '\
-            <div class="container resource-value" style="width:' + this.availableWidth() + 'px;">\
+            <div class="container resource-value" style="width:100%">\
                 <input type="text" id="phone-value-' + this.ID + '" class="text" size="20"\
                  value="' + this.labelForURI(this.statement.objectValue()) + '"\
-                 style="width:' + (this.availableWidth() / 2 - 20) + 'px;\
-                        background-position:1% center;\
+                 style="width:51%;\
+                        box-sizing: border-box;\
+                        -moz-box-sizing: border-box;\
+                        -webkit-box-sizing: border-box;\
+                        background-position: 1% center;\
                         background-image:url(\'' + RDFAUTHOR_BASE + 'img/phone.png\');\
                         background-repeat:no-repeat;\
                         padding-left:20px" />\

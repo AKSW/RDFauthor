@@ -48,11 +48,14 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {        
         var markup = '\
-            <div class="container resource-value" style="width:' + this.availableWidth() + 'px;">\
+            <div class="container resource-value" style="width:100%">\
                 <input type="text" id="mail-value-' + this.ID + '" class="text"\
                  value="' + this.labelForURI(this.statement.objectValue()) + '"\
-                 style="width:' + (this.availableWidth() - 24) + 'px;\
-                        background-position:1% center;\
+                 style="width:100%;\
+                        box-sizing: border-box;\
+                        -moz-box-sizing: border-box;\
+                        -webkit-box-sizing: border-box;\
+                        background-position: 3px center;\
                         background-image:url(\'' + RDFAUTHOR_BASE + 'img/email.png\');\
                         background-repeat:no-repeat;\
                         padding-left:22px" />\
