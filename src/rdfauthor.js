@@ -115,6 +115,9 @@ RDFauthor = (function($, undefined) {
     /** Number of pending scripts */
     var _requirePending = 0;
     
+    /** Root element for editing */
+    var _rootElement = null;
+    
     /** Default options */
     var _defaultOptions = {
         title: 'Title', 
@@ -684,8 +687,11 @@ RDFauthor = (function($, undefined) {
      * @private
      */
     function _populateView(view) {
-        /* reset old view */
-        _resetView();
+        var root = _root();
+        if (null === root) {
+            // reset old view
+            _resetView();
+        }
         
         if (undefined === view) {
             view = RDFauthor.getView();
@@ -693,14 +699,23 @@ RDFauthor = (function($, undefined) {
         
         /* make sure, view has predicate info available */
         _fetchPredicateInfo(function() {
-            for (var graph in _databanksByGraph) {
-                var updateEndpoint = RDFauthor.updateURIForGraph(graph);
-                if (undefined !== updateEndpoint) {
-                    var triples = _databanksByGraph[graph].triples();
-                    for (var i = 0, length = triples.length; i < length; i++) {
-                        // init statement
-                        var statement = new Statement(triples[i], {'graph': graph});
-                        view.addWidget(statement);
+            
+            if (null !== root) {
+                root.find('.rdfauthor-statement-provider').each(function () {
+                    var statement = $(this).data('rdfauthor.statement');
+                    view.addWidget(statement);
+                });
+            } else {                
+                // add all parsed statements
+                for (var graph in _databanksByGraph) {
+                    var updateEndpoint = RDFauthor.updateURIForGraph(graph);
+                    if (undefined !== updateEndpoint) {
+                        var triples = _databanksByGraph[graph].triples();
+                        for (var i = 0, length = triples.length; i < length; i++) {
+                            // init statement
+                            var statement = new Statement(triples[i], {'graph': graph});
+                            view.addWidget(statement);
+                        }
                     }
                 }
             }
@@ -769,6 +784,16 @@ RDFauthor = (function($, undefined) {
                 _databanksByGraph[g] = _extractedByGraph[g];
             }
         }
+    }
+    
+    /** Returns current view root element */
+    function _root() {
+        return _rootElement;
+    }
+    
+    /** Sets current view root element */
+    function _setRoot(root) {
+        _rootElement = root;
     }
     
     /**
@@ -1488,6 +1513,12 @@ RDFauthor = (function($, undefined) {
          * @param {HTMLElement} root
          */
         start: function (root) {
+            if (arguments.length >= 1) {
+                _setRoot(root);
+            } else {
+                _setRoot(null);
+            }
+            
             this.eventTarget().trigger('rdfauthor.start');
             /* parse */
             _parse(function() {
