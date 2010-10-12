@@ -858,7 +858,7 @@ RDFauthor = (function($, undefined) {
                             'delete': removedJSON ? removedJSON : '{}'
                         }, function () {
                             _view.hide(true);
-                            // _callIfIsFunction(_options.onSubmitSuccess);
+                            _callIfIsFunction(_options.onSubmitSuccess);
                         });
                     }
                 }

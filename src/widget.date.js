@@ -11,7 +11,7 @@ RDFauthor.registerWidget({
         
         if (undefined === jQuery.ui.datepicker) {
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.datepicker.js');
-            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.date.css');
+            // RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.date.css');
         }
     },
     
