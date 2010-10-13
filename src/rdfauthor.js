@@ -118,6 +118,9 @@ RDFauthor = (function($, undefined) {
     /** Root element for editing */
     var _rootElement = null;
     
+    /** Statement options storage */
+    var _statementOptions = {};
+    
     /** Default options */
     var _defaultOptions = {
         title: 'Title', 
@@ -166,12 +169,22 @@ RDFauthor = (function($, undefined) {
     function _addTriple(element, triple, graph) {
         if (undefined !== triple) {
             var statement;
+            
+            // handle object label callback
+            var label = null;
+            if (typeof _options.objectLabel == 'function') {
+                label = _options.objectLabel(element);
+
+            }
+            
             /* blank graph means page graph */
             if (graph instanceof RDFBlankNode) {
                 graph = _pageGraph();
             }
             try {
-                statement = new Statement(triple, {'graph': graph});
+                // TODO: …
+                statement = new Statement(triple, {'graph': graph, objectLabel: label});
+                _statementOptions[statement.asRdfQueryTriple()] = {'graph': graph, objectLabel: label};
             } catch (e) {
                 /* count illegal RDFa triples */
                 _parserErrors++;
@@ -714,7 +727,18 @@ RDFauthor = (function($, undefined) {
                         for (var i = 0, length = triples.length; i < length; i++) {
                             // init statement
                             var statement = new Statement(triples[i], {'graph': graph});
-                            view.addWidget(statement);
+                            
+                            // handle object label callback
+                            var element = RDFauthor.elementForStatement(statement);
+                            var label = null;
+                            if (typeof _options.objectLabel == 'function') {
+                                label = _options.objectLabel(element);
+                            }
+                            
+                            // init statement
+                            var statement2 = new Statement(triples[i], {'graph': graph, objectLabel: label});
+                            
+                            view.addWidget(statement2);
                         }
                     }
                 }

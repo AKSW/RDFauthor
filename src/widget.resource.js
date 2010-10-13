@@ -83,7 +83,7 @@ RDFauthor.registerWidget({
         }
         
         // jQuery UI styles
-        // RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
         
         // load stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
@@ -98,11 +98,15 @@ RDFauthor.registerWidget({
         return jQuery('#resource-input-' + this.ID);
     }, 
     
-    markup: function () {    
+    markup: function () {
+        var l = this.statement.objectLabel();
+        var value = this.statement.objectLabel() 
+                  ? this.statement.objectLabel() 
+                  : (this.statement.hasObject() ? this.statement.objectValue() : '');
         var markup = '\
             <div class="container resource-value">\
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input" \
-                       value="' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
+                       value="' + value + '"/>\
             </div>';
         
         return markup;
@@ -115,13 +119,14 @@ RDFauthor.registerWidget({
             var hasChanged = (
                 this.statement.hasObject() 
                 && this.statement.objectValue() !== this.value()
+                && null !== this.value()
             );
             
             if (hasChanged || this.removeOnSubmit) {
                 databank.remove(this.statement.asRdfQueryTriple());
             }
             
-            if (!this.removeOnSubmit) {
+            if (!this.removeOnSubmit && this.value()) {
                 var self = this;
                 try {
                     var newStatement = this.statement.copyWithObject({
@@ -153,10 +158,10 @@ RDFauthor.registerWidget({
             return this.selectedResource;
         }
         
-        var typedValue = this.element().val();
-        if ('' !== typedValue) {
-            return typedValue;
-        }
+        // var typedValue = this.element().val();
+        // if ('' !== typedValue) {
+        //     return typedValue;
+        // }
         
         return null;
     }, 

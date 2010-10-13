@@ -115,11 +115,12 @@ function Statement(statementSpec, statementOptions) {
     }
     
     // statement options and defaults
-    statementOptions = statementOptions != undefined ? statementOptions : {};
-    this._hidden     = statementOptions.hidden != undefined ? Boolean(statementOptions.hidden) : false;
-    this._required   = statementOptions.required != undefined ? Boolean(statementOptions.required) : false;
-    this._protected  = statementOptions.protected != undefined ? Boolean(statementOptions.protected) : false;
-    this._graph      = statementOptions.graph != undefined ? String(statementOptions.graph) : null;
+    statementOptions  = statementOptions != undefined ? statementOptions : {};
+    this._hidden      = statementOptions.hidden != undefined ? Boolean(statementOptions.hidden) : false;
+    this._required    = statementOptions.required != undefined ? Boolean(statementOptions.required) : false;
+    this._protected   = statementOptions.protected != undefined ? Boolean(statementOptions.protected) : false;
+    this._graph       = statementOptions.graph != undefined ? String(statementOptions.graph) : null;
+    this._objectLabel = statementOptions.objectLabel != undefined ? String(statementOptions.objectLabel) : null;
     
     // the human-readable string representing the property 
     if (statementOptions.title && typeof statementOptions.title == 'string' && '' != statementOptions.title) {
@@ -413,6 +414,10 @@ Statement.prototype = {
         }
         
         return null;
+    }, 
+    
+    objectLabel: function() {
+        return this._objectLabel;
     }, 
     
     /**
