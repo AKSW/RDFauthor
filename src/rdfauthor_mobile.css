@@ -36,7 +36,7 @@
 {
     font-size: 1.6em;
     font-weight: 900;
-    color: #fff;
+    color: #000;
     line-height: 1.3;
 }
 
@@ -201,7 +201,7 @@
     margin: 0 0.3em;
     padding: 0 0.2em;
     font-weight: bold;
-    color: #DDD;
+    color: #000;
     background-color: transparent;
     font-size: 100%;
 }
