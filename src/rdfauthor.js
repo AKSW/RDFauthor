@@ -339,10 +339,8 @@ RDFauthor = (function($, undefined) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
+                _callIfIsFunction(_options.onCancel());
                 RDFauthor.cancel();
-                if (typeof _options.onCancel == 'function') {
-                    _options.onCancel();
-                }
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
             useAnimations: _options.useAnimations
@@ -350,6 +348,34 @@ RDFauthor = (function($, undefined) {
         
         // init view controller
         var viewController = new PopoverController(options);
+        
+        return viewController;
+    }
+    
+    function _createMobileView() {
+        if ($('.modal-wrapper').length < 1) {
+            $('body').append('<div class="modal-wrapper" style="display:none"></div>');
+        }
+                        
+        var self = this;
+        var options = $.extend({}, _options, {
+            onBeforeSubmit: function () {
+                // keep db before changes
+                _cloneDatabanks();
+            }, 
+            onAfterSubmit: function () {
+                _updateSources();
+            }, 
+            onAfterCancel: function () {
+                _callIfIsFunction(_options.onCancel());
+                RDFauthor.cancel();
+            }, 
+            container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
+            useAnimations: _options.useAnimations
+        });
+        
+        // init view controller
+        var viewController = new MobileController(options);
         
         return viewController;
     }
@@ -954,6 +980,7 @@ RDFauthor = (function($, undefined) {
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.selector.js');     /* Property selector */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js'); /* Subject Group */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.popovercontroller.js');   /* ViewController */
+    _require(RDFAUTHOR_BASE + 'src/rdfauthor.mobilecontroller.js');   /* ViewController */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.inlinecontroller.js'); /* InlineViewController */
     _require(__RDFA_BASE + 'rdfa.js');                          /* RDFA */
     
@@ -1140,6 +1167,8 @@ RDFauthor = (function($, undefined) {
             if (null === _view) {
                 if (_options.viewOptions.type === 'popover') {
                     _view = _createPopoverView();
+                } else if(_options.viewOptions.type === 'mobile'){
+                    _view = _createMobileView();
                 } else {
                     _view = _createInlineView();
                 }
