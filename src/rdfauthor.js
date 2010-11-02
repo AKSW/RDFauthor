@@ -1523,8 +1523,8 @@ RDFauthor = (function($, undefined) {
         }, 
         
         /**
-         * Sets the infor predicates for the graph denoted by graphURI.
-         * Currently the info keys 'queryEndpoint' and 'updateEndpoint' 
+         * Sets the info predicates for the graph denoted by graphURI.
+         * Currently the info spec keys 'queryEndpoint' and 'updateEndpoint' 
          * (both pointing to a URI) are recodgnized.
          */
         setInfoForGraph: function (graphURI, infoSpec, infoValue) {
