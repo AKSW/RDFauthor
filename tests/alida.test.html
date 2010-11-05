@@ -9,8 +9,9 @@
         <script type="text/javascript" src="../libraries/jquery.js"></script>
         <script type="text/javascript" src="../libraries/alida.js"></script>
         <script type="text/javascript">
-            Alida.addEndpoint('http://test.de/');
-            alert(Alida.getEndpoints().length);
+            Alida.addEndpoint('http://catalogus-professorum.org/sparql');
+            alert(Alida.getEndpoints()[0]);
+            Alida.query('Norman');
         </script>
     </head>
     <body>
