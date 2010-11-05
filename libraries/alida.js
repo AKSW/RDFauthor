@@ -7,7 +7,7 @@ Alida = (function ($) {
     var _endpoints = new Array();
     
     function _private() {
-        
+        var test;
     };
     
     return {
