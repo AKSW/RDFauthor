@@ -9,6 +9,12 @@ Alida = (function ($) {
     /** Endpoints array */
     var _endpoints = new Array();
 
+    /** MIME Type for XML */
+    var XML = 'application/sparql-results+xml';
+
+    /** MIME Type for JSON */
+    var JSON = 'application/sparql-results+json';
+
     /**
      * Creates the query string
      * @private
@@ -29,26 +35,34 @@ Alida = (function ($) {
     }
 
     /**
-     * Parses the first ajax request including subject and object.
+     * Parses the XML object from the first ajax request including subject and object.
      * @private
      * @param {XML} data XML document contains the first result
      */
-    function _parseFirstRequestData (data) {
-        $(data).find('result').each(function()
-        {
-            $(this).find("binding").each(function()
-            {
-                if(this.attributes[0].value=="s")
-                {
+    function _parseFirstRequestXML (data) {
+        $(data).find('result').each(function () {
+            $(this).find("binding").each(function () {
+                if (this.attributes[0].value=="s") {
                     subject = $(this).text().trim();
                     //TODO add subject to array
                 }
-                if(this.attributes[0].value=="search")
-                {
+                if (this.attributes[0].value=="search") {
                     object = $(this).text().trim();
                     //TODO add object to array
                 }
             });
+        });
+    }
+
+    /**
+     * Parses the JSON object from the first ajax request including subject and object.
+     * @private
+     * @param {String} data JSON String contains the first result
+     */
+    function _parseFirstRequestJSON (data) {
+        var result = $.parseJSON(data);
+        $(result.bindings).each(function (i) {
+            alert(result.bindings[i].s.value+' - '+result.bindings[i].search.value);
         });
     }
     
@@ -98,23 +112,35 @@ Alida = (function ($) {
         query: function (searchString, resultCallback, errorCallback) {
             $(_endpoints).each( function (i) {
                 //TODO headerabfrage
-
                 //do an ajax request
                 $.ajax({
+                    beforeSend: function (req) {
+                        req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
+                    },
+
                     type: "GET",
 
                     timeout: _defaultOptions.timeout,
 
-                    url: '../libraries/alidaProxy.php',
+                    url: _endpoints[i],
 
-                    data: "contentType=xml&endpoint="+_endpoints[i]+"&query="+escape(_createQuery(searchString)),
+                    data: "query="+escape(_createQuery(searchString)),
 
                     success: function (data, textStatus, XMLHttpRequest) {
                         //Success output
                         alert('success\n'+data + textStatus, XMLHttpRequest);
-
-                        //Parsing the data
-                        _parseFirstRequestData(data);
+                        switch (XMLHttpRequest.getResponseHeader("Content-Type")){
+                            case XML:
+                                alert('XML');
+                                //Parsing the XML object
+                                _parseFirstRequestXML(XMLHttpRequest.responseXML);
+                                break;
+                            case JSON:
+                                alert('JSON');
+                                //Parsing the JSON object
+                                _parseFirstRequestJSON(XMLHttpRequest.responseText);
+                                break;
+                        }
 
                         //Resultcallback
                         if( jQuery.isFunction(resultCallback) ) {
