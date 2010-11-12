@@ -1,3 +1,9 @@
+/**
+ * This file is part of the aLiDa project.
+ * http://code.google.com/p/alida/
+ * Author: Clemens Hoffmann <cannelony@gmail.com>
+ */
+
 Alida = (function ($) {
 
     /** Default options */
@@ -14,6 +20,79 @@ Alida = (function ($) {
 
     /** MIME Type for JSON */
     var JSON = 'application/sparql-results+json';
+
+    /** result object */
+    var result = {
+        subjectURI : SubjectClass
+    }
+
+    /**
+     * Instantiates an subjectClass object, which contains the label,
+     * all of them properties (facets, including values),
+     * and the source of the subject (endpoint).
+     * @constructor
+     * @param {String} label label of subject
+     * @param {Array} facets properties of subject
+     * @param {Array} endpoints source of subject
+     */
+    function SubjectClass (label, facets, endpoints) {
+        this.label = label;
+        this.facets = facets;
+        this.endpoints = endpoints;
+        return this;
+    }
+
+    SubjectClass.prototype.addFacet = function (uri, label) {
+        var newFacet = {
+            facetURI : uri,
+            label    : label
+        }
+        this.facets.push(newFacet);
+    }
+
+    /**
+     * Receives all facets and their values of a subject
+     * @private
+     * @param {String} subjectURI path to subject
+     */
+    function _getFacetsOfSubject (subjectURI) {
+        var queryFacet = "SELECT DISTINCT ?facet ?value WHERE { <" + subjectURI + "> ?facet  ?value}";
+        window.console.info(queryFacet);
+        $(_endpoints).each( function (i) {
+            $.ajax({
+                beforeSend: function (req) {
+                    req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
+                },
+                type: "GET",
+                timeout: _defaultOptions.timeout,
+                url: _endpoints[i],
+                data: "query="+escape(queryFacet),
+                success: function (data, textStatus, XMLHttpRequest) {
+                    //Success output
+                    //alert('success\n'+data + textStatus, XMLHttpRequest);
+                    switch (XMLHttpRequest.getResponseHeader("Content-Type")){
+                        case XML:
+                            alert('XML - getFacet');
+                            //TODO parse facets and values
+                            break;
+                        case JSON:
+                            alert('JSON - getFacet');
+                            alert(XMLHttpRequest.responseText);
+                            //TODO parse facets and values
+                            break;
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //Error output
+                    alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
+                }
+            }); // End of ajax request part
+        });
+    }
+
+    function _createResultObject () {
+
+    }
 
     /**
      * Creates the query string
@@ -63,7 +142,9 @@ Alida = (function ($) {
         var result = $.parseJSON(data);
         $(result.bindings).each(function (i) {
             alert(result.bindings[i].s.value+' - '+result.bindings[i].search.value);
+            _getFacetsOfSubject (result.bindings[i].s.value);
         });
+
     }
     
     return {
@@ -128,20 +209,19 @@ Alida = (function ($) {
 
                     success: function (data, textStatus, XMLHttpRequest) {
                         //Success output
-                        alert('success\n'+data + textStatus, XMLHttpRequest);
+                        //alert('success\n'+data + textStatus, XMLHttpRequest);
                         switch (XMLHttpRequest.getResponseHeader("Content-Type")){
                             case XML:
-                                alert('XML');
+                                //alert('XML');
                                 //Parsing the XML object
                                 _parseFirstRequestXML(XMLHttpRequest.responseXML);
                                 break;
                             case JSON:
-                                alert('JSON');
+                                //alert('JSON');
                                 //Parsing the JSON object
                                 _parseFirstRequestJSON(XMLHttpRequest.responseText);
                                 break;
                         }
-
                         //Resultcallback
                         if( jQuery.isFunction(resultCallback) ) {
                             resultCallback();
