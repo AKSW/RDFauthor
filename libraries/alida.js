@@ -22,8 +22,8 @@ Alida = (function ($) {
     var JSON = 'application/sparql-results+json';
 
     /** result object */
-    var result = {
-        subjectURI : SubjectClass
+    var _result = {
+        //subjectURI : Subject
     }
 
     /**
@@ -35,28 +35,24 @@ Alida = (function ($) {
      * @param {Array} facets properties of subject
      * @param {Array} endpoints source of subject
      */
-    function SubjectClass (label, facets, endpoints) {
+    function Subject (subjectURI, label, endpoints) {
+        this.subjectURI = subjectURI;
         this.label = label;
-        this.facets = facets;
+        this.facets = null;
         this.endpoints = endpoints;
         return this;
     }
 
-    SubjectClass.prototype.addFacet = function (uri, label) {
+    Subject.prototype.addFacet = function (uri, label) {
         var newFacet = {
             facetURI : uri,
             label    : label
         }
         this.facets.push(newFacet);
     }
-
-    /**
-     * Receives all facets and their values of a subject
-     * @private
-     * @param {String} subjectURI path to subject
-     */
-    function _getFacetsOfSubject (subjectURI) {
-        var queryFacet = "SELECT DISTINCT ?facet ?value WHERE { <" + subjectURI + "> ?facet  ?value}";
+    
+    Subject.prototype.getFacet = function () {
+        var queryFacet = "SELECT DISTINCT ?facet ?value WHERE { <" + this.subjectURI + "> ?facet  ?value}";
         window.console.info(queryFacet);
         $(_endpoints).each( function (i) {
             $.ajax({
@@ -72,13 +68,15 @@ Alida = (function ($) {
                     //alert('success\n'+data + textStatus, XMLHttpRequest);
                     switch (XMLHttpRequest.getResponseHeader("Content-Type")){
                         case XML:
-                            alert('XML - getFacet');
-                            //TODO parse facets and values
+                            //alert('XML - getFacet');
+                            //TODO parse facets and values and adds it to the right subject
                             break;
                         case JSON:
-                            alert('JSON - getFacet');
-                            alert(XMLHttpRequest.responseText);
-                            //TODO parse facets and values
+                            //alert('JSON - getFacet');
+                            //alert(XMLHttpRequest.responseText);
+                            //TODO parse facets and values and adds it to the right subject
+                            var JSONfacets = $.parseJSON(XMLHttpRequest.responseText);
+                            alert("Type: "+JSONfacets.bindings[1].facet.type + "\nFacetURI: "+JSONfacets.bindings[1].facet.value +"\nValueType: "+JSONfacets.bindings[1].value.type+"\nValue: "+JSONfacets.bindings[1].value.value);
                             break;
                     }
                 },
@@ -137,12 +135,14 @@ Alida = (function ($) {
      * Parses the JSON object from the first ajax request including subject and object.
      * @private
      * @param {String} data JSON String contains the first result
+     * @param {String} endpoint endpoint url
      */
-    function _parseFirstRequestJSON (data) {
-        var result = $.parseJSON(data);
-        $(result.bindings).each(function (i) {
-            alert(result.bindings[i].s.value+' - '+result.bindings[i].search.value);
-            _getFacetsOfSubject (result.bindings[i].s.value);
+    function _parseFirstRequestJSON (data, endpoint) {
+        var JSONresult = $.parseJSON(data);
+        $(JSONresult.bindings).each(function (i) {
+            alert(JSONresult.bindings[i].s.value+' - '+JSONresult.bindings[i].search.value);
+            _result[JSONresult.bindings[i].s.value] = new Subject (JSONresult.bindings[i].s.value, JSONresult.bindings[i].search.value, endpoint);
+            //_getFacetsOfSubject (result.bindings[i].s.value);
         });
 
     }
@@ -172,6 +172,10 @@ Alida = (function ($) {
             return _endpoints;
         },
         
+        getResult: function () {
+            return _result;
+        },
+        
         /**
          * var result = {
          *     subjectURI: {
@@ -191,6 +195,8 @@ Alida = (function ($) {
          * @param {function} errorCallback Errorcallback will be called, when an error occurred
          */
         query: function (searchString, resultCallback, errorCallback) {
+            //each query get a new result object
+            //TODO reset _result
             $(_endpoints).each( function (i) {
                 //TODO headerabfrage
                 //do an ajax request
@@ -219,7 +225,7 @@ Alida = (function ($) {
                             case JSON:
                                 //alert('JSON');
                                 //Parsing the JSON object
-                                _parseFirstRequestJSON(XMLHttpRequest.responseText);
+                                _parseFirstRequestJSON(XMLHttpRequest.responseText, _endpoints[i]);
                                 break;
                         }
                         //Resultcallback

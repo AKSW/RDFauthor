@@ -11,7 +11,16 @@
         <script type="text/javascript">
             Alida.addEndpoint('http://localhost/ontowiki/sparql');
             alert(Alida.getEndpoints()[0]);
-            Alida.query('Datenbank');
+            function resultCallback () {
+                alert('Fertig');
+                var result = Alida.getResult();
+                for (var subjectURI in result) {
+                    result[subjectURI].getFacet();
+                }
+                //alert(result['http://od.fmi.uni-leipzig.de/s10/ASV.TextDatenbanken'].label);
+            }
+            
+            Alida.query('Datenbank',resultCallback);
         </script>
     </head>
     <body>
