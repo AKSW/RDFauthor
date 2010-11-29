@@ -23,9 +23,54 @@ Alida = (function ($) {
 
     /** result object */
     var _result = {
-        //subjectURI : Subject
-        //query
+        //subjectURI : Subject,
+        //query : String,
+        facets: function () {
+            for (var subjectURI in _result) {
+                if (typeof(_result[subjectURI])=="object") {
+                    var queryFacet = "SELECT DISTINCT ?facet WHERE { <" + _result[subjectURI].URI + "> ?facet  ?value}";
+                    window.console.info(queryFacet);
+                    $(_endpoints).each( function (i) {
+                        $.ajax({
+                            beforeSend: function (req) {
+                                req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
+                            },
+                            type: "GET",
+                            timeout: _defaultOptions.timeout,
+                            url: _endpoints[i],
+                            data: "query="+escape(queryFacet),
+                            success: function (data, textStatus, XMLHttpRequest) {
+                                //Success output
+                                //alert('success\n'+data + textStatus, XMLHttpRequest);
+                                switch (XMLHttpRequest.getResponseHeader("Content-Type")){
+                                    case XML:
+                                        //alert('XML - getFacet');
+                                        //TODO parse facets and values and adds it to the right subject
+                                        break;
+                                    case JSON:
+                                        //alert('JSON - getFacet');
+                                        //alert(XMLHttpRequest.responseText);
+                                        //TODO parse facets and values and adds it to the right subject
+                                        var JSONfacets = $.parseJSON(XMLHttpRequest.responseText);
+                                        alert("Type: "+JSONfacets.bindings[1].facet.type + "\nFacetURI: "+JSONfacets.bindings[1].facet.value);
+                                        break;
+                                }
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                //Error output
+                                alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
+                            }
+                        }); // End of ajax request part
+                    });
+                } 
+            }
+        },
+        filter: function (facet, value) {
+            // new query
+            return _result;
+        }
     }
+    
 
     /**
      * Instantiates an subjectClass object, which contains the label,
@@ -37,7 +82,7 @@ Alida = (function ($) {
      * @param {Array} endpoints source of subject
      */
     function Subject (subjectURI, label, endpoints) {
-        this.subjectURI = subjectURI;
+        this.URI = subjectURI;
         this.label = label;
         this.facets = null;
         this.endpoints = endpoints;
@@ -50,46 +95,6 @@ Alida = (function ($) {
             label    : label
         }
         this.facets.push(newFacet);
-    }
-    
-    result.
-    
-    //result nicht subject
-    Subject.prototype.getFacets = function () {
-        var queryFacet = "SELECT DISTINCT ?facet ?value WHERE { <" + this.subjectURI + "> ?facet  ?value}";
-        window.console.info(queryFacet);
-        $(_endpoints).each( function (i) {
-            $.ajax({
-                beforeSend: function (req) {
-                    req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
-                },
-                type: "GET",
-                timeout: _defaultOptions.timeout,
-                url: _endpoints[i],
-                data: "query="+escape(queryFacet),
-                success: function (data, textStatus, XMLHttpRequest) {
-                    //Success output
-                    //alert('success\n'+data + textStatus, XMLHttpRequest);
-                    switch (XMLHttpRequest.getResponseHeader("Content-Type")){
-                        case XML:
-                            //alert('XML - getFacet');
-                            //TODO parse facets and values and adds it to the right subject
-                            break;
-                        case JSON:
-                            //alert('JSON - getFacet');
-                            //alert(XMLHttpRequest.responseText);
-                            //TODO parse facets and values and adds it to the right subject
-                            var JSONfacets = $.parseJSON(XMLHttpRequest.responseText);
-                            alert("Type: "+JSONfacets.bindings[1].facet.type + "\nFacetURI: "+JSONfacets.bindings[1].facet.value +"\nValueType: "+JSONfacets.bindings[1].value.type+"\nValue: "+JSONfacets.bindings[1].value.value);
-                            break;
-                    }
-                },
-                error: function (XMLHttpRequest, textStatus, errorThrown) {
-                    //Error output
-                    alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
-                }
-            }); // End of ajax request part
-        });
     }
 
     function _createResultObject () {
@@ -144,7 +149,7 @@ Alida = (function ($) {
     function _parseFirstRequestJSON (data, endpoint) {
         var JSONresult = $.parseJSON(data);
         $(JSONresult.bindings).each(function (i) {
-            alert(JSONresult.bindings[i].s.value+' - '+JSONresult.bindings[i].search.value);
+            //alert(JSONresult.bindings[i].s.value+' - '+JSONresult.bindings[i].search.value);
             _result[JSONresult.bindings[i].s.value] = new Subject (JSONresult.bindings[i].s.value, JSONresult.bindings[i].search.value, endpoint);
             //_getFacetsOfSubject (result.bindings[i].s.value);
         });
