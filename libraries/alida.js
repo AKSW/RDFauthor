@@ -23,12 +23,12 @@ Alida = (function ($) {
 
     /** result object */
     var _result = {
-        //subjectURI : Subject,
         //query : String,
+        subjects: {/*subjectURI : Subject*/},
         facets: function () {
-            for (var subjectURI in _result) {
-                if (typeof(_result[subjectURI])=="object") {
-                    var queryFacet = "SELECT DISTINCT ?facet WHERE { <" + _result[subjectURI].URI + "> ?facet  ?value}";
+            for (var subjectURI in this.subjects) {
+                if (this.subjects[subjectURI] instanceof Subject) {
+                    var queryFacet = "SELECT DISTINCT ?facet WHERE { <" + this.subjects[subjectURI].URI + "> ?facet  ?value}";
                     window.console.info(queryFacet);
                     $(_endpoints).each( function (i) {
                         $.ajax({
@@ -66,7 +66,7 @@ Alida = (function ($) {
             }
         },
         filter: function (facet, value) {
-            // new query
+            // new query and return new result object
             return _result;
         }
     }
@@ -150,7 +150,7 @@ Alida = (function ($) {
         var JSONresult = $.parseJSON(data);
         $(JSONresult.bindings).each(function (i) {
             //alert(JSONresult.bindings[i].s.value+' - '+JSONresult.bindings[i].search.value);
-            _result[JSONresult.bindings[i].s.value] = new Subject (JSONresult.bindings[i].s.value, JSONresult.bindings[i].search.value, endpoint);
+            _result.subjects[JSONresult.bindings[i].s.value] = new Subject (JSONresult.bindings[i].s.value, JSONresult.bindings[i].search.value, endpoint);
             //_getFacetsOfSubject (result.bindings[i].s.value);
         });
 
