@@ -14,13 +14,20 @@
             function resultCallback () {
                 alert('Fertig');
                 var result = Alida.getResult();
+                
+                for (var f in result.getFacets()) {
+                    var values = f.getValues();
+                    var result2 = result.filter(f, value?);
+                }
+                result.getFacets(); // facetten von allen subjects URIs
+                result.getValue(facetURI);
                 for (var subjectURI in result) {
-                    result[subjectURI].getFacet();
+                    result[subjectURI].getFacets();
                 }
                 //alert(result['http://od.fmi.uni-leipzig.de/s10/ASV.TextDatenbanken'].label);
             }
             
-            Alida.query('Datenbank',resultCallback);
+            Alida.query('Datenbank',resultCallback, 10);
         </script>
     </head>
     <body>

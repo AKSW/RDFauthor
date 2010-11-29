@@ -24,6 +24,7 @@ Alida = (function ($) {
     /** result object */
     var _result = {
         //subjectURI : Subject
+        //query
     }
 
     /**
@@ -51,7 +52,10 @@ Alida = (function ($) {
         this.facets.push(newFacet);
     }
     
-    Subject.prototype.getFacet = function () {
+    result.
+    
+    //result nicht subject
+    Subject.prototype.getFacets = function () {
         var queryFacet = "SELECT DISTINCT ?facet ?value WHERE { <" + this.subjectURI + "> ?facet  ?value}";
         window.console.info(queryFacet);
         $(_endpoints).each( function (i) {

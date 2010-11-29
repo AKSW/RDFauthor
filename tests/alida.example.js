@@ -7,24 +7,33 @@ var r = {
     subjects: [/* ... */],          /* Array mit subjekten */
     queryTime: 123,                 /* Ausführungszeit */
     query: 'SELECT ?s FROM ...',    /* Query die benutzt wurde */
-    /* Eventuell weitere informationen aus Alida */
-};
-
-// Ein Subjekt könnte so aussehen
-var s = {
-    uri: 'http://example.com/ttt',  /* Subjekt-URI */
     facets: function () {
         // Wenn das Subjekt innerhalb von Alida erzeugt wird, 
         // könntest du hier auch private Methoden aufrufen
         return Alida.facetsForSubject(this.uri);
     }, 
-    valueForFacet: function (f) {
-        // Hier könntest du auf die interne Alida-Hashmap für Facetten
-        // zugreifen. Alternativ speichert jedes Subjekt seine Facetten, 
-        // nachdem einmal drauf zugegriffen wurde
-        return this.facets()[f].values;
+    filter: function (facet, /*value, array, undefined */ values) {
+        if ($.isArray(values)) {
+            // array
+        } else {
+            // kein array
+        }
+        
+        return result;
     }
+    /* Eventuell weitere informationen aus Alida */
 };
+
+// Ein Subjekt könnte so aussehen
+//var s = {
+//    uri: 'http://example.com/ttt',  /* Subjekt-URI */
+//    valueForFacet: function (f) {
+//        // Hier könntest du auf die interne Alida-Hashmap für Facetten
+//        // zugreifen. Alternativ speichert jedes Subjekt seine Facetten, 
+//        // nachdem einmal drauf zugegriffen wurde
+//        return this.facets()[f].values;
+//    }
+//};
 
 // Eine Facette könnte so aussehen:
 var f = {
