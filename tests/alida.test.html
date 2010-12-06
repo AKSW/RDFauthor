@@ -16,11 +16,9 @@
             /**
              * ResultCallback function will be called after first query
              */
-            function resultCallback () {
+            function resultCallback (result) {
                 //alert that the resultCallback was called
                 alert('ResultCallback');
-                //receives the result object of the query
-                var result = Alida.getResult();
                 //get the query string
                 alert(result['query']);
                 //get size of subjects
@@ -28,9 +26,10 @@
                 //receive the facets of each subject in the result object
                 result.facets(function (){
                     for (var subjectURI in result.subjects) {
-                        alert(subjectURI + ' - ' + result.subjects[subjectURI].sizeOfFacets());
-                        for (f in result.subjects[subjectURI].facets) {
-                            alert(subjectURI + ' ' + result.subjects[subjectURI].facets[f].URI);
+                        //alert(subjectURI + ' - ' + result.subjects[subjectURI].sizeOfFacets());
+                        for (var f in result.subjects[subjectURI].facets) {
+                            //alert(subjectURI + ' ' + result.subjects[subjectURI].facets[f].URI);
+                            result.subjects[subjectURI].getValues(result.subjects[subjectURI].facets[f]);
                         }
                     }
                 });

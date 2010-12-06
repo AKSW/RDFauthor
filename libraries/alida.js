@@ -61,8 +61,7 @@ Alida = (function ($) {
                                         $(JSONfacets.bindings).each(function(i) {
                                             var facetUri = JSONfacets.bindings[i].facet.value;
                                             var type = JSONfacets.bindings[i].facet.type;
-                                            var label = "label will be insert here"; //humanreadable uri
-                                            _result.subjects[tempSubject[curLen]].addFacet(facetUri,type,label);
+                                            _result.subjects[tempSubject[curLen]].addFacet(facetUri,type);
                                         });
                                         break;
                                 }
@@ -121,9 +120,14 @@ Alida = (function ($) {
         this.URI = uri;
         this.type = type;
         this.label = label;
+        this.values = [];
         return this;
     }
-
+    
+    Facet.prototype.toString = function () {
+        return this.URI;
+    }
+    
     /**
      * Instantiates an subject object, which contains the label,
      * all of them properties (facets, including values),
@@ -141,7 +145,9 @@ Alida = (function ($) {
         return this;
     }
 
-    Subject.prototype.addFacet = function (uri, type, label) {
+    Subject.prototype.addFacet = function (uri, type) {
+        //TODO cut uri for label
+        var label = "label will be insert here";
         this.facets[uri] = new Facet(uri, type, label);
     }
 
@@ -152,6 +158,54 @@ Alida = (function ($) {
         }
         return len;
     }
+    
+    Subject.prototype.getValues = function (facet) {
+        var addValueToFacet = this.facets[String(facet)].values;
+        var valueQuery = "SELECT DISTINCT ?value WHERE { <" 
+                       + this.URI
+                       + "> <"
+                       + String(facet)
+                       + "> ?value}";
+        //window.console.info(valueQuery);
+        $.ajax({
+            beforeSend: function (req) {
+                req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
+            },
+            type: "GET",
+            timeout: _defaultOptions.timeout,
+            url: this.endpoints,
+            data: "query="+escape(valueQuery),
+            success: function (data, textStatus, XMLHttpRequest) {
+                //Success output
+                //alert('success\n'+data + textStatus, XMLHttpRequest);
+                switch (XMLHttpRequest.getResponseHeader("Content-Type")){
+                    case XML:
+                        //alert('XML - getFacet');
+                        //TODO parse facets and values and adds it to the right subject
+                        break;
+                    case JSON:
+                        //alert('JSON - getFacet');
+                        //alert(XMLHttpRequest.responseText);
+                        var JSONvalue = $.parseJSON(XMLHttpRequest.responseText);
+                        $(JSONvalue.bindings).each(function(i) {
+                            var value = JSONvalue.bindings[i].value.value;
+                            var type = JSONvalue.bindings[i].value.type;
+                            //alert(type + ' - ' + value);
+                            addValueToFacet.push({
+                                type: type,
+                                value: value,
+                                label: "label here" //TODO uri cutten
+                            });
+                        });
+                        break;
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                //Error output
+                alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
+            }
+        });
+    }
 
     /**
      * Creates the query string
@@ -160,13 +214,13 @@ Alida = (function ($) {
      * @return {String} mainquery
      */
     function _createQuery (searchString) {
-        var mainquery = "SELECT DISTINCT ?s ?search\
-                         WHERE {\
-                             ?s ?p ?o.\
-                             FILTER regex(?o, \"" + searchString + "\", \"i\" ).\
-                             FILTER isLiteral(?o).\
-                             ?s <http://www.w3.org/2000/01/rdf-schema#label> ?search.\
-                         } LIMIT " + _defaultOptions.limit;
+        var mainquery = "SELECT DISTINCT ?s ?search "
+                      + "WHERE { "
+                      +      "?s ?p ?o. "
+                      +      "FILTER regex(?o, \"" + searchString + "\", \"i\" ). "
+                      +      "FILTER isLiteral(?o). "
+                      +      "?s <http://www.w3.org/2000/01/rdf-schema#label> ?search. "
+                      + "} LIMIT " + _defaultOptions.limit;
         //Output mainquery
         window.console.info(mainquery);
         return mainquery;
@@ -280,7 +334,7 @@ Alida = (function ($) {
                         }
                         //Resultcallback
                         if( jQuery.isFunction(resultCallback) ) {
-                            resultCallback();
+                            resultCallback(_result);
                         }
                     },
 
