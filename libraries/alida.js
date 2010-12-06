@@ -25,10 +25,17 @@ Alida = (function ($) {
     var _result = {
         //query : String,
         subjects: {/*subjectURI : Subject*/},
-        facets: function () {
+        facets: function (resultCallback) {
+            var length = this.sizeOfSubjects();
+            var curLen = 0;
+            var tempSubject = [];
             for (var subjectURI in this.subjects) {
-                if (this.subjects[subjectURI] instanceof Subject) {
-                    var queryFacet = "SELECT DISTINCT ?facet WHERE { <" + this.subjects[subjectURI].URI + "> ?facet  ?value}";
+                var loopSubject = this.subjects[subjectURI];
+                tempSubject.push(this.subjects[subjectURI].URI);
+                if (loopSubject instanceof Subject) {
+                    var queryFacet = "SELECT DISTINCT ?facet WHERE { <" 
+                                   + loopSubject.URI
+                                   + "> ?facet  ?value}";
                     window.console.info(queryFacet);
                     $(_endpoints).each( function (i) {
                         $.ajax({
@@ -50,15 +57,34 @@ Alida = (function ($) {
                                     case JSON:
                                         //alert('JSON - getFacet');
                                         //alert(XMLHttpRequest.responseText);
-                                        //TODO parse facets and values and adds it to the right subject
                                         var JSONfacets = $.parseJSON(XMLHttpRequest.responseText);
-                                        alert("Type: "+JSONfacets.bindings[1].facet.type + "\nFacetURI: "+JSONfacets.bindings[1].facet.value);
+                                        $(JSONfacets.bindings).each(function(i) {
+                                            var facetUri = JSONfacets.bindings[i].facet.value;
+                                            var type = JSONfacets.bindings[i].facet.type;
+                                            var label = "label will be insert here"; //humanreadable uri
+                                            _result.subjects[tempSubject[curLen]].addFacet(facetUri,type,label);
+                                        });
                                         break;
                                 }
                             },
                             error: function (XMLHttpRequest, textStatus, errorThrown) {
                                 //Error output
                                 alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
+                            },
+                            complete: function (XMLHttpRequest, textStatus) {
+                                switch (textStatus) {
+                                    case "success":
+                                        curLen++;
+                                        if (length == curLen) {
+                                            if (jQuery.isFunction(resultCallback)) {
+                                                resultCallback();
+                                            }
+                                            return this;
+                                        }
+                                        break;
+                                    default:
+                                        return false;
+                                }
                             }
                         }); // End of ajax request part
                     });
@@ -67,38 +93,64 @@ Alida = (function ($) {
         },
         filter: function (facet, value) {
             // new query and return new result object
-            return _result;
+            return this;
         }
     }
-    
 
     /**
-     * Instantiates an subjectClass object, which contains the label,
+     * Return the length of the associative array "subjects"
+     * @return len length of subjects
+     */
+    _result.sizeOfSubjects = function () {
+        var len = 0;
+        for (var subject in this.subjects) {
+            if (this.subjects.hasOwnProperty(subject)) len++;
+        }
+        return len;
+    }
+
+    /**
+     * Instantiates one facet object, which contains to
+     * one specific subject.
+     * @constructor
+     * @param {String} uri uri of facet
+     * @param {String} type type could be for instance uri, literal
+     * @param {String} label label is a human readable format of the facet
+     */
+    function Facet (uri, type, label) {
+        this.URI = uri;
+        this.type = type;
+        this.label = label;
+        return this;
+    }
+
+    /**
+     * Instantiates an subject object, which contains the label,
      * all of them properties (facets, including values),
      * and the source of the subject (endpoint).
      * @constructor
      * @param {String} label label of subject
-     * @param {Array} facets properties of subject
+     * @param {Object} facets properties of subject
      * @param {Array} endpoints source of subject
      */
     function Subject (subjectURI, label, endpoints) {
         this.URI = subjectURI;
         this.label = label;
-        this.facets = null;
+        this.facets = {};
         this.endpoints = endpoints;
         return this;
     }
 
-    Subject.prototype.addFacet = function (uri, label) {
-        var newFacet = {
-            facetURI : uri,
-            label    : label
-        }
-        this.facets.push(newFacet);
+    Subject.prototype.addFacet = function (uri, type, label) {
+        this.facets[uri] = new Facet(uri, type, label);
     }
 
-    function _createResultObject () {
-
+    Subject.prototype.sizeOfFacets = function () {
+        var len = 0;
+        for (var f in this.facets) {
+            if (this.facets.hasOwnProperty(f)) len++;
+        }
+        return len;
     }
 
     /**
@@ -149,9 +201,10 @@ Alida = (function ($) {
     function _parseFirstRequestJSON (data, endpoint) {
         var JSONresult = $.parseJSON(data);
         $(JSONresult.bindings).each(function (i) {
-            //alert(JSONresult.bindings[i].s.value+' - '+JSONresult.bindings[i].search.value);
-            _result.subjects[JSONresult.bindings[i].s.value] = new Subject (JSONresult.bindings[i].s.value, JSONresult.bindings[i].search.value, endpoint);
-            //_getFacetsOfSubject (result.bindings[i].s.value);
+            _result.subjects[JSONresult.bindings[i].s.value] =
+                new Subject (JSONresult.bindings[i].s.value,
+                             JSONresult.bindings[i].search.value,
+                             endpoint);
         });
 
     }
@@ -186,18 +239,6 @@ Alida = (function ($) {
         },
         
         /**
-         * var result = {
-         *     subjectURI: {
-         *         facets: [{uri: facetURI, label: facetLabel, count: 5}, ...], 
-         *         endpoints: []
-         *     }, 
-         *     subjectURI2: ...
-         * }
-         *
-         *
-         */
-
-        /**
          * Inits a query.
          * @param {String] searchString Search string
          * @param {function} resultCallback Resultcallback will be called, when all results are available
@@ -205,7 +246,6 @@ Alida = (function ($) {
          */
         query: function (searchString, resultCallback, errorCallback) {
             //each query get a new result object
-            //TODO reset _result
             $(_endpoints).each( function (i) {
                 //TODO headerabfrage
                 //do an ajax request
@@ -225,6 +265,7 @@ Alida = (function ($) {
                     success: function (data, textStatus, XMLHttpRequest) {
                         //Success output
                         //alert('success\n'+data + textStatus, XMLHttpRequest);
+                        _result['query'] = _createQuery(searchString);
                         switch (XMLHttpRequest.getResponseHeader("Content-Type")){
                             case XML:
                                 //alert('XML');
@@ -268,17 +309,3 @@ Alida = (function ($) {
     };
     
 })(jQuery);
-
-/*
- Beispiel:
- 
- funtion alidaResult() {
-     
- }
- 
- Alida.query('ttt', 'alidaResult')
-
-
-
-
-*/
