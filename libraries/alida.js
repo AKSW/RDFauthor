@@ -8,7 +8,7 @@ Alida = (function ($) {
 
     /** Default options */
     var _defaultOptions = {
-        timeout: 10000,
+        timeout: 20000,
         limit: 5
     };
 
@@ -78,11 +78,10 @@ Alida = (function ($) {
                                             if (jQuery.isFunction(resultCallback)) {
                                                 resultCallback();
                                             }
-                                            return this;
                                         }
                                         break;
                                     default:
-                                        return false;
+                                        window.console.info('Error while getting facets');
                                 }
                             }
                         }); // End of ajax request part
@@ -159,8 +158,10 @@ Alida = (function ($) {
         return len;
     }
     
-    Subject.prototype.getValues = function (facet) {
+    Subject.prototype.getValues = function (facet, callback) {
         var addValueToFacet = this.facets[String(facet)].values;
+        var subjectURI = this.URI;
+        var facetURI = String(facet);
         var valueQuery = "SELECT DISTINCT ?value WHERE { <" 
                        + this.URI
                        + "> <"
@@ -176,6 +177,8 @@ Alida = (function ($) {
             url: this.endpoints,
             data: "query="+escape(valueQuery),
             success: function (data, textStatus, XMLHttpRequest) {
+                var value = undefined;
+                var type = undefined;
                 //Success output
                 //alert('success\n'+data + textStatus, XMLHttpRequest);
                 switch (XMLHttpRequest.getResponseHeader("Content-Type")){
@@ -188,8 +191,8 @@ Alida = (function ($) {
                         //alert(XMLHttpRequest.responseText);
                         var JSONvalue = $.parseJSON(XMLHttpRequest.responseText);
                         $(JSONvalue.bindings).each(function(i) {
-                            var value = JSONvalue.bindings[i].value.value;
-                            var type = JSONvalue.bindings[i].value.type;
+                            value = JSONvalue.bindings[i].value.value;
+                            type = JSONvalue.bindings[i].value.type;
                             //alert(type + ' - ' + value);
                             addValueToFacet.push({
                                 type: type,
@@ -198,6 +201,9 @@ Alida = (function ($) {
                             });
                         });
                         break;
+                }
+                if (jQuery.isFunction(callback)) {
+                    callback(value, type, subjectURI, facetURI);
                 }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -347,11 +353,10 @@ Alida = (function ($) {
                             errorCallback();
                         }
                     }
-
+                    
                 }); // End of ajax request part
 
             }); // End of _endpoints array
-
         }, 
 
         /**
