@@ -48,11 +48,15 @@ $(document).ready(function() {
                     test(subjectURI, resultTemp.subjects[subjectURI].sizeOfFacets(), function() {
                         for (var f in resultTemp.subjects[subjectArray[numS]].facets) {
                             ok(typeof resultTemp.subjects[subjectArray[numS]].facets[f] == 'object','[ ' + f + ' ] should be of type \'object\'.');
-                            resultTemp.subjects[subjectArray[numS]].getValues(resultTemp.subjects[subjectArray[numS]].facets[f],function(value,type,subject,facet) {
-                                module('facet values');
-                                test(subject + ' - ' + facet, 2, function() {
-                                    ok(value.length != 0,'value != null. Result: ' + value);
+                            resultTemp.subjects[subjectArray[numS]].getValues(resultTemp.subjects[subjectArray[numS]].facets[f],function(fvalue,type,value,label,subject,facet) {
+                                module('facet values and callback test');
+                                test(subject + ' - ' + facet, 6, function() {
+                                    ok(fvalue[type] == 'literal' || 'uri', 'fvalue[type]is literal or uri. Result: ' + fvalue[type]);
+                                    ok(fvalue[value].length != 0,'fvalue[value] != null. Result: ' + fvalue[value]);
+                                    ok(fvalue[label].length != 0,'fvalue[label] != null. Result: ' + fvalue[label]);
                                     ok(type == 'literal' || 'uri', 'Facet value type is literal or uri. Result: ' + type);
+                                    ok(value.length != 0,'value != null. Result: ' + value);
+                                    ok(label.length != 0,'label != null. Result: ' + label);
                                 });
                             });
                         }

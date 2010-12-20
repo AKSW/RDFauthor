@@ -145,8 +145,8 @@ Alida = (function ($) {
     }
 
     Subject.prototype.addFacet = function (uri, type) {
-        //TODO cut uri for label
-        var label = "label will be insert here";
+        //TODO test label
+        var label = this.URI.trimURI();
         this.facets[uri] = new Facet(uri, type, label);
     }
 
@@ -177,8 +177,10 @@ Alida = (function ($) {
             url: this.endpoints,
             data: "query="+escape(valueQuery),
             success: function (data, textStatus, XMLHttpRequest) {
-                var value = undefined;
-                var type = undefined;
+                var value = null;
+                var type = null;
+                var label = null;
+                fvalue = {};
                 //Success output
                 //alert('success\n'+data + textStatus, XMLHttpRequest);
                 switch (XMLHttpRequest.getResponseHeader("Content-Type")){
@@ -193,17 +195,21 @@ Alida = (function ($) {
                         $(JSONvalue.bindings).each(function(i) {
                             value = JSONvalue.bindings[i].value.value;
                             type = JSONvalue.bindings[i].value.type;
+                            label = value.trimURI();
                             //alert(type + ' - ' + value);
+                            fvalue[type] = type;
+                            fvalue[value] = value;
+                            fvalue[label] = label;
                             addValueToFacet.push({
                                 type: type,
                                 value: value,
-                                label: "label here" //TODO uri cutten
+                                label: label //TODO uri cutten
                             });
                         });
                         break;
                 }
                 if (jQuery.isFunction(callback)) {
-                    callback(value, type, subjectURI, facetURI);
+                    callback(fvalue,type, value, label, subjectURI, facetURI);
                 }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -211,6 +217,24 @@ Alida = (function ($) {
                 alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
             }
         });
+    }
+
+    String.prototype.trimURI = function () {
+        // Splitting the label part from the uri
+        if ( (sharpIndex = this.lastIndexOf("#")) != -1 ) {
+            label = this.slice(sharpIndex+1,this.length);
+        } else {
+            slashIndex = this.lastIndexOf("/");
+            label = this.slice(slashIndex+1,this.length);
+        }
+        //looking for concatenated words and seperate them by whitespace
+        while ( (pos = label.search(/[a-z][A-Z]/)) != -1 ) {
+            label = label.substr(0,pos+1) + " "  + label.substr(pos+1,label.length);
+        }
+        label = label.replace(/_/," / ");
+        // doesn't work yet
+        label[0] = label[0].toUpperCase();
+        return label;
     }
 
     /**
