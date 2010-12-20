@@ -58,9 +58,9 @@ Alida = (function ($) {
                                         //alert('JSON - getFacet');
                                         //alert(XMLHttpRequest.responseText);
                                         var JSONfacets = $.parseJSON(XMLHttpRequest.responseText);
-                                        $(JSONfacets.bindings).each(function(i) {
-                                            var facetUri = JSONfacets.bindings[i].facet.value;
-                                            var type = JSONfacets.bindings[i].facet.type;
+                                        $(JSONfacets.results.bindings).each(function(i) {
+                                            var facetUri = JSONfacets.results.bindings[i].facet.value;
+                                            var type = JSONfacets.results.bindings[i].facet.type;
                                             _result.subjects[tempSubject[curLen]].addFacet(facetUri,type);
                                         });
                                         break;
@@ -192,9 +192,9 @@ Alida = (function ($) {
                         //alert('JSON - getFacet');
                         //alert(XMLHttpRequest.responseText);
                         var JSONvalue = $.parseJSON(XMLHttpRequest.responseText);
-                        $(JSONvalue.bindings).each(function(i) {
-                            value = JSONvalue.bindings[i].value.value;
-                            type = JSONvalue.bindings[i].value.type;
+                        $(JSONvalue.results.bindings).each(function(i) {
+                            value = JSONvalue.results.bindings[i].value.value;
+                            type = JSONvalue.results.bindings[i].value.type;
                             label = value.trimURI();
                             //alert(type + ' - ' + value);
                             fvalue[type] = type;
@@ -207,6 +207,8 @@ Alida = (function ($) {
                             });
                         });
                         break;
+                    default:
+                       alert('Should not happen: ' + XMLHttpRequest.getResponseHeader("Content-Type"));
                 }
                 if (jQuery.isFunction(callback)) {
                     callback(fvalue,type, value, label, subjectURI, facetURI);
@@ -284,10 +286,11 @@ Alida = (function ($) {
      */
     function _parseFirstRequestJSON (data, endpoint) {
         var JSONresult = $.parseJSON(data);
-        $(JSONresult.bindings).each(function (i) {
-            _result.subjects[JSONresult.bindings[i].s.value] =
-                new Subject (JSONresult.bindings[i].s.value,
-                             JSONresult.bindings[i].search.value,
+        $(JSONresult.results.bindings).each(function (i) {
+            // alert(JSONresult.results.bindings[i].s.value + JSONresult.results.bindings[i].search.value);
+            _result.subjects[JSONresult.results.bindings[i].s.value] =
+                new Subject (JSONresult.results.bindings[i].s.value,
+                             JSONresult.results.bindings[i].search.value,
                              endpoint);
         });
 
