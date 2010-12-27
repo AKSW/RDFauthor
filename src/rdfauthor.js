@@ -434,7 +434,7 @@ RDFauthor = (function($, undefined) {
                 _predicateInfo = {};
 
                 /* query */
-                if (patterns.length > 0) {
+                if ((patterns.length > 0) && (filters.length > 0)) {
                     var query = '\
                         SELECT DISTINCT ?predicate ' + selects + '\
                         WHERE {' + patterns.join(' UNION ') + ' FILTER(' + filters.join(' || ') + ')}';
