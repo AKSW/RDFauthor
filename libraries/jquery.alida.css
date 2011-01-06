@@ -1,0 +1,131 @@
+
+
+/* css for alida-plugin */
+.alida{
+    z-index: 100000;
+    font-size: 0.8em !important;
+    border: 1px solid black;
+    width: 360px;
+    overflow: auto;
+    background-color: #FFFFFF;
+    position: absolute;
+    display: none;
+}
+
+.alida h3{
+	padding-left: 25px;
+}
+
+.alida ul, .alida li {
+    list-style-type: none;
+    list-style-position: inline;
+    padding: 0px;
+    margin:0px;
+    font-size: 1em;
+}
+
+.alida .sboxError{
+    color: red;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.even{
+    background-color: #eee;
+}
+
+.odd{
+    background-color: #fff;
+}
+
+#results{
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 1em;
+    font-style: inherit;
+    font-weight: bold;
+}
+
+#results li:hover{
+    background-color: #aaa;
+}
+
+#results li{
+    padding: 3px 5px 1px 10px;
+    cursor: pointer;
+}
+
+#endpoints li{
+    padding: 0px 5px 4px 10px;
+    cursor: pointer;
+}
+
+div.facetContainer {
+    background: #ccc;
+}
+
+#facets{
+/*
+    width: 130px;
+*/
+    float:left;
+    /*border-right: 1px solid black;*/
+    width: 39%;
+}
+
+#facets li{
+    padding: 3px 10px 3px 3px;
+    cursor: pointer;
+}
+
+#facets li:hover{
+    background-color: #eee;
+}
+
+#facetContent{
+    float:left;
+    /*border-left: 1px solid black;*/
+    width:60%;
+}
+
+#results .resultelementSubject{
+    color: #555;
+    font-size: 0.6em;
+    font-style: italic;
+    font-weight: lighter;
+}
+
+#resultlist{
+    height: 150px;
+    overflow: auto;
+}
+
+.selectedEntry{
+    background-color: #aaa;
+}
+
+.processing{
+    background-image:url("../images/spinner.gif") !important;
+    background-position:right center !important;
+    background-repeat:no-repeat !important;
+    cursor:wait !important;
+    min-height:0;
+}
+
+#noElements{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-style: italic;
+	color: #ccc;
+	font-size: large;
+	position: static;
+	text-align: center;
+	position: absolute;
+	top: 30%;
+	left: 20%;
+	display: none;
+}
+
+
+/* overriding the default jQuery padding */
+.ui-accordion-content { padding: 0px !important; }

@@ -13,7 +13,7 @@ Alida = (function ($) {
     };
 
     /** Endpoints array */
-    var _endpoints = new Array();
+    var _endpoints = [];
 
     /** MIME Type for XML */
     var XML = 'application/sparql-results+xml';
