@@ -38,14 +38,14 @@ Alida = (function ($) {
                                    + loopSubject.URI
                                    + "> ?facet  ?value}";
                     window.console.info(queryFacet);
-                    $(_endpoints).each( function (i) {
+                    $(_result.endpoints).each( function (i) {
                         $.ajax({
                             beforeSend: function (req) {
                                 req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
                             },
                             type: "GET",
                             timeout: _defaultOptions.timeout,
-                            url: _endpoints[i],
+                            url: _result.endpoints[i],
                             data: "query="+escape(queryFacet),
                             success: function (data, textStatus, XMLHttpRequest) {
                                 //Success output
@@ -365,7 +365,7 @@ Alida = (function ($) {
                             case JSON:
                                 //alert('JSON');
                                 //Parsing the JSON object
-                                _parseFirstRequestJSON(XMLHttpRequest.responseText, _endpoints[i]);
+                                _parseFirstRequestJSON(XMLHttpRequest.responseText, endpoints[i]);
                                 break;
                         }
                         //Resultcallback

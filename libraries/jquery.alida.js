@@ -66,8 +66,20 @@
         numEndpoints.html(' [' + settings.endpoints.length + ']');
     },
 
-    _insertResult = function (label) {
-        resultDOM.find('.results').append('<li>' + label + '</li>');
+    _insertResult = function (alidaID, label) {
+        $('#'+alidaID).find('.results').append('<li>' + label + '</li>');
+    },
+    
+    _insertFacet = function (alidaID, facet) {
+        var exist = false;
+        $('#'+alidaID).find('.facets').find('li').each(function() {
+            if($(this).html()==facet) {
+                exist = true;
+            }
+        });
+        if (exist == false) {
+            $('#'+alidaID).find('.facets').append('<li>' + facet + '</li>');
+        }
     },
 
     _showHideMonitoring = function (input, alidaID) {
@@ -122,16 +134,21 @@
         },options);
 
         return this.each(function(){
-            var alidaResult;
             var input = $(this);
             var alidaID = 'alida-' + _id();
+            var alidaResult;
             input.data('alidaID',alidaID);
             _init(input, settings, alidaID);
             Alida.query('Datenbank', settings.endpoints, function(result){
                 alidaResult = result;
-                for (var subjectURI in alidaResult.subjects) {
-                    _insertResult(alidaResult.subjects[subjectURI].label);
-                }
+                alidaResult.facets(function(){
+                    for (var subjectURI in alidaResult.subjects) {
+                        _insertResult(alidaID, alidaResult.subjects[subjectURI].label);
+                        for (var f in alidaResult.subjects[subjectURI].facets) {
+                            _insertFacet(alidaID, f);
+                        }
+                    }
+                });
             });
         });
     };

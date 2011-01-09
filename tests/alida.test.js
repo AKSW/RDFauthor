@@ -53,7 +53,7 @@ $(document).ready(function() {
     module('query');
     test('send query', 1, function(){
         stop();
-        Alida.query(search, function(result) {
+        Alida.query(search, ['http://localhost/ontowiki/sparql'],function(result) {
             start();
             resultTemp = result;
             ok(true,'Query successfully sent.');
@@ -68,7 +68,7 @@ $(document).ready(function() {
     
     module('facets');
     test('get facets', function() {
-        stop();
+        stop(); 
         resultTemp.facets(function() {
             start();
             ok(true,'Facets received successfully.');
