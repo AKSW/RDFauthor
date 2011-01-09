@@ -61,11 +61,14 @@
 
     _endpoints = function (settings) {
         $(settings.endpoints).each(function (i) {
-            Alida.addEndpoint(settings.endpoints[i]);
             endpointDOM.find('.endpoints').append('<li>' + settings.endpoints[i] + '</li>');
         });
         numEndpoints.html(' [' + settings.endpoints.length + ']');
-    }
+    },
+
+    _insertResult = function (label) {
+        resultDOM.find('.results').append('<li>' + label + '</li>');
+    },
 
     _showHideMonitoring = function (input, alidaID) {
         var alidaFocus;
@@ -119,10 +122,17 @@
         },options);
 
         return this.each(function(){
+            var alidaResult;
             var input = $(this);
             var alidaID = 'alida-' + _id();
             input.data('alidaID',alidaID);
             _init(input, settings, alidaID);
+            Alida.query('Datenbank', settings.endpoints, function(result){
+                alidaResult = result;
+                for (var subjectURI in alidaResult.subjects) {
+                    _insertResult(alidaResult.subjects[subjectURI].label);
+                }
+            });
         });
     };
 

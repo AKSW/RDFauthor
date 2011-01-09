@@ -10,7 +10,7 @@
         <script type="text/javascript" src="../libraries/alida.js"></script>
         <script type="text/javascript">
             //addEndpoint
-            Alida.addEndpoint('http://localhost/ontowiki/sparql');
+            //Alida.addEndpoint('http://localhost/ontowiki/sparql');
             //get Endpoint over function
             alert(Alida.getEndpoints()[0]);
             /**
@@ -41,7 +41,7 @@
 //                result.getValue(facetURI);
             }
             //send request to the endpoint
-            Alida.query('Datenbank',resultCallback);
+            Alida.query('Datenbank',['http://localhost/ontowiki/sparql'],resultCallback);
         </script>
     </head>
     <body>

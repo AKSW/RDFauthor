@@ -25,6 +25,7 @@ Alida = (function ($) {
     var _result = {
         //query : String,
         subjects: {/*subjectURI : Subject*/},
+        endpoints: [],
         facets: function (resultCallback) {
             var length = this.sizeOfSubjects();
             var curLen = 0;
@@ -310,7 +311,7 @@ Alida = (function ($) {
          * @param {String} endpointURI EndpointURI
          */
         addEndpoint: function (endpointURI) {
-            _endpoints.push(endpointURI);
+            _result.endpoints.push(endpointURI);
         },
 
         /**
@@ -318,7 +319,7 @@ Alida = (function ($) {
          * @return {Array} _endpoints Specified endpoints
          */
         getEndpoints: function () {
-            return _endpoints;
+            return _result.endpoints;
         },
         
         getResult: function () {
@@ -331,9 +332,11 @@ Alida = (function ($) {
          * @param {function} resultCallback Resultcallback will be called, when all results are available
          * @param {function} errorCallback Errorcallback will be called, when an error occurred
          */
-        query: function (searchString, resultCallback, errorCallback) {
+        query: function (searchString, endpoints, resultCallback, errorCallback) {
             //each query get a new result object
-            $(_endpoints).each( function (i) {
+            _result.endpoints = [];
+            $(endpoints).each( function (i) {
+                _result.endpoints = endpoints;
                 //TODO headerabfrage
                 //do an ajax request
                 $.ajax({
@@ -345,7 +348,7 @@ Alida = (function ($) {
 
                     timeout: _defaultOptions.timeout,
 
-                    url: _endpoints[i],
+                    url: endpoints[i],
 
                     data: "query="+escape(_createQuery(searchString)),
 
