@@ -19,6 +19,24 @@
         ALT         : 18,
         CTRL        : 17
     };
+    
+    String.prototype.trimURI = function () {
+        // Splitting the label part from the uri
+        if ( (sharpIndex = this.lastIndexOf("#")) != -1 ) {
+            label = this.slice(sharpIndex+1,this.length);
+        }else{
+            slashIndex = this.lastIndexOf("/");
+            label = this.slice(slashIndex+1,this.length);
+        }
+        //looking for concatenated words and seperate them by whitespace
+        while ( (pos = label.search(/[a-z][A-Z]/)) != -1 ) {
+            label = label.substr(0,pos+1) + " "  + label.substr(pos+1,label.length);
+        }
+        label = label.replace(/_/," / ");
+        // doesn't work yet
+        //label[0] = label[0].toUpperCase();
+        return label;
+    };
 
     /**
      * Private methods
@@ -67,19 +85,23 @@
     },
 
     _insertResult = function (alidaID, label) {
-        $('#'+alidaID).find('.results').append('<li>' + label + '</li>');
+        $('#'+alidaID).find('.results').append('<li>' + label + '</li>');        
     },
     
     _insertFacet = function (alidaID, facet) {
         var exist = false;
         $('#'+alidaID).find('.facets').find('li').each(function() {
-            if($(this).html()==facet) {
+            if($(this).html()==facet.trimURI()) {
                 exist = true;
             }
         });
         if (exist == false) {
-            $('#'+alidaID).find('.facets').append('<li>' + facet + '</li>');
+            $('#'+alidaID).find('.facets').append('<li>' + facet.trimURI() + '</li>');
         }
+    },
+    
+    _reset = function (alidaID) {
+        $('#'+alidaID .results).empty();
     },
 
     _showHideMonitoring = function (input, alidaID) {
@@ -135,21 +157,55 @@
 
         return this.each(function(){
             var input = $(this);
+            var typingDelay;
             var alidaID = 'alida-' + _id();
             var alidaResult;
             input.data('alidaID',alidaID);
             _init(input, settings, alidaID);
-            Alida.query('Datenbank', settings.endpoints, function(result){
-                alidaResult = result;
-                alidaResult.facets(function(){
-                    for (var subjectURI in alidaResult.subjects) {
-                        _insertResult(alidaID, alidaResult.subjects[subjectURI].label);
-                        for (var f in alidaResult.subjects[subjectURI].facets) {
-                            _insertFacet(alidaID, f);
+            
+            input.keydown(function(event) {
+                switch(event.which){
+                    case KEY.ESC : 
+                        $('#'+alidaID).hide();
+                        break;
+                    default:
+                        if (typingDelay) {
+                            window.clearInterval(typingDelay);
                         }
-                    }
-                });
+                        typingDelay = setInterval(query, settings.delay);
+                        break;
+                }
             });
+            
+            query = function () {
+                _reset(alidaID);
+                window.clearInterval(typingDelay);
+                Alida.query(input.val(), settings.endpoints, function(result){
+                    alidaResult = result;
+                    alidaResult.facets(function(){
+                        for (var subjectURI in alidaResult.subjects) {
+                            _insertResult(alidaID, alidaResult.subjects[subjectURI].label);
+                            $('#'+alidaID+' .results li').each(function(i){
+                                if( i % 2 == 0 ){
+                                    $(this).addClass('even');
+                                }else{
+                                    $(this).addClass('odd');
+                                }
+                            });
+                            for (var f in alidaResult.subjects[subjectURI].facets) {
+                                _insertFacet(alidaID, f);
+                                $('#'+alidaID+' .facets li').each(function(i){
+                                    if( i % 2 == 0 ){
+                                        $(this).addClass('even');
+                                    }else{
+                                        $(this).addClass('odd');
+                                    }
+                                });
+                            }
+                        }
+                    });
+                });
+            };
         });
     };
 
