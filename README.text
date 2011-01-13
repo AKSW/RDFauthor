@@ -34,6 +34,11 @@ Three steps are required in order to use RDFauthor within your project.
 ## API Documentation ##
 RDFauthor's API documentation can be built with 
 [JsDoc Toolkit](http://code.google.com/p/jsdoc-toolkit/).
+You need to set two environment variables:
+
+- set `$JSDOCDIR` to the path under which you installed JsDoc (e.g. `/opt/local/jsdoc-toolkit`).
+- set `$JSDOCTEMPLATEDIR` to RDFauthor's documentation template dir (e.g. `/opt/local/rdfauthor/misc/jsdoc-template`). The template dir is located under `misc/jsdoc-templates` in your RDFauthor dir.
+
 Assuming `jsrun.sh` is available in you path, you can run JsDoc from within the 
 RDFauthor directory using the following command:
 

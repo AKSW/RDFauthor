@@ -30,7 +30,7 @@ function MobileController(options) {
         title: 'Edit Properties', 
         saveButtonTitle: 'Save', 
         cancelButtonTitle: 'Cancel', 
-        propertyButtonTitle: 'Add Property', 
+        propertyButtonTitle: 'Add', 
         container: 'body', 
         showButtons: true, 
         showPropertyButton: true, 
@@ -84,7 +84,7 @@ function MobileController(options) {
             }
             
             buttonHTML = '\
-                <div id="rdfauthor-buttons">\
+                <div id="rdfauthor-buttons" data-role="controlgroup" data-type="horizontal" >\
                     ' + propertyButton + '\
                     <button type="button" id="rdfauthor-button-cancel">' + self._options.cancelButtonTitle + '</button>\
                     <button type="button" id="rdfauthor-button-submit">' + self._options.saveButtonTitle + '</button>\
