@@ -12,18 +12,11 @@ Alida = (function ($) {
         limit: 5
     };
 
-    /** Endpoints array */
-    var _endpoints = [];
-
     /** MIME Type for XML */
     var XML = 'application/sparql-results+xml';
 
     /** MIME Type for JSON */
     var JSON = 'application/sparql-results+json';
-
-
-
-
 
     /**
      * Instantiates one facet object, which contains to
@@ -181,7 +174,7 @@ Alida = (function ($) {
      * @private
      * @param {XML} data XML document contains the first result
      */
-    function _parseFirstRequestXML (data) {
+    function _parseFirstRequestXML (data, endpoint, _result) {
         $(data).find('result').each(function () {
             $(this).find("binding").each(function () {
                 if (this.attributes[0].value=="s") {
@@ -212,11 +205,6 @@ Alida = (function ($) {
                              endpoint);
         });
 
-    }
-
-    function _newResult () {
-        var newResult = _result;
-        return newResult;
     }
     
     return {
@@ -375,7 +363,7 @@ Alida = (function ($) {
                             case XML:
                                 //alert('XML');
                                 //Parsing the XML object
-                                _parseFirstRequestXML(XMLHttpRequest.responseXML);
+                                _parseFirstRequestXML(XMLHttpRequest.responseXML,_result);
                                 break;
                             case JSON:
                                 //alert('JSON');

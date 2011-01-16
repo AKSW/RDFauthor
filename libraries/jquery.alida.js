@@ -92,15 +92,20 @@
         $('#'+alidaID).find('.results').append('<li>' + label + '</li>');        
     },
     
-    _insertFacet = function (alidaID, facet) {
+    _insertFacet = function (alidaID, facet, subjectURI) {
         var exist = false;
         $('#'+alidaID).find('.facets').find('li').each(function() {
             if($(this).html()==facet.trimURI()) {
                 exist = true;
+                var subjects = $(this).data('subjects');
+                subjects.push(subjectURI);
+                $(this).data('subjects', subjects);
             }
         });
         if (exist == false) {
             $('#'+alidaID).find('.facets').append('<li>' + facet.trimURI() + '</li>');
+            $('#'+alidaID).find('.facets li:last').data('uri',facet);
+            $('#'+alidaID).find('.facets li:last').data('subjects',[subjectURI]);
         }
     },
     
@@ -164,15 +169,19 @@
             var input = $(this);
             var typingDelay;
             var alidaID = 'alida-' + _id();
-            var alidaResult;
             var resultContainer = []
             input.data('alidaID',alidaID);
             _init(input, settings, alidaID);
+
+            $('#'+alidaID+' .facets li').live('click', function() {
+                alert($(this).data('uri') + ' - ' + $(this).data('subjects').length );
+            });
+
             
             input.keydown(function(event) {
                 switch(event.which){
                     case KEY.ESC : 
-                        input.hide();
+                        $('#'+alidaID).hide();
                         break;
                     default:
                         if (typingDelay) {
@@ -186,7 +195,7 @@
             query = function () {
                 _reset(alidaID);
                 window.clearInterval(typingDelay);
-                if (input.val().length >= settings.inputChars) {
+                if (input.val().length >= 3) {
                     Alida.query(input.val(), settings.endpoints, function(result){
                         resultContainer.push(result);
                         resultContainer.last().facets(function(){
@@ -200,7 +209,7 @@
                                     }
                                 });
                                 for (var f in resultContainer.last().subjects[subjectURI].facets) {
-                                    _insertFacet(alidaID, f);
+                                    _insertFacet(alidaID, f,subjectURI);
                                     $('#'+alidaID+' .facets li').each(function(i){
                                         if( i % 2 == 0 ){
                                             $(this).addClass('even');
@@ -214,6 +223,7 @@
                     });
                 }
             };
+            
         });
     };
 
