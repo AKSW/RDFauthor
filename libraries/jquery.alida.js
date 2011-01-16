@@ -1,6 +1,6 @@
 (function($) 
 {
-    var $widget, alidaDOM, endpointTitle, endpointDOM, facetTitle,
+    var alidaDOM, endpointTitle, endpointDOM, facetTitle,
         facetDOM, resultTitle, resultDOM, numEndpoints, numFacets, numResults;
     //keycodes
     var KEY = {
@@ -36,6 +36,10 @@
         // doesn't work yet
         //label[0] = label[0].toUpperCase();
         return label;
+    };
+
+    Array.prototype.last = function () {
+        return this[this.length-1];
     };
 
     /**
@@ -101,7 +105,8 @@
     },
     
     _reset = function (alidaID) {
-        $('#'+alidaID .results).empty();
+        $('#'+alidaID).find('.results').empty();
+        $('#'+alidaID).find('.facets').empty();
     },
 
     _showHideMonitoring = function (input, alidaID) {
@@ -160,13 +165,14 @@
             var typingDelay;
             var alidaID = 'alida-' + _id();
             var alidaResult;
+            var resultContainer = []
             input.data('alidaID',alidaID);
             _init(input, settings, alidaID);
             
             input.keydown(function(event) {
                 switch(event.which){
                     case KEY.ESC : 
-                        $('#'+alidaID).hide();
+                        input.hide();
                         break;
                     default:
                         if (typingDelay) {
@@ -180,31 +186,33 @@
             query = function () {
                 _reset(alidaID);
                 window.clearInterval(typingDelay);
-                Alida.query(input.val(), settings.endpoints, function(result){
-                    alidaResult = result;
-                    alidaResult.facets(function(){
-                        for (var subjectURI in alidaResult.subjects) {
-                            _insertResult(alidaID, alidaResult.subjects[subjectURI].label);
-                            $('#'+alidaID+' .results li').each(function(i){
-                                if( i % 2 == 0 ){
-                                    $(this).addClass('even');
-                                }else{
-                                    $(this).addClass('odd');
-                                }
-                            });
-                            for (var f in alidaResult.subjects[subjectURI].facets) {
-                                _insertFacet(alidaID, f);
-                                $('#'+alidaID+' .facets li').each(function(i){
+                if (input.val().length >= settings.inputChars) {
+                    Alida.query(input.val(), settings.endpoints, function(result){
+                        resultContainer.push(result);
+                        resultContainer.last().facets(function(){
+                            for (var subjectURI in resultContainer.last().subjects) {
+                                _insertResult(alidaID, resultContainer.last().subjects[subjectURI].label);
+                                $('#'+alidaID+' .results li').each(function(i){
                                     if( i % 2 == 0 ){
                                         $(this).addClass('even');
                                     }else{
                                         $(this).addClass('odd');
                                     }
                                 });
+                                for (var f in resultContainer.last().subjects[subjectURI].facets) {
+                                    _insertFacet(alidaID, f);
+                                    $('#'+alidaID+' .facets li').each(function(i){
+                                        if( i % 2 == 0 ){
+                                            $(this).addClass('even');
+                                        }else{
+                                            $(this).addClass('odd');
+                                        }
+                                    });
+                                }
                             }
-                        }
+                        });
                     });
-                });
+                }
             };
         });
     };

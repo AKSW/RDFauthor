@@ -24,6 +24,10 @@
                     'endpoints': ["http://localhost/ontowiki/sparql" ],
                     'limit': 5
                 });
+                $('#input3').alida({
+                    'endpoints': ["http://localhost/ontowiki/sparql" , "http://localhost/ontowiki-0.9.5/sparql"],
+                    'limit': 5
+                });
             });
         </script>
         <title>Testpage</title>
@@ -36,6 +40,10 @@
              <br><br><br><br><br><br>
             <p>
              <input id="input2" type="text" />
+            </p>
+             <br><br><br><br><br><br>
+            <p>
+             <input id="input3" type="text" />
             </p>
         </form>
         <p>

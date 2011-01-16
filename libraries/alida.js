@@ -21,92 +21,9 @@ Alida = (function ($) {
     /** MIME Type for JSON */
     var JSON = 'application/sparql-results+json';
 
-    /** result object */
-    var _result = {
-        //query : String,
-        subjects: {/*subjectURI : Subject*/},
-        endpoints: [],
-        facets: function (resultCallback) {
-            var length = this.sizeOfSubjects();
-            var curLen = 0;
-            var tempSubject = [];
-            for (var subjectURI in this.subjects) {
-                var loopSubject = this.subjects[subjectURI];
-                tempSubject.push(this.subjects[subjectURI].URI);
-                if (loopSubject instanceof Subject) {
-                    var queryFacet = "SELECT DISTINCT ?facet WHERE { <" 
-                                   + loopSubject.URI
-                                   + "> ?facet  ?value}";
-                    window.console.info(queryFacet);
-                    $(_result.endpoints).each( function (i) {
-                        $.ajax({
-                            beforeSend: function (req) {
-                                req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
-                            },
-                            type: "GET",
-                            timeout: _defaultOptions.timeout,
-                            url: _result.endpoints[i],
-                            data: "query="+escape(queryFacet),
-                            success: function (data, textStatus, XMLHttpRequest) {
-                                //Success output
-                                //alert('success\n'+data + textStatus, XMLHttpRequest);
-                                switch (XMLHttpRequest.getResponseHeader("Content-Type")){
-                                    case XML:
-                                        //alert('XML - getFacet');
-                                        //TODO parse facets and values and adds it to the right subject
-                                        break;
-                                    case JSON:
-                                        //alert('JSON - getFacet');
-                                        //alert(XMLHttpRequest.responseText);
-                                        var JSONfacets = $.parseJSON(XMLHttpRequest.responseText);
-                                        $(JSONfacets.results.bindings).each(function(i) {
-                                            var facetUri = JSONfacets.results.bindings[i].facet.value;
-                                            var type = JSONfacets.results.bindings[i].facet.type;
-                                            _result.subjects[tempSubject[curLen]].addFacet(facetUri,type);
-                                        });
-                                        break;
-                                }
-                            },
-                            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                                //Error output
-                                alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
-                            },
-                            complete: function (XMLHttpRequest, textStatus) {
-                                switch (textStatus) {
-                                    case "success":
-                                        curLen++;
-                                        if (length == curLen) {
-                                            if (jQuery.isFunction(resultCallback)) {
-                                                resultCallback();
-                                            }
-                                        }
-                                        break;
-                                    default:
-                                        window.console.info('Error while getting facets');
-                                }
-                            }
-                        }); // End of ajax request part
-                    });
-                } 
-            }
-        },
-        filter: function (facet, value) {
-            // new query and return new result object
-            return this;
-        }
-    }
 
-    /**
-     * Return the length of the associative array "subjects"
-     * @return len length of subjects
-     */
-    _result.sizeOfSubjects = function () {
-        var len = 0;
-        for (var subject in this.subjects) {
-            if (this.subjects.hasOwnProperty(subject)) len++;
-        }
-        return len;
-    }
+
+
 
     /**
      * Instantiates one facet object, which contains to
@@ -285,16 +202,21 @@ Alida = (function ($) {
      * @param {String} data JSON String contains the first result
      * @param {String} endpoint endpoint url
      */
-    function _parseFirstRequestJSON (data, endpoint) {
+    function _parseFirstRequestJSON (data, endpoint, result) {
         var JSONresult = $.parseJSON(data);
         $(JSONresult.results.bindings).each(function (i) {
             // alert(JSONresult.results.bindings[i].s.value + JSONresult.results.bindings[i].search.value);
-            _result.subjects[JSONresult.results.bindings[i].s.value] =
+            result.subjects[JSONresult.results.bindings[i].s.value] =
                 new Subject (JSONresult.results.bindings[i].s.value,
                              JSONresult.results.bindings[i].search.value,
                              endpoint);
         });
 
+    }
+
+    function _newResult () {
+        var newResult = _result;
+        return newResult;
     }
     
     return {
@@ -333,10 +255,101 @@ Alida = (function ($) {
          * @param {function} errorCallback Errorcallback will be called, when an error occurred
          */
         query: function (searchString, endpoints, resultCallback, errorCallback) {
+            //var newResult = _newResult();
+
+
+
+
             //each query get a new result object
-            _result.endpoints = [];
+            //_result.endpoints = endpoints
             $(endpoints).each( function (i) {
-                _result.endpoints = endpoints;
+
+
+                /** result object */
+                var _result = {
+                    //query : String,
+                    subjects: {/*subjectURI : Subject*/},
+                    endpoints: [],
+                    facets: function (resultCallback) {
+                        var length = this.sizeOfSubjects();
+                        var curLen = 0;
+                        var tempSubject = [];
+                        var thisResult = this;
+                        for (var subjectURI in this.subjects) {
+                            var loopSubject = this.subjects[subjectURI];
+                            tempSubject.push(this.subjects[subjectURI].URI);
+                            if (loopSubject instanceof Subject) {
+                                var queryFacet = "SELECT DISTINCT ?facet WHERE { <"
+                                               + loopSubject.URI
+                                               + "> ?facet  ?value}";
+                                window.console.info(queryFacet);
+                                $(thisResult.endpoints).each( function (i) {
+                                    $.ajax({
+                                        beforeSend: function (req) {
+                                            req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
+                                        },
+                                        type: "GET",
+                                        timeout: _defaultOptions.timeout,
+                                        url: thisResult.endpoints[i],
+                                        data: "query="+escape(queryFacet),
+                                        success: function (data, textStatus, XMLHttpRequest) {
+                                            //Success output
+                                            //alert('success\n'+data + textStatus, XMLHttpRequest);
+                                            switch (XMLHttpRequest.getResponseHeader("Content-Type")){
+                                                case XML:
+                                                    //alert('XML - getFacet');
+                                                    //TODO parse facets and values and adds it to the right subject
+                                                    break;
+                                                case JSON:
+                                                    //alert('JSON - getFacet');
+                                                    //alert(XMLHttpRequest.responseText);
+                                                    var JSONfacets = $.parseJSON(XMLHttpRequest.responseText);
+                                                    $(JSONfacets.results.bindings).each(function(i) {
+                                                        var facetUri = JSONfacets.results.bindings[i].facet.value;
+                                                        var type = JSONfacets.results.bindings[i].facet.type;
+                                                        thisResult.subjects[tempSubject[curLen]].addFacet(facetUri,type);
+                                                    });
+                                                    break;
+                                            }
+                                        },
+                                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                            //Error output
+                                            alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
+                                        },
+                                        complete: function (XMLHttpRequest, textStatus) {
+                                            switch (textStatus) {
+                                                case "success":
+                                                    curLen++;
+                                                    if (length == curLen) {
+                                                        if (jQuery.isFunction(resultCallback)) {
+                                                            resultCallback();
+                                                        }
+                                                    }
+                                                    break;
+                                                default:
+                                                    window.console.info('Error while getting facets');
+                                            }
+                                        }
+                                    }); // End of ajax request part
+                                });
+                            }
+                        }
+                    },
+                    sizeOfSubjects: function () {
+                        var len = 0;
+                        for (var subject in this.subjects) {
+                            if (this.subjects.hasOwnProperty(subject)) len++;
+                        }
+                        return len;
+                    },
+                    filter: function (facet, value) {
+                        // new query and return new result object
+                        return this;
+                    }
+                };
+
+                _result.endpoints.push(endpoints[i]);
+
                 //TODO headerabfrage
                 //do an ajax request
                 $.ajax({
@@ -353,8 +366,10 @@ Alida = (function ($) {
                     data: "query="+escape(_createQuery(searchString)),
 
                     success: function (data, textStatus, XMLHttpRequest) {
+                        
                         //Success output
                         //alert('success\n'+data + textStatus, XMLHttpRequest);
+                        //_result['query'] = _createQuery(searchString);
                         _result['query'] = _createQuery(searchString);
                         switch (XMLHttpRequest.getResponseHeader("Content-Type")){
                             case XML:
@@ -365,11 +380,12 @@ Alida = (function ($) {
                             case JSON:
                                 //alert('JSON');
                                 //Parsing the JSON object
-                                _parseFirstRequestJSON(XMLHttpRequest.responseText, endpoints[i]);
+                                _parseFirstRequestJSON(XMLHttpRequest.responseText, endpoints[i],_result);
                                 break;
                         }
                         //Resultcallback
                         if( jQuery.isFunction(resultCallback) ) {
+                            
                             resultCallback(_result);
                         }
                     },
