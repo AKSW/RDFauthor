@@ -979,7 +979,7 @@ RDFauthor = (function($, undefined) {
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js'); /* Predicate Row */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.selector.js');     /* Property selector */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js'); /* Subject Group */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.popovercontroller.js');   /* ViewController */
+    //_require(RDFAUTHOR_BASE + 'src/rdfauthor.popovercontroller.js');   /* ViewController */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.mobilecontroller.js');   /* ViewController */
     _require(RDFAUTHOR_BASE + 'src/rdfauthor.inlinecontroller.js'); /* InlineViewController */
     _require(__RDFA_BASE + 'rdfa.js');                          /* RDFA */
