@@ -17,15 +17,11 @@
         <script type="text/javascript">
             $().ready(function(){
                 $('#input').alida({
-                    'endpoints': ["http://catalogus-professorum.org/sparql", "http://od.fmi.uni-leipzig.de/sparql", "http://localhost/ontowiki/sparql" ],
+                    'endpoints': [/*"http://catalogus-professorum.org/sparql", "http://od.fmi.uni-leipzig.de/sparql", */"http://localhost/ontowiki/sparql" ],
                     'limit': 5
                 });
                 $('#input2').alida({
                     'endpoints': ["http://localhost/ontowiki/sparql" ],
-                    'limit': 5
-                });
-                $('#input3').alida({
-                    'endpoints': ["http://localhost/ontowiki/sparql" , "http://localhost/ontowiki-0.9.5/sparql"],
                     'limit': 5
                 });
             });
@@ -40,10 +36,6 @@
              <br><br><br><br><br><br>
             <p>
              <input id="input2" type="text" />
-            </p>
-             <br><br><br><br><br><br>
-            <p>
-             <input id="input3" type="text" />
             </p>
         </form>
         <p>

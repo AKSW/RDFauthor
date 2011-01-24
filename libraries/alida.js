@@ -174,7 +174,7 @@ Alida = (function ($) {
      * @private
      * @param {XML} data XML document contains the first result
      */
-    function _parseFirstRequestXML (data, endpoint, _result) {
+    function _parseFirstRequestXML (data, endpoint, result) {
         $(data).find('result').each(function () {
             $(this).find("binding").each(function () {
                 if (this.attributes[0].value=="s") {
@@ -381,7 +381,6 @@ Alida = (function ($) {
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
                         //Error output
                         alert('Error:' + XMLHttpRequest + ' ' + textStatus + ' ' + errorThrown);
-
                         //Errorcallback
                         if( jQuery.isFunction(errorCallback) ) {
                             errorCallback();

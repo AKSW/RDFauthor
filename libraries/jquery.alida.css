@@ -13,7 +13,7 @@
 }
 
 .alida h3{
-	padding-left: 25px;
+    padding-left: 25px;
 }
 
 .alida ul, .alida li {
@@ -65,28 +65,23 @@ div.facetContainer {
     background: #ccc;
 }
 
-#facets{
-/*
-    width: 130px;
-*/
-    float:left;
-    /*border-right: 1px solid black;*/
-    width: 39%;
+.facets{
+    /*float: left;*/
+    /*width: 50%;*/
 }
 
-#facets li{
+.facets li{
     padding: 3px 10px 3px 3px;
     cursor: pointer;
 }
 
-#facets li:hover{
+.facets li:hover{
     background-color: #eee;
 }
 
-#facetContent{
-    float:left;
-    /*border-left: 1px solid black;*/
-    width:60%;
+.facetContent{
+    /*float: left;*/
+    /*width: 50%;*/
 }
 
 #results .resultelementSubject{
