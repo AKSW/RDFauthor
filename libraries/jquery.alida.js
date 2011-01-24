@@ -55,7 +55,8 @@
             endpointTitle = $('<h3>' + settings.strings.endpointString + '</h3>'),
             endpointDOM = $('<div></div>').append('<ul class="endpoints"></ul>'),
             facetTitle = $('<h3>' + settings.strings.facetString + '</h3>'),
-            facetDOM = $('<div></div>').append('<ul class="facets"></ul>')
+            facetDOM = $('<div></div>').append('<span class="facet-run">facet-run</span>')
+                                       .append('<ul class="facets"></ul>')
                                        .append('<ul class="facetContent"></ul>'),
             resultTitle = $('<h3>' + settings.strings.resultString + '</h3>'),
             resultDOM = $('<div></div>').append('<ul class="results"></ul>')
@@ -88,6 +89,11 @@
         });
         numEndpoints.html(' [' + settings.endpoints.length + ']');
     },
+    
+    _addFacetRun = function (alidaID, facetrun) {
+        var run = $('#'+alidaID).find('.facet-run').html() + '»' + facetrun;
+        $('#'+alidaID).find('.facet-run').html(run)
+    },
 
     _insertResult = function (alidaID, label) {
         $('#'+alidaID).find('.results').append('<li>' + label + '</li>');
@@ -117,6 +123,9 @@
     _reset = function (alidaID) {
         $('#'+alidaID).find('.results').empty();
         $('#'+alidaID).find('.facets').empty();
+        $('#'+alidaID).find('.facetContent').empty();
+        $('#'+alidaID).find('.numberOfFacets').empty();
+        $('#'+alidaID).find('.numberOfResults').empty();
     },
 
     _showHideMonitoring = function (input, alidaID) {
@@ -186,6 +195,11 @@
                 var faceturi = $(this).data('uri');
                 var subjects = $(this).data('subjects');
                 var result = $('#'+alidaID).data('input').data('resultContainer').last();
+                var left = $('#'+alidaID+'.facetContent');
+                left.animate({
+                    "right":"-=50px"
+                });
+                _addFacetRun(alidaID,$(this).html());
                 //alert($(this).data('uri') + ' - ' + $(this).data('subjects').length + ' - ' + $('#'+alidaID).data('input').data('resultContainer').length);
                 $(subjects).each(function(i){
                     result.subjects[subjects[i]].getValues(faceturi, function(fvalue) {
@@ -223,7 +237,12 @@
                 window.clearInterval(typingDelay);
                 
                 if (searchString.length >= settingsTemp.inputChars) {
-                    Alida.query(searchString, settingsTemp.endpoints, function(result){
+                    Alida.query(searchString, settingsTemp.endpoints, function(){
+                        //startCallback
+                        input.addClass('spinner');
+                    }, 
+                    function(result){
+                        //resultCallback
                         resultContainerTemp.push(result);
                         resultContainerTemp.last().facets(function() {
                             for (var subjectURI in resultContainerTemp.last().subjects) {
@@ -248,6 +267,9 @@
                                 }
                             }
                         });
+                    },
+                    function(){
+                        input.removeClass('spinner');
                     });
                 }
             };

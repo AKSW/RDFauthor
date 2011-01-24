@@ -242,14 +242,12 @@ Alida = (function ($) {
          * @param {function} resultCallback Resultcallback will be called, when all results are available
          * @param {function} errorCallback Errorcallback will be called, when an error occurred
          */
-        query: function (searchString, endpoints, resultCallback, errorCallback) {
-            //var newResult = _newResult();
-
-
-
+        query: function (searchString, endpoints, onStartCallback, resultCallback, onStopCallback, errorCallback) {
+            if( jQuery.isFunction(onStartCallback) ) {
+                onStartCallback();
+            }
 
             //each query get a new result object
-            //_result.endpoints = endpoints
             $(endpoints).each( function (i) {
 
 
@@ -312,6 +310,9 @@ Alida = (function ($) {
                                                         if (jQuery.isFunction(resultCallback)) {
                                                             resultCallback();
                                                         }
+                                                        if (jQuery.isFunction(onStopCallback)) {
+                                                            onStopCallback();
+                                                        }
                                                     }
                                                     break;
                                                 default:
@@ -373,7 +374,6 @@ Alida = (function ($) {
                         }
                         //Resultcallback
                         if( jQuery.isFunction(resultCallback) ) {
-                            
                             resultCallback(_result);
                         }
                     },

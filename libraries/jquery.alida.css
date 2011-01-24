@@ -70,6 +70,13 @@ div.facetContainer {
     /*width: 50%;*/
 }
 
+.facet-run{
+    background-color: black;
+    border-bottom: white;
+    color: white;
+    width: 100%;
+}
+
 .facets li{
     padding: 3px 10px 3px 3px;
     cursor: pointer;
@@ -100,8 +107,8 @@ div.facetContainer {
     background-color: #aaa;
 }
 
-.processing{
-    background-image:url("../images/spinner.gif") !important;
+.spinner{
+    background-image:url("spinner.gif") !important;
     background-position:right center !important;
     background-repeat:no-repeat !important;
     cursor:wait !important;
