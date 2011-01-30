@@ -87,7 +87,10 @@ RDFauthor.registerWidget({
             );
             
             if (somethingChanged || this.removeOnSubmit) {
-                databank.remove(this.statement.asRdfQueryTriple());
+                var rdfqTriple = this.statement.asRdfQueryTriple();
+                if (rdfqTriple) {
+                    databank.remove(String(rdfqTriple));
+                }
             }
             
             // new statement must not be empty

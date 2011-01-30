@@ -64,7 +64,10 @@ RDFauthor.registerWidget({
             var isNew = !this.statement.hasObject() && (null !== this.value());
             
             if (somethingChanged || this.removeOnSubmit) {
-                databank.remove(this.statement.asRdfQueryTriple());
+                var rdfqTriple = this.statement.asRdfQueryTriple();
+                if (rdfqTriple) {
+                    databank.remove(String(rdfqTriple));
+                }
             }
             
             if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {

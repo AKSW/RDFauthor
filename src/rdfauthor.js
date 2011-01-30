@@ -43,7 +43,7 @@ RDFauthor = (function($, undefined) {
     var SCRIPT_STATE_LOADING = 1;
     
     /** script is ready */
-    var SCRIPT_STATE_READY   = 2;
+    var SCRIPT_STATE_READY = 2;
     
     /** Databanks indexed by graph URI. */
     var _databanksByGraph = {};
@@ -859,7 +859,8 @@ RDFauthor = (function($, undefined) {
     
     function _restoreDatabanks() {
         for (var g in _extractedByGraph) {
-            if (undefined !== _extractedByGraph[g] && _extractedByGraph[g] instanceof $.rdf.databank) {
+            if (undefined !== _extractedByGraph[g] 
+                && _extractedByGraph[g] instanceof $.rdf.databank) {
                 // restore databank
                 _databanksByGraph[g] = _extractedByGraph[g];
             }
@@ -931,12 +932,14 @@ RDFauthor = (function($, undefined) {
                     
                     var addedArray = $.makeArray(added.triples());
                     if (addedArray.length > 0) {
-                        updateQuery += '\nINSERT DATA INTO <' + g + '> {' + addedArray.join('\n').replace('""""', '"""') + '}';
+                        updateQuery += '\nINSERT DATA INTO <' + g + '> {' + 
+                        addedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
                     var removedArray = $.makeArray(removed.triples());
                     if (removedArray.length > 0) {
-                        updateQuery += '\nDELETE DATA FROM <' + g + '> {' + removedArray.join('\n').replace('""""', '"""') + '}';
+                        updateQuery += '\nDELETE DATA FROM <' + g + '> {' + 
+                        removedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
                     $.post(updateURI, {
@@ -947,8 +950,10 @@ RDFauthor = (function($, undefined) {
                     }, 'json');
                 } else {
                     // REST style
-                    var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
-                    var removedJSON = $.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
+                    var addedJSON = $.rdf.dump(added.triples(), 
+                                               {format: 'application/json', serialize: true});
+                    var removedJSON = $.rdf.dump(removed.triples(), 
+                                                 {format: 'application/json', serialize: true});
                     
                     /*
                     alert('Added: ' + addedJSON);
@@ -1141,7 +1146,8 @@ RDFauthor = (function($, undefined) {
                  } else if (undefined !== _options.defaultGraph) {
                      /* 2. options.defaultGraph */
                      _defaultGraphURI = _options.defaultGraph;
-                 } else if (undefined !== _graphInfo[_pageGraph()] && undefined !== _graphInfo[_pageGraph()]['defaultGraph']) {
+                 } else if (undefined !== _graphInfo[_pageGraph()] 
+                            && undefined !== _graphInfo[_pageGraph()]['defaultGraph']) {
                      /* 3. link w/ rel="update:defaultGraph" */
                      _defaultGraphURI = _graphInfo[_pageGraph()]['defaultGraph'];
                  } else {
@@ -1166,7 +1172,8 @@ RDFauthor = (function($, undefined) {
                  } else if (undefined !== _options.defaultSubject) {
                      /* 2. options.defaultSubject */
                      _defaultSubjectURI = _options.defaultSubject;
-                 } else if (undefined !== _graphInfo[_pageGraph()] && undefined !== _graphInfo[_pageGraph()]['defaultSubject']) {
+                 } else if (undefined !== _graphInfo[_pageGraph()] 
+                            && undefined !== _graphInfo[_pageGraph()]['defaultSubject']) {
                      /* 3. link w/ rel="update:defaultSubject" */
                      _defaultSubjectURI = _graphInfo[_pageGraph()]['defaultSubject'];
                  }
@@ -1208,7 +1215,8 @@ RDFauthor = (function($, undefined) {
         }, 
         
         /**
-         * Returns an instance of the widget that has been registered for <code>hookName</code> and <code>hookValue</code>.
+         * Returns an instance of the widget that has been registered 
+         * for <code>hookName</code> and <code>hookValue</code>.
          * @param {string} hookName
          * @param {mixed} hookValue
          * @param {Statement} statement The statement with which to initialize the widget
@@ -1303,7 +1311,8 @@ RDFauthor = (function($, undefined) {
                     infoSpec = _infoShortcuts[infoSpec];
                 }
 
-                if ((undefined !== _predicateInfo[predicateURI]) && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
+                if ((undefined !== _predicateInfo[predicateURI]) 
+                    && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
                     return _predicateInfo[predicateURI][infoSpec];
                 }
             }
@@ -1403,7 +1412,8 @@ RDFauthor = (function($, undefined) {
          *        <a href="http://www.w3.org/TR/rdf-sparql-json-res/">SPARQL Results JSON</a> object.</li>
          *    <li>{function} <code>callbackError</code> Function to be called if an error occurs.</li>
          *    <li>{boolean} <code>async</code> Function to be called if an error occurs. If false, the 
-         *        query result will be returned. Otherwise, callbackSuccess must be supplied and will be called.</li>
+         *        query result will be returned. Otherwise, callbackSuccess must be supplied and 
+         *        will be called.</li>
          *    <li>{string} <code>sparqlEndpoint</code> The URI for the SPARQL endpoint to be used.</li>
          *  </ul>  
          * @throws An exception if the graph queried has no associated SPARQL endpoint.

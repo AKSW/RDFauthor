@@ -123,7 +123,10 @@ RDFauthor.registerWidget({
             );
             
             if (hasChanged || this.removeOnSubmit) {
-                databank.remove(this.statement.asRdfQueryTriple());
+                var rdfqTriple = this.statement.asRdfQueryTriple();
+                if (rdfqTriple) {
+                    databank.remove(String(rdfqTriple));
+                }
             }
             
             if (!this.removeOnSubmit && this.value()) {
@@ -213,7 +216,7 @@ RDFauthor.registerWidget({
             RDFauthor.queryGraph(this.statement.graphURI(), query, {
                 callbackSuccess: function (data) {                
                     var sparqlResults = [];
-                    if (data['results'] && data['results']['bindings']) {
+                    if (data && data['results'] && data['results']['bindings']) {
                         var bindings  = data['results']['bindings'];
                         var resources = {};
 
