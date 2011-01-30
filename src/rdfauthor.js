@@ -249,9 +249,9 @@ RDFauthor = (function($, undefined) {
      * Calls its parameter if it is of type funtion.
      * @private
      */
-    function _callIfIsFunction(functionSpec) {
+    function _callIfIsFunction(functionSpec, params) {
         if ($.isFunction(functionSpec)) {
-            functionSpec();
+            functionSpec.apply(functionSpec, params);
         }
     }
     
@@ -438,9 +438,10 @@ RDFauthor = (function($, undefined) {
                 filters.push('sameTerm(?predicate, <' + predicate + '>)');
             }
         } else {
-            basePattern = '{?s ?predicate ?o .} UNION {?predicate a <http://www.w3.org/2000/01/rdf-schema#Property> . }';/*
-                UNION {?predicate a <http://www.w3.org/2002/07/owl#ObjectProperty> . }
-                UNION {?predicate a <http://www.w3.org/2002/07/owl#DatatypeProperty> . }';*/
+            basePattern = '{?s ?predicate ?o .} ' + 
+                'UNION {?predicate a <http://www.w3.org/2000/01/rdf-schema#Property> . } ' + 
+                'UNION {?predicate a <http://www.w3.org/2002/07/owl#ObjectProperty> . } ' + 
+                'UNION {?predicate a <http://www.w3.org/2002/07/owl#DatatypeProperty> . }';
         }
         
         if (patterns.length > 0) {  
@@ -940,10 +941,10 @@ RDFauthor = (function($, undefined) {
                     
                     $.post(updateURI, {
                         'query': updateQuery
-                    }, function () {
+                    }, function (responseData, textStatus, XHR) {
                         _view.hide(true);
-                        _callIfIsFunction(_options.onSubmitSuccess);
-                    });
+                        _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                    }, 'json');
                 } else {
                     // REST style
                     var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
@@ -960,10 +961,10 @@ RDFauthor = (function($, undefined) {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
                             'delete': removedJSON ? removedJSON : '{}'
-                        }, function () {
+                        }, function (responseData, textStatus, XHR) {
                             _view.hide(true);
-                            _callIfIsFunction(_options.onSubmitSuccess);
-                        });
+                            _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                        }, 'json');
                     }
                 }
             }
@@ -1435,7 +1436,9 @@ RDFauthor = (function($, undefined) {
                 data: parameters, 
                 async: o.async, 
                 /* request application/sparql-results+json */
-                beforeSend: function (XMLHTTPRequest) {XMLHTTPRequest.setRequestHeader('Accept', 'application/sparql-results+json');}
+                beforeSend: function (XMLHTTPRequest) {
+                    XMLHTTPRequest.setRequestHeader('Accept', 'application/sparql-results+json');
+                }
             };
             
             /* Success callback */
