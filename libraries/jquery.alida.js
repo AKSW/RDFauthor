@@ -1,6 +1,6 @@
 (function($) 
 {
-    var alidaDOM, endpointTitle, endpointDOM, facetTitle, typingDelay,
+    var alidaDOM, endpointTitle, endpointDOM, facetTitle, typingDelay,optQueryTemp,
         facetDOM, resultTitle, resultDOM, numEndpoints, numFacets, numResults;
     //keycodes
     var KEY = {
@@ -55,7 +55,10 @@
             endpointTitle = $('<h3>' + settings.strings.endpointString + '</h3>'),
             endpointDOM = $('<div></div>').append('<ul class="endpoints"></ul>'),
             facetTitle = $('<h3>' + settings.strings.facetString + '</h3>'),
-            facetDOM = $('<div></div>').append('<span class="facet-run">facet-run</span>')
+            facetDOM = $('<div></div>').addClass('facet-slide')
+                                       .append('<div class="facet-run-div">\
+                                               <button class="button-back">Back</button>\
+                                               <span class="facet-run"></span></div>')
                                        .append('<ul class="facets"></ul>')
                                        .append('<ul class="facetContent"></ul>'),
             resultTitle = $('<h3>' + settings.strings.resultString + '</h3>'),
@@ -95,8 +98,11 @@
         $('#'+alidaID).find('.facet-run').html(run)
     },
 
-    _insertResult = function (alidaID, label) {
+    _insertResult = function (alidaID, result) {
+        var label = result.label;
+        var uri = result.URI;
         $('#'+alidaID).find('.results').append('<li>' + label + '</li>');
+        $('#'+alidaID).find('.results li:last').data('uri',uri);
     },
     
     _insertFacet = function (alidaID, facet, subjectURI) {
@@ -116,16 +122,64 @@
         }
     },
     
-    _insertFacetValue = function (alidaID, facetValue) {
-        $('#'+alidaID).find('.facetContent').append('<li>' + facetValue + '</li>');
+    _insertFacetValue = function (alidaID, faceturi, fvalue) {
+        var exist = false;
+        var facetValueLabel = fvalue.label;
+        var facetValue = fvalue.value;
+        var facetValueType = fvalue.type;
+        $('#'+alidaID).find('.facetContent').find('li').each(function(i) {
+            if($(this).html()==facetValueLabel && facetValueLabel != undefined) {
+                exist = true;
+            }
+        });
+        if(exist == false && facetValueLabel != undefined) {
+            $('#'+alidaID).find('.facetContent').append('<li>' + facetValueLabel + '</li>');
+            $('#'+alidaID).find('.facetContent li:last').data('faceturi',faceturi);
+            $('#'+alidaID).find('.facetContent li:last').data('value',facetValue);
+            $('#'+alidaID).find('.facetContent li:last').data('type',facetValueType);
+            $('#'+alidaID).find('.facetContent li:last').data('label',facetValue);
+        }
+    },
+
+    _rebuiltContent = function (alidaID,result) {
+        _reset(alidaID);
+        for (var subjectURI in result.subjects) {
+            _insertResult(alidaID, result.subjects[subjectURI].label);
+            for (var f in result.subjects[subjectURI].facets) {
+                _insertFacet(alidaID, f,subjectURI);
+            }
+        }
+    },
+
+    _rdy = function (alidaID,result) {
+        $('#'+alidaID+' .numberOfResults').html(' [' + result.sizeOfSubjects() + ']');
+        // even odd to results
+        $('#'+alidaID+' .results li').each(function(i){
+            if( i % 2 == 0 ){
+                $(this).addClass('even');
+            }else{
+                $(this).addClass('odd');
+            }
+        });
+        // even odd to facets
+        $('#'+alidaID+' .facets li').each(function(i){
+            if( i % 2 == 0 ){
+                $(this).addClass('even');
+            }else{
+                $(this).addClass('odd');
+            }
+        });
     },
     
     _reset = function (alidaID) {
         $('#'+alidaID).find('.results').empty();
-        $('#'+alidaID).find('.facets').empty();
+        $('#'+alidaID).find('.facets').empty().slideDown();
         $('#'+alidaID).find('.facetContent').empty();
+        $('#'+alidaID).find('.facet-run-div').hide();
+        $('#'+alidaID).find('.facet-run').empty();
         $('#'+alidaID).find('.numberOfFacets').empty();
         $('#'+alidaID).find('.numberOfResults').empty();
+
     },
 
     _showHideMonitoring = function (input, alidaID) {
@@ -152,8 +206,6 @@
      * Public methods
      */
     $.fn.alida = function(options) {
-
-
         return this.each(function(){
             
             // default settings, may substitute by user
@@ -188,25 +240,70 @@
             $(this).data('alidaID',alidaID);
             $(this).data('settings',settings);
             $(this).data('callbacks',callbacks);
-            $(this).data('resultContainer', resultContainer)
+            $(this).data('resultContainer', resultContainer);
+            $(this).before("<input id='"+alidaID+"-hiddenURI' type='hidden' value=''></input>");
             _init($(this), settings, alidaID);
 
             $('#'+alidaID+' .facets li').live('click', function() {
                 var faceturi = $(this).data('uri');
                 var subjects = $(this).data('subjects');
                 var result = $('#'+alidaID).data('input').data('resultContainer').last();
-                var left = $('#'+alidaID+'.facetContent');
-                left.animate({
-                    "right":"-=50px"
-                });
+//                var left = $('.facets');
+//                var right = $('.facetContent');
+//                left.animate({
+//                    left: parseInt(left.css('left'),10) == 0 ? -left.outerWidth() : 0
+//                });
+//                right.animate({
+//                   marginLeft: parseInt(right.css('marginLeft'),10) == 0 ? right.outerWidth() : 0
+//                });
+                $('#'+alidaID+' .facets').slideUp();
+                $('#'+alidaID+' .facet-run-div').fadeIn('slow');
                 _addFacetRun(alidaID,$(this).html());
-                //alert($(this).data('uri') + ' - ' + $(this).data('subjects').length + ' - ' + $('#'+alidaID).data('input').data('resultContainer').length);
                 $(subjects).each(function(i){
-                    result.subjects[subjects[i]].getValues(faceturi, function(fvalue) {
-                        _insertFacetValue(alidaID,fvalue[label]);
+                    result.subjects[subjects[i]].getValues(faceturi, function(fvalues) {
+                        $(fvalues).each(function(j){
+                            _insertFacetValue(alidaID,faceturi,fvalues[j]);
+                        });
                     });
                 });
-                
+                $('.facetContent').fadeIn('slow');
+            });
+
+            $('#'+alidaID+' .facetContent li').live('click', function() {
+                var input = $('#'+alidaID).data('input');
+                var facetUri = $(this).data('faceturi');
+                var facetValue = $(this).data('value');
+                var facetValueType = $(this).data('type');
+                var optQuery = optQueryTemp;
+                switch(facetValueType){
+                    case 'uri':
+                        optQuery.push("?s <" + facetUri + "> <" + facetValue + ">. ");
+                        break;
+                    case 'literal':
+                        optQuery.push("?s <" + facetUri + "> \"" + facetValue + "\". ");
+                        break;
+                    default:
+                        window.console.error('error while creating optQuery');
+                        break;
+                }
+                query(input,optQuery);
+            });
+
+            $('#'+alidaID+' .results li').live('click', function() {
+                var hiddenUri = alidaID + '-hiddenURI';
+                var uri = $(this).data('uri')
+                var result = $(this).html();
+                $('#'+hiddenUri).val(uri);
+                $('#'+alidaID).data('input').val(result);
+                $('#'+alidaID).hide();
+            });
+
+            $('#'+alidaID+' .button-back').live('click',function() {
+                var id = $('#'+alidaID).data('input').data('alidaID');
+                var result = $('#'+alidaID).data('input').data('resultContainer').last();
+                _rebuiltContent(alidaID,result);
+                _rdy(alidaID,result);
+                return false;
             });
 
             $("input").keydown(function(event) {
@@ -214,19 +311,26 @@
                     switch(event.which){
                         case KEY.ESC : 
                             $('#'+alidaID).hide();
+                            Alida.abortRequests();
                             break;
                         default:
                             if (typeof(typingDelay)!= "undefined") {
                                 window.clearInterval(typingDelay);
                             }
                            var typedInput = $(this);
-                           typingDelay = setInterval(function() { query(typedInput); }, typedInput.data('settings').delay);
+                           typingDelay = setInterval(function() { 
+                               Alida.abortRequests();
+                               optQueryTemp = [];
+                               _reset($(this).data('alidaID'));
+                               query(typedInput,[]); },
+                           typedInput.data('settings').delay);
                            break;
                     }
                 }
             });
             
-            query = function (input) {
+            query = function (input,optQuery) {
+                Alida.abortRequests();
                 var alidaIDTemp = input.data('alidaID');
                 var resultContainerTemp = input.data('resultContainer');
                 var settingsTemp = input.data('settings');
@@ -237,39 +341,44 @@
                 window.clearInterval(typingDelay);
                 
                 if (searchString.length >= settingsTemp.inputChars) {
-                    Alida.query(searchString, settingsTemp.endpoints, function(){
-                        //startCallback
+                    Alida.query(searchString, optQuery, settingsTemp.endpoints,
+                    /** startCallback */
+                    function(){
                         input.addClass('spinner');
-                    }, 
+                    },
+                    /** resultCallback */
                     function(result){
-                        //resultCallback
                         resultContainerTemp.push(result);
                         resultContainerTemp.last().facets(function() {
                             for (var subjectURI in resultContainerTemp.last().subjects) {
-                                _insertResult(alidaIDTemp, resultContainerTemp.last().subjects[subjectURI].label);
-                                $('#'+alidaIDTemp+' .numberOfResults').html(' [' + resultContainerTemp.last().sizeOfSubjects() + ']');
-                                $('#'+alidaIDTemp+' .results li').each(function(i){
-                                    if( i % 2 == 0 ){
-                                        $(this).addClass('even');
-                                    }else{
-                                        $(this).addClass('odd');
-                                    }
-                                });
+                                _insertResult(alidaIDTemp, resultContainerTemp.last().subjects[subjectURI]);
                                 for (var f in resultContainerTemp.last().subjects[subjectURI].facets) {
                                     _insertFacet(alidaIDTemp, f,subjectURI);
-                                    $('#'+alidaIDTemp+' .facets li').each(function(i){
-                                        if( i % 2 == 0 ){
-                                            $(this).addClass('even');
-                                        }else{
-                                            $(this).addClass('odd');
-                                        }
-                                    });
                                 }
                             }
                         });
                     },
+                    /** stopCallback */
                     function(){
                         input.removeClass('spinner');
+                        // add number of results
+                        $('#'+alidaIDTemp+' .numberOfResults').html(' [' + resultContainerTemp.last().sizeOfSubjects() + ']');
+                        // even odd to results
+                        $('#'+alidaIDTemp+' .results li').each(function(i){
+                            if( i % 2 == 0 ){
+                                $(this).addClass('even');
+                            }else{
+                                $(this).addClass('odd');
+                            }
+                        });
+                        // even odd to facets
+                        $('#'+alidaIDTemp+' .facets li').each(function(i){
+                            if( i % 2 == 0 ){
+                                $(this).addClass('even');
+                            }else{
+                                $(this).addClass('odd');
+                            }
+                        });
                     });
                 }
             };

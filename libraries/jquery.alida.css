@@ -31,6 +31,50 @@
     text-align: center;
 }
 
+.facet-slide{
+/*    margin: 1em 0;
+    overflow: hidden;
+    height: 300px;
+    width: auto;
+    position: relative;
+    background-color: white !important;*/
+    /*width: 100%;*/
+}
+
+.facets{
+    /*float: left;*/
+    /*width: 50%;*/
+/*    background-color: white;
+    bottom: 0;
+    color: #333333;
+    height: 250px;
+    left: 0;
+    padding: 6px;
+    position: absolute;
+    left: 0%;
+    width: 99%;*/
+}
+
+.facetContent{
+    /*float: left;*/
+    /*width: 50%;*/
+/*    background-color: white;
+               bottom: 0;
+               color: #333333;
+               height: 250px;
+               left: 0;
+               padding: 6px;
+               position: absolute;
+               width: 99%;
+               margin-left: 100%;*/
+    display: none;
+    background-color: #eee
+}
+
+.facetContent li {
+    padding: 3px 5px 1px 10px;
+}
+
 .even{
     background-color: #eee;
 }
@@ -39,21 +83,21 @@
     background-color: #fff;
 }
 
-#results{
+/*.alida .results{
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 15px;
     line-height: 1em;
     font-style: inherit;
     font-weight: bold;
-}
+}*/
 
-#results li:hover{
-    background-color: #aaa;
-}
-
-#results li{
-    padding: 3px 5px 1px 10px;
+.alida li:hover{
+    background-color: #ddd;
     cursor: pointer;
+}
+
+.alida .results li{
+    padding: 3px 5px 1px 10px;
 }
 
 #endpoints li{
@@ -65,30 +109,29 @@ div.facetContainer {
     background: #ccc;
 }
 
-.facets{
-    /*float: left;*/
-    /*width: 50%;*/
-}
+
 
 .facet-run{
-    background-color: black;
-    border-bottom: white;
-    color: white;
+    color: black;
+    padding: 3px 5px 1px 10px;
+}
+
+.facet-run-div{
+    background-color: #eee;
     width: 100%;
+    height: 25px;
+    padding-top: 1px;
+    display: none;
+    border-bottom: 1px dashed;
+}
+
+.facet-run-div .button-back{
+    float:right;
 }
 
 .facets li{
     padding: 3px 10px 3px 3px;
     cursor: pointer;
-}
-
-.facets li:hover{
-    background-color: #eee;
-}
-
-.facetContent{
-    /*float: left;*/
-    /*width: 50%;*/
 }
 
 #results .resultelementSubject{

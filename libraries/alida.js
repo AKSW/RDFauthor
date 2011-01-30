@@ -17,6 +17,8 @@ Alida = (function ($) {
 
     /** MIME Type for JSON */
     var JSON = 'application/sparql-results+json';
+    /** bind ajax request to queryResult and query Facets*/
+    var _queryResult = $.ajax({}), _queryFacets = $.ajax({});
 
     /**
      * Instantiates one facet object, which contains to
@@ -91,7 +93,7 @@ Alida = (function ($) {
                 var value = null;
                 var type = null;
                 var label = null;
-                fvalue = {};
+                fvalues = [];
                 //Success output
                 //alert('success\n'+data + textStatus, XMLHttpRequest);
                 switch (XMLHttpRequest.getResponseHeader("Content-Type")){
@@ -108,13 +110,19 @@ Alida = (function ($) {
                             type = JSONvalue.results.bindings[i].value.type;
                             label = value.trimURI();
                             //alert(type + ' - ' + value);
-                            fvalue[type] = type;
-                            fvalue[value] = value;
-                            fvalue[label] = label;
+                            var fvalue = {
+                                type: type,
+                                value: value,
+                                label: label
+                            };
+//                            fvalue[type] = type;
+//                            fvalue[value] = value;
+//                            fvalue[label] = label;
+                            fvalues.push(fvalue);
                             addValueToFacet.push({
                                 type: type,
                                 value: value,
-                                label: label //TODO uri cutten
+                                label: label
                             });
                         });
                         break;
@@ -122,7 +130,7 @@ Alida = (function ($) {
                        alert('Should not happen: ' + XMLHttpRequest.getResponseHeader("Content-Type"));
                 }
                 if (jQuery.isFunction(callback)) {
-                    callback(fvalue,type, value, label, subjectURI, facetURI);
+                    callback(fvalues,type, value, label, subjectURI, facetURI);
                 }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -154,16 +162,20 @@ Alida = (function ($) {
      * Creates the query string
      * @private
      * @param {String} searchString Users search string
+     * @param {Array} optQuery additional querystring if filtering
      * @return {String} mainquery
      */
-    function _createQuery (searchString) {
+    function _createQuery (searchString, optQuery) {
         var mainquery = "SELECT DISTINCT ?s ?search "
                       + "WHERE { "
                       +      "?s ?p ?o. "
                       +      "FILTER regex(?o, \"" + searchString + "\", \"i\" ). "
                       +      "FILTER isLiteral(?o). "
-                      +      "?s <http://www.w3.org/2000/01/rdf-schema#label> ?search. "
-                      + "} LIMIT " + _defaultOptions.limit;
+                      +      "?s <http://www.w3.org/2000/01/rdf-schema#label> ?search. ";
+        $(optQuery).each(function(i){
+            mainquery += optQuery[i];
+        });
+        mainquery += "} LIMIT " + _defaultOptions.limit;
         //Output mainquery
         window.console.info(mainquery);
         return mainquery;
@@ -209,6 +221,14 @@ Alida = (function ($) {
     
     return {
         /**
+         * Abort all ajax requests of alida.
+         */
+        abortRequests: function () {
+            _queryResult.abort();
+            _queryFacets.abort();
+        },
+
+        /**
          * Modify the defaultoptions.
          * @param {Array} options Modified default options
          */
@@ -242,7 +262,7 @@ Alida = (function ($) {
          * @param {function} resultCallback Resultcallback will be called, when all results are available
          * @param {function} errorCallback Errorcallback will be called, when an error occurred
          */
-        query: function (searchString, endpoints, onStartCallback, resultCallback, onStopCallback, errorCallback) {
+        query: function (searchString, optQuery, endpoints, onStartCallback, resultCallback, onStopCallback, errorCallback) {
             if( jQuery.isFunction(onStartCallback) ) {
                 onStartCallback();
             }
@@ -270,7 +290,7 @@ Alida = (function ($) {
                                                + "> ?facet  ?value}";
                                 window.console.info(queryFacet);
                                 $(thisResult.endpoints).each( function (i) {
-                                    $.ajax({
+                                    _queryFacets = $.ajax({
                                         beforeSend: function (req) {
                                             req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
                                         },
@@ -324,6 +344,7 @@ Alida = (function ($) {
                             }
                         }
                     },
+                    optQuery: [],
                     sizeOfSubjects: function () {
                         var len = 0;
                         for (var subject in this.subjects) {
@@ -341,7 +362,7 @@ Alida = (function ($) {
 
                 //TODO headerabfrage
                 //do an ajax request
-                $.ajax({
+                _queryResult = $.ajax({
                     beforeSend: function (req) {
                         req.setRequestHeader("Accept", JSON + "," + XML + ";q=0.2");
                     },
@@ -352,14 +373,14 @@ Alida = (function ($) {
 
                     url: endpoints[i],
 
-                    data: "query="+escape(_createQuery(searchString)),
+                    data: "query="+escape(_createQuery(searchString, optQuery)),
 
                     success: function (data, textStatus, XMLHttpRequest) {
                         
                         //Success output
                         //alert('success\n'+data + textStatus, XMLHttpRequest);
                         //_result['query'] = _createQuery(searchString);
-                        _result['query'] = _createQuery(searchString);
+                        _result['query'] = _createQuery(searchString, optQuery);
                         switch (XMLHttpRequest.getResponseHeader("Content-Type")){
                             case XML:
                                 //alert('XML');
@@ -375,6 +396,9 @@ Alida = (function ($) {
                         //Resultcallback
                         if( jQuery.isFunction(resultCallback) ) {
                             resultCallback(_result);
+                        }
+                        if (jQuery.isFunction(onStopCallback) && _result.sizeOfSubjects() == 0) {
+                            onStopCallback();
                         }
                     },
 
