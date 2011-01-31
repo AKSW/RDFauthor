@@ -50,10 +50,18 @@
         input.after(
             alidaDOM = $('<div class="alida" id="' + input.data('alidaID') + '"></div>')
         );
-
+        
+        if(input.data('settings').showEndpoints == true){
+            alidaDOM.append(
+                endpointTitle = $('<h3>' + settings.strings.endpointString + '</h3>'),
+                endpointDOM = $('<div></div>').append('<ul class="endpoints"></ul>')
+            );
+            endpointTitle.append(
+                numEndpoints = $('<span class="numberOfEndpoints"></span>')
+            );
+        }
+        
         alidaDOM.append(
-            endpointTitle = $('<h3>' + settings.strings.endpointString + '</h3>'),
-            endpointDOM = $('<div></div>').append('<ul class="endpoints"></ul>'),
             facetTitle = $('<h3>' + settings.strings.facetString + '</h3>'),
             facetDOM = $('<div></div>').addClass('facet-slide')
                                        .append('<div class="facet-run-div">\
@@ -61,12 +69,8 @@
                                                <span class="facet-run"></span></div>')
                                        .append('<ul class="facets"></ul>')
                                        .append('<ul class="facetContent"></ul>'),
-            resultTitle = $('<h3>' + settings.strings.resultString + '</h3>'),
+            resultTitle = $('<h3>' + settings.strings.resultString + '</h3>').addClass('resultTitle'),
             resultDOM = $('<div></div>').append('<ul class="results"></ul>')
-        );
-
-        endpointTitle.append(
-            numEndpoints = $('<span class="numberOfEndpoints"></span>')
         );
 
         facetTitle.append(
@@ -78,7 +82,12 @@
         );
         _showHideMonitoring(input, alidaID);
         _endpoints(settings);
-        $('#' + alidaID).accordion({active: 2, autoHeight: false});
+        if(input.data('settings').showEndpoints == true){
+            $('#' + alidaID).accordion({active: 2, autoHeight: false});
+        } else {
+            $('#' + alidaID).accordion({active: 1, autoHeight: false});
+        }
+        
         $('#'+alidaID).data('input',input);
     },
 
@@ -93,9 +102,32 @@
         numEndpoints.html(' [' + settings.endpoints.length + ']');
     },
     
-    _addFacetRun = function (alidaID, facetrun) {
-        var run = $('#'+alidaID).find('.facet-run').html() + '»' + facetrun;
+    _addFacetRun = function (alidaID, filter) {
+        var run = 'filter: ';
+        $(filter).each(function(i){
+            run+='»'+filter[i].facet;
+        });
         $('#'+alidaID).find('.facet-run').html(run)
+    },
+    
+    _markFacets = function (alidaID, filter) {
+        var numF = 0;
+        $('#'+alidaID+' .facets li').each(function(i){
+            numF++;
+            var curFacet = $(this);
+            $(filter).each(function(i){
+                if (curFacet.html() == filter[i].facet){
+                    curFacet.css('font-weight','bold');
+                    curFacet.html(curFacet.html()+' ('+filter[i].value+')');
+                }
+            });
+        });
+        $('#'+alidaID+' .numberOfFacets').html(' [' + numF + ']');
+        if ( filter.length != 0) {
+            var oldNumber = $('#'+alidaID+' .numberOfFacets').html();
+            $('#'+alidaID+' .numberOfFacets').html(oldNumber + ' - ' +filter.length + ' filtered');
+        }
+        
     },
 
     _insertResult = function (alidaID, result) {
@@ -112,8 +144,6 @@
                 exist = true;
                 $(this).data('subjects').push(subjectURI);
             }
-            var numF = i+1;
-            $('#'+alidaID+' .numberOfFacets').html(' [' + numF + ']');
         });
         if (exist == false) {
             $('#'+alidaID).find('.facets').append('<li>' + facet.trimURI() + '</li>');
@@ -215,6 +245,7 @@
                 shownFacets: 6, //max displayed facets
                 inputChars: 3, //number of inputted characters after search begins
                 delay: 750, //delay after typing to start the search (ms)
+                showEndpoints: true, //show endpoints in the accordion
                 strings: { //displayed texts
                     facetString : 'Facets',
                     endpointString: 'Endpoints',
@@ -236,18 +267,26 @@
             },options);
             
             var alidaID = 'alida-' + _id();
-            var resultContainer = []
+            var resultContainer = [];
+            var filter = [];
             $(this).data('alidaID',alidaID);
             $(this).data('settings',settings);
             $(this).data('callbacks',callbacks);
             $(this).data('resultContainer', resultContainer);
+            $(this).data('filter',filter);
             $(this).before("<input id='"+alidaID+"-hiddenURI' type='hidden' value=''></input>");
             _init($(this), settings, alidaID);
 
             $('#'+alidaID+' .facets li').live('click', function() {
+                var clicked = {
+                    facet : $(this).html(),
+                    value : null
+                }
                 var faceturi = $(this).data('uri');
                 var subjects = $(this).data('subjects');
                 var result = $('#'+alidaID).data('input').data('resultContainer').last();
+                var filter = $('#'+alidaID).data('input').data('filter');
+                filter.push(clicked);
 //                var left = $('.facets');
 //                var right = $('.facetContent');
 //                left.animate({
@@ -258,7 +297,7 @@
 //                });
                 $('#'+alidaID+' .facets').slideUp();
                 $('#'+alidaID+' .facet-run-div').fadeIn('slow');
-                _addFacetRun(alidaID,$(this).html());
+                _addFacetRun(alidaID,filter);
                 $(subjects).each(function(i){
                     result.subjects[subjects[i]].getValues(faceturi, function(fvalues) {
                         $(fvalues).each(function(j){
@@ -275,6 +314,7 @@
                 var facetValue = $(this).data('value');
                 var facetValueType = $(this).data('type');
                 var optQuery = optQueryTemp;
+                input.data('filter').last().value = $(this).html();
                 switch(facetValueType){
                     case 'uri':
                         optQuery.push("?s <" + facetUri + "> <" + facetValue + ">. ");
@@ -287,6 +327,7 @@
                         break;
                 }
                 query(input,optQuery);
+                $('#'+alidaID+' .resultTitle').click();
             });
 
             $('#'+alidaID+' .results li').live('click', function() {
@@ -301,8 +342,11 @@
             $('#'+alidaID+' .button-back').live('click',function() {
                 var id = $('#'+alidaID).data('input').data('alidaID');
                 var result = $('#'+alidaID).data('input').data('resultContainer').last();
+                var filter = $('#'+alidaID).data('input').data('filter');
+                $('#'+alidaID).data('input').data('filter').pop();
                 _rebuiltContent(alidaID,result);
                 _rdy(alidaID,result);
+                _markFacets(alidaID,filter);
                 return false;
             });
 
@@ -324,6 +368,7 @@
                                _reset($(this).data('alidaID'));
                                query(typedInput,[]); },
                            typedInput.data('settings').delay);
+                           $(this).data('filter',[]);
                            break;
                     }
                 }
@@ -334,6 +379,7 @@
                 var alidaIDTemp = input.data('alidaID');
                 var resultContainerTemp = input.data('resultContainer');
                 var settingsTemp = input.data('settings');
+                var filter = input.data('filter');
                 var searchString = input.val();
                 
                 _reset(alidaIDTemp);
@@ -379,6 +425,7 @@
                                 $(this).addClass('odd');
                             }
                         });
+                        _markFacets(alidaIDTemp,filter);
                     });
                 }
             };
