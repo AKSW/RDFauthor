@@ -174,7 +174,7 @@
     _rebuiltContent = function (alidaID,result) {
         _reset(alidaID);
         for (var subjectURI in result.subjects) {
-            _insertResult(alidaID, result.subjects[subjectURI].label);
+            _insertResult(alidaID, result.subjects[subjectURI]);
             for (var f in result.subjects[subjectURI].facets) {
                 _insertFacet(alidaID, f,subjectURI);
             }
