@@ -2,6 +2,7 @@
  * This file is part of the RDFauthor project.
  * http://code.google.com/p/rdfauthor
  * Author: Norman Heino <norman.heino@gmail.com>
+ * Author: Sebastian Tramp <mail@sebastian.tramp.name>
  */
 
 /*
@@ -10,12 +11,12 @@
  */
 RDFauthor.registerWidget({
     /*
-    // Uncomment this to execute code when your widget is instantiated, 
+    // Uncomment this to execute code when your widget is instantiated,
     // e.g. load scripts/stylesheets etc.
     init: function () {},
-    */ 
-    
-    // Uncomment this to execute code when you widget's markup is ready in the DOM, 
+    */
+
+    // Uncomment this to execute code when you widget's markup is ready in the DOM,
     // e.g. load jQuery plug-ins, attach event handlers etc.
     ready: function () {
         var self   = this;
@@ -32,21 +33,21 @@ RDFauthor.registerWidget({
             }
         });
     },
-    
+
     // return your jQuery-wrapped main input element here
     element: function () {
         return $('#mail-value-' + this.ID);
-    }, 
-    
+    },
+
     /*
     // Uncomment to give focus to your widget.
-    // The default implementation will give focus to the first match in the 
+    // The default implementation will give focus to the first match in the
     // return value of element().
     focus: function () {},
-    */ 
-    
+    */
+
     // return your widget's markup code here
-    markup: function () {        
+    markup: function () {
         var markup = '\
             <div class="container resource-value" style="width:100%">\
                 <input type="text" id="mail-value-' + this.ID + '" class="text"\
@@ -62,29 +63,29 @@ RDFauthor.registerWidget({
             </div>';
 
         return markup;
-    }, 
-    
+    },
+
     // commit changes here (add/remove/change)
     submit: function () {
         if (this.shouldProcessSubmit()) {
             // get databank
             var databank   = RDFauthor.databankForGraph(this.statement.graphURI());
             var hasChanged = (
-                this.statement.hasObject() 
+                this.statement.hasObject()
                 && this.statement.objectValue() !== this.value()
             );
-            
+
             if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
                     databank.remove(String(rdfqTriple));
                 }
             }
-            
+
             if (!this.removeOnSubmit) {
                 try {
                     var newStatement = this.statement.copyWithObject({
-                        value: '<' + this.value() + '>', 
+                        value: '<' + this.value() + '>',
                         type: 'uri'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
@@ -95,54 +96,60 @@ RDFauthor.registerWidget({
                 }
             }
         }
-        
+
         return true;
-    }, 
-    
+    },
+
     shouldProcessSubmit: function () {
         var t1 = !this.statement.hasObject();
         var t2 = null === this.value();
         var t3 = this.removeOnSubmit;
-        
+
         return (!(t1 && t2) || t3);
-    }, 
-    
+    },
+
     value: function() {
         var typedValue = this.element().val();
         if (String(typedValue).length > 0) {
             return this.URIForLabel(typedValue);
         }
-        
+
         return null;
-    }, 
-    
+    },
+
     labelForURI: function (URI) {
-        var label = String(URI)
+        var label = '';
+
+        if ((typeof (URI) == 'undefined') || (String(URI) == 'null') ) {
+            return label;
+        }
+
+        label = String(URI)
             .replace(/mailto:/g, '');   // remove the mailto: prefix
-        
+
         return label;
-    }, 
-    
+    },
+
     validateLabel: function (label) {
-        var phoneRE = new RegExp(/^[a-zA-Z_-]+@([0-9a-z-]+\.)+([a-z]){2,5}$/);
-        
-        return phoneRE.test(label);
-    }, 
-    
+        var emailRE = new RegExp(/^[a-zA-Z_-]+@([0-9a-z-]+\.)+([a-z]){2,5}$/);
+
+        return emailRE.test(label);
+    },
+
     URIForLabel: function (label) {
         var URI = String(label);
-        
+
         return 'mailto:' + URI;
     }
 }, [{
     // hooks to register your widget for
-        // Uncomment this if your widgets binds to the property hook, 
+        // Uncomment this if your widgets binds to the property hook,
         // and denote the type of property (ObjectProperty or DatatypeProperty).
         // For other hooks this can be inferred automatically.
-        type: 'ObjectProperty', 
+        type: 'ObjectProperty',
         // name of first hook
         name: 'property',
-        // array of values for first hook 
-        values: ['http://xmlns.com/foaf/0.1/mbox']
+        // array of values for first hook
+        values: ['http://xmlns.com/foaf/0.1/mbox', 'http://rdfs.org/sioc/ns#email']
     }]
 );
