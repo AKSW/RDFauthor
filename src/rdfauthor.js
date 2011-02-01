@@ -487,9 +487,9 @@ RDFauthor = (function($, undefined) {
                     }
                     
                     /* TODO: for each graph */
-                    try {
+                    // try {
                         RDFauthor.queryGraph(graph, query, {
-                            callbackSuccess: function(result) {
+                            callbackSuccess: function (result) {
                                 if (result['results'] && result['results']['bindings']) {
                                     for (var r in result['results']['bindings']) {
                                         /* build  */
@@ -518,13 +518,17 @@ RDFauthor = (function($, undefined) {
 
                                 _callIfIsFunction(callback);
                             }, 
+                            callbackError: function () {
+                                // SPARQL error
+                                _callIfIsFunction(callback);
+                            }, 
                             // synchronous
                             async: false
                         })
-                    } catch (e) {
-                        // TODO: 
-                        _callIfIsFunction(callback);
-                    }
+                    // } catch (e) {
+                    //     // TODO: 
+                    //     _callIfIsFunction(callback);
+                    // }
                 }
             } else {
                 _predicateInfo = {};
@@ -553,6 +557,43 @@ RDFauthor = (function($, undefined) {
         }
         
         _graphInfo[subject][key] = statement.objectValue();
+    }
+    
+    /**
+     * Builds an RDF/JSON index structure with literal objects being
+     * replace bei the 'data-object-hash' attribute value from the
+     * corresponding DOM element.
+     *
+     * @param {array} triples
+     * @param {string} graph
+     * @returns {object} rdf/json index
+     */
+    function _buildHashedObjectIndexes(triples, graph) {
+        var index = {}, 
+            hashed = {}, 
+            targetIndex;
+        
+        for (var i = 0; i < triples.length; i++) {
+            var statement = new Statement(triples[i], graph);
+            var element   = RDFauthor.elementForStatement(statement);
+            var hash      = $(element).attr('data-object-hash');
+            
+            targetIndex = (hash !== undefined) ? hashed : index;
+            
+            var s = String(triples[i].subject.value);
+            var p = String(triples[i].property.value);
+            // var o = hash;
+            if (undefined === targetIndex[s]) {
+                targetIndex[s] = {};
+            }
+            if (undefined === targetIndex[s][p]) {
+                targetIndex[s][p] = [];
+            }
+
+            targetIndex[s][p].push(hash ? hash : triples[i].object.dump());
+        }
+        
+        return {'plain': index, 'hashed': hashed};
     }
     
     /**
@@ -953,14 +994,12 @@ RDFauthor = (function($, undefined) {
                     }, 'json');
                 } else {
                     // REST style
-                    var addedJSON = $.rdf.dump(added.triples(), 
-                                               {format: 'application/json', serialize: true});
-                    var removedJSON = $.rdf.dump(removed.triples(), 
-                                                 {format: 'application/json', serialize: true});
+                    var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
+                    var indexes = _buildHashedObjectIndexes(removed.triples(), g);
                     
                     /*
                     alert('Added: ' + addedJSON);
-                    alert('Removed: ' + removedJSON);
+                    alert('Removed: ' + $.toJSON(indexes));
                     return;
                     // */
                     if (addedJSON || removedJSON) {
@@ -968,7 +1007,8 @@ RDFauthor = (function($, undefined) {
                         $.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
-                            'delete': removedJSON ? removedJSON : '{}'
+                            'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
+                            'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
                         }, function (responseData, textStatus, XHR) {
                             _view.hide(true);
                             _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
