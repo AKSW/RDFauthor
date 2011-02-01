@@ -418,6 +418,9 @@ RDFauthor = (function($, undefined) {
         return W;
     }
     
+    /**
+     * Builds the SPARQL query for fetching predicate info.
+     */
     function _createPredicateInfoQuery() {
         var selects     = '';
         var filters     = [];
