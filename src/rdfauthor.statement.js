@@ -160,7 +160,11 @@ Statement.prototype = {
             this._object.value = String(this._object.value).replace('&amp;', '&').replace('&amp;', '&');
         }
         
-        return jQuery.rdf.triple(this._subject, this._predicate, this._object ? this._object : this.objectPlaceholder);
+        if (null !== this._object) {
+            return jQuery.rdf.triple(this._subject, this._predicate, this._object);
+        }
+        
+        return undefined;
     }, 
     
     /**

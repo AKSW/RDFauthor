@@ -43,7 +43,7 @@ RDFauthor = (function($, undefined) {
     var SCRIPT_STATE_LOADING = 1;
     
     /** script is ready */
-    var SCRIPT_STATE_READY   = 2;
+    var SCRIPT_STATE_READY = 2;
     
     /** Databanks indexed by graph URI. */
     var _databanksByGraph = {};
@@ -131,6 +131,7 @@ RDFauthor = (function($, undefined) {
         autoParse: true, 
         usePredicateInfo: true, 
         useSPARQL11: false, 
+        fetchAllPredicates: true, 
         viewOptions: {
             type: 'popover' /* inline or popover */
         }
@@ -155,8 +156,16 @@ RDFauthor = (function($, undefined) {
      * Adds a predicate that is queried for
      * @private
      */
-    function _addInfoPredicate(infoPredicateURI, shortcut) {
+    function _addInfoPredicate(infoPredicateURI, shortcut, filterCondition) {
+        // store predicate
         _infoPredicates[infoPredicateURI] = {};
+        
+        // add filter
+        if (filterCondition) {
+            _infoPredicates[infoPredicateURI].filter = filterCondition;
+        }
+        
+        // keep shortcut
         if (undefined !== shortcut) {
             _infoShortcuts[shortcut] = infoPredicateURI;
         }
@@ -240,9 +249,9 @@ RDFauthor = (function($, undefined) {
      * Calls its parameter if it is of type funtion.
      * @private
      */
-    function _callIfIsFunction(functionSpec) {
+    function _callIfIsFunction(functionSpec, params) {
         if ($.isFunction(functionSpec)) {
-            functionSpec();
+            functionSpec.apply(functionSpec, params);
         }
     }
     
@@ -410,36 +419,59 @@ RDFauthor = (function($, undefined) {
     }
     
     /**
+     * Builds the SPARQL query for fetching predicate info.
+     */
+    function _createPredicateInfoQuery() {
+        var selects     = '';
+        var filters     = [];
+        var patterns    = [];
+        var basePattern = '';
+        
+        for (var infoPredicateURI in _infoPredicates) {
+            var variableName = _shortcutForInfoPredicate(infoPredicateURI);
+            var filter = _infoPredicates[infoPredicateURI].filter 
+                       ? 'FILTER(' + _infoPredicates[infoPredicateURI].filter + ')' : 
+                       '';
+            selects += (' ?' + variableName);
+            patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . ' + filter + '}');
+        }
+        
+        if (!_options.fetchAllPredicates) {
+            for (var predicate in _predicates) {
+                filters.push('sameTerm(?predicate, <' + predicate + '>)');
+            }
+        } else {
+            basePattern = '{?s ?predicate ?o .} ' + 
+                'UNION {?predicate a <http://www.w3.org/2000/01/rdf-schema#Property> . } ' + 
+                'UNION {?predicate a <http://www.w3.org/2002/07/owl#ObjectProperty> . } ' + 
+                'UNION {?predicate a <http://www.w3.org/2002/07/owl#DatatypeProperty> . }';
+        }
+        
+        if (patterns.length > 0) {  
+            var query = '\
+                SELECT DISTINCT ?predicate ' + selects + '\
+                WHERE {' + basePattern + patterns.join(' OPTIONAL ') + 
+                ((filters.length > 0) ? (' FILTER(' + filters.join(' || ') + ')') : '') + 
+            '}';
+            
+            return query;
+        }
+        
+        return null;
+    }
+    
+    /**
      * Loads info predicates for all predicates
      * @private
      */ 
     function _fetchPredicateInfo(callback) {
         if (null === _predicateInfo) {
             if (_options.usePredicateInfo) {
-                var selects  = '';
-                var filters  = [];
-                var patterns = [];
-
-                for (var infoPredicateURI in _infoPredicates) {
-                    var variableName = _shortcutForInfoPredicate(infoPredicateURI);
-                    selects += (' ?' + variableName);
-                    patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . }');
-                }
+                var query = _createPredicateInfoQuery();
                 
-                for (var predicate in _predicates) {
-                    filters.push('sameTerm(?predicate, <' + predicate + '>)');
-                }
-                
-                /* init */
                 _predicateInfo = {};
-
-                /* query */
-                if (patterns.length > 0) {
-                    var query = '\
-                        SELECT DISTINCT ?predicate ' + selects + '\
-                        WHERE {' + patterns.join(' UNION ') + ' FILTER(' + filters.join(' || ') + ')}';
-                    // query = query.replace(/\s+/g, ' ');
-
+                
+                if (query) {
                     // use first graph w/ update info for now
                     var graph;
                     for (var g in _graphInfo) {
@@ -448,16 +480,16 @@ RDFauthor = (function($, undefined) {
                             break;
                         }
                     }
-
+                    
                     // fallback to default graph
                     if (undefined === graph) {
                         graph = RDFauthor.defaultGraphURI();
                     }
-
+                    
                     /* TODO: for each graph */
-                    try {
+                    // try {
                         RDFauthor.queryGraph(graph, query, {
-                            callbackSuccess: function(result) {
+                            callbackSuccess: function (result) {
                                 if (result['results'] && result['results']['bindings']) {
                                     for (var r in result['results']['bindings']) {
                                         /* build  */
@@ -486,12 +518,17 @@ RDFauthor = (function($, undefined) {
 
                                 _callIfIsFunction(callback);
                             }, 
+                            callbackError: function () {
+                                // SPARQL error
+                                _callIfIsFunction(callback);
+                            }, 
+                            // synchronous
                             async: false
                         })
-                    } catch (e) {
-                        // TODO: 
-                        _callIfIsFunction(callback);
-                    }
+                    // } catch (e) {
+                    //     // TODO: 
+                    //     _callIfIsFunction(callback);
+                    // }
                 }
             } else {
                 _predicateInfo = {};
@@ -520,6 +557,43 @@ RDFauthor = (function($, undefined) {
         }
         
         _graphInfo[subject][key] = statement.objectValue();
+    }
+    
+    /**
+     * Builds an RDF/JSON index structure with literal objects being
+     * replace bei the 'data-object-hash' attribute value from the
+     * corresponding DOM element.
+     *
+     * @param {array} triples
+     * @param {string} graph
+     * @returns {object} rdf/json index
+     */
+    function _buildHashedObjectIndexes(triples, graph) {
+        var index = {}, 
+            hashed = {}, 
+            targetIndex;
+        
+        for (var i = 0; i < triples.length; i++) {
+            var statement = new Statement(triples[i], graph);
+            var element   = RDFauthor.elementForStatement(statement);
+            var hash      = $(element).attr('data-object-hash');
+            
+            targetIndex = (hash !== undefined) ? hashed : index;
+            
+            var s = String(triples[i].subject.value);
+            var p = String(triples[i].property.value);
+            // var o = hash;
+            if (undefined === targetIndex[s]) {
+                targetIndex[s] = {};
+            }
+            if (undefined === targetIndex[s][p]) {
+                targetIndex[s][p] = [];
+            }
+
+            targetIndex[s][p].push(hash ? hash : triples[i].object.dump());
+        }
+        
+        return {'plain': index, 'hashed': hashed};
     }
     
     /**
@@ -829,7 +903,8 @@ RDFauthor = (function($, undefined) {
     
     function _restoreDatabanks() {
         for (var g in _extractedByGraph) {
-            if (undefined !== _extractedByGraph[g] && _extractedByGraph[g] instanceof $.rdf.databank) {
+            if (undefined !== _extractedByGraph[g] 
+                && _extractedByGraph[g] instanceof $.rdf.databank) {
                 // restore databank
                 _databanksByGraph[g] = _extractedByGraph[g];
             }
@@ -901,28 +976,30 @@ RDFauthor = (function($, undefined) {
                     
                     var addedArray = $.makeArray(added.triples());
                     if (addedArray.length > 0) {
-                        updateQuery += '\nINSERT DATA INTO <' + g + '> {' + addedArray.join('\n').replace('""""', '"""') + '}';
+                        updateQuery += '\nINSERT DATA INTO <' + g + '> {' + 
+                        addedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
                     var removedArray = $.makeArray(removed.triples());
                     if (removedArray.length > 0) {
-                        updateQuery += '\nDELETE DATA FROM <' + g + '> {' + removedArray.join('\n').replace('""""', '"""') + '}';
+                        updateQuery += '\nDELETE DATA FROM <' + g + '> {' + 
+                        removedArray.join('\n').replace('""""', '"""') + '}';
                     }
                     
                     $.post(updateURI, {
                         'query': updateQuery
-                    }, function () {
+                    }, function (responseData, textStatus, XHR) {
                         _view.hide(true);
-                        _callIfIsFunction(_options.onSubmitSuccess);
-                    });
+                        _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                    }, 'json');
                 } else {
                     // REST style
                     var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
-                    var removedJSON = $.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
+                    var indexes = _buildHashedObjectIndexes(removed.triples(), g);
                     
                     /*
                     alert('Added: ' + addedJSON);
-                    alert('Removed: ' + removedJSON);
+                    alert('Removed: ' + $.toJSON(indexes));
                     return;
                     // */
                     if (addedJSON || removedJSON) {
@@ -930,11 +1007,12 @@ RDFauthor = (function($, undefined) {
                         $.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
-                            'delete': removedJSON ? removedJSON : '{}'
-                        }, function () {
+                            'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
+                            'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
+                        }, function (responseData, textStatus, XHR) {
                             _view.hide(true);
-                            _callIfIsFunction(_options.onSubmitSuccess);
-                        });
+                            _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                        }, 'json');
                     }
                 }
             }
@@ -1007,7 +1085,7 @@ RDFauthor = (function($, undefined) {
     // default info predicates
     _addInfoPredicate(RDF_NS + 'type', 'type');
     _addInfoPredicate(RDFS_NS + 'range', 'range');
-    _addInfoPredicate(RDFS_NS + 'label', 'label');
+    _addInfoPredicate(RDFS_NS + 'label', 'label', 'langMatches(lang(?predicate), "en")');
     
     // load default options
     _resetOptions();
@@ -1111,7 +1189,8 @@ RDFauthor = (function($, undefined) {
                  } else if (undefined !== _options.defaultGraph) {
                      /* 2. options.defaultGraph */
                      _defaultGraphURI = _options.defaultGraph;
-                 } else if (undefined !== _graphInfo[_pageGraph()] && undefined !== _graphInfo[_pageGraph()]['defaultGraph']) {
+                 } else if (undefined !== _graphInfo[_pageGraph()] 
+                            && undefined !== _graphInfo[_pageGraph()]['defaultGraph']) {
                      /* 3. link w/ rel="update:defaultGraph" */
                      _defaultGraphURI = _graphInfo[_pageGraph()]['defaultGraph'];
                  } else {
@@ -1136,7 +1215,8 @@ RDFauthor = (function($, undefined) {
                  } else if (undefined !== _options.defaultSubject) {
                      /* 2. options.defaultSubject */
                      _defaultSubjectURI = _options.defaultSubject;
-                 } else if (undefined !== _graphInfo[_pageGraph()] && undefined !== _graphInfo[_pageGraph()]['defaultSubject']) {
+                 } else if (undefined !== _graphInfo[_pageGraph()] 
+                            && undefined !== _graphInfo[_pageGraph()]['defaultSubject']) {
                      /* 3. link w/ rel="update:defaultSubject" */
                      _defaultSubjectURI = _graphInfo[_pageGraph()]['defaultSubject'];
                  }
@@ -1178,7 +1258,8 @@ RDFauthor = (function($, undefined) {
         }, 
         
         /**
-         * Returns an instance of the widget that has been registered for <code>hookName</code> and <code>hookValue</code>.
+         * Returns an instance of the widget that has been registered 
+         * for <code>hookName</code> and <code>hookValue</code>.
          * @param {string} hookName
          * @param {mixed} hookValue
          * @param {Statement} statement The statement with which to initialize the widget
@@ -1224,8 +1305,15 @@ RDFauthor = (function($, undefined) {
                     || ($.inArray(RDFS_NS + 'Literal', ranges) >= 0)) {
                     
                     widgetConstructor = _registeredWidgets[LITERAL_HOOK][''];
-                } else if (($.inArray(OWL_NS + 'ObjectProperty', types) >= 0)
-                    || ($.inArray(RDFS_NS + 'Resource', ranges) >= 0)) {
+                } else if (
+                    /* owl stuff */
+                    ($.inArray(OWL_NS + 'ObjectProperty', types) >= 0)
+                    || ($.inArray(OWL_NS + 'Thing', ranges) >= 0)
+                    || ($.inArray(OWL_NS + 'Class', ranges) >= 0)
+                    /* rdfs stuff */
+                    || ($.inArray(RDFS_NS + 'Resource', ranges) >= 0)
+                    || ($.inArray(RDFS_NS + 'Class', ranges) >= 0)
+                ) {
                     
                     widgetConstructor = _registeredWidgets[OBJECT_HOOK][''];
                 } else if ($.inArray(RDF_NS + 'XMLLiteral', ranges) >= 0) {
@@ -1266,7 +1354,8 @@ RDFauthor = (function($, undefined) {
                     infoSpec = _infoShortcuts[infoSpec];
                 }
 
-                if ((undefined !== _predicateInfo[predicateURI]) && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
+                if ((undefined !== _predicateInfo[predicateURI]) 
+                    && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
                     return _predicateInfo[predicateURI][infoSpec];
                 }
             }
@@ -1366,7 +1455,8 @@ RDFauthor = (function($, undefined) {
          *        <a href="http://www.w3.org/TR/rdf-sparql-json-res/">SPARQL Results JSON</a> object.</li>
          *    <li>{function} <code>callbackError</code> Function to be called if an error occurs.</li>
          *    <li>{boolean} <code>async</code> Function to be called if an error occurs. If false, the 
-         *        query result will be returned. Otherwise, callbackSuccess must be supplied and will be called.</li>
+         *        query result will be returned. Otherwise, callbackSuccess must be supplied and 
+         *        will be called.</li>
          *    <li>{string} <code>sparqlEndpoint</code> The URI for the SPARQL endpoint to be used.</li>
          *  </ul>  
          * @throws An exception if the graph queried has no associated SPARQL endpoint.
@@ -1399,7 +1489,9 @@ RDFauthor = (function($, undefined) {
                 data: parameters, 
                 async: o.async, 
                 /* request application/sparql-results+json */
-                beforeSend: function (XMLHTTPRequest) {XMLHTTPRequest.setRequestHeader('Accept', 'application/sparql-results+json');}
+                beforeSend: function (XMLHTTPRequest) {
+                    XMLHTTPRequest.setRequestHeader('Accept', 'application/sparql-results+json');
+                }
             };
             
             /* Success callback */
