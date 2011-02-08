@@ -491,17 +491,18 @@ RDFauthor = (function($, undefined) {
                         RDFauthor.queryGraph(graph, query, {
                             callbackSuccess: function (result) {
                                 if (result && result['results'] && result['results']['bindings']) {
-                                    for (var r in result['results']['bindings']) {
+                                    var b = result['results']['bindings'];
+                                    for (var r in b) {
                                         /* build  */
                                         var predicate, infoPredicate, infoValue;
-                                        for (var current in result['results']['bindings'][r]) {
+                                        for (var current in b[r]) {
                                             switch (current) {
                                                 case 'predicate': 
-                                                    predicate = result['results']['bindings'][r][current].value;
+                                                    predicate = b[r][current].value;
                                                     break;
                                                 default:
                                                     infoPredicate = _infoShortcuts[current];
-                                                    infoValue     = result['results']['bindings'][r][current].value;
+                                                    infoValue     = b[r][current].value;
                                             }
                                         }
 
