@@ -490,7 +490,7 @@ RDFauthor = (function($, undefined) {
                     // try {
                         RDFauthor.queryGraph(graph, query, {
                             callbackSuccess: function (result) {
-                                if (result['results'] && result['results']['bindings']) {
+                                if (result && result['results'] && result['results']['bindings']) {
                                     for (var r in result['results']['bindings']) {
                                         /* build  */
                                         var predicate, infoPredicate, infoValue;
