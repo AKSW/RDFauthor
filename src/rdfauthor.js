@@ -996,7 +996,8 @@ RDFauthor = (function($, undefined) {
                 } else {
                     // REST style
                     var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
-                    var indexes = _buildHashedObjectIndexes(removed.triples(), g);
+                    var removedJSON = $.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
+                    //var indexes = _buildHashedObjectIndexes(removed.triples(), g);
                     
                     /*
                     alert('Added: ' + addedJSON);
@@ -1008,8 +1009,9 @@ RDFauthor = (function($, undefined) {
                         $.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
-                            'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
-                            'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
+                            'delete': removedJSON ? removedJSON : '{}',
+                            //'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
+                            //'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
                         }, function (responseData, textStatus, XHR) {
                             _view.hide(true);
                             _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
