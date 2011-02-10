@@ -60,6 +60,9 @@ RDFauthor = (function($, undefined) {
         'explicit': [], 
         'hidden': []
     };
+
+    /** Wheather the property axiom cache has been loaded */
+    var _cacheLoaded = false;
     
     /** Original databanks as extracted by graph URI. */
     var _extractedByGraph = {};
@@ -92,12 +95,15 @@ RDFauthor = (function($, undefined) {
     var _pageParsed = false;
     
     /** Predicate info */
-    var _predicateInfo = null;
+    var _predicateInfo = {};
+
+    /** Whether predicate infos have been loaded */
+    var _predicateInfoLoaded = false;
     
-    /** predicates to be queried for */
+    /** Predicates to be queried for */
     var _predicates = {};
     
-    /**  Callbacks to be executed when script loading finishes */
+    /** Callbacks to be executed when script loading finishes */
     var _scriptCallbacks = {};
     
     /** Loaded JavaScript URIs */
@@ -459,17 +465,26 @@ RDFauthor = (function($, undefined) {
         
         return null;
     }
+
+    function _loadCache() {
+        if (!_cacheLoaded) {
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.cache.js', function () {
+                $.extend(_predicateInfo, __cache);
+            }); 
+            _cacheLoaded = true;
+        };
+    }
     
     /**
      * Loads info predicates for all predicates
      * @private
      */ 
     function _fetchPredicateInfo(callback) {
-        if (null === _predicateInfo) {
+        if (!_predicateInfoLoaded) {
             if (_options.usePredicateInfo) {
                 var query = _createPredicateInfoQuery();
                 
-                _predicateInfo = {};
+                //_predicateInfo = {};
                 
                 if (query) {
                     // use first graph w/ update info for now
@@ -535,6 +550,7 @@ RDFauthor = (function($, undefined) {
                 _predicateInfo = {};
                 _callIfIsFunction(callback);
             }
+            _predicateInfoLoaded = true;
         } else {
             _callIfIsFunction(callback);
         }
@@ -1037,6 +1053,9 @@ RDFauthor = (function($, undefined) {
         CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT: _addTriple, 
         CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
     };
+
+    // Cache
+    _loadCache();
     
     // jQuery UI
     if (undefined === $.ui) {
@@ -1353,13 +1372,19 @@ RDFauthor = (function($, undefined) {
         infoForPredicate: function (predicateURI, infoSpec) {
             // predicate info not yet loaded
             if (null !== _predicateInfo) {
+                var infoSpecURI;
                 if (undefined !== _infoShortcuts[infoSpec]) {
-                    infoSpec = _infoShortcuts[infoSpec];
+                    infoSpecURI = _infoShortcuts[infoSpec];
                 }
 
-                if ((undefined !== _predicateInfo[predicateURI]) 
-                    && (undefined !== _predicateInfo[predicateURI][infoSpec])) {
-                    return _predicateInfo[predicateURI][infoSpec];
+                if (undefined !== _predicateInfo[predicateURI]) {
+                    if (undefined !== _predicateInfo[predicateURI][infoSpec]) {
+                        return  _predicateInfo[predicateURI][infoSpec];
+                    }
+
+                    if (undefined !==  _predicateInfo[predicateURI][infoSpecURI]) {
+                        return  _predicateInfo[predicateURI][infoSpecURI];
+                    }
                 }
             }
             
