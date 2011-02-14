@@ -1013,7 +1013,7 @@ RDFauthor = (function($, undefined) {
                     // REST style
                     var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
                     var removedJSON = $.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
-                    //var indexes = _buildHashedObjectIndexes(removed.triples(), g);
+                    var indexes = _buildHashedObjectIndexes(removed.triples(), g);
                     
                     /*
                     alert('Added: ' + addedJSON);
@@ -1027,7 +1027,7 @@ RDFauthor = (function($, undefined) {
                             'insert': addedJSON ? addedJSON : '{}', 
                             'delete': removedJSON ? removedJSON : '{}',
                             //'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
-                            //'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
+                            'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
                         }, function (responseData, textStatus, XHR) {
                             _view.hide(true);
                             _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
@@ -1545,7 +1545,7 @@ RDFauthor = (function($, undefined) {
                 
                 /* not same origin, use JSONp and modify ajax options accordingly */
                 var JSONpOptions = {
-                    dataType: 'jsonp', 
+                    dataType: 'jsonp',
                     callbackParameter: 'callback'
                 }
                 $.extend(ajaxOptions, JSONpOptions);
