@@ -575,7 +575,7 @@ RDFauthor = (function($, undefined) {
         
         _graphInfo[subject][key] = statement.objectValue();
     }
-    
+
     /**
      * Builds an RDF/JSON index structure with literal objects being
      * replace bei the 'data-object-hash' attribute value from the
@@ -1012,8 +1012,7 @@ RDFauthor = (function($, undefined) {
                 } else {
                     // REST style
                     var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
-                    var removedJSON = $.rdf.dump(removed.triples(), {format: 'application/json', serialize: true});
-                    var indexes = _buildHashedObjectIndexes(removed.triples(), g);
+                    var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     
                     /*
                     alert('Added: ' + addedJSON);
@@ -1025,8 +1024,7 @@ RDFauthor = (function($, undefined) {
                         $.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
-                            'delete': removedJSON ? removedJSON : '{}',
-                            //'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
+                            'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
                             'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
                         }, function (responseData, textStatus, XHR) {
                             _view.hide(true);

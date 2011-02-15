@@ -41,7 +41,7 @@ RDFauthor.registerWidget({
             maxResults:        3,       /* maximum number of results per source */
             // Source options:
             sparql:            true,    /* use SPARQL endpoint */
-            sindice:           true,    /* use Sindice semantic search */
+            //sindice:           true,    [> use Sindice semantic search <]
             uri:               true,    /* provide generated URI */
             // Filter options:
             filterRange:       true,    /* show only resources in the rdfs:range of the statement's property */
@@ -67,7 +67,7 @@ RDFauthor.registerWidget({
         this.sources = {
             sparql:     {label: 'Local result',         color: '#efe', border: '#e3ffe3', rank:  1}, 
             sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2}, 
-            sindice:    {label: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6}, 
+            sindice:    {lael: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6}, 
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  8}
         }
         
