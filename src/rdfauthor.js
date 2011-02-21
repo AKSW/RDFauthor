@@ -428,36 +428,41 @@ RDFauthor = (function($, undefined) {
      * Builds the SPARQL query for fetching predicate info.
      */
     function _createPredicateInfoQuery() {
-        var selects     = '';
-        var filters     = [];
-        var patterns    = [];
-        var basePattern = '';
+        var selects     = '',
+            basePattern = '',
+            filters     = [],
+            infoFilters = [],
+            typeFilters = [];
         
         for (var infoPredicateURI in _infoPredicates) {
-            var variableName = _shortcutForInfoPredicate(infoPredicateURI);
-            var filter = _infoPredicates[infoPredicateURI].filter 
-                       ? 'FILTER(' + _infoPredicates[infoPredicateURI].filter + ')' : 
-                       '';
-            selects += (' ?' + variableName);
-            patterns.push('{?predicate <' + infoPredicateURI + '> ?' + variableName + ' . ' + filter + '}');
+            infoFilters.push('sameTerm(?infoPredicate, <' + infoPredicateURI + '>)');
         }
+
+        typeFilters = [
+           'sameTerm(?type, <http://www.w3.org/2000/01/rdf-schema#Property>)',
+           'sameTerm(?type, <http://www.w3.org/2000/01/rdf-schema#Property>)',
+           'sameTerm(?type, <http://www.w3.org/2002/07/owl#DatatypeProperty>)',
+        ];
         
+        // Query certain predicates only
         if (!_options.fetchAllPredicates) {
             for (var predicate in _predicates) {
                 filters.push('sameTerm(?predicate, <' + predicate + '>)');
             }
         } else {
-            basePattern = '{?s ?predicate ?o .} ' + 
-                'UNION {?predicate a <http://www.w3.org/2000/01/rdf-schema#Property> . } ' + 
-                'UNION {?predicate a <http://www.w3.org/2002/07/owl#ObjectProperty> . } ' + 
-                'UNION {?predicate a <http://www.w3.org/2002/07/owl#DatatypeProperty> . }';
+            basePattern = '?predicate ?infoPredicate ?infoValue . ';
         }
         
-        if (patterns.length > 0) {  
+        // No query w/o filter on info predicates
+        if (infoFilters.length > 0) {  
             var query = '\
-                SELECT DISTINCT ?predicate ' + selects + '\
-                WHERE {' + basePattern + patterns.join(' OPTIONAL ') + 
-                ((filters.length > 0) ? (' FILTER(' + filters.join(' || ') + ')') : '') + 
+                SELECT DISTINCT ?predicate ?infoPredicate ?infoValue\
+                WHERE {' + basePattern + 
+                ('FILTER (' + infoFilters.join(' || ') + ')') +
+                'OPTIONAL {?anySubject ?predicate ?anyObject . } ' + 
+                'OPTIONAL {?predicate a ?type}' + 
+                ((typeFilters.length > 0) ? (' FILTER(' + typeFilters.join(' || ') + ')') : '') + 
+                // ((filters.length > 0) ? (' FILTER(' + filters.join(' || ') + ')') : '') + 
             '}';
             
             return query;
@@ -483,6 +488,8 @@ RDFauthor = (function($, undefined) {
         if (!_predicateInfoLoaded) {
             if (_options.usePredicateInfo) {
                 var query = _createPredicateInfoQuery();
+
+                alert(query);
                 
                 //_predicateInfo = {};
                 
@@ -506,20 +513,13 @@ RDFauthor = (function($, undefined) {
                         RDFauthor.queryGraph(graph, query, {
                             callbackSuccess: function (result) {
                                 if (result && result['results'] && result['results']['bindings']) {
-                                    var b = result['results']['bindings'];
-                                    for (var r in b) {
+                                    var bindings = result['results']['bindings'];
+                                    for (var i = 0; i < bindings.length; i++) {
+                                        var row = bindings[i];
                                         /* build  */
-                                        var predicate, infoPredicate, infoValue;
-                                        for (var current in b[r]) {
-                                            switch (current) {
-                                                case 'predicate': 
-                                                    predicate = b[r][current].value;
-                                                    break;
-                                                default:
-                                                    infoPredicate = _infoShortcuts[current];
-                                                    infoValue     = b[r][current].value;
-                                            }
-                                        }
+                                        var predicate = row['predicate'].value,
+                                            infoPredicate = row['infoPredicate'].value,
+                                            infoValue = row['infoValue'].value;
 
                                         /* build info structure */
                                         if (undefined === _predicateInfo[predicate]) {
