@@ -150,6 +150,6 @@ RDFauthor.registerWidget({
         // name of first hook
         name: 'property',
         // array of values for first hook
-        values: ['http://xmlns.com/foaf/0.1/mbox', 'http://rdfs.org/sioc/ns#email']
+        values: ['http://xmlns.com/foaf/0.1/mbox', 'http://rdfs.org/sioc/ns#email', 'http://usefulinc.com/ns/doap#mailing-list']
     }]
 );
