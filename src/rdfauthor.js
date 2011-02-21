@@ -489,8 +489,6 @@ RDFauthor = (function($, undefined) {
             if (_options.usePredicateInfo) {
                 var query = _createPredicateInfoQuery();
 
-                alert(query);
-                
                 //_predicateInfo = {};
                 
                 if (query) {
@@ -1621,7 +1619,23 @@ RDFauthor = (function($, undefined) {
             
             // remove events
             $(this.eventTarget()).unbind();
-        }, 
+        },
+        
+        /**
+         * Searches the property cache for a label matchint 'term'.
+         * @param {string} term
+         * @return {array}
+         */
+        searchCacheByLabel: function (term) {
+            var results = [];
+            for (var property in __cache) {
+                var propertyLabel = __cache[property]['label'];
+                if (propertyLabel && String(propertyLabel.search(term)) > -1) {
+                    results.push(__cache[property]);
+                }
+            }
+            return results;
+        },
         
         /**
          * Returns the SPARQL query service URI for graph denoted by graphURI.
