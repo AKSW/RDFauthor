@@ -15,6 +15,7 @@ function Selector(graphURI, subjectURI, options) {
     
     var widgetOptions = {
         maxResults: 5, 
+        local: true, 
         sparql: true,
         sindice: false,
         uri: true,

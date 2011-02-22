@@ -1631,7 +1631,7 @@ RDFauthor = (function($, undefined) {
             for (var property in __cache) {
                 var propertyLabel = __cache[property]['label'];
                 if (propertyLabel && String(propertyLabel.search(term)) > -1) {
-                    results.push(__cache[property]);
+                    results.push($.extend({}, __cache[property], {'uri': property}));
                 }
             }
             return results;

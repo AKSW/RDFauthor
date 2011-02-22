@@ -35,21 +35,22 @@ RDFauthor.registerWidget({
         /* default options */
         this._options = jQuery.extend({
             // Autocomplete options:
-            minChars:          3,       /* minmum chars needed to be typed before search starts */
-            delay:             1000,    /* delay in ms before search starts */
-            max:               9,       /* maximum number of results */
-            maxResults:        3,       /* maximum number of results per source */
+            minChars:           3,      /* minmum chars needed to be typed before search starts */
+            delay:              1000,   /* delay in ms before search starts */
+            max:                9,      /* maximum number of results */
+            maxResults:         3,      /* maximum number of results per source */
             // Source options:
-            sparql:            true,    /* use SPARQL endpoint */
-            //sindice:           true,    [> use Sindice semantic search <]
-            uri:               true,    /* provide generated URI */
+            local:              false,  /* Local property cache */
+            sparql:             true,   /* use SPARQL endpoint */
+            //sindice:           true,   /* use Sindice semantic search */
+            uri:                true,   /* provide generated URI */
             // Filter options:
-            filterRange:       true,    /* show only resources in the rdfs:range of the statement's property */
-            filterDomain:      false,   /* show only properties whose domain matches the statement's subject */
-            filterProperties:  false,   /* show only resources used as properties */
+            filterRange:        true,   /* show only resources in the rdfs:range of the statement's property */
+            filterDomain:       false,  /* show only properties whose domain matches the statement's subject */
+            filterProperties:   false,  /* show only resources used as properties */
             // Callbacks
-            selectionCallback: null,    /* the function to be called when a new selection is made */
-            selectOnReturn:    false    /* executes selection callback if the user hits return in the search field */
+            selectionCallback:  null,   /* the function to be called when a new selection is made */
+            selectOnReturn:     false   /* executes selection callback if the user hits return in the search field */
             
         }, this.options);
         
@@ -65,6 +66,7 @@ RDFauthor.registerWidget({
         
         // search sources appearence config
         this.sources = {
+            local:      {label: 'Local result',     color: '#efe',  border: '#e3ffe3',  rank: 0},
             sparql:     {label: 'Local result',         color: '#efe', border: '#e3ffe3', rank:  1}, 
             sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2}, 
             sindice:    {lael: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6}, 
@@ -172,7 +174,7 @@ RDFauthor.registerWidget({
     performSearch: function (searchTerm, responseCallback) {
         this.searchResults = [];
         var self = this;
-        
+
         if (this._options.sparql) {
             // SPARQL endpoint    
             var prologue      = '\
@@ -323,19 +325,43 @@ RDFauthor.registerWidget({
                 label: searchTerm
             }], responseCallback, 'uri');
         }
+        
+        if (this._options.local) {
+            this.ongoingSearches++;
+            var results = [], 
+                searchResults = RDFauthor.searchCacheByLabel(searchTerm);
+            for (var i = 0; i < searchResults.length; i++) {
+                results.push({
+                    source: 'local', 
+                    value: searchResults[i]['uri'], 
+                    label: searchResults[i]['label'],
+                });
+            };
+            // Add results to global callback
+            this.results(results, responseCallback, 'local');
+        };
     }, 
-    
+
     results: function (partialResult, responseCallback, sourceKey) {
         var rank = this.sources[sourceKey].rank;
-        this.searchResults[rank] = partialResult;
+        if (partialResult.length) {
+            this.searchResults[rank] = partialResult;
+        }
         this.ongoingSearches--;
         
         if (this.ongoingSearches <= 0) {
-            var combinedResults = [];
+            var combinedResults = [],
+                uriDict = {};
             
-            for (var i = 1, max = this.searchResults.length; i < max; i++) {
-                if (undefined !== this.searchResults[i]) {
-                    combinedResults = combinedResults.concat(this.searchResults[i]);
+            for (var i = 0; i < this.searchResults.length; i++) {
+                var current = this.searchResults[i];
+                if (undefined !== current) {
+                    for (var j = 0; j < current.length; j++) {
+                        if (!(current[j]['value'] in uriDict)) {
+                            combinedResults.push(current[j]);
+                            uriDict[current[j]['value']] = true;
+                        }
+                    }
                 }
             }
             
@@ -358,8 +384,8 @@ RDFauthor.registerWidget({
     }, 
     
     highlight: function (text, term) {
-        var ttt = text.replace(RegExp(term, 'i'), '<em>$&</em>');
-        return ttt;
+        var highlight = text.replace(RegExp(term, 'i'), '<em>$&</em>');
+        return highlight;
     }, 
     
     localName: function (uri) {
