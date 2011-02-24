@@ -269,12 +269,12 @@
             var alidaID = 'alida-' + _id();
             var resultContainer = [];
             var filter = [];
+            $(this).attr('autocomplete','off');
             $(this).data('alidaID',alidaID);
             $(this).data('settings',settings);
             $(this).data('callbacks',callbacks);
             $(this).data('resultContainer', resultContainer);
             $(this).data('filter',filter);
-            $(this).before("<input id='"+alidaID+"-hiddenURI' type='hidden' value=''></input>");
             _init($(this), settings, alidaID);
 
             $('#'+alidaID+' .facets li').live('click', function() {
@@ -331,10 +331,8 @@
             });
 
             $('#'+alidaID+' .results li').live('click', function() {
-                var hiddenUri = alidaID + '-hiddenURI';
                 var uri = $(this).data('uri')
                 var result = $(this).html();
-                $('#'+hiddenUri).val(uri);
                 $('#'+alidaID).data('input').val(result);
                 $('#'+alidaID).hide();
             });
