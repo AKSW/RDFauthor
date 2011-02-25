@@ -1,8 +1,16 @@
+/**
+ * @fileoverview jQuery Alida Plugin
+ * @author Clemens Hoffmann <cannelony@gmail.com>
+ * @version 0.1
+ * @required alida.js, jquery.alida.css, jQuery 1.4 or higher
+ */
+
 (function($) 
 {
+    /** attributes */
     var alidaDOM, endpointTitle, endpointDOM, facetTitle, typingDelay,optQueryTemp,
         facetDOM, resultTitle, resultDOM, numEndpoints, numFacets, numResults;
-    //keycodes
+    /** keycodes */
     var KEY = {
         BACKSPACE   : 8,
         RETURN      : 13,
@@ -19,7 +27,11 @@
         ALT         : 18,
         CTRL        : 17
     };
-    
+
+    /**
+     * Trim the uri to a human readable format
+     * @return Human readable label for an uri
+     */
     String.prototype.trimURI = function () {
         // Splitting the label part from the uri
         if ( (sharpIndex = this.lastIndexOf("#")) != -1 ) {
@@ -38,6 +50,10 @@
         return label;
     };
 
+    /**
+     * This prototype function returns the last element in an array
+     * @return The last element in an array
+     */
     Array.prototype.last = function () {
         return this[this.length-1];
     };
@@ -46,6 +62,12 @@
      * Private methods
      */
 
+     /**
+      * Init will be run at the beginning
+      * @param {Object} input Input object of jQuery
+      * @param {Array} settings Settings of jquery.alida
+      * @param {String} alidaID Identify each input field, where alida is running
+      */
     _init = function (input, settings, alidaID) {
         input.after(
             alidaDOM = $('<div class="alida" id="' + input.data('alidaID') + '"></div>')
@@ -91,17 +113,30 @@
         $('#'+alidaID).data('input',input);
     },
 
+    /**
+     * Create a random Number
+     * @return Random Number
+     */
     _id = function () {
         return Math.floor(Math.random()*11111);
     },
 
+    /**
+     * Adds the given endpoints to the endpoint box
+     * @param {Array} settings Settings of jquery.alida
+     */
     _endpoints = function (settings) {
         $(settings.endpoints).each(function (i) {
             endpointDOM.find('.endpoints').append('<li>' + settings.endpoints[i] + '</li>');
         });
         numEndpoints.html(' [' + settings.endpoints.length + ']');
     },
-    
+
+    /**
+     * Paste the navigation through the properties
+     * @param {String} alidaID Identify each input field, where alida is running
+     * @param {Array} filter Former facets
+     */
     _addFacetRun = function (alidaID, filter) {
         var run = 'filter: ';
         $(filter).each(function(i){
@@ -109,7 +144,12 @@
         });
         $('#'+alidaID).find('.facet-run').html(run)
     },
-    
+
+    /**
+     * Marks former chosen facets by the user
+     * @param {String} alidaID Identify each input field, where alida is running.
+     * @param {Array} filter Former facets
+     */
     _markFacets = function (alidaID, filter) {
         var numF = 0;
         $('#'+alidaID+' .facets li').each(function(i){
@@ -130,13 +170,24 @@
         
     },
 
+    /**
+     * Insert the result
+     * @param {String} alidaID Identify each input field, where alida is running
+     * @param {Object} result The alida result
+     */
     _insertResult = function (alidaID, result) {
         var label = result.label;
         var uri = result.URI;
         $('#'+alidaID).find('.results').append('<li>' + label + '</li>');
         $('#'+alidaID).find('.results li:last').data('uri',uri);
     },
-    
+
+    /**
+     * Insert the facets
+     * @param {String} alidaID Identify each input field, where alida is running
+     * @param {String} facet Uri of facet
+     * @param {String} subjectURI Uri of subject
+     */
     _insertFacet = function (alidaID, facet, subjectURI) {
         var exist = false;
         $('#'+alidaID).find('.facets').find('li').each(function(i) {
@@ -151,7 +202,13 @@
             $('#'+alidaID).find('.facets li:last').data('subjects',[subjectURI]);
         }
     },
-    
+
+    /**
+     * Insert facet values
+     * @param {String} alidaID Identify each input field, where alida is running
+     * @param {String} faceturi Uri of the facet
+     * @param {Array} fvalue Array with value object, which were created by alida
+     */
     _insertFacetValue = function (alidaID, faceturi, fvalue) {
         var exist = false;
         var facetValueLabel = fvalue.label;
@@ -171,6 +228,12 @@
         }
     },
 
+    /**
+     * This function will be run, when an user click on the back button in the
+     * facet value menu
+     * @param {String} alidaID Identify each input field, where alida is running
+     * @param {Object} result The alida result
+     */
     _rebuiltContent = function (alidaID,result) {
         _reset(alidaID);
         for (var subjectURI in result.subjects) {
@@ -181,6 +244,11 @@
         }
     },
 
+    /**
+     * Adds even odd
+     * @param {String} alidaID Identify each input field, where alida is running
+     * @param {Object} result The alida result
+     */
     _rdy = function (alidaID,result) {
         $('#'+alidaID+' .numberOfResults').html(' [' + result.sizeOfSubjects() + ']');
         // even odd to results
@@ -200,7 +268,11 @@
             }
         });
     },
-    
+
+    /**
+     * Clear all entries in the gui
+     * @param {String} alidaID Identify each input field, where alida is running
+     */
     _reset = function (alidaID) {
         $('#'+alidaID).find('.results').empty();
         $('#'+alidaID).find('.facets').empty().slideDown();
@@ -212,6 +284,11 @@
 
     },
 
+    /**
+     * This function is in charge of displaying and closing the widget
+     * @param {Object} input Input object of jQuery
+     * @param {String} alidaID Identify each input field, where alida is running
+     */
     _showHideMonitoring = function (input, alidaID) {
         var alidaFocus;
         input.focus(function(){
@@ -238,7 +315,7 @@
     $.fn.alida = function(options) {
         return this.each(function(){
             
-            // default settings, may substitute by user
+            /** default settings, may substitute by user */
             var settings = $.extend({
                 limit: 10, //limit for SPARQL queries / max. number of result elements
                 endpoints: [], //array of endpoints
@@ -255,7 +332,7 @@
                     noElementsString: 'no elements to display'
                 }
             },options);
-
+            /** callbacks */
             var callbacks = jQuery.extend({
                 onStart: function() {}, //would be called, if a query was send
                 onStop: function() {}, //would be called, after displaying the results
@@ -266,17 +343,18 @@
                 onResultsOutput: function() {} //changes the look and feel for displaying the results
             },options);
             
-            var alidaID = 'alida-' + _id();
-            var resultContainer = [];
-            var filter = [];
-            $(this).attr('autocomplete','off');
-            $(this).data('alidaID',alidaID);
-            $(this).data('settings',settings);
-            $(this).data('callbacks',callbacks);
-            $(this).data('resultContainer', resultContainer);
-            $(this).data('filter',filter);
+            var alidaID = 'alida-' + _id(); //indentify the unique alida widget for each input
+            var resultContainer = []; //collect the results of alida
+            var filter = []; //chosen facets by user
+            $(this).attr('autocomplete','off'); //turn off autocomplete of each input (cache)
+            $(this).data('alidaID',alidaID); //attach alidaID to input
+            $(this).data('settings',settings); //attach settings to input
+            $(this).data('callbacks',callbacks); //attach callbacks to input
+            $(this).data('resultContainer', resultContainer); //attach resultContainer to input
+            $(this).data('filter',filter); //attach filter to input
             _init($(this), settings, alidaID);
 
+            /** clicking event on facets */
             $('#'+alidaID+' .facets li').live('click', function() {
                 var clicked = {
                     facet : $(this).html(),
@@ -287,14 +365,6 @@
                 var result = $('#'+alidaID).data('input').data('resultContainer').last();
                 var filter = $('#'+alidaID).data('input').data('filter');
                 filter.push(clicked);
-//                var left = $('.facets');
-//                var right = $('.facetContent');
-//                left.animate({
-//                    left: parseInt(left.css('left'),10) == 0 ? -left.outerWidth() : 0
-//                });
-//                right.animate({
-//                   marginLeft: parseInt(right.css('marginLeft'),10) == 0 ? right.outerWidth() : 0
-//                });
                 $('#'+alidaID+' .facets').slideUp();
                 $('#'+alidaID+' .facet-run-div').fadeIn('slow');
                 _addFacetRun(alidaID,filter);
@@ -308,6 +378,7 @@
                 $('.facetContent').fadeIn('slow');
             });
 
+            /** clicking event on facet content */
             $('#'+alidaID+' .facetContent li').live('click', function() {
                 var input = $('#'+alidaID).data('input');
                 var facetUri = $(this).data('faceturi');
@@ -330,6 +401,7 @@
                 $('#'+alidaID+' .resultTitle').click();
             });
 
+            /** clicking event on result */
             $('#'+alidaID+' .results li').live('click', function() {
                 var uri = $(this).data('uri')
                 var result = $(this).html();
@@ -337,6 +409,7 @@
                 $('#'+alidaID).hide();
             });
 
+            /** clicking event on "back" button */
             $('#'+alidaID+' .button-back').live('click',function() {
                 var id = $('#'+alidaID).data('input').data('alidaID');
                 var result = $('#'+alidaID).data('input').data('resultContainer').last();
@@ -348,6 +421,7 @@
                 return false;
             });
 
+            /** key events */
             $("input").keydown(function(event) {
                 if( typeof( $(this).data('alidaID') ) == 'string') {
                     switch(event.which){
@@ -371,7 +445,12 @@
                     }
                 }
             });
-            
+
+            /**
+             * Search function
+             * @param {Object} input Input object of jQuery
+             * @param {Array} optQuery Is used for filtering the results
+             */
             query = function (input,optQuery) {
                 Alida.abortRequests();
                 var alidaIDTemp = input.data('alidaID');

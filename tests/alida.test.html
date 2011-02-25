@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
+    <head>
+        <title>RDFauthor alida Test Page</title>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <script type="text/javascript" src="../libraries/jquery.js"></script>
+        <script type="text/javascript" src="../libraries/alida.js"></script>
+        <script type="text/javascript">
+            Alida.setOptions({
+                'limit': 10
+            });
+            Alida.query('Datenb',[],["http://localhost/ontowiki/sparql" ],function(){},function(result){
+                alert(result.sizeOfSubjects());
+            })
+//            //addEndpoint
+//            //Alida.addEndpoint('http://localhost/ontowiki/sparql');
+//            //get Endpoint over function
+//            alert(Alida.getEndpoints()[0]);
+//            /**
+//             * ResultCallback function will be called after first query
+//             */
+//            function resultCallback (result) {
+//                //alert that the resultCallback was called
+//                alert('ResultCallback');
+//                //get the query string
+//                alert(result['query']);
+//                //get size of subjects
+//                alert(result.sizeOfSubjects());
+//                //receive the facets of each subject in the result object
+//                result.facets(function (){
+//                    for (var subjectURI in result.subjects) {
+//                        //alert(subjectURI + ' - ' + result.subjects[subjectURI].sizeOfFacets());
+//                        for (var f in result.subjects[subjectURI].facets) {
+//                            //alert(subjectURI + ' ' + result.subjects[subjectURI].facets[f].URI);
+//                            result.subjects[subjectURI].getValues(result.subjects[subjectURI].facets[f]);
+//                        }
+//                    }
+//                });
+////                for (var f in result.getFacets()) {
+////                    var values = f.getValues();
+////                    var result2 = result.filter(f, value?);
+////                }
+////                result.getFacets(); // facetten von allen subjects URIs
+////                result.getValue(facetURI);
+//            }
+//            //send request to the endpoint
+//            Alida.query('Datenbank',['http://localhost/ontowiki/sparql'],resultCallback);
+        </script>
+    </head>
+    <body>
+        <!-- Empty body -->
+    </body>
+</html>
