@@ -1,7 +1,9 @@
 /**
- * This file is part of the aLiDa project.
+ * @fileoverview This file is part of the aLiDa project.
  * http://code.google.com/p/alida/
- * Author: Clemens Hoffmann <cannelony@gmail.com>
+ * @author Clemens Hoffmann <cannelony@gmail.com>
+ * @version 0.1
+ * @required jQuery 1.4 or higher
  */
 
 Alida = (function ($) {
@@ -24,9 +26,9 @@ Alida = (function ($) {
      * Instantiates one facet object, which contains to
      * one specific subject.
      * @constructor
-     * @param {String} uri uri of facet
-     * @param {String} type type could be for instance uri, literal
-     * @param {String} label label is a human readable format of the facet
+     * @param {String} uri Uri of facet
+     * @param {String} type Type could be for instance uri, literal
+     * @param {String} label Label is a human readable format of the facet
      */
     function Facet (uri, type, label) {
         this.URI = uri;
@@ -36,6 +38,10 @@ Alida = (function ($) {
         return this;
     }
     
+    /**
+     * ToString for facets
+     * @return A facet uri
+     */
     Facet.prototype.toString = function () {
         return this.URI;
     }
@@ -45,8 +51,8 @@ Alida = (function ($) {
      * all of them properties (facets, including values),
      * and the source of the subject (endpoint).
      * @constructor
-     * @param {String} label label of subject
-     * @param {Object} facets properties of subject
+     * @param {String} subjectURI The subject uri
+     * @param {String} label The subject label
      * @param {Array} endpoints source of subject
      */
     function Subject (subjectURI, label, endpoints) {
@@ -57,12 +63,20 @@ Alida = (function ($) {
         return this;
     }
 
+    /**
+     * Add an instance of a facet to a subject
+     * @param {String} uri Facet uri
+     * @param {String} type Type of facet
+     */
     Subject.prototype.addFacet = function (uri, type) {
-        //TODO test label
         var label = this.URI.trimURI();
         this.facets[uri] = new Facet(uri, type, label);
     }
 
+    /**
+     * This function return the number of facets of a subject
+     * @return Number of facets concerning the subject
+     */
     Subject.prototype.sizeOfFacets = function () {
         var len = 0;
         for (var f in this.facets) {
@@ -70,7 +84,14 @@ Alida = (function ($) {
         }
         return len;
     }
-    
+
+
+    /**
+     * Request the values of a specify subject class
+     * @param {Object} facet Could be a facet object
+     * @param {String} facet Could be a facet uri
+     * @param {function} callback This callback will be run, if the request is done.
+     */
     Subject.prototype.getValues = function (facet, callback) {
         var addValueToFacet = this.facets[String(facet)].values;
         var subjectURI = this.URI;
@@ -109,15 +130,11 @@ Alida = (function ($) {
                             value = JSONvalue.results.bindings[i].value.value;
                             type = JSONvalue.results.bindings[i].value.type;
                             label = value.trimURI();
-                            //alert(type + ' - ' + value);
                             var fvalue = {
                                 type: type,
                                 value: value,
                                 label: label
                             };
-//                            fvalue[type] = type;
-//                            fvalue[value] = value;
-//                            fvalue[label] = label;
                             fvalues.push(fvalue);
                             addValueToFacet.push({
                                 type: type,
@@ -140,6 +157,10 @@ Alida = (function ($) {
         });
     }
 
+    /**
+     * Trim the uri to a human readable format
+     * @return Human readable label for an uri
+     */
     String.prototype.trimURI = function () {
         // Splitting the label part from the uri
         if ( (sharpIndex = this.lastIndexOf("#")) != -1 ) {
@@ -162,8 +183,8 @@ Alida = (function ($) {
      * Creates the query string
      * @private
      * @param {String} searchString Users search string
-     * @param {Array} optQuery additional querystring if filtering
-     * @return {String} mainquery
+     * @param {Array} optQuery Additional querystring if filtering
+     * @return A specify query
      */
     function _createQuery (searchString, optQuery) {
         var mainquery = "SELECT DISTINCT ?s ?search "
@@ -185,6 +206,8 @@ Alida = (function ($) {
      * Parses the XML object from the first ajax request including subject and object.
      * @private
      * @param {XML} data XML document contains the first result
+     * @param {String} endpoint endpoint url
+     * @param {Object} result The result object of one query
      */
     function _parseFirstRequestXML (data, endpoint, result) {
         $(data).find('result').each(function () {
@@ -206,6 +229,7 @@ Alida = (function ($) {
      * @private
      * @param {String} data JSON String contains the first result
      * @param {String} endpoint endpoint url
+     * @param {Object} result The result object of one query
      */
     function _parseFirstRequestJSON (data, endpoint, result) {
         var JSONresult = $.parseJSON(data);
@@ -235,42 +259,22 @@ Alida = (function ($) {
         setOptions: function (options) {
             _defaultOptions = $.extend(_defaultOptions, options);
         }, 
-
-        /**
-         * Adds an new endpoint.
-         * @param {String} endpointURI EndpointURI
-         */
-        addEndpoint: function (endpointURI) {
-            _result.endpoints.push(endpointURI);
-        },
-
-        /**
-         * Returns all specified endpoints.
-         * @return {Array} _endpoints Specified endpoints
-         */
-        getEndpoints: function () {
-            return _result.endpoints;
-        },
-        
-        getResult: function () {
-            return _result;
-        },
         
         /**
          * Inits a query.
-         * @param {String] searchString Search string
-         * @param {function} resultCallback Resultcallback will be called, when all results are available
-         * @param {function} errorCallback Errorcallback will be called, when an error occurred
+         * @param {String} searchString Search string
+         * @param {Array} optQuery, can be used to modify the sparql query (e.g. filter)
+         * @param {function} onstartCallback This callback will be called, before the first request will send
+         * @param {function} resultCallback This callback will be called, when all results are available
+         * @param {function} onStopCallback This callback will be called, when the result is received
+         * @param {function} errorCallback This callback will be called, when an error occurred
          */
         query: function (searchString, optQuery, endpoints, onStartCallback, resultCallback, onStopCallback, errorCallback) {
             if( jQuery.isFunction(onStartCallback) ) {
                 onStartCallback();
             }
-
             //each query get a new result object
             $(endpoints).each( function (i) {
-
-
                 /** result object */
                 var _result = {
                     //query : String,
