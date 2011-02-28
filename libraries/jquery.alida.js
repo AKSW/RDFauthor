@@ -464,45 +464,44 @@
                 window.clearInterval(typingDelay);
                 
                 if (searchString.length >= settingsTemp.inputChars) {
-                    Alida.query(searchString, optQuery, settingsTemp.endpoints,
-                    /** startCallback */
-                    function(){
-                        input.addClass('spinner');
-                    },
-                    /** resultCallback */
-                    function(result){
-                        resultContainerTemp.push(result);
-                        resultContainerTemp.last().facets(function() {
-                            for (var subjectURI in resultContainerTemp.last().subjects) {
-                                _insertResult(alidaIDTemp, resultContainerTemp.last().subjects[subjectURI]);
-                                for (var f in resultContainerTemp.last().subjects[subjectURI].facets) {
-                                    _insertFacet(alidaIDTemp, f,subjectURI);
+                    Alida.query(searchString, settingsTemp.endpoints, {
+                        optQuery: optQuery,
+                        onStart:  function () {
+                            input.addClass('spinner');
+                        },
+                        onResult: function (result) {
+                            resultContainerTemp.push(result);
+                            resultContainerTemp.last().facets(function() {
+                                for (var subjectURI in resultContainerTemp.last().subjects) {
+                                    _insertResult(alidaIDTemp, resultContainerTemp.last().subjects[subjectURI]);
+                                    for (var f in resultContainerTemp.last().subjects[subjectURI].facets) {
+                                        _insertFacet(alidaIDTemp, f,subjectURI);
+                                    }
                                 }
-                            }
-                        });
-                    },
-                    /** stopCallback */
-                    function(){
-                        input.removeClass('spinner');
-                        // add number of results
-                        $('#'+alidaIDTemp+' .numberOfResults').html(' [' + resultContainerTemp.last().sizeOfSubjects() + ']');
-                        // even odd to results
-                        $('#'+alidaIDTemp+' .results li').each(function(i){
-                            if( i % 2 == 0 ){
-                                $(this).addClass('even');
-                            }else{
-                                $(this).addClass('odd');
-                            }
-                        });
-                        // even odd to facets
-                        $('#'+alidaIDTemp+' .facets li').each(function(i){
-                            if( i % 2 == 0 ){
-                                $(this).addClass('even');
-                            }else{
-                                $(this).addClass('odd');
-                            }
-                        });
-                        _markFacets(alidaIDTemp,filter);
+                            });
+                        },
+                        onStop:   function () {
+                            input.removeClass('spinner');
+                            // add number of results
+                            $('#'+alidaIDTemp+' .numberOfResults').html(' [' + resultContainerTemp.last().sizeOfSubjects() + ']');
+                            // even odd to results
+                            $('#'+alidaIDTemp+' .results li').each(function(i){
+                                if( i % 2 == 0 ){
+                                    $(this).addClass('even');
+                                }else{
+                                    $(this).addClass('odd');
+                                }
+                            });
+                            // even odd to facets
+                            $('#'+alidaIDTemp+' .facets li').each(function(i){
+                                if( i % 2 == 0 ){
+                                    $(this).addClass('even');
+                                }else{
+                                    $(this).addClass('odd');
+                                }
+                            });
+                            _markFacets(alidaIDTemp,filter);
+                        }
                     });
                 }
             };
