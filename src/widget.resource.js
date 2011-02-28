@@ -71,7 +71,7 @@ RDFauthor.registerWidget({
             local:      {label: 'Local result',     color: '#efe',  border: '#e3ffe3',  rank: 0},
             sparql:     {label: 'Local result',         color: '#efe', border: '#e3ffe3', rank:  1}, 
             sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2},
-            alida:      {label: 'Alida result', color: '#00bffF', border: '#00008b', rank: 3},
+            alida:      {label: 'Alida result', color: '#00bffF', border: '#e6e6Fa', rank: 3},
             sindice:    {lael: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6}, 
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  8}
         }
@@ -353,6 +353,15 @@ RDFauthor.registerWidget({
                     self.results(alidaResults, responseCallback, 'alida');
                 }
             });
+            
+            $('.ui-menu-item').live('click',function(){
+                //alert($(this).find('.resource-edit-label').html());
+            });
+            
+            $('.facets').live('click', function(){
+                $(this).find('.facet-itmes').slideToggle();
+            });
+            
             this.ongoingSearches++;
         }
         
@@ -457,6 +466,7 @@ RDFauthor.registerWidget({
             }
             
             var self = this;
+            var isFirst = true;
             this.element().autocomplete({
                 minLength: self._options.minChars,
                 delay: self._options.delay,
@@ -531,8 +541,19 @@ RDFauthor.registerWidget({
                 } else if (e.which === 27) {
                     e.stopPropagation();
                 }
+                isFirst=true;
             })
             .data('autocomplete')._renderItem = function(ul, item) {
+                // Add facets
+                if (isFirst) {
+                    jQuery(ul)
+                        .append('<li class="facets"><div style="background-color: #F0F8ff;\
+                                border:1px solid ' + self.sources[item.source]['border'] + ';">\
+                            <span style="font-size:15px;">Facetten</span>\
+                        </div><div class="facet-itmes" style="display:none;font-size:15px;background-color: #F0F8ff;border:1px solid rgb(230, 230, 250);">test</div></li>')
+                        .css('width', self.element().innerWidth() - 4)
+                    isFirst = false;
+                }
                 // TODO: item sometimes undefiend
                 if (item) {
                     return jQuery('<li></li>')
@@ -547,7 +568,6 @@ RDFauthor.registerWidget({
                         .appendTo(ul);
                 }
             };
-            
             this._initialized  = true;
             this._autocomplete = this.element().data('autocomplete');
         }
