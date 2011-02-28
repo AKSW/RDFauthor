@@ -154,6 +154,9 @@ RDFauthor.registerWidget({
 }, [{
         name: 'range', 
         values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
+    },     {
+        name: 'property',
+        values: ['http://rdfs.org/sioc/ns#content']
     }, {
         name: 'datatype',
         values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']

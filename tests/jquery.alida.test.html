@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" type="text/css" href="../libraries/jquery.alida.css" />
+        <!--<link rel="stylesheet" type="text/css" href="lib/css/smoothness/jquery-ui-1.8.1.custom.css" />-->
+        <link rel="stylesheet" type="text/css" href="../libraries/jquery.ui.autocomplete.css" />
+        <script type="text/javascript" src="../libraries/jquery.js"></script>
+        <script type="text/javascript" src="../libraries/alida.js"></script>
+        <script type="text/javascript" src="../libraries/jquery.alida.js"></script>
+        <script type="text/javascript" src="../libraries/jquery-ui.js"></script>
+        <!--<script type="text/javascript" src="lib/js/jquery-ui-1.8.1.custom.min.js">-->
+        </script>
+        <script type="text/javascript">
+            $().ready(function(){
+                $('#input').alida({
+                    'endpoints': [/*"http://catalogus-professorum.org/sparql", "http://od.fmi.uni-leipzig.de/sparql", */"http://localhost/ontowiki/sparql" ],
+                    'limit': 5
+                });
+                $('#input2').alida({
+                    'endpoints': ["http://localhost/ontowiki/sparql" ],
+                    'limit': '10',
+                    'showEndpoints': 'false'
+                });
+            });
+        </script>
+        <title>Testpage</title>
+    </head>
+    <body>
+        <form id="alida" action="" method="get">
+            <p>
+                <input style="width:400px;" id="input" type="text" />
+            </p>
+             <br><br><br><br><br><br>
+            <p>
+             <input style="width:400px;" id="input2" type="text" />
+            </p>
+        </form>
+        <p>
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+        </p>
+        <h4>Tests</h4>
+        <p>
+            <span>Es existiert ein <a href="tests/test.html">QUnit - Komponententest</a> zu Alida.</span>
+        </p>
+    </body>
+</html>
