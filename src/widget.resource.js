@@ -14,10 +14,11 @@ RDFauthor.registerWidget({
         this.ongoingSearches       = 0;
         this.searchResults         = [];
         
-        this._domReady     = false;
-        this._pluginLoaded = false;
-        this._initialized  = false;
-        this._autocomplete = null;
+        this._domReady      = false;
+        this._pluginLoaded  = false;
+        this._pluginLoaded2 = false;
+        this._initialized   = false;
+        this._autocomplete  = null;
         
         this._namespaces = jQuery.extend({
             foaf: 'http://xmlns.com/foaf/0.1/', 
@@ -42,6 +43,7 @@ RDFauthor.registerWidget({
             // Source options:
             local:              false,  /* Local property cache */
             sparql:             true,   /* use SPARQL endpoint */
+            alida:              true,   /* use alida api*/
             //sindice:           true,   /* use Sindice semantic search */
             uri:                true,   /* provide generated URI */
             // Filter options:
@@ -68,7 +70,8 @@ RDFauthor.registerWidget({
         this.sources = {
             local:      {label: 'Local result',     color: '#efe',  border: '#e3ffe3',  rank: 0},
             sparql:     {label: 'Local result',         color: '#efe', border: '#e3ffe3', rank:  1}, 
-            sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2}, 
+            sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2},
+            alida:      {label: 'Alida result', color: '#00bffF', border: '#00008b', rank: 3},
             sindice:    {lael: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6}, 
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  8}
         }
@@ -83,6 +86,11 @@ RDFauthor.registerWidget({
             self._pluginLoaded = true;
             self._initAutocomplete();
         }
+        
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/alida.js', function () {
+            self._pluginLoaded2 = true;
+            self._initAutocomplete();
+        });
         
         // jQuery UI styles
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
@@ -326,6 +334,28 @@ RDFauthor.registerWidget({
             }], responseCallback, 'uri');
         }
         
+        // alida api
+        if (this._options.alida) {
+            var alidaResults = [];
+            var endpoints = [];
+            /** add endpoint */
+            endpoints.push(RDFauthor.serviceURIForGraph(this.statement.graphURI()));
+            /** perfom alida */
+            Alida.query(searchTerm,endpoints, {
+                'onResult': function (result) {
+                    for (var subjectURI in result.subjects) {
+                        alidaResults.push({
+                            source: 'alida',
+                            value: result.subjects[subjectURI].URI,
+                            label: result.subjects[subjectURI].label
+                        });
+                    }
+                    self.results(alidaResults, responseCallback, 'alida');
+                }
+            });
+            this.ongoingSearches++;
+        }
+        
         if (this._options.local) {
             this.ongoingSearches++;
             var results = [], 
@@ -420,7 +450,7 @@ RDFauthor.registerWidget({
     
     _initAutocomplete: function () {
         var self = this;
-        if (this._pluginLoaded && this._domReady && !this._initialized) {
+        if (this._pluginLoaded && this._pluginLoaded2 && this._domReady && !this._initialized) {
             // must be URI
             if (this.statement.hasObject()) {
                 this.element().addClass('resource-autocomplete-uri');
