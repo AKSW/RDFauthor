@@ -263,13 +263,22 @@ Alida = (function ($) {
         /**
          * Inits a query.
          * @param {String} searchString Search string
-         * @param {Array} optQuery, can be used to modify the sparql query (e.g. filter)
-         * @param {function} onstartCallback This callback will be called, before the first request will send
-         * @param {function} resultCallback This callback will be called, when all results are available
-         * @param {function} onStopCallback This callback will be called, when the result is received
-         * @param {function} errorCallback This callback will be called, when an error occurred
+         * @param {Array} endpoints Endpoints is an array, which contains all your endpoint URLs.
+         * @param {object} options Optional parameters; the following are supported:
+         *  - optQuery {array} SPARQL triples patterns or filter clauses that will be added to the search query.
+         *  - onStart {function} Callback, which will be called before the first results are received.
+         *  - onResult {function} - Callback, which will be called when the results are received. The function receives as the parameter a results object.
+         *  - onStop {function} Callback, which will be called when all results and facets are received.
+         *  - onError {function} Callback, which will be called if an error occurred.
          */
-        query: function (searchString, optQuery, endpoints, onStartCallback, resultCallback, onStopCallback, errorCallback) {
+        query: function (searchString, endpoints, options) {
+            options = options || {};
+            var optQuery        = options.optQuery,
+                onStartCallback = options.onStart,
+                resultCallback  = options.onResult,
+                onStopCallback  = options.onStop,
+                errorCallback   = options.onError;
+
             if( jQuery.isFunction(onStartCallback) ) {
                 onStartCallback();
             }

@@ -12,9 +12,11 @@
             Alida.setOptions({
                 'limit': 10
             });
-            Alida.query('Datenb',[],["http://localhost/ontowiki/sparql" ],function(){},function(result){
-                alert(result.sizeOfSubjects());
-            })
+            Alida.query('Datenb',["http://localhost/ontowiki/sparql"], {
+                'onResult': function (result) {
+                    alert(result.sizeOfSubjects());
+                } 
+            });
 //            //addEndpoint
 //            //Alida.addEndpoint('http://localhost/ontowiki/sparql');
 //            //get Endpoint over function
