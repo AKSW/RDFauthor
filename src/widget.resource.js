@@ -5,6 +5,63 @@
  */
 
 var MAX_TITLE_LENGTH = 50;
+var resourceWidget;
+
+// click events
+            $('.facet-items li').live('click', function(){
+                var input = $(this).data('input');
+                var result = input.data('result');
+                var faceturi = $(this).data('uri');
+                var subjects = $(this).data('subjects');
+                input.next('div').find('.facet-values').empty();
+                $(subjects).each(function(i){
+                    result.subjects[subjects[i]].getValues(faceturi, function(fvalues) {
+                        $(fvalues).each(function(j){
+                            var exists = false;
+                            var facetValueLabel = fvalues[j].label;
+                            var facetValue = fvalues[j].value;
+                            var facetValueType = fvalues[j].type;
+                            input.next('div').find('.facet-values li').each(function(i){
+                                if($(this).html()==facetValueLabel && facetValueLabel != undefined) {
+                                    exists = true;
+                                }
+                            });
+                            if(exists == false && facetValueLabel != undefined) {
+                                input.next('div').find('.facet-values').append('<li>'+facetValueLabel+'</li>');
+                                input.next('div').find('.facet-values li:last').data('faceturi',faceturi);
+                                input.next('div').find('.facet-values li:last').data('value',facetValue);
+                                input.next('div').find('.facet-values li:last').data('type',facetValueType);
+                                input.next('div').find('.facet-values li:last').data('label',facetValue);
+                                input.next('div').find('.facet-values li:last').data('input',input);
+                            }
+                        });
+                    });
+                });
+            });
+
+
+            $('.facet-values li').live('click',function(){
+                //var input = input.data('input');
+                var input = $(this).data('input');
+                var searchTerm = input.data('searchTerm');
+                var responseCallback = input.data('responseCallback');
+                var facetUri = $(this).data('faceturi');
+                var facetValue = $(this).data('value');
+                var facetValueType = $(this).data('type');
+                var optQuery = [];
+                switch(facetValueType){
+                    case 'uri':
+                        optQuery.push("?s <" + facetUri + "> <" + facetValue + ">. ");
+                        break;
+                    case 'literal':
+                        optQuery.push("?s <" + facetUri + "> \"" + facetValue + "\". ");
+                        break;
+                    default:
+                        window.console.error('error while creating optQuery');
+                        break;
+                }
+                resourceWidget.performSearch(input, searchTerm, responseCallback, optQuery);
+            });
 
 RDFauthor.registerWidget({
     init: function () {
@@ -97,6 +154,8 @@ RDFauthor.registerWidget({
         
         // load stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
+
+
     }, 
     
     ready: function () {
@@ -179,9 +238,10 @@ RDFauthor.registerWidget({
         return null;
     }, 
     
-    performSearch: function (searchTerm, responseCallback) {
+    performSearch: function (input, searchTerm, responseCallback, optQuery) {
         this.searchResults = [];
         var self = this;
+        resourceWidget = this;
 
         if (this._options.sparql) {
             // SPARQL endpoint    
@@ -342,26 +402,47 @@ RDFauthor.registerWidget({
             endpoints.push(RDFauthor.serviceURIForGraph(this.statement.graphURI()));
             /** perfom alida */
             Alida.query(searchTerm,endpoints, {
+                'optQuery': optQuery,
+                'onStart': function() {
+                    input.next('div').find('ul').empty();
+                    input.data('responseCallback',responseCallback);
+                    input.data('searchTerm',searchTerm);
+                    //input.removeData();
+                },
                 'onResult': function (result) {
-                    for (var subjectURI in result.subjects) {
-                        alidaResults.push({
-                            source: 'alida',
-                            value: result.subjects[subjectURI].URI,
-                            label: result.subjects[subjectURI].label
-                        });
-                    }
-                    self.results(alidaResults, responseCallback, 'alida');
+                    input.data('result',result);
+                    result.facets(function(){
+                        for (var subjectURI in result.subjects) {
+                            //facets
+                            for (var f in result.subjects[subjectURI].facets) {
+                                //check if distinct facet
+                                var exists = false;
+                                input.next('div').find('.facet-items li').each(function(i){
+                                    if($(this).html()==f.trimURI()){
+                                        exists=true;
+                                        $(this).data('subjects').push(subjectURI)
+                                    }
+                                });
+                                if (exists == false){
+                                    input.next('div').find('.facet-items').append('<li>'+f.trimURI()+'</li>');
+                                    input.next('div').find('.facet-items li:last').data('uri',f);
+                                    input.next('div').find('.facet-items li:last').data('subjects',[subjectURI]);
+                                    input.next('div').find('.facet-items li:last').data('input',input);
+                                }
+                            }
+                            //create Alida results (subjects) for autocomplete
+                            alidaResults.push({
+                                source: 'alida',
+                                value: result.subjects[subjectURI].URI,
+                                label: result.subjects[subjectURI].label
+                            });
+                        }
+                        self.results(alidaResults, responseCallback, 'alida');
+                    });
                 }
             });
             
-            $('.ui-menu-item').live('click',function(){
-                //alert($(this).find('.resource-edit-label').html());
-            });
-            
-            $('.facets').live('click', function(){
-                $(this).find('.facet-itmes').slideToggle();
-            });
-            
+
             this.ongoingSearches++;
         }
         
@@ -373,7 +454,7 @@ RDFauthor.registerWidget({
                 results.push({
                     source: 'local', 
                     value: searchResults[i]['uri'], 
-                    label: searchResults[i]['label'],
+                    label: searchResults[i]['label']
                 });
             };
             // Add results to global callback
@@ -464,9 +545,11 @@ RDFauthor.registerWidget({
             if (this.statement.hasObject()) {
                 this.element().addClass('resource-autocomplete-uri');
             }
-            
             var self = this;
             var isFirst = true;
+            var input = this.element();
+            this.element().after('<div class="facets"><ul class="facet-items"></ul>\
+                                  <ul class="facet-values"></ul></div>');
             this.element().autocomplete({
                 minLength: self._options.minChars,
                 delay: self._options.delay,
@@ -491,7 +574,7 @@ RDFauthor.registerWidget({
                     self.searchTerm = request.term;
 
                     // search
-                    self.performSearch(request.term, response);
+                    self.performSearch(input, request.term, response);
                 }, 
                 select: function (event, ui) {
                     self.selectedResource      = ui.item.value;
@@ -544,16 +627,16 @@ RDFauthor.registerWidget({
                 isFirst=true;
             })
             .data('autocomplete')._renderItem = function(ul, item) {
-                // Add facets
-                if (isFirst) {
-                    jQuery(ul)
-                        .append('<li class="facets"><div style="background-color: #F0F8ff;\
-                                border:1px solid ' + self.sources[item.source]['border'] + ';">\
-                            <span style="font-size:15px;">Facetten</span>\
-                        </div><div class="facet-itmes" style="display:none;font-size:15px;background-color: #F0F8ff;border:1px solid rgb(230, 230, 250);">test</div></li>')
-                        .css('width', self.element().innerWidth() - 4)
-                    isFirst = false;
-                }
+//                // Add facets
+//                if (isFirst) {
+//                    jQuery(ul)
+//                        .append('<li class="facets"><div style="background-color: #F0F8ff;\
+//                                border:1px solid //' + self.sources[item.source]['border'] + ';">\
+//                            <span style="font-size:15px;">Facetten</span>\
+//                        </div><ul class="facet-items" style="font-size:15px;background-color: #F0F8ff;border:1px solid rgb(230, 230, 250);"><li>test</li></ul></li>//')
+//                        .css('width', self.element().innerWidth() - 4)
+//                    isFirst = false;
+//                }
                 // TODO: item sometimes undefiend
                 if (item) {
                     return jQuery('<li></li>')
