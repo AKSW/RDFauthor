@@ -8,60 +8,59 @@ var MAX_TITLE_LENGTH = 50;
 var resourceWidget;
 
 // click events
-            $('.facet-items li').live('click', function(){
-                var input = $(this).data('input');
-                var result = input.data('result');
-                var faceturi = $(this).data('uri');
-                var subjects = $(this).data('subjects');
-                input.next('div').find('.facet-values').empty();
-                $(subjects).each(function(i){
-                    result.subjects[subjects[i]].getValues(faceturi, function(fvalues) {
-                        $(fvalues).each(function(j){
-                            var exists = false;
-                            var facetValueLabel = fvalues[j].label;
-                            var facetValue = fvalues[j].value;
-                            var facetValueType = fvalues[j].type;
-                            input.next('div').find('.facet-values li').each(function(i){
-                                if($(this).html()==facetValueLabel && facetValueLabel != undefined) {
-                                    exists = true;
-                                }
-                            });
-                            if(exists == false && facetValueLabel != undefined) {
-                                input.next('div').find('.facet-values').append('<li>'+facetValueLabel+'</li>');
-                                input.next('div').find('.facet-values li:last').data('faceturi',faceturi);
-                                input.next('div').find('.facet-values li:last').data('value',facetValue);
-                                input.next('div').find('.facet-values li:last').data('type',facetValueType);
-                                input.next('div').find('.facet-values li:last').data('label',facetValue);
-                                input.next('div').find('.facet-values li:last').data('input',input);
-                            }
-                        });
-                    });
+$('.facet-items li').live('click', function(){
+    var input = $(this).data('input');
+    var result = input.data('result');
+    var faceturi = $(this).data('uri');
+    var subjects = $(this).data('subjects');
+    input.next('.alida').find('.facet-values').empty();
+    $(subjects).each(function(i){
+        result.subjects[subjects[i]].getValues(faceturi, function(fvalues) {
+            $(fvalues).each(function(j){
+                var exists = false;
+                var facetValueLabel = fvalues[j].label;
+                var facetValue = fvalues[j].value;
+                var facetValueType = fvalues[j].type;
+                input.next('.alida').find('.facet-values li').each(function(i){
+                    if($(this).html()==facetValueLabel && facetValueLabel != undefined) {
+                        exists = true;
+                    }
                 });
-            });
-
-
-            $('.facet-values li').live('click',function(){
-                //var input = input.data('input');
-                var input = $(this).data('input');
-                var searchTerm = input.data('searchTerm');
-                var responseCallback = input.data('responseCallback');
-                var facetUri = $(this).data('faceturi');
-                var facetValue = $(this).data('value');
-                var facetValueType = $(this).data('type');
-                var optQuery = [];
-                switch(facetValueType){
-                    case 'uri':
-                        optQuery.push("?s <" + facetUri + "> <" + facetValue + ">. ");
-                        break;
-                    case 'literal':
-                        optQuery.push("?s <" + facetUri + "> \"" + facetValue + "\". ");
-                        break;
-                    default:
-                        window.console.error('error while creating optQuery');
-                        break;
+                if(exists == false && facetValueLabel != undefined) {
+                    input.next('.alida').find('.facet-values').append('<li>'+facetValueLabel+'</li>');
+                    input.next('.alida').find('.facet-values li:last').data('faceturi',faceturi);
+                    input.next('.alida').find('.facet-values li:last').data('value',facetValue);
+                    input.next('.alida').find('.facet-values li:last').data('type',facetValueType);
+                    input.next('.alida').find('.facet-values li:last').data('label',facetValue);
+                    input.next('.alida').find('.facet-values li:last').data('input',input);
                 }
-                resourceWidget.performSearch(input, searchTerm, responseCallback, optQuery);
             });
+        });
+    });
+});
+
+
+$('.facet-values li').live('click',function(){
+    var input = $(this).data('input');
+    var searchTerm = input.data('searchTerm');
+    var responseCallback = input.data('responseCallback');
+    var facetUri = $(this).data('faceturi');
+    var facetValue = $(this).data('value');
+    var facetValueType = $(this).data('type');
+    switch(facetValueType){
+        case 'uri':
+            input.data('optquery').push("?s <" + facetUri + "> <" + facetValue + ">. ");
+            break;
+        case 'literal':
+            input.data('optquery').push("?s <" + facetUri + "> \"" + facetValue + "\". ");
+            break;
+        default:
+            window.console.error('error while creating optQuery');
+            break;
+    }
+    input.focus();
+    resourceWidget.performSearch(input, searchTerm, responseCallback, input.data('optquery'));
+});
 
 RDFauthor.registerWidget({
     init: function () {
@@ -404,7 +403,7 @@ RDFauthor.registerWidget({
             Alida.query(searchTerm,endpoints, {
                 'optQuery': optQuery,
                 'onStart': function() {
-                    input.next('div').find('ul').empty();
+                    input.next('.alida').find('ul').empty();
                     input.data('responseCallback',responseCallback);
                     input.data('searchTerm',searchTerm);
                     //input.removeData();
@@ -417,17 +416,17 @@ RDFauthor.registerWidget({
                             for (var f in result.subjects[subjectURI].facets) {
                                 //check if distinct facet
                                 var exists = false;
-                                input.next('div').find('.facet-items li').each(function(i){
+                                input.next('.alida').find('.facet-items li').each(function(i){
                                     if($(this).html()==f.trimURI()){
                                         exists=true;
                                         $(this).data('subjects').push(subjectURI)
                                     }
                                 });
                                 if (exists == false){
-                                    input.next('div').find('.facet-items').append('<li>'+f.trimURI()+'</li>');
-                                    input.next('div').find('.facet-items li:last').data('uri',f);
-                                    input.next('div').find('.facet-items li:last').data('subjects',[subjectURI]);
-                                    input.next('div').find('.facet-items li:last').data('input',input);
+                                    input.next('.alida').find('.facet-items').append('<li>'+f.trimURI()+'</li>');
+                                    input.next('.alida').find('.facet-items li:last').data('uri',f);
+                                    input.next('.alida').find('.facet-items li:last').data('subjects',[subjectURI]);
+                                    input.next('.alida').find('.facet-items li:last').data('input',input);
                                 }
                             }
                             //create Alida results (subjects) for autocomplete
@@ -548,7 +547,8 @@ RDFauthor.registerWidget({
             var self = this;
             var isFirst = true;
             var input = this.element();
-            this.element().after('<div class="facets"><ul class="facet-items"></ul>\
+            input.data('optquery',[]);
+            this.element().after('<div class="alida"><ul class="facet-items"></ul>\
                                   <ul class="facet-values"></ul></div>');
             this.element().autocomplete({
                 minLength: self._options.minChars,
@@ -572,7 +572,7 @@ RDFauthor.registerWidget({
                 source: function (request, response) {
                     // keep for later
                     self.searchTerm = request.term;
-
+                    input.data('optquery',[]);
                     // search
                     self.performSearch(input, request.term, response);
                 }, 
