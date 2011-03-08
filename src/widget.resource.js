@@ -436,12 +436,12 @@ RDFauthor.registerWidget({
                                 label: result.subjects[subjectURI].label
                             });
                         }
-                        self.results(alidaResults, responseCallback, 'alida');
                     });
+                },
+                'onStop': function (){
+                    self.results(alidaResults, responseCallback, 'alida');
                 }
             });
-            
-
             this.ongoingSearches++;
         }
         

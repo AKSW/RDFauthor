@@ -175,7 +175,7 @@ Alida = (function ($) {
         }
         label = label.replace(/_/," / ");
         // doesn't work yet
-        label[0] = label[0].toUpperCase();
+        //label[0] = label[0].toUpperCase();
         return label;
     }
 
