@@ -4,6 +4,8 @@
  * Author: Tim Ermilov <yamalight@gmail.com>
  */
 
+var RDFAUTHOR_MOBILECONTROLLER_JS = 1;
+
 /**
  * Constructs a view object for mobile devices.
  *
@@ -336,3 +338,4 @@ MobileController.prototype = {
         }
     }
 };
+

@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var WIDGET_TEL_JS = 1;
+
 /*
  * RDFauthor widget template.
  * Use this as a base for your own widget implementations.
@@ -154,3 +156,4 @@ RDFauthor.registerWidget({
                  'http://purl.org/net/ldap#fax']
     }]
 );
+

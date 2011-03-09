@@ -3,6 +3,9 @@
  * http://code.google.com/p/rdfauthor
  * Author: Norman Heino <norman.heino@gmail.com>
  */
+
+var WIDGET_LITERAL_JS = 1;
+
 RDFauthor.registerWidget({
     init: function () {
         this.disclosureID = 'disclosure-' + RDFauthor.nextID();
@@ -285,3 +288,4 @@ RDFauthor.registerWidget({
         name: '__LITERAL__'
     }
 );
+

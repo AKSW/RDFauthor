@@ -4,6 +4,7 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var WIDGET_RESOURCE_JS = 1;
 var MAX_TITLE_LENGTH = 50;
 
 RDFauthor.registerWidget({

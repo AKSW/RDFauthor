@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var RDFAUTHOR_STATEMENT_JS = 1;
+
 /**
  * Constructs a Statement object which encapsulates a statement and display-specific properties.
  * 

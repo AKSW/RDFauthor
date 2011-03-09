@@ -1,3 +1,5 @@
+var RDFAUTHOR_INLINE_CONTROLLER = 1;
+
 function InlineController(options) {
     // default options
     var defaultOptions = {
@@ -76,3 +78,4 @@ InlineController.prototype = {
         }
     }
 }
+

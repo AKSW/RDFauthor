@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var RDFAUTHOR_PREDICATEROW_JS = 1;
+
 /**
  * Constructs a PredicateRow object self manages a number of widgets sharing 
  * same subject and predicate.
@@ -303,3 +305,4 @@ PredicateRow.prototype = {
         return submitOk;
     }
 }
+

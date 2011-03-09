@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var WIDGET_TEMPLATE_JS = 1;
+
 /*
  * RDFauthor widget template.
  * Use this as a base for your own widget implementations.
@@ -73,3 +75,4 @@ RDFauthor.registerWidget({
         values: ['http://www.w3.org/2001/XMLSchema#string']
     }/* add more hooks here */]
 );
+

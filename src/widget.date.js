@@ -3,6 +3,9 @@
  * http://code.google.com/p/rdfauthor
  * Author: Norman Heino <norman.heino@gmail.com>
  */
+
+var WIDGET_DATE_JS = 1;
+
 RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
@@ -110,3 +113,4 @@ RDFauthor.registerWidget({
         values: ['http://www.w3.org/2001/XMLSchema#date']
     }
 );
+

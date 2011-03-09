@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var RDFAUTHOR_SUBJECTGROUP_JS = 1;
+
 /**
  * Constructs a subject group object that manages property rows sharing same subject. 
  *
@@ -211,3 +213,4 @@ SubjectGroup.prototype = {
         }
     }
 }
+

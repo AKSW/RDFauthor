@@ -876,14 +876,27 @@ RDFauthor = (function($, undefined) {
      * loading. Readyness is announced when all pending scripts are loaded.
      */
     function _require(scriptURI, callback) {
-        _requirePending++;
-        _loadScript(scriptURI, function () {
-            _callIfIsFunction(callback);
-            _requirePending--;
-            if (_requirePending == 0) {
-                _ready();
-            }
-        });
+        var lastSlash = scriptURI.lastIndexOf('/'),
+            loadedKey;
+
+        if (lastSlash > -1) {
+            loadedKey = scriptURI.slice(lastSlash+1);
+        } else {
+            loadedKey = scriptURI;
+        }
+
+        loadedKey = loadedKey.replace(new RegExp('\\.', 'g'), '_').toUpperCase();
+
+        if (!window[loadedKey]) {
+            _requirePending++;
+            _loadScript(scriptURI, function () {
+                _callIfIsFunction(callback);
+                _requirePending--;
+                if (_requirePending == 0) {
+                    _ready();
+                }
+            });
+        }
     }
     
     function _resetDatabanks() {
@@ -1714,3 +1727,4 @@ RDFauthor = (function($, undefined) {
         }
     }
 })(jQuery);
+

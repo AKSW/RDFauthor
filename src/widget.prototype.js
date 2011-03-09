@@ -4,6 +4,9 @@
  * <code>MyWidget.prototype = Widget;</code> or make sure you implement all 
  * the functions yourself.
  */
+
+var WIDGET_PROTOTYPE_JS = 1;
+
 var Widget = {
     animate: false, 
     options: {}, 
@@ -88,3 +91,4 @@ var Widget = {
         return null;
     }
 };
+

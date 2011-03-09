@@ -5,6 +5,8 @@
  * Author: Sebastian Tramp <mail@sebastian.tramp.name>
  */
 
+var WIDGET_MAILTO_JS = 1;
+
 /*
  * RDFauthor widget template.
  * Use this as a base for your own widget implementations.
@@ -153,3 +155,4 @@ RDFauthor.registerWidget({
         values: ['http://xmlns.com/foaf/0.1/mbox', 'http://rdfs.org/sioc/ns#email', 'http://usefulinc.com/ns/doap#mailing-list']
     }]
 );
+

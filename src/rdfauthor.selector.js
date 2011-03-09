@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var RDFAUTHOR_SELECTOR_JS = 1;
+
 function Selector(graphURI, subjectURI, options) {
     this._options = $.extend({
         container: 'body', 

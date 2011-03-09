@@ -4,6 +4,7 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var WIDGET_ALIDA_JS = 1;
 /*
  * RDFauthor widget template.
  * Use this as a base for your own widget implementations.
@@ -71,3 +72,4 @@ RDFauthor.registerWidget({
         values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#type']
     }/* add more hooks here */]
 );
+

@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var WIDGET_XMLLITERAL_JS = 1;
+
 RDFauthor.registerWidget({    
     _loadMCE: function () {
         if (this._mceLoaded && this._domReady) {
@@ -159,3 +161,4 @@ RDFauthor.registerWidget({
         values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
     }]
 );
+

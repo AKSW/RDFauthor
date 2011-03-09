@@ -4,6 +4,8 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
+var RDFAUTHOR_POPOVERCONTROLLER_JS = 1;
+
 /**
  * Constructs a view object.
  *
@@ -357,3 +359,4 @@ PopoverController.prototype = {
         }
     }
 };
+
