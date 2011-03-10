@@ -8,6 +8,7 @@ RDFauthor.registerWidget({
         this.disclosureID = 'disclosure-' + RDFauthor.nextID();
         this.languages    = RDFauthor.literalLanguages();
         this.datatypes    = RDFauthor.literalDatatypes();
+        this.bool         = ["http://www.w3.org/2001/XMLSchema#boolean"];
         this.namespaces   = RDFauthor.namespaces();
 
         this.languages.unshift('');
@@ -20,7 +21,6 @@ RDFauthor.registerWidget({
     
     ready: function () {
         var widget = this;
-        
         // disclosure button
         jQuery('#' + widget.disclosureID).click(function () {
             var close = $(this).hasClass('open') ? true : false;
@@ -50,19 +50,33 @@ RDFauthor.registerWidget({
         
         // literal options
         $('.literal-type .radio').click(function() {
+            var textarea = $(this).parent().parent().parent().find('textarea');
+            if ( (textarea.val() != 'true' ) && (textarea.val() != 'false') ) {
+                $(this).data('val',textarea.val());
+            }
             var jDatatypeSelect = $('#' + $(this).attr('name').replace('literal-type', 'literal-datatype')).eq(0);
             var jLangSelect     = $('#' + $(this).attr('name').replace('literal-type', 'literal-lang')).eq(0);
 
             if ($(this).val() == 'plain') {
+                //alert($(this).data('val'));
+                textarea.val($(this).data('val'));
                 jDatatypeSelect.closest('div').hide();
                 jLangSelect.closest('div').show();
                 // clear datatype
                 jDatatypeSelect.val('');
-            } else {
+            } else if ($(this).val() == 'typed') {
+                //alert($(this).data('val'));
+                textarea.val($(this).data('val'));
                 jDatatypeSelect.closest('div').show();
                 jLangSelect.closest('div').hide();
                 // clear lang
                 jLangSelect.val('');
+            } else if ($(this).val() == 'true' || 'false') {
+                textarea.val($(this).val());
+                jDatatypeSelect.closest('div').hide();
+                jLangSelect.closest('div').hide();
+                jLangSelect.val('');
+                jDatatypeSelect.val('');
             }
         });
         
@@ -163,6 +177,10 @@ RDFauthor.registerWidget({
                         + (this.statement.objectDatatype() ? '' : ' checked="checked"') + ' value="plain" />Plain</label>\
                 <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"' 
                         + (this.statement.objectDatatype() ? ' checked="checked"' : '') + ' value="typed" />Typed</label>\
+                <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"'
+                        + (this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'true' ? ' checked="checked"' : '') + ' value="true" />True</label>\
+                <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"'
+                        + (this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'false' ? ' checked="checked"' : '') + ' value="false" />False</label>\
             </div>\
             <div class="container util ' + this.disclosureID + '" style="display:none">\
                 <div class="literal-lang"' + (this.statement.objectDatatype() ? ' style="display:none"' : '') + '>\
