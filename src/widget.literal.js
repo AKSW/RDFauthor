@@ -190,7 +190,7 @@ RDFauthor.registerWidget({
                         </select>\
                     </label>\
                 </div>\
-                <div class="literal-datatype"' + (this.statement.objectDatatype() ? '' : ' style="display:none"') + '>\
+                <div class="literal-datatype"' + (this.statement.objectDatatype() != this.bool[0] ? '' : ' style="display:none"') + '>\
                     <label>Datatype:\
                         <select id="literal-datatype-' + this.ID + '" name="literal-datatype-' + this.ID + '">\
                             ' + this.makeOptionString(this.datatypes, this.statement.objectDatatype(), true) + '\
