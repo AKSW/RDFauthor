@@ -235,8 +235,10 @@ RDFauthor.registerWidget({
                     var objectOptions = {};
                     if (null !== this.lang()) {
                         objectOptions.lang = this.lang();
-                    } else if (null !== this.datatype()) {
+                    } else if (null !== this.datatype() && null != this.bool[0]) {
                         objectOptions.datatype = this.datatype();
+                    } else if (null !== this.bool[0]) {
+                        objectOptions.datatype = this.bool[0];
                     }
                     var newStatement = this.statement.copyWithObject({
                         value: this.value(), 
