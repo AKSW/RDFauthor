@@ -154,6 +154,9 @@ RDFauthor.registerWidget({
         // load stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
 
+        // load stylesheets
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/widget.alida.css');
+
 
     }, 
     

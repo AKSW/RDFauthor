@@ -1,0 +1,65 @@
+.rdfauthor-widget-container,
+.rdfauthor-widget-container .resource-value
+{
+    overflow:visible;
+}
+
+.rdfauthor-widget-container .resource-value input
+{
+    z-index: 666;
+    position:relative;
+}
+
+.alida
+{
+    z-index: 667;
+    width:100%;
+    position:relative;
+    height:1px;
+    overflow:visible;
+    padding:0;
+    margin:0;
+}
+
+.alida ul
+{
+    list-style:none;
+    width:50%;
+    padding:0;
+    margin:0;
+    position:absolute;
+    bottom:2em;
+    max-height:20em;
+    overflow:auto;
+    background:#fff;
+    border-bottom:solid 2px #fff;
+}
+
+.alida ul.facet-items
+{
+    left:0;
+    font-weight:bold;
+}
+
+.alida ul.facet-values
+{
+    right:0;
+}
+
+.alida ul li
+{
+    width:auto;
+    margin:2px;
+    padding:0.25em;
+    background:#eee;
+    border:solid 1px #e3e3e3;
+    -moz-border-radius:2px;
+}
+
+.alida ul li:hover
+{
+    cursor:pointer;
+    border-color:#0073ea;
+    background:#0073ea;
+    color:#fff;
+}
