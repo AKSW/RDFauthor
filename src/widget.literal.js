@@ -58,20 +58,27 @@ RDFauthor.registerWidget({
             var jLangSelect     = $('#' + $(this).attr('name').replace('literal-type', 'literal-lang')).eq(0);
 
             if ($(this).val() == 'plain') {
-                //alert($(this).data('val'));
+                textarea.attr('readonly','');
+                if(textarea.val() == 'true' || textarea.val() == 'false'){
+                    textarea.val('');
+                }
                 textarea.val($(this).data('val'));
                 jDatatypeSelect.closest('div').hide();
                 jLangSelect.closest('div').show();
                 // clear datatype
                 jDatatypeSelect.val('');
             } else if ($(this).val() == 'typed') {
-                //alert($(this).data('val'));
+                textarea.attr('readonly','');
+                if(textarea.val() == 'true' || textarea.val() == 'false'){
+                    textarea.val('');
+                } 
                 textarea.val($(this).data('val'));
                 jDatatypeSelect.closest('div').show();
                 jLangSelect.closest('div').hide();
                 // clear lang
                 jLangSelect.val('');
             } else if ($(this).val() == 'true' || 'false') {
+                textarea.attr('readonly','true');
                 textarea.val($(this).val());
                 jDatatypeSelect.closest('div').hide();
                 jLangSelect.closest('div').hide();
@@ -159,10 +166,13 @@ RDFauthor.registerWidget({
             buttonClass: /*(this.isLarge()) ? 'disclosure-button-horizontal' :*/ 'disclosure-button-vertical', 
             containerClass: this.valueClass()
         }
-
+        var readonly = '';
+        if (this.statement.objectValue() == 'true' || this.statement.objectValue() == 'false') {
+            readonly = 'readonly="true"';
+        }
         var areaMarkup = '\
             <div class="container ' + areaConfig.containerClass + '" style="width:100%">\
-                <textarea rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' + 
+                <textarea ' + readonly + ' rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' +
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
             </div>\
             <div class="container util" style="clear:left">\
@@ -229,7 +239,6 @@ RDFauthor.registerWidget({
                     databank.remove(String(rdfqTriple));
                 }
             }
-            
             if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
                 try {
                     var objectOptions = {};
