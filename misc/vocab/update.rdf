@@ -16,7 +16,6 @@
 <!-- Ontology Information -->
   <owl:Ontology rdf:about=""
                 dc:creator="Norman Heino"
-                dc:creator="Sebastian Tramp"
                 rdfs:label="AKSW Update Vocabulary" >
     <rdfs:comment>A vocabulary describing update services and endpoints for RDFa widgets. It reuses some resources from the W3C WSDL-RDF mapping.</rdfs:comment>
   </owl:Ontology>
