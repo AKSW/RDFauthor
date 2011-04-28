@@ -31,11 +31,15 @@
 </head>
 
 <body xmlns:update="http://ns.aksw.org/update/">
-    <div update:from="http://localhost/rdfauthor/test/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ldap="http://purl.net/net/ldap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" class="vcard" about="http://bis.ontowiki.net/ThomasRiechert" typeof="foaf:Person">
+    <div update:from="http://localhost/rdfauthor/test/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ldap="http://purl.net/net/ldap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:geo="http://www. w3.org/2003/01/geo/wgs84_pos#" class="vcard" about="http://bis.ontowiki.net/ThomasRiechert" typeof="foaf:Person">
         
         <span rel="foaf:depiction">
             <img src="http://bis.informatik.uni-leipzig.de/images/jpegPhoto.php?name=sn&amp;value=Riechert" alt="depiction of Thomas Riechert"/>
         </span>
+        <p>
+            <span property="geo:lat" datatype="xsd:decimal">51.355971</span>
+            <span property="geo:long" datatype="xsd:decimal">12.328634</span>
+        </p>
         <p>
             <span class="block" property="foaf:name">Thomas Riechert</span>
             <span property="ldap:sreet" datatype="xsd:string">Johannisgasse 26</span>, Room
