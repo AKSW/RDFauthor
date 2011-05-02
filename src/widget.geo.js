@@ -47,8 +47,8 @@ RDFauthor.registerWidget({
                 <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
             </div>\
-            <div class="controls" style="display:block">\
-                <div class="map" class="smallmap" style="width:200px;height:200px;border:1px solid #ccc;"></div>\
+            <div id="controls" style="display:block">\
+                <div id="map" class="smallmap" style="width:200px;height:200px;border:1px solid #ccc;"></div>\
             </div>';
 
         return markup;
