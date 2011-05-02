@@ -8,11 +8,31 @@
     
     <link about="http://localhost/rdfauthor/test/" rel="update:queryEndpoint" href="http://localhost/OntoWiki/sparql" />
     <link about="http://localhost/rdfauthor/test/" rel="update:updateEndpoint" href="http://localhost/OntoWiki/update/" />
-    
+    <link rel="stylesheet" href="http://dev.openlayers.org/releases/OpenLayers-2.10/theme/default/style.css" />
+
     <script type="text/javascript" src="../../libraries/jquery.js"></script>
+    <!--<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>-->
     <script type="text/javascript" src="../../libraries/jquery-ui.js"></script>
     <!--script type="text/javascript" src="../../libraries/jquery.rdfquery.core.js"></script-->
-    
+    <script>
+    $(document).ready(function () {
+        var map, markers;
+        var zoom = 6;
+        var lon = 12;
+        var lat = 51;
+        map = new OpenLayers.Map('testmap');
+        var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS",
+                      "http://vmap0.tiles.osgeo.org/wms/vmap0",
+                      {layers: 'basic'} );
+        map.addLayers([wms]);
+        markers = new OpenLayers.Layer.Markers("markers");
+        map.addLayer(markers);
+
+        map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
+        map.addControl( new OpenLayers.Control.LayerSwitcher() );
+        map.addControl( new OpenLayers.Control.MousePosition() );
+    });
+    </script>
     <script type="text/javascript">
         var RDFAUTHOR_BASE = 'http://localhost/rdfauthor';
         RDFAUTHOR_READY_CALLBACK = function() {
@@ -57,6 +77,10 @@
             </span>
         </p>
     </div>
+    <!--<div id="testcontrols">
+        <div id="testmap" style="width:200px;height:200px;border:1px solid #ccc;">
+        </div>
+    </div>-->
 </body>
 
 </html>
