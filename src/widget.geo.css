@@ -1,0 +1,8 @@
+.geo-widget {
+  z-index: 10000;
+  background-color: #FFF;
+  border: 1px solid #FFF;
+  width: 300px;
+  overflow: auto;
+  position: absolute;
+}

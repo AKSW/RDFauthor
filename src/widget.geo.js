@@ -13,19 +13,25 @@ RDFauthor.registerWidget({
         this._DomRdy = false;
 
         var self = this;
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.geo.css');
+        RDFauthor.loadStylesheet('http://dev.openlayers.org/releases/OpenLayers-2.10/theme/default/style.css');
+
+        RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ');
+        RDFauthor.loadScript('http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us');
         RDFauthor.loadScript('http://openlayers.org/api/OpenLayers.js', function(){
             self._OpenLayersLoaded = true;
             self._initGeo();
         });
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.geo.css');
-        RDFauthor.loadStylesheet('http://dev.openlayers.org/releases/OpenLayers-2.10/theme/default/style.css');
     },
 
     // Uncomment this to execute code when you widget's markup is ready in the DOM,
     // e.g. load jQuery plug-ins, attach event handlers etc.
     ready: function () {
         this._domRdy = true
+        this.element().data('id',this.ID);
+        this.element().data('geo-widget', 'geo-widet-'+this.ID);
         this._initGeo();
+        
     },
 
     // return your jQuery-wrapped main input element here
@@ -43,13 +49,15 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup =
-            '<div class="container" style="width:100%">\
-                <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
-                    + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
+            '<div class="container2" style="width:100%">\
+              <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
+                  + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
+              <div class="geo-widget" id="geo-widget-'+ this.ID+'" style="display: none;">\
+                <label>Locate: </label><input type="text" style="width:90%" class="text" id="geo-widget-search-' + this.ID + '">\
+                <div id="map-'+this.ID+'" class="smallmap" style="width:99%;height:200px;border:1px solid #ccc;"></div>\
+              </div>\
             </div>\
-            <div id="controls" style="display:block">\
-                <div id="map" class="smallmap" style="width:200px;height:200px;border:1px solid #ccc;"></div>\
-            </div>';
+            ';
 
         return markup;
     },
@@ -109,16 +117,32 @@ RDFauthor.registerWidget({
 
         return null;
     },
-    initOpenLayers: function () {
+
+    _initOpenLayers: function (mapid, lon, lat) {
         var map, markers;
         var zoom = 6;
-        var lon = 12;
-        var lat = 51;
-        map = new OpenLayers.Map('container geo util ' + this.disclosureID + '');
+        // var lon = 12;
+        // var lat = 51;
+        map = new OpenLayers.Map('map-'+mapid);
+
+        // var satellite = new OpenLayers.Layer.Google(
+          // "Google Satellite" , {type: G_SATELLITE_MAP}
+        // );
+
         var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS",
                       "http://vmap0.tiles.osgeo.org/wms/vmap0",
                       {layers: 'basic'} );
-        map.addLayers([wms]);
+
+        var shared = new OpenLayers.Layer.VirtualEarth("Shaded", {
+            type: VEMapStyle.Shaded
+        });
+
+        var gmap = new OpenLayers.Layer.Google(
+            "Google Streets", // the default
+            {numZoomLevels: 20}
+        );
+
+        map.addLayers([shared,wms]);
         markers = new OpenLayers.Layer.Markers("markers");
         map.addLayer(markers);
 
@@ -127,26 +151,31 @@ RDFauthor.registerWidget({
         map.addControl( new OpenLayers.Control.MousePosition() );
     },
     _initGeo: function () {
+        var self = this;
         if (this._OpenLayersLoaded && this._domRdy) {
-            //$('#geo-edit-'+this.ID).click(function() {
-                alert('test geo widget');
+            self.element().click(function() {
+                // alert(self.element().data('geo-widget'));
+                var mapid = self.element().data('id');
+                self.element().next().show();
+                self._initOpenLayers(mapid,12,51);
+                // $(this).parent().parent().find('.widget-geo').show();
                 //this.initOpenLayers();
-                var map, markers;
-                var zoom = 6;
-                var lon = 12;
-                var lat = 51;
-                map = new OpenLayers.Map('map');
-                var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS",
-                              "http://vmap0.tiles.osgeo.org/wms/vmap0",
-                              {layers: 'basic'} );
-                map.addLayers([wms]);
-                markers = new OpenLayers.Layer.Markers("markers");
-                map.addLayer(markers);
+                // var map, markers;
+                // var zoom = 6;
+                // var lon = 12;
+                // var lat = 51;
+                // map = new OpenLayers.Map('map');
+                // var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS",
+                              // "http://vmap0.tiles.osgeo.org/wms/vmap0",
+                              // {layers: 'basic'} );
+                // map.addLayers([wms]);
+                // markers = new OpenLayers.Layer.Markers("markers");
+                // map.addLayer(markers);
 
-                map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
-                map.addControl( new OpenLayers.Control.LayerSwitcher() );
-                map.addControl( new OpenLayers.Control.MousePosition() );
-            //});
+                // map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
+                // map.addControl( new OpenLayers.Control.LayerSwitcher() );
+                // map.addControl( new OpenLayers.Control.MousePosition() );
+            });
         }
     }
 }, {
