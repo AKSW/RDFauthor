@@ -1,7 +1,8 @@
 /*
  * This file is part of the RDFauthor project.
  * http://code.google.com/p/rdfauthor
- * Author: Norman Heino <norman.heino@gmail.com>
+ * Author: Norman Heino <norman.heino@gmail.com>,
+ *         Clemens Hoffmann <cannelony@gmail.com>
  */
 RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated,
@@ -18,6 +19,7 @@ RDFauthor.registerWidget({
 
         RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ');
         RDFauthor.loadScript('http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us');
+        RDFauthor.loadScript('http://openstreetmap.org/openlayers/OpenStreetMap.js');
         RDFauthor.loadScript('http://openlayers.org/api/OpenLayers.js', function(){
             self._OpenLayersLoaded = true;
             self._initGeo();
@@ -51,7 +53,8 @@ RDFauthor.registerWidget({
         var markup =
             '<div class="container2" style="width:100%">\
               <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
-                  + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
+                  + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" name="'
+                  + this.statement.predicateLabel() + '"/>\
               <div class="geo-widget" id="geo-widget-'+ this.ID+'" style="display: none;">\
                 <label>Locate: </label><input type="text" style="width:90%" class="text" id="geo-widget-search-' + this.ID + '">\
                 <div id="map-'+this.ID+'" class="smallmap" style="width:99%;height:200px;border:1px solid #ccc;"></div>\
@@ -121,9 +124,55 @@ RDFauthor.registerWidget({
     _initOpenLayers: function (mapid, lon, lat) {
         var map, markers;
         var zoom = 6;
-        // var lon = 12;
-        // var lat = 51;
-        map = new OpenLayers.Map('map-'+mapid);
+
+        OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
+            defaultHandlerOptions: {
+                'single': true,
+                'double': false,
+                'pixelTolerance': 0,
+                'stopSingle': false,
+                'stopDouble': false
+            },
+
+            initialize: function(options) {
+                this.handlerOptions = OpenLayers.Util.extend(
+                    {}, this.defaultHandlerOptions
+                );
+                OpenLayers.Control.prototype.initialize.apply(
+                    this, arguments
+                ); 
+                this.handler = new OpenLayers.Handler.Click(
+                    this, {
+                        'click': this.trigger
+                    }, this.handlerOptions
+                );
+            }, 
+
+            trigger: function(e) {
+                var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(
+                   new OpenLayers.Projection("EPSG:900913"), 
+                   new OpenLayers.Projection("EPSG:4326")
+                );
+
+                alert("You clicked near " + lonlat.lat + " N, " +
+                                          + lonlat.lon + " E");
+
+                $('legend').each(function(i) {
+                    switch($(this).text()){
+                        case 'long' : lon = $(this).next().find('input[name="long"]').val(lonlat.lon);
+                            break;
+                        case 'lat'  : lat = $(this).next().find('input[name="lat"]').val(lonlat.lat);
+                            break;
+                    }
+                });
+
+            }
+
+        });
+
+        map = new OpenLayers.Map('map-'+mapid, {
+            displayProjection: new OpenLayers.Projection("EPSG:4326")
+        });
 
         // var satellite = new OpenLayers.Layer.Google(
           // "Google Satellite" , {type: G_SATELLITE_MAP}
@@ -133,53 +182,65 @@ RDFauthor.registerWidget({
                       "http://vmap0.tiles.osgeo.org/wms/vmap0",
                       {layers: 'basic'} );
 
-        var shared = new OpenLayers.Layer.VirtualEarth("Shaded", {
+        var shared = new OpenLayers.Layer.VirtualEarth("Bing", {
             type: VEMapStyle.Shaded
         });
+
+        var layer_mapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
+
+        var layer_cyclemap = new OpenLayers.Layer.OSM.CycleMap("Cyle");
 
         var gmap = new OpenLayers.Layer.Google(
             "Google Streets", // the default
             {numZoomLevels: 20}
         );
 
-        map.addLayers([shared,wms]);
-        markers = new OpenLayers.Layer.Markers("markers");
+        map.addLayers([layer_mapnik, layer_cyclemap]);
+        markers = new OpenLayers.Layer.Markers( "Markers" );
         map.addLayer(markers);
 
-        map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
+        var size = new OpenLayers.Size(21,25);
+        var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+        var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png',size,offset);
+
+        markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat).transform(
+            new OpenLayers.Projection("EPSG:4326"),
+            map.getProjectionObject()
+        ),icon)); 
+
+        map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
+            new OpenLayers.Projection("EPSG:4326"),
+            map.getProjectionObject()
+        ), zoom);
         map.addControl( new OpenLayers.Control.LayerSwitcher() );
         map.addControl( new OpenLayers.Control.MousePosition() );
+
+        var click = new OpenLayers.Control.Click();
+        map.addControl(click);
+        click.activate();
     },
+
     _initGeo: function () {
         var self = this;
         if (this._OpenLayersLoaded && this._domRdy) {
             self.element().click(function() {
-                // alert(self.element().data('geo-widget'));
                 var mapid = self.element().data('id');
+                var lon, lat;
                 self.element().next().show();
-                self._initOpenLayers(mapid,12,51);
-                // $(this).parent().parent().find('.widget-geo').show();
-                //this.initOpenLayers();
-                // var map, markers;
-                // var zoom = 6;
-                // var lon = 12;
-                // var lat = 51;
-                // map = new OpenLayers.Map('map');
-                // var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS",
-                              // "http://vmap0.tiles.osgeo.org/wms/vmap0",
-                              // {layers: 'basic'} );
-                // map.addLayers([wms]);
-                // markers = new OpenLayers.Layer.Markers("markers");
-                // map.addLayer(markers);
-
-                // map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
-                // map.addControl( new OpenLayers.Control.LayerSwitcher() );
-                // map.addControl( new OpenLayers.Control.MousePosition() );
+                $('legend').each(function(i) {
+                    switch($(this).text()){
+                        case 'long' : lon = $(this).next().find('input[name="long"]').val();
+                            break;
+                        case 'lat'  : lat = $(this).next().find('input[name="lat"]').val();
+                            break;
+                    }
+                });
+                self._initOpenLayers(mapid,lon,lat);
             });
         }
     }
 }, {
-        name: 'datatype',
-        values: ['http://www.w3.org/2001/XMLSchema#decimal']
+        name: 'property',
+        values: ['http://www.w3.org/2003/01/geo/wgs84_pos#long','http://www.w3.org/2003/01/geo/wgs84_pos#lat']
     }
 );
