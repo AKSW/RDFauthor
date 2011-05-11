@@ -10,18 +10,30 @@ RDFauthor.registerWidget({
     init: function () {
         this.disclosureID = 'disclosure-' + RDFauthor.nextID();
         this.datatype = 'http://www.w3.org/2001/XMLSchema#decimal';
-        this._OpenLayersLoaded = false;
-        this._DomRdy = false;
+        this._openLayersLoaded = false;
+        this._domRdy = false;
+        this._osmLoaded = false;
+        this._bingLoaded = false;
+        this._googleLoaded = false;
 
         var self = this;
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.geo.css');
         RDFauthor.loadStylesheet('http://dev.openlayers.org/releases/OpenLayers-2.10/theme/default/style.css');
 
-        RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ');
-        RDFauthor.loadScript('http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us');
-        RDFauthor.loadScript('http://openstreetmap.org/openlayers/OpenStreetMap.js');
+        RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ', function() {
+            self._googleLoaded = true;
+            self._initGeo();
+        });
+        RDFauthor.loadScript('http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us', function() {
+            self._bingLoaded = true;
+            self._initGeo();
+        });
+        RDFauthor.loadScript('http://openstreetmap.org/openlayers/OpenStreetMap.js', function() {
+            self._osmLoaded = true;
+            self._initGeo();
+        });
         RDFauthor.loadScript('http://openlayers.org/api/OpenLayers.js', function(){
-            self._OpenLayersLoaded = true;
+            self._openLayersLoaded = true;
             self._initGeo();
         });
     },
@@ -221,8 +233,10 @@ RDFauthor.registerWidget({
     },
 
     _initGeo: function () {
+        // alert('OLL '+this._openLayersLoaded+' GL '+this._googleLoaded+' OSML '+this._osmLoaded+' BL '+this._bingLoaded+' DL '+this._domRdy);
         var self = this;
-        if (this._OpenLayersLoaded && this._domRdy) {
+        if (this._openLayersLoaded && this._googleLoaded && 
+            this._osmLoaded && this._bingLoaded && this._domRdy) {
             self.element().click(function() {
                 var mapid = self.element().data('id');
                 var lon, lat;
