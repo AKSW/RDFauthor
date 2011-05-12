@@ -18,24 +18,30 @@ RDFauthor.registerWidget({
 
         var self = this;
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.geo.css');
-        RDFauthor.loadStylesheet('http://dev.openlayers.org/releases/OpenLayers-2.10/theme/default/style.css');
 
-        RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ', function() {
-            self._googleLoaded = true;
-            self._initGeo();
-        });
-        RDFauthor.loadScript('http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us', function() {
-            self._bingLoaded = true;
-            self._initGeo();
-        });
-        RDFauthor.loadScript('http://openstreetmap.org/openlayers/OpenStreetMap.js', function() {
-            self._osmLoaded = true;
-            self._initGeo();
-        });
-        RDFauthor.loadScript('http://openlayers.org/api/OpenLayers.js', function(){
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/openlayers/OpenLayers.js', function(){
+            // load OpenLayer Stylesheet
+            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/openlayers/theme/default/style.css');
             self._openLayersLoaded = true;
             self._initGeo();
+            // load OpenStreetMap
+            RDFauthor.loadScript('http://openstreetmap.org/openlayers/OpenStreetMap.js', function() {
+                self._osmLoaded = true;
+                self._initGeo();
+            });
+            // load Google Maps
+            RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ', function() {
+                self._googleLoaded = true;
+                self._initGeo();
+            });
+            // load Bing Maps
+            RDFauthor.loadScript('http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us', function() {
+                self._bingLoaded = true;
+                self._initGeo();
+            });
+
         });
+
     },
 
     // Uncomment this to execute code when you widget's markup is ready in the DOM,
@@ -213,7 +219,7 @@ RDFauthor.registerWidget({
 
         var size = new OpenLayers.Size(21,25);
         var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-        var icon = new OpenLayers.Icon('http://www.openlayers.org/dev/img/marker.png',size,offset);
+        var icon = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
 
         markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat).transform(
             new OpenLayers.Projection("EPSG:4326"),
