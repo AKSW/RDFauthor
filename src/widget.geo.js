@@ -49,9 +49,11 @@ RDFauthor.registerWidget({
     ready: function () {
         this._domRdy = true
         this.element().data('id',this.ID);
-        this.element().data('geo-widget', 'geo-widet-'+this.ID);
         this._initGeo();
-        
+        // $('<div class="test123" style="display:none;width:200px;height:200px;background-color:black;z-index:100000000;position:absolute;color:white;"><span>test</span></div>').appendTo('body');
+        // $('html').click(function(){
+            // $('.test123').css('top','200px').css('left','500px').show('slow');
+        // });
     },
 
     // return your jQuery-wrapped main input element here
@@ -73,12 +75,19 @@ RDFauthor.registerWidget({
               <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
                   + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" name="'
                   + this.statement.predicateLabel() + '"/>\
-              <div class="geo-widget" id="geo-widget-'+ this.ID+'" style="display: none;">\
-                <label>Locate: </label><input type="text" style="width:90%" class="text" id="geo-widget-search-' + this.ID + '">\
-                <div id="map-'+this.ID+'" class="smallmap" style="width:99%;height:200px;border:1px solid #ccc;"></div>\
-              </div>\
-            </div>\
+             </div>\
             ';
+
+        var geowidget =
+            '<div id="geo-widget" style="display: none;">\
+               <label class="text">Locate: </label><input type="text" style="width:90%" class="text" id="geo-widget-search">\
+               <div id="geo-widget-map" class="smallmap" style="width:99%;height:200px;border:1px solid #ccc;"></div>\
+             </div>\
+            ';
+        
+        if( $('#geo-widget').length == 0 ) {
+            $('body').append(geowidget);
+        }
 
         return markup;
     },
@@ -139,7 +148,7 @@ RDFauthor.registerWidget({
         return null;
     },
 
-    _initOpenLayers: function (mapid, lon, lat) {
+    _initOpenLayers: function (lon, lat) {
         var map, markers;
         var zoom = 6;
 
@@ -188,7 +197,7 @@ RDFauthor.registerWidget({
 
         });
 
-        map = new OpenLayers.Map('map-'+mapid, {
+        map = new OpenLayers.Map('geo-widget-map', {
             displayProjection: new OpenLayers.Projection("EPSG:4326")
         });
 
@@ -241,12 +250,20 @@ RDFauthor.registerWidget({
     _initGeo: function () {
         // alert('OLL '+this._openLayersLoaded+' GL '+this._googleLoaded+' OSML '+this._osmLoaded+' BL '+this._bingLoaded+' DL '+this._domRdy);
         var self = this;
+        var focus;
         if (this._openLayersLoaded && this._googleLoaded && 
             this._osmLoaded && this._bingLoaded && this._domRdy) {
             self.element().click(function() {
-                var mapid = self.element().data('id');
                 var lon, lat;
-                self.element().next().show();
+                // positioning
+                var left = self._getPosition().left + 'px !important;';
+                var top = self._getPosition().top + 'px !important';
+                
+                $('#geo-widget').css('left',left)
+                                .css('top',top)
+                                .data('input',$(this))
+                                .show();
+
                 $('input[name]').each(function(i) {
                     switch($(this).attr('name')){
                         case 'long' : lon = $(this).val();
@@ -255,9 +272,27 @@ RDFauthor.registerWidget({
                             break;
                     }
                 });
-                self._initOpenLayers(mapid,lon,lat);
+                if( !$('#geo-widget').children() == 0 ) {
+                    self._initOpenLayers(lon,lat);
+                }
+                console.log($('#geo-widget').children() == 0);
             });
         }
+        $('.rdfauthor-view-content').scroll(function() {
+            var left = self._getPosition().left + 'px !important;';
+            var top = self._getPosition().top + 'px !important';
+                
+            $('#geo-widget').css('left',left)
+                            .css('top',top)
+        });
+    },
+
+    _getPosition: function() {
+        var pos = {
+            'top' : this.element().offset().top + this.element().outerHeight(),
+            'left': this.element().offset().left
+        };
+        return pos;
     }
 }, {
         name: 'property',
