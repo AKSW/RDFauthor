@@ -172,14 +172,14 @@ RDFauthor.registerWidget({
                    new OpenLayers.Projection("EPSG:4326")
                 );
 
-                alert("You clicked near " + lonlat.lat + " N, " +
-                                          + lonlat.lon + " E");
+                // alert("You clicked near " + lonlat.lat + " N, " +
+                                          // + lonlat.lon + " E");
 
-                $('legend').each(function(i) {
-                    switch($(this).text()){
-                        case 'long' : lon = $(this).next().find('input[name="long"]').val(lonlat.lon);
+                $('input[name]').each(function(i) {
+                    switch($(this).attr('name')){
+                        case 'long' : lon = $(this).val(lonlat.lon);
                             break;
-                        case 'lat'  : lat = $(this).next().find('input[name="lat"]').val(lonlat.lat);
+                        case 'lat'  : lat = $(this).val(lonlat.lat);
                             break;
                     }
                 });
@@ -247,11 +247,11 @@ RDFauthor.registerWidget({
                 var mapid = self.element().data('id');
                 var lon, lat;
                 self.element().next().show();
-                $('legend').each(function(i) {
-                    switch($(this).text()){
-                        case 'long' : lon = $(this).next().find('input[name="long"]').val();
+                $('input[name]').each(function(i) {
+                    switch($(this).attr('name')){
+                        case 'long' : lon = $(this).val();
                             break;
-                        case 'lat'  : lat = $(this).next().find('input[name="lat"]').val();
+                        case 'lat'  : lat = $(this).val();
                             break;
                     }
                 });
