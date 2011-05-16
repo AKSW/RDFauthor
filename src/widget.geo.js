@@ -266,6 +266,28 @@ RDFauthor.registerWidget({
         var click = new OpenLayers.Control.Click();
         map.addControl(click);
         click.activate();
+
+        $('#geo-widget-button').click(function() {
+            var searchTerm = $('#geo-widget-search').val();
+            $.ajax({
+                url: "http://maps.google.com/maps/geo?q="+searchTerm,
+                dataType: "jsonp",
+                cache: false,
+                data: { "sensor":"false", "output":"json", "v":"2"},
+                success: function(data){
+                    var glon = data.Placemark[0].Point.coordinates[0];
+                    var glat = data.Placemark[0].Point.coordinates[1];
+                    var icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
+                    var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
+                        new OpenLayers.Projection("EPSG:4326"),
+                        map.getProjectionObject()
+                    ),icon3);
+                    markers.addMarker(searchMarker);
+                }
+            });
+
+        });
+
     },
 
     _initGeo: function () {
@@ -298,22 +320,6 @@ RDFauthor.registerWidget({
                     self._initOpenLayers(lon,lat);
                 }
 
-                $('#geo-widget-button').click(function() {
-                    alert('clicked');
-                    $.ajax({
-                        type: "GET",  
-                        url: "http://maps.google.com/maps/geo?sensor=false&output=json",
-                        dataType: "jsonp",
-                        cache: false,
-                        data: { "adress" : "Leipzig"},
-                        success: function(data){
-                            alert(data);
-                        }
-                    });
-                    // $.getJSON("http://maps.googleapis.com/maps/api/geocode/json", { address: "90210", sensor: false }, function(data) {
-                        // alert("JSON Data: " + data);
-                    // });
-                });
             });
         }
         $('.rdfauthor-view-content').scroll(function() {
