@@ -41,6 +41,11 @@ RDFauthor.registerWidget({
             });
 
         });
+        
+        Array.prototype.last = function() {
+          var length = this.length-1;
+          return this[length];
+        }
 
     },
 
@@ -80,7 +85,8 @@ RDFauthor.registerWidget({
 
         var geowidget =
             '<div id="geo-widget" style="display: none;">\
-               <label class="text">Locate: </label><input type="text" style="width:90%" class="text" id="geo-widget-search">\
+               <label class="text">Locate: </label><input type="text" style="width:65%" class="text" id="geo-widget-search">\
+               <button id="geo-widget-button">Go</button>\
                <div id="geo-widget-map" class="smallmap" style="width:99%;height:200px;border:1px solid #ccc;"></div>\
              </div>\
             ';
@@ -127,7 +133,7 @@ RDFauthor.registerWidget({
                 }
             }
         }
-
+        $('#geo-widget-geo').remove();
         return true;
     },
 
@@ -151,6 +157,7 @@ RDFauthor.registerWidget({
     _initOpenLayers: function (lon, lat) {
         var map, markers;
         var zoom = 6;
+        $('#geo-widget-map').data('markers',[]);
 
         OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
             defaultHandlerOptions: {
@@ -176,6 +183,11 @@ RDFauthor.registerWidget({
             }, 
 
             trigger: function(e) {
+                var lastMarker = $('#geo-widget-map').data('markers').last();
+                if ( lastMarker != undefined ) {
+                    markers.removeMarker(lastMarker);
+                }
+                
                 var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(
                    new OpenLayers.Projection("EPSG:900913"), 
                    new OpenLayers.Projection("EPSG:4326")
@@ -193,6 +205,15 @@ RDFauthor.registerWidget({
                     }
                 });
 
+                var size = new OpenLayers.Size(21,25);
+                var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+                var icon2 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-blue.png',size,offset);
+                var clickedMarker = new OpenLayers.Marker(new OpenLayers.LonLat(lonlat.lon,lonlat.lat).transform(
+                    new OpenLayers.Projection("EPSG:4326"),
+                    map.getProjectionObject()
+                ),icon2);
+                markers.addMarker(clickedMarker);
+                $('#geo-widget-map').data('markers').push(clickedMarker);
             }
 
         });
@@ -272,10 +293,27 @@ RDFauthor.registerWidget({
                             break;
                     }
                 });
-                if( !$('#geo-widget').children() == 0 ) {
+
+                if( $('#geo-widget-map').children().length == 0 ) {
                     self._initOpenLayers(lon,lat);
                 }
-                console.log($('#geo-widget').children() == 0);
+
+                $('#geo-widget-button').click(function() {
+                    alert('clicked');
+                    $.ajax({
+                        type: "GET",  
+                        url: "http://maps.google.com/maps/geo?sensor=false&output=json",
+                        dataType: "jsonp",
+                        cache: false,
+                        data: { "adress" : "Leipzig"},
+                        success: function(data){
+                            alert(data);
+                        }
+                    });
+                    // $.getJSON("http://maps.googleapis.com/maps/api/geocode/json", { address: "90210", sensor: false }, function(data) {
+                        // alert("JSON Data: " + data);
+                    // });
+                });
             });
         }
         $('.rdfauthor-view-content').scroll(function() {
@@ -294,6 +332,7 @@ RDFauthor.registerWidget({
         };
         return pos;
     }
+    
 }, {
         name: 'property',
         values: ['http://www.w3.org/2003/01/geo/wgs84_pos#long','http://www.w3.org/2003/01/geo/wgs84_pos#lat']
