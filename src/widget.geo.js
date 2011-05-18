@@ -185,6 +185,13 @@ RDFauthor.registerWidget({
             }, 
 
             trigger: function(e) {
+                // set visibility
+                searchOverlay.setVisibility(false);
+                clickOverlay.setVisibility(true);
+
+                // set opacity of init marker to 0.5
+                $('#geo-widget-map').data('initMarker').setOpacity(0.5);
+
                 var lastMarker = $('#geo-widget-map').data('clickMarkers').last();
                 if ( lastMarker != undefined ) {
                     clickOverlay.removeMarker(lastMarker);
@@ -263,6 +270,10 @@ RDFauthor.registerWidget({
         click.activate();
 
         $('#geo-widget-button').click(function() {
+            // set visibility
+            searchOverlay.setVisibility(true);
+            clickOverlay.setVisibility(false);
+
             var searchTerm = $('#geo-widget-search').val();
             $.ajax({
                 url: "http://maps.google.com/maps/geo?q="+searchTerm,
@@ -291,6 +302,7 @@ RDFauthor.registerWidget({
                             ),icon3);
                             $('#geo-widget-map').data('searchMarkers').push(searchMarker);
                             searchMarker.events.register('mousedown', searchMarker, function(evt) { 
+                                $('#geo-widget-map').data('initMarker').setOpacity(0.5);
                                 this.icon = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
                                 searchOverlay.redraw();
                                 self._setLonLat(glon, glat);
@@ -383,7 +395,7 @@ RDFauthor.registerWidget({
                     break;
             }
         });
-        return { "lon" : lon, "lat" : lat }
+        return { "lon" : lon, "lat" : lat };
     }
 
     
