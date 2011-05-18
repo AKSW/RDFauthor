@@ -155,9 +155,10 @@ RDFauthor.registerWidget({
     },
 
     _initOpenLayers: function (lon, lat) {
-        var map, markers;
+        var map, markers, clickOverlay, searchOverlay;
         var zoom = 6;
-        $('#geo-widget-map').data('markers',[]);
+        $('#geo-widget-map').data('clickMarkers',[]);
+        $('#geo-widget-map').data('searchMarkers',[]);
 
         OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
             defaultHandlerOptions: {
@@ -183,7 +184,7 @@ RDFauthor.registerWidget({
             }, 
 
             trigger: function(e) {
-                var lastMarker = $('#geo-widget-map').data('markers').last();
+                var lastMarker = $('#geo-widget-map').data('clickMarkers').last();
                 if ( lastMarker != undefined ) {
                     markers.removeMarker(lastMarker);
                 }
@@ -212,8 +213,8 @@ RDFauthor.registerWidget({
                     new OpenLayers.Projection("EPSG:4326"),
                     map.getProjectionObject()
                 ),icon2);
-                markers.addMarker(clickedMarker);
-                $('#geo-widget-map').data('markers').push(clickedMarker);
+                clickOverlay.addMarker(clickedMarker);
+                $('#geo-widget-map').data('clickMarkers').push(clickedMarker);
             }
 
         });
@@ -244,8 +245,10 @@ RDFauthor.registerWidget({
         );
 
         map.addLayers([layer_mapnik, layer_cyclemap]);
-        markers = new OpenLayers.Layer.Markers( "Markers" );
-        map.addLayer(markers);
+        markers = new OpenLayers.Layer.Markers( "Init" );
+        clickOverlay = new OpenLayers.Layer.Markers ( "Click" );
+        searchOverlay = new OpenLayers.Layer.Markers ( "Search" )
+        map.addLayers([markers, clickOverlay, searchOverlay]);
 
         var size = new OpenLayers.Size(21,25);
         var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
@@ -275,14 +278,18 @@ RDFauthor.registerWidget({
                 cache: false,
                 data: { "sensor":"false", "output":"json", "v":"2"},
                 success: function(data){
-                    var glon = data.Placemark[0].Point.coordinates[0];
-                    var glat = data.Placemark[0].Point.coordinates[1];
-                    var icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
-                    var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
-                        new OpenLayers.Projection("EPSG:4326"),
-                        map.getProjectionObject()
-                    ),icon3);
-                    markers.addMarker(searchMarker);
+                    $(data.Placemark).each(function(i) {
+                        var glon = data.Placemark[i].Point.coordinates[0];
+                        var glat = data.Placemark[i].Point.coordinates[1];
+                        var icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
+                        var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
+                            new OpenLayers.Projection("EPSG:4326"),
+                            map.getProjectionObject()
+                        ),icon3);
+                        $('#geo-widget-map').data('searchMarkers').push(searchMarker);
+                        searchMarker.events.register('mousedown', searchMarker, function(evt) { alert(glon + ' ' + glat); OpenLayers.Event.stop(evt); });
+                        searchOverlay.addMarker(searchMarker);
+                    });
                 }
             });
 
