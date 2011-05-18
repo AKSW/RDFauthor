@@ -186,7 +186,7 @@ RDFauthor.registerWidget({
             trigger: function(e) {
                 var lastMarker = $('#geo-widget-map').data('clickMarkers').last();
                 if ( lastMarker != undefined ) {
-                    markers.removeMarker(lastMarker);
+                    clickOverlay.removeMarker(lastMarker);
                 }
                 
                 var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(
@@ -278,6 +278,7 @@ RDFauthor.registerWidget({
                 cache: false,
                 data: { "sensor":"false", "output":"json", "v":"2"},
                 success: function(data){
+                    searchOverlay.clearMarkers();
                     $(data.Placemark).each(function(i) {
                         var glon = data.Placemark[i].Point.coordinates[0];
                         var glat = data.Placemark[i].Point.coordinates[1];
