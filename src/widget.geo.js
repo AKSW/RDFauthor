@@ -155,6 +155,7 @@ RDFauthor.registerWidget({
     },
 
     _initOpenLayers: function (lon, lat) {
+        var self = this;
         var map, markers, clickOverlay, searchOverlay;
         var zoom = 6;
         $('#geo-widget-map').data('clickMarkers',[]);
@@ -194,17 +195,7 @@ RDFauthor.registerWidget({
                    new OpenLayers.Projection("EPSG:4326")
                 );
 
-                // alert("You clicked near " + lonlat.lat + " N, " +
-                                          // + lonlat.lon + " E");
-
-                $('input[name]').each(function(i) {
-                    switch($(this).attr('name')){
-                        case 'long' : lon = $(this).val(lonlat.lon);
-                            break;
-                        case 'lat'  : lat = $(this).val(lonlat.lat);
-                            break;
-                    }
-                });
+                self._setLonLat(lonlat.lon, lonlat.lat);
 
                 var size = new OpenLayers.Size(21,25);
                 var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
@@ -247,17 +238,18 @@ RDFauthor.registerWidget({
         map.addLayers([layer_mapnik, layer_cyclemap]);
         markers = new OpenLayers.Layer.Markers( "Init" );
         clickOverlay = new OpenLayers.Layer.Markers ( "Click" );
-        searchOverlay = new OpenLayers.Layer.Markers ( "Search" )
+        searchOverlay = new OpenLayers.Layer.Markers ( "Search" );
         map.addLayers([markers, clickOverlay, searchOverlay]);
 
         var size = new OpenLayers.Size(21,25);
         var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
         var icon = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
-
-        markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat).transform(
+        var initMarker = new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat).transform(
             new OpenLayers.Projection("EPSG:4326"),
             map.getProjectionObject()
-        ),icon)); 
+        ),icon);
+        $('#geo-widget-map').data('initMarker',initMarker);
+        markers.addMarker(initMarker); 
 
         map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
             new OpenLayers.Projection("EPSG:4326"),
@@ -278,22 +270,45 @@ RDFauthor.registerWidget({
                 cache: false,
                 data: { "sensor":"false", "output":"json", "v":"2"},
                 success: function(data){
-                    searchOverlay.clearMarkers();
-                    $(data.Placemark).each(function(i) {
-                        var glon = data.Placemark[i].Point.coordinates[0];
-                        var glat = data.Placemark[i].Point.coordinates[1];
-                        var icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
-                        var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
-                            new OpenLayers.Projection("EPSG:4326"),
-                            map.getProjectionObject()
-                        ),icon3);
-                        $('#geo-widget-map').data('searchMarkers').push(searchMarker);
-                        searchMarker.events.register('mousedown', searchMarker, function(evt) { alert(glon + ' ' + glat); OpenLayers.Event.stop(evt); });
-                        searchOverlay.addMarker(searchMarker);
-                    });
+                    if ( data.Placemark != undefined ) {
+                        searchOverlay.clearMarkers();
+                        $('#geo-widget-map').data('searchMarkers',[]);
+                        $(data.Placemark).each(function(i) {
+                            var glon = data.Placemark[i].Point.coordinates[0];
+                            var glat = data.Placemark[i].Point.coordinates[1];
+                            var icon3;
+                            if ( data.Placemark.length == 1) {
+                                self._setLonLat(glon, glat);
+                                $('#geo-widget-map').data('initMarker').setOpacity(0.5);
+                                icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
+                            } else {
+                                $('#geo-widget-map').data('initMarker').setOpacity(1);
+                                icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
+                            };
+                            var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
+                                new OpenLayers.Projection("EPSG:4326"),
+                                map.getProjectionObject()
+                            ),icon3);
+                            $('#geo-widget-map').data('searchMarkers').push(searchMarker);
+                            searchMarker.events.register('mousedown', searchMarker, function(evt) { 
+                                this.icon = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
+                                searchOverlay.redraw();
+                                self._setLonLat(glon, glat);
+                                OpenLayers.Event.stop(evt); 
+                            });
+                            searchOverlay.addMarker(searchMarker);
+                        });
+                        //fit map
+                        var bounds = searchOverlay.getDataExtent();
+                        bounds.extend(markers.getDataExtent());
+                        map.zoomToExtent(bounds);
+                    }else{
+                        searchOverlay.clearMarkers();
+                        $('#geo-widget-map').data('initMarker').setOpacity(1);
+                        alert('no results - try again');
+                    } 
                 }
             });
-
         });
 
     },
@@ -345,7 +360,32 @@ RDFauthor.registerWidget({
             'left': this.element().offset().left
         };
         return pos;
+    },
+
+    _setLonLat: function(lon, lat) {
+        $('input[name]').each(function(i) {
+            switch($(this).attr('name')){
+                case 'long' : lon = $(this).val(lon);
+                    break;
+                case 'lat'  : lat = $(this).val(lat);
+                    break;
+            }
+        });
+    },
+
+    _getLonLat: function() {
+        var lon, lat;
+        $('input[name]').each(function(i) {
+            switch($(this).attr('name')){
+                case 'long' : lon = $(this).val();
+                    break;
+                case 'lat'  : lat = $(this).val();
+                    break;
+            }
+        });
+        return { "lon" : lon, "lat" : lat }
     }
+
     
 }, {
         name: 'property',
