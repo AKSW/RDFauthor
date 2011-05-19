@@ -1,10 +1,12 @@
 #geo-widget {
   z-index: 10000;
-  background-color: #FFF;
-  border: 1px solid #FFF;
+  /*background-color: #FFF;*/
+  /*border: 1px solid #FFF;*/
   width: 300px;
   overflow: auto;
   position: absolute;
   top: 0px;
   left: 0px;
+  padding-left: 0px !important;
+  padding-top: 0px !important;
 }

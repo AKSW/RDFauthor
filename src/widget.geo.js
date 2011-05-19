@@ -86,9 +86,15 @@ RDFauthor.registerWidget({
                    <span class="button button-windowclose"><span>\
                  </div>\
                </div>\
-               <label class="text">Locate: </label><input type="text" style="width:65%" class="text" id="geo-widget-search">\
-               <button id="geo-widget-button">Go</button>\
-               <div id="geo-widget-map" class="smallmap" style="width:99%;height:200px;border:1px solid #ccc;"></div>\
+               <div class="content">\
+                 <form>\
+                 <p class="width98">\
+                   <label class="display-block onlyAural" for="geo-widget-search">Locate</label>\
+                   <input type="text" style="width:65%" class="text inner-label width99" name="geo-widget-search" id="geo-widget-search">\
+                 </p>\
+                 </form>\
+                 <div id="geo-widget-map" class="smallmap width99" style="height:200px;border:1px solid #ccc;"></div>\
+              </div>\
              </div>\
             ';
         
