@@ -22,6 +22,10 @@ RDFauthor.registerWidget({
             dateFormat: $.datepicker.ISO_8601, 
             // showOn: 'both', 
             firstDay: 1
+        })
+        
+        $('.rdfauthor-view-content').scroll(function() {
+            $('#ui-datepicker-div').fadeOut();
         });
 
         $('#ui-datepicker-div').css('z-index', 10000);
