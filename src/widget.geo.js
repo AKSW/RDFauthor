@@ -300,11 +300,26 @@ RDFauthor.registerWidget({
                                 new OpenLayers.Projection("EPSG:4326"),
                                 map.getProjectionObject()
                             ),icon3);
-                            $('#geo-widget-map').data('searchMarkers').push(searchMarker);
-                            searchMarker.events.register('mousedown', searchMarker, function(evt) { 
+                            $('#geo-widget-map').data('searchMarkers').push({
+                                "marker" : searchMarker,
+                                "lon" : glon,
+                                "lat" : glat
+                            });
+                            searchMarker.events.register('mousedown', searchMarker, function(evt) {
+                                // set opacity to original marker
                                 $('#geo-widget-map').data('initMarker').setOpacity(0.5);
-                                this.icon = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
+                                // get last modified marker
+                                var lastModified = $('#geo-widget-map').data('searchMarkers').last();
+                                lastModified.marker.erase();
+                                lastModified.marker.icon = icon3.clone();
+                                this.erase();
+                                this.icon = icon.clone();
                                 searchOverlay.redraw();
+                                $('#geo-widget-map').data('searchMarkers').push({
+                                    "marker" : searchMarker,
+                                    "lon" : glon,
+                                    "lat" : glat
+                                });
                                 self._setLonLat(glon, glat);
                                 OpenLayers.Event.stop(evt); 
                             });
@@ -326,12 +341,12 @@ RDFauthor.registerWidget({
     },
 
     _initGeo: function () {
-        // alert('OLL '+this._openLayersLoaded+' GL '+this._googleLoaded+' OSML '+this._osmLoaded+' BL '+this._bingLoaded+' DL '+this._domRdy);
         var self = this;
         var focus;
         if (this._openLayersLoaded && this._googleLoaded && 
             this._osmLoaded && this._bingLoaded && this._domRdy) {
             self.element().click(function() {
+                focus = true;
                 var lon, lat;
                 // positioning
                 var left = self._getPosition().left + 'px !important;';
@@ -355,6 +370,20 @@ RDFauthor.registerWidget({
                     self._initOpenLayers(lon,lat);
                 }
 
+            });
+
+            $("html").click(function(){
+                if ($('#geo-widget').css("display") != "none" && focus == false) {
+                    $('#geo-widget').hide();
+                }else if (focus == true){
+                    $('#geo-widget').show();
+                }
+            });
+            $('#geo-widget').mouseover(function(){
+                focus = true;
+            });
+            $('#geo-widget').mouseout(function(){
+                focus = false;
             });
         }
         $('.rdfauthor-view-content').scroll(function() {
@@ -396,6 +425,13 @@ RDFauthor.registerWidget({
             }
         });
         return { "lon" : lon, "lat" : lat };
+    },
+
+    _createMarker: function(lon, lat, icon, map) {
+        return new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat).transform(
+                       new OpenLayers.Projection("EPSG:4326"),
+                       map.getProjectionObject()
+                   ),icon.clone());
     }
 
     
