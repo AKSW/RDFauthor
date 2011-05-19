@@ -78,7 +78,14 @@ RDFauthor.registerWidget({
             ';
 
         var geowidget =
-            '<div id="geo-widget" style="display: none;">\
+            '<div id="geo-widget" class="window" style="display: none;">\
+               <h1 class="title">Geo Widget</h1>\
+               <div class="window-buttons">\
+                 <div class="window-buttons-left"></div>\
+                 <div class="window-buttons-right">\
+                   <span class="button button-windowclose"><span>\
+                 </div>\
+               </div>\
                <label class="text">Locate: </label><input type="text" style="width:65%" class="text" id="geo-widget-search">\
                <button id="geo-widget-button">Go</button>\
                <div id="geo-widget-map" class="smallmap" style="width:99%;height:200px;border:1px solid #ccc;"></div>\
