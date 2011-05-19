@@ -8,8 +8,6 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated,
     // e.g. load scripts/stylesheets etc.
     init: function () {
-        this.disclosureID = 'disclosure-' + RDFauthor.nextID();
-        this.datatype = 'http://www.w3.org/2001/XMLSchema#decimal';
         this._openLayersLoaded = false;
         this._domRdy = false;
         this._osmLoaded = false;
@@ -55,10 +53,6 @@ RDFauthor.registerWidget({
         this._domRdy = true
         this.element().data('id',this.ID);
         this._initGeo();
-        // $('<div class="test123" style="display:none;width:200px;height:200px;background-color:black;z-index:100000000;position:absolute;color:white;"><span>test</span></div>').appendTo('body');
-        // $('html').click(function(){
-            // $('.test123').css('top','200px').css('left','500px').show('slow');
-        // });
     },
 
     // return your jQuery-wrapped main input element here
@@ -303,22 +297,28 @@ RDFauthor.registerWidget({
                             $('#geo-widget-map').data('searchMarkers').push({
                                 "marker" : searchMarker,
                                 "lon" : glon,
-                                "lat" : glat
+                                "lat" : glat,
+                                "click" : false
                             });
                             searchMarker.events.register('mousedown', searchMarker, function(evt) {
                                 // set opacity to original marker
                                 $('#geo-widget-map').data('initMarker').setOpacity(0.5);
                                 // get last modified marker
                                 var lastModified = $('#geo-widget-map').data('searchMarkers').last();
-                                lastModified.marker.erase();
-                                lastModified.marker.icon = icon3.clone();
+                                console.log(lastModified.click);
+                                if ( lastModified.click ) {
+                                    lastModified.marker.erase();
+                                    lastModified.marker.icon = icon3.clone();
+                                    searchOverlay.redraw();
+                                }
                                 this.erase();
                                 this.icon = icon.clone();
                                 searchOverlay.redraw();
                                 $('#geo-widget-map').data('searchMarkers').push({
                                     "marker" : searchMarker,
                                     "lon" : glon,
-                                    "lat" : glat
+                                    "lat" : glat,
+                                    "click" : true
                                 });
                                 self._setLonLat(glon, glat);
                                 OpenLayers.Event.stop(evt); 
