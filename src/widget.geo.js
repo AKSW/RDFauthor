@@ -254,10 +254,14 @@ RDFauthor.registerWidget({
         $('#geo-widget-map').data('initMarker',initMarker);
         markers.addMarker(initMarker); 
 
-        map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
-            new OpenLayers.Projection("EPSG:4326"),
-            map.getProjectionObject()
-        ), zoom);
+        // map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
+            // new OpenLayers.Projection("EPSG:4326"),
+            // map.getProjectionObject()
+        // ), zoom);
+
+        var bounds = markers.getDataExtent();
+        map.zoomToExtent(bounds);
+
         map.addControl( new OpenLayers.Control.LayerSwitcher() );
         map.addControl( new OpenLayers.Control.MousePosition() );
 
@@ -382,15 +386,15 @@ RDFauthor.registerWidget({
 
             $("html").click(function(){
                 if ($('#geo-widget').css("display") != "none" && focus == false) {
-                    $('#geo-widget').hide();
+                    $('#geo-widget').fadeOut();
                 }else if (focus == true){
-                    $('#geo-widget').show();
+                    $('#geo-widget').fadeIn();
                 }
             });
-            $('#geo-widget').mouseover(function(){
+            $('#geo-widget,input[name="long"],input[name="lat"]').mouseover(function(){
                 focus = true;
             });
-            $('#geo-widget').mouseout(function(){
+            $('#geo-widget,input[name="long"],input[name="lat"]').mouseout(function(){
                 focus = false;
             });
         }
@@ -399,7 +403,8 @@ RDFauthor.registerWidget({
             var top = self._getPosition().top + 'px !important';
                 
             $('#geo-widget').css('left',left)
-                            .css('top',top)
+                            .css('top',top);
+            $('#geo-widget').fadeOut();
         });
     },
 
