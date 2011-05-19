@@ -150,7 +150,7 @@ RDFauthor.registerWidget({
 
     _initOpenLayers: function (lon, lat) {
         var self = this;
-        var map, markers, clickOverlay, searchOverlay;
+        var map, markers, clickOverlay, searchOverlay, inputOverlay;
         var zoom = 6;
         $('#geo-widget-map').data('clickMarkers',[]);
         $('#geo-widget-map').data('searchMarkers',[]);
@@ -182,6 +182,7 @@ RDFauthor.registerWidget({
                 // set visibility
                 searchOverlay.setVisibility(false);
                 clickOverlay.setVisibility(true);
+                inputOverlay.setVisibility(false);
 
                 // set opacity of init marker to 0.5
                 $('#geo-widget-map').data('initMarker').setOpacity(0.5);
@@ -240,7 +241,8 @@ RDFauthor.registerWidget({
         markers = new OpenLayers.Layer.Markers( "Init" );
         clickOverlay = new OpenLayers.Layer.Markers ( "Click" );
         searchOverlay = new OpenLayers.Layer.Markers ( "Search" );
-        map.addLayers([markers, clickOverlay, searchOverlay]);
+        inputOverlay = new OpenLayers.Layer.Markers ( "Input" );
+        map.addLayers([markers, clickOverlay, searchOverlay, inputOverlay]);
 
         var size = new OpenLayers.Size(21,25);
         var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
@@ -262,11 +264,27 @@ RDFauthor.registerWidget({
         var click = new OpenLayers.Control.Click();
         map.addControl(click);
         click.activate();
+        
+        $('input[name="lat"],input[name="long"]').live('change keyup mouseenter',function() {
+            // set visibility
+            searchOverlay.setVisibility(false);
+            clickOverlay.setVisibility(false);
+            inputOverlay.setVisibility(true);
+            $('#geo-widget-map').data('initMarker').setOpacity(0.5);
+            var lonlat = self._getLonLat();
+            var inputMarker = self._createMarker(lonlat.lon,lonlat.lat,icon,map);
+            inputOverlay.clearMarkers();
+            inputOverlay.addMarker(inputMarker);
+            var bounds = inputOverlay.getDataExtent();
+            bounds.extend(markers.getDataExtent());
+            map.zoomToExtent(bounds);
+        });
 
         $('#geo-widget-button').click(function() {
             // set visibility
             searchOverlay.setVisibility(true);
             clickOverlay.setVisibility(false);
+            inputOverlay.setVisibility(false);
 
             var searchTerm = $('#geo-widget-search').val();
             $.ajax({
@@ -305,7 +323,6 @@ RDFauthor.registerWidget({
                                 $('#geo-widget-map').data('initMarker').setOpacity(0.5);
                                 // get last modified marker
                                 var lastModified = $('#geo-widget-map').data('searchMarkers').last();
-                                console.log(lastModified.click);
                                 if ( lastModified.click ) {
                                     lastModified.marker.erase();
                                     lastModified.marker.icon = icon3.clone();
@@ -347,27 +364,18 @@ RDFauthor.registerWidget({
             this._osmLoaded && this._bingLoaded && this._domRdy) {
             self.element().click(function() {
                 focus = true;
-                var lon, lat;
                 // positioning
                 var left = self._getPosition().left + 'px !important;';
                 var top = self._getPosition().top + 'px !important';
-                
+                var lonlat = self._getLonLat()
+
                 $('#geo-widget').css('left',left)
                                 .css('top',top)
                                 .data('input',$(this))
                                 .show();
-
-                $('input[name]').each(function(i) {
-                    switch($(this).attr('name')){
-                        case 'long' : lon = $(this).val();
-                            break;
-                        case 'lat'  : lat = $(this).val();
-                            break;
-                    }
-                });
-
+                
                 if( $('#geo-widget-map').children().length == 0 ) {
-                    self._initOpenLayers(lon,lat);
+                    self._initOpenLayers(lonlat.lon,lonlat.lat);
                 }
 
             });
