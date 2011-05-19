@@ -70,7 +70,7 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup =
-            '<div class="container2" style="width:100%">\
+            '<div class="container" style="width:100%">\
               <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
                   + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" name="'
                   + this.statement.predicateLabel() + '"/>\
