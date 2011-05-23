@@ -90,7 +90,7 @@ RDFauthor.registerWidget({
                  <form>\
                  <p class="width98">\
                    <label class="display-block onlyAural" for="geo-widget-search">Locate</label>\
-                   <input type="text" style="width:65%" class="text inner-label width99" name="geo-widget-search" id="geo-widget-search">\
+                   <input type="text" style="width:65%" class="text inner-label width99" value="Locate" name="geo-widget-search" id="geo-widget-search">\
                  </p>\
                  </form>\
                  <div id="geo-widget-map" class="smallmap width99" style="height:200px;border:1px solid #ccc;"></div>\
@@ -140,7 +140,7 @@ RDFauthor.registerWidget({
                 }
             }
         }
-        $('#geo-widget-geo').remove();
+        $('#geo-widget').remove();
         return true;
     },
 
@@ -297,79 +297,99 @@ RDFauthor.registerWidget({
             map.zoomToExtent(bounds);
         });
 
-        $('#geo-widget-button').click(function() {
-            // set visibility
-            searchOverlay.setVisibility(true);
-            clickOverlay.setVisibility(false);
-            inputOverlay.setVisibility(false);
+        $('#geo-widget-search').keydown(function(event) {
+            var KEY = {
+                BACKSPACE   : 8,
+                RETURN      : 13,
+                DEL         : 46,
+                COMMA       : 188,
+                TAB         : 9,
+                UP          : 38,
+                DOWN        : 40,
+                LEFT        : 37,
+                RIGHT       : 39,
+                ESC         : 27,
+                PAGEUP      : 33,
+                PAGEDOWN    : 34,
+                ALT         : 18,
+                CTRL        : 17
+            };
 
-            var searchTerm = $('#geo-widget-search').val();
-            $.ajax({
-                url: "http://maps.google.com/maps/geo?q="+searchTerm,
-                dataType: "jsonp",
-                cache: false,
-                data: { "sensor":"false", "output":"json", "v":"2"},
-                success: function(data){
-                    if ( data.Placemark != undefined ) {
-                        searchOverlay.clearMarkers();
-                        $('#geo-widget-map').data('searchMarkers',[]);
-                        $(data.Placemark).each(function(i) {
-                            var glon = data.Placemark[i].Point.coordinates[0];
-                            var glat = data.Placemark[i].Point.coordinates[1];
-                            var icon3;
-                            if ( data.Placemark.length == 1) {
-                                self._setLonLat(glon, glat);
-                                $('#geo-widget-map').data('initMarker').setOpacity(0.5);
-                                icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
-                            } else {
-                                $('#geo-widget-map').data('initMarker').setOpacity(1);
-                                icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
-                            };
-                            var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
-                                new OpenLayers.Projection("EPSG:4326"),
-                                map.getProjectionObject()
-                            ),icon3);
-                            $('#geo-widget-map').data('searchMarkers').push({
-                                "marker" : searchMarker,
-                                "lon" : glon,
-                                "lat" : glat,
-                                "click" : false
-                            });
-                            searchMarker.events.register('mousedown', searchMarker, function(evt) {
-                                // set opacity to original marker
-                                $('#geo-widget-map').data('initMarker').setOpacity(0.5);
-                                // get last modified marker
-                                var lastModified = $('#geo-widget-map').data('searchMarkers').last();
-                                if ( lastModified.click ) {
-                                    lastModified.marker.erase();
-                                    lastModified.marker.icon = icon3.clone();
-                                    searchOverlay.redraw();
-                                }
-                                this.erase();
-                                this.icon = icon.clone();
-                                searchOverlay.redraw();
+            if(event.which == KEY.RETURN) {
+                event.preventDefault();
+                // set visibility
+                searchOverlay.setVisibility(true);
+                clickOverlay.setVisibility(false);
+                inputOverlay.setVisibility(false);
+
+                var searchTerm = $('#geo-widget-search').val();
+                $.ajax({
+                    url: "http://maps.google.com/maps/geo?q="+searchTerm,
+                    dataType: "jsonp",
+                    cache: false,
+                    data: { "sensor":"false", "output":"json", "v":"2"},
+                    success: function(data){
+                        if ( data.Placemark != undefined ) {
+                            searchOverlay.clearMarkers();
+                            $('#geo-widget-map').data('searchMarkers',[]);
+                            $(data.Placemark).each(function(i) {
+                                var glon = data.Placemark[i].Point.coordinates[0];
+                                var glat = data.Placemark[i].Point.coordinates[1];
+                                var icon3;
+                                if ( data.Placemark.length == 1) {
+                                    self._setLonLat(glon, glat);
+                                    $('#geo-widget-map').data('initMarker').setOpacity(0.5);
+                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
+                                } else {
+                                    $('#geo-widget-map').data('initMarker').setOpacity(1);
+                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
+                                };
+                                var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
+                                    new OpenLayers.Projection("EPSG:4326"),
+                                    map.getProjectionObject()
+                                ),icon3);
                                 $('#geo-widget-map').data('searchMarkers').push({
                                     "marker" : searchMarker,
                                     "lon" : glon,
                                     "lat" : glat,
-                                    "click" : true
+                                    "click" : false
                                 });
-                                self._setLonLat(glon, glat);
-                                OpenLayers.Event.stop(evt); 
+                                searchMarker.events.register('mousedown', searchMarker, function(evt) {
+                                    // set opacity to original marker
+                                    $('#geo-widget-map').data('initMarker').setOpacity(0.5);
+                                    // get last modified marker
+                                    var lastModified = $('#geo-widget-map').data('searchMarkers').last();
+                                    if ( lastModified.click ) {
+                                        lastModified.marker.erase();
+                                        lastModified.marker.icon = icon3.clone();
+                                        searchOverlay.redraw();
+                                    }
+                                    this.erase();
+                                    this.icon = icon.clone();
+                                    searchOverlay.redraw();
+                                    $('#geo-widget-map').data('searchMarkers').push({
+                                        "marker" : searchMarker,
+                                        "lon" : glon,
+                                        "lat" : glat,
+                                        "click" : true
+                                    });
+                                    self._setLonLat(glon, glat);
+                                    OpenLayers.Event.stop(evt); 
+                                });
+                                searchOverlay.addMarker(searchMarker);
                             });
-                            searchOverlay.addMarker(searchMarker);
-                        });
-                        //fit map
-                        var bounds = searchOverlay.getDataExtent();
-                        bounds.extend(markers.getDataExtent());
-                        map.zoomToExtent(bounds);
-                    }else{
-                        searchOverlay.clearMarkers();
-                        $('#geo-widget-map').data('initMarker').setOpacity(1);
-                        alert('no results - try again');
-                    } 
-                }
-            });
+                            //fit map
+                            var bounds = searchOverlay.getDataExtent();
+                            bounds.extend(markers.getDataExtent());
+                            map.zoomToExtent(bounds);
+                        }else{
+                            searchOverlay.clearMarkers();
+                            $('#geo-widget-map').data('initMarker').setOpacity(1);
+                            alert('no results - try again');
+                        } 
+                    }
+                });
+            } // end if return
         });
 
     },
@@ -377,6 +397,7 @@ RDFauthor.registerWidget({
     _initGeo: function () {
         var self = this;
         var focus;
+        
         if (this._openLayersLoaded && this._googleLoaded && 
             this._osmLoaded && this._bingLoaded && this._domRdy) {
             self.element().click(function() {
@@ -411,6 +432,7 @@ RDFauthor.registerWidget({
                 focus = false;
             });
         }
+
         $('.rdfauthor-view-content').scroll(function() {
             var left = self._getPosition().left + 'px !important;';
             var top = self._getPosition().top + 'px !important';
@@ -418,6 +440,15 @@ RDFauthor.registerWidget({
             $('#geo-widget').css('left',left)
                             .css('top',top);
             $('#geo-widget').fadeOut();
+        });
+
+        $('#geo-widget .button-windowclose').live('click', function() {
+            $('#geo-widget').fadeOut();
+        });
+
+        var value = $('#geo-widget-search').val();
+        $('#geo-widget-search').data('value',value).live('click', function() {
+            $(this).val('');
         });
     },
 
