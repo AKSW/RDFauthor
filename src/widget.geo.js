@@ -282,7 +282,7 @@ RDFauthor.registerWidget({
         map.addControl(click);
         click.activate();
         
-        $('input[name="lat"],input[name="long"]').live('change keyup mouseenter',function() {
+        $('input[name="lat"],input[name="long"]').live('change keyup cut input',function() {
             // set visibility
             searchOverlay.setVisibility(false);
             clickOverlay.setVisibility(false);
@@ -416,6 +416,16 @@ RDFauthor.registerWidget({
                     self._initOpenLayers(lonlat.lon,lonlat.lat);
                 }
 
+                var value = $('#geo-widget-search').val();
+                if ( value.length == 0 ) {
+                    var prevValue = $('#geo-widget-search').data('value');
+                    $('#geo-widget-search').val(prevValue);
+                } else {
+                    $('#geo-widget-search').data('value',value).live('click', function() {
+                        $(this).val('');
+                    });
+                }
+
             });
 
             $("html").click(function(){
@@ -433,7 +443,7 @@ RDFauthor.registerWidget({
             });
         }
 
-        $('.rdfauthor-view-content').scroll(function() {
+        $('.rdfauthor-view-content,html').scroll(function() {
             var left = self._getPosition().left + 'px !important;';
             var top = self._getPosition().top + 'px !important';
                 
@@ -446,10 +456,6 @@ RDFauthor.registerWidget({
             $('#geo-widget').fadeOut();
         });
 
-        var value = $('#geo-widget-search').val();
-        $('#geo-widget-search').data('value',value).live('click', function() {
-            $(this).val('');
-        });
     },
 
     _getPosition: function() {
