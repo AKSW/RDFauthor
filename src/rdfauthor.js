@@ -1090,6 +1090,7 @@ RDFauthor = (function($, undefined) {
         _require(RDFAUTHOR_BASE + 'src/widget.date.js');
         _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
         _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.geo.js');
         _requirePending--;
     });
     
