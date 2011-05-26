@@ -8,7 +8,7 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated,
     // e.g. load scripts/stylesheets etc.
     init: function () {
-        this.datatype = "http://www.w3.org/2001/XMLSchema#double";
+        this.datatype = "http://www.w3.org/2001/XMLSchema#float";
         this._predicateLat = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
         this._predicateLong = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
         this._openLayersLoaded = false;
