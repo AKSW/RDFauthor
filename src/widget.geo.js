@@ -8,6 +8,9 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated,
     // e.g. load scripts/stylesheets etc.
     init: function () {
+        this.datatype = "http://www.w3.org/2001/XMLSchema#double";
+        this._predicateLat = "http://www.w3.org/2003/01/geo/wgs84_pos#lat";
+        this._predicateLong = "http://www.w3.org/2003/01/geo/wgs84_pos#long";
         this._openLayersLoaded = false;
         this._domRdy = false;
         this._osmLoaded = false;
@@ -69,11 +72,19 @@ RDFauthor.registerWidget({
 
     // return your widget's markup code here
     markup: function () {
+        var predicateLabel;
+        switch(this.statement.predicateURI()) {
+          case this._predicateLat : predicateLabel = "lat"
+              break;
+          case this._predicateLong: predicateLabel = "long"
+              break;
+        }
+
         var markup =
             '<div class="container" style="width:100%">\
               <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
                   + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" name="'
-                  + this.statement.predicateLabel() + '"/>\
+                  + predicateLabel + '"/>\
              </div>\
             ';
 
