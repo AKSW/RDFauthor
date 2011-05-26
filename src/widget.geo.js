@@ -31,7 +31,8 @@ RDFauthor.registerWidget({
                 self._initGeo();
             });
             // load Google Maps
-            RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ', function() {
+            RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC'
+                                 +'9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ', function() {
                 self._googleLoaded = true;
                 self._initGeo();
             });
@@ -101,10 +102,12 @@ RDFauthor.registerWidget({
                  <form>\
                  <p class="width98">\
                    <label class="display-block onlyAural" for="geo-widget-search">Locate</label>\
-                   <input type="text" style="width:65%" class="text inner-label width99" value="Locate" name="geo-widget-search" id="geo-widget-search">\
+                   <input type="text" style="width:65%" class="text inner-label width99" value="Locate"\
+                    name="geo-widget-search" id="geo-widget-search">\
                  </p>\
                  </form>\
-                 <div id="geo-widget-map" class="smallmap width99" style="height:200px;border:1px solid #ccc;"></div>\
+                 <div id="geo-widget-map" class="smallmap width99" style="height:200px;border:1px solid #ccc;">\
+                 </div>\
               </div>\
              </div>\
             ';
@@ -225,8 +228,11 @@ RDFauthor.registerWidget({
 
                 var size = new OpenLayers.Size(21,25);
                 var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-                var icon2 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-blue.png',size,offset);
-                var clickedMarker = new OpenLayers.Marker(new OpenLayers.LonLat(lonlat.lon,lonlat.lat).transform(
+                var icon2 = new OpenLayers.Icon(RDFAUTHOR_BASE + 
+                                                'libraries/openlayers/img/marker-blue.png',
+                                                size,offset);
+                var clickedMarker = new OpenLayers.Marker(new OpenLayers.LonLat(lonlat.lon,lonlat.lat)
+                                                                        .transform(
                     new OpenLayers.Projection("EPSG:4326"),
                     map.getProjectionObject()
                 ),icon2);
@@ -270,7 +276,8 @@ RDFauthor.registerWidget({
 
         var size = new OpenLayers.Size(21,25);
         var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-        var icon = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
+        var icon = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',
+                                       size,offset);
         var initMarker = new OpenLayers.Marker(new OpenLayers.LonLat(lon,lat).transform(
             new OpenLayers.Projection("EPSG:4326"),
             map.getProjectionObject()
@@ -350,12 +357,17 @@ RDFauthor.registerWidget({
                                 if ( data.Placemark.length == 1) {
                                     self._setLonLat(glon, glat);
                                     $('#geo-widget-map').data('initMarker').setOpacity(0.5);
-                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker.png',size,offset);
+                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 
+                                                                'libraries/openlayers/img/marker.png',
+                                                                size,offset);
                                 } else {
                                     $('#geo-widget-map').data('initMarker').setOpacity(1);
-                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 'libraries/openlayers/img/marker-green.png',size,offset);
+                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 
+                                                                'libraries/openlayers/img/marker-green.png',
+                                                                size,offset);
                                 };
-                                var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat).transform(
+                                var searchMarker = new OpenLayers.Marker(new OpenLayers.LonLat(glon,glat)
+                                                                                       .transform(
                                     new OpenLayers.Projection("EPSG:4326"),
                                     map.getProjectionObject()
                                 ),icon3);
@@ -511,6 +523,7 @@ RDFauthor.registerWidget({
     
 }, {
         name: 'property',
-        values: ['http://www.w3.org/2003/01/geo/wgs84_pos#long','http://www.w3.org/2003/01/geo/wgs84_pos#lat']
+        values: ['http://www.w3.org/2003/01/geo/wgs84_pos#long',
+                 'http://www.w3.org/2003/01/geo/wgs84_pos#lat']
     }
 );
