@@ -10,7 +10,7 @@ RDFauthor.registerWidget({
         this.datatype = {
             date: 'http://www.w3.org/2001/XMLSchema#date',
             dateTime: 'http://www.w3.org/2001/XMLSchema#dateTime',
-            time: 'http://www.w3.org/2001/XMLSchema#dateTime'
+            time: 'http://www.w3.org/2001/XMLSchema#time'
         };
         this._datetimepickerLoaded = false;
         this._domRdy = false;
@@ -118,13 +118,10 @@ RDFauthor.registerWidget({
     },
     _init: function () {
         var self = this;
-        // console.log('datetime widget - '+ self._datetimepickerLoaded + ' ' + self._domRdy);
         if (self._datetimepickerLoaded && self._domRdy) {
             var datatype = this.statement.objectDatatype();
-            console.log(datatype);
             switch(datatype) {
                 case self.datatype['date']:
-                        console.log('date');
                         this.element().datepicker({
                             dateFormat: $.datepicker.ISO_8601, 
                             // showOn: 'both', 
@@ -132,13 +129,14 @@ RDFauthor.registerWidget({
                         });
                         $('#ui-datepicker-div').css('z-index', 10000);
                     break;
-                case self.datatype['datetime']:
-                        console.log('datetime');
-                        this.element().datetimepicker();
+                case self.datatype['dateTime']:
+                        this.element().datetimepicker({
+                            separator: 'T',
+                            dateFormat: $.datepicker.ISO_8601
+                        });
                     break;
                 case self.datatype['time']:
-                        console.log('time');
-                        this.element().timepicker();
+                        this.element().timepicker({});
                     break;
                 default: alert('no matched datatype');
                     break;
@@ -147,6 +145,8 @@ RDFauthor.registerWidget({
     }
 }, {
         name: 'datatype',
-        values: ['http://www.w3.org/2001/XMLSchema#dateTime','http://www.w3.org/2001/XMLSchema#date','http://www.w3.org/2001/XMLSchema#time']
+        values: ['http://www.w3.org/2001/XMLSchema#dateTime',
+                 'http://www.w3.org/2001/XMLSchema#date',
+                 'http://www.w3.org/2001/XMLSchema#time']
     }
 );
