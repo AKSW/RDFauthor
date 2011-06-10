@@ -134,13 +134,15 @@ RDFauthor.registerWidget({
                             separator: 'T',
                             dateFormat: $.datepicker.ISO_8601,
                             showSecond: true,
-                            timeFormat: 'hh:mm:ss'
+                            timeFormat: 'hh:mm:ss',
+                            showTimezone: true
                         });
                     break;
                 case self.datatype['time']:
                         this.element().timepicker({
                             showSecond: true,
-                            timeFormat: 'hh:mm:ss'
+                            timeFormat: 'hh:mm:ss',
+                            showTimezone: true
                         });
                     break;
                 default: alert('no matched datatype');
