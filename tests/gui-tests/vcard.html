@@ -16,6 +16,15 @@
     <script type="text/javascript">
         var RDFAUTHOR_BASE = 'http://localhost/rdfauthor';
         RDFAUTHOR_READY_CALLBACK = function() {
+            $.typedValue.types['http://www.w3.org/2001/XMLSchema#time'] = {
+                regex: /^.*$/,
+                strip: true,
+                /** @ignore */
+                value: function (v, options) {
+                  var opts = $.extend({}, $.typedValue.defaults, options);
+                  return v;
+                }
+            };
             RDFauthor.start();
         }
     </script>
@@ -44,8 +53,8 @@
             <span property="ldap:locality" datatype="xsd:string">Leipzig</span>
         </p>
         <p>Day of birth (date): <span property="foaf:birthDate" datatype="xsd:date">1973-05-09</span></p>
-        <p>start (datetime): <span property="ns0:start" datatype="xsd:dateTime">1973-05-09 9:12</span></p>
-        <p>start (time): <span property="ns0:start2" datatype="xsd:time">12:12:12</span></p>
+        <p>start (datetime): <span property="ns0:datetime" datatype="xsd:dateTime">1973-05-09T09:12:00</span></p>
+        <p>start (time): <span property="ns0:time" datatype="xsd:time">10:45:12</span></p>
         <p>
             Phone: <a rel="foaf:phone" href="tel:+493419732323">+49&thinsp;(341)&thinsp;97-32323</a>
             <span class="block">
