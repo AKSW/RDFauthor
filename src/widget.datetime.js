@@ -133,13 +133,13 @@ RDFauthor.registerWidget({
                         this.element().datetimepicker({
                             separator: 'T',
                             dateFormat: $.datepicker.ISO_8601,
-                            showSeconds: true,
+                            showSecond: true,
                             timeFormat: 'hh:mm:ss'
                         });
                     break;
                 case self.datatype['time']:
                         this.element().timepicker({
-                            showSeconds: true,
+                            showSecond: true,
                             timeFormat: 'hh:mm:ss'
                         });
                     break;
