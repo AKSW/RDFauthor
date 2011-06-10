@@ -123,7 +123,7 @@ RDFauthor.registerWidget({
             var datatype = this.statement.objectDatatype();
             console.log(datatype);
             switch(datatype) {
-                case self.datatype['date2']:
+                case self.datatype['date']:
                         console.log('date');
                         this.element().datepicker({
                             dateFormat: $.datepicker.ISO_8601, 
@@ -132,11 +132,11 @@ RDFauthor.registerWidget({
                         });
                         $('#ui-datepicker-div').css('z-index', 10000);
                     break;
-                case self.datatype['datetime2']:
+                case self.datatype['datetime']:
                         console.log('datetime');
                         this.element().datetimepicker();
                     break;
-                case self.datatype['time2']:
+                case self.datatype['time']:
                         console.log('time');
                         this.element().timepicker();
                     break;
