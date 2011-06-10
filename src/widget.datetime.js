@@ -132,11 +132,16 @@ RDFauthor.registerWidget({
                 case self.datatype['dateTime']:
                         this.element().datetimepicker({
                             separator: 'T',
-                            dateFormat: $.datepicker.ISO_8601
+                            dateFormat: $.datepicker.ISO_8601,
+                            showSeconds: true,
+                            timeFormat: 'hh:mm:ss'
                         });
                     break;
                 case self.datatype['time']:
-                        this.element().timepicker({});
+                        this.element().timepicker({
+                            showSeconds: true,
+                            timeFormat: 'hh:mm:ss'
+                        });
                     break;
                 default: alert('no matched datatype');
                     break;
