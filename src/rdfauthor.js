@@ -1578,7 +1578,7 @@ RDFauthor = (function($, undefined) {
         registerWidget: function (widgetSpec, hooks) {
             // Check interface conformance
             // if (!_checkInterface(widgetSpec, Widget)) {
-            //     throw "Registered object does not conform to 'Widget' interface.";
+                // throw "Registered object does not conform to 'Widget' interface.";
             // }
             
             // ensure array
@@ -1589,7 +1589,6 @@ RDFauthor = (function($, undefined) {
             for (var i = 0; i < hooks.length; i++) {
                 // the default hook value is an empty string (any value)
                 var hookSpec = $.extend({values: ['']}, hooks[i]);
-                
                 // is the hook supported for which the widget attemps to register?
                 if (_registeredWidgets[hookSpec.name]) {
                     // Register for all hook values

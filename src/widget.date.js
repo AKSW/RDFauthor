@@ -7,28 +7,35 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
     init: function () {
-        this.datatype = 'http://www.w3.org/2001/XMLSchema#date';
+        this.datatype = {
+            date: 'http://www.w3.org/2001/XMLSchema#date',
+            dateTime: 'http://www.w3.org/2001/XMLSchema#dateTime',
+            time: 'http://www.w3.org/2001/XMLSchema#dateTime'
+        };
+        this._datetimepickerLoaded = false;
+        this._domRdy = false;
+        var self = this;
         
         if (undefined === jQuery.ui.datepicker) {
-            RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.datepicker.js');
-            // RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.date.css');
+            RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.js');
+            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.css');
         }
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.js', function () {
+            self._datetimepickerLoaded = true;
+            self._init();
+        });
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.css');
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
     // e.g. load jQuery plug-ins, attach event handlers etc.
     ready: function () {
-        this.element().datepicker({
-            dateFormat: $.datepicker.ISO_8601, 
-            // showOn: 'both', 
-            firstDay: 1
-        })
-        
+        var self = this;
+        self._domRdy = true;
+        self._init();
         $('.rdfauthor-view-content').scroll(function() {
             $('#ui-datepicker-div').fadeOut();
         });
-
-        $('#ui-datepicker-div').css('z-index', 10000);
     },
     
     // return your jQuery-wrapped main input element here
@@ -108,9 +115,38 @@ RDFauthor.registerWidget({
         }
         
         return null;
+    },
+    _init: function () {
+        var self = this;
+        // console.log('datetime widget - '+ self._datetimepickerLoaded + ' ' + self._domRdy);
+        if (self._datetimepickerLoaded && self._domRdy) {
+            var datatype = this.statement.objectDatatype();
+            console.log(datatype);
+            switch(datatype) {
+                case self.datatype['date2']:
+                        console.log('date');
+                        this.element().datepicker({
+                            dateFormat: $.datepicker.ISO_8601, 
+                            // showOn: 'both', 
+                            firstDay: 1
+                        });
+                        $('#ui-datepicker-div').css('z-index', 10000);
+                    break;
+                case self.datatype['datetime2']:
+                        console.log('datetime');
+                        this.element().datetimepicker();
+                    break;
+                case self.datatype['time2']:
+                        console.log('time');
+                        this.element().timepicker();
+                    break;
+                default: alert('no matched datatype');
+                    break;
+            }
+        }
     }
 }, {
         name: 'datatype',
-        values: ['http://www.w3.org/2001/XMLSchema#date']
+        values: ['http://www.w3.org/2001/XMLSchema#dateTime','http://www.w3.org/2001/XMLSchema#date','http://www.w3.org/2001/XMLSchema#time']
     }
 );
