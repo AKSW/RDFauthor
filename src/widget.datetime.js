@@ -7,11 +7,12 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
     init: function () {
-        this.datatype = {
+        this.datatypes = {
             date: 'http://www.w3.org/2001/XMLSchema#date',
             dateTime: 'http://www.w3.org/2001/XMLSchema#dateTime',
             time: 'http://www.w3.org/2001/XMLSchema#time'
         };
+        this.datatype;
         this._datetimepickerLoaded = false;
         this._domRdy = false;
         var self = this;
@@ -109,8 +110,9 @@ RDFauthor.registerWidget({
     },
     
     value: function () {
-        var value = $('#date-edit-' + this.ID).val();
-        if (String(value) > 0) {
+        var value = this.element().val();
+        console.log(String(value));
+        if (String(value).length > 0) {
             return value;
         }
         
@@ -121,7 +123,9 @@ RDFauthor.registerWidget({
         if (self._datetimepickerLoaded && self._domRdy) {
             var datatype = this.statement.objectDatatype();
             switch(datatype) {
-                case self.datatype['date']:
+                case self.datatypes['date']:
+                        self.datatype = self.datatypes['date'];
+                        console.log(self.datatype);
                         this.element().datepicker({
                             dateFormat: $.datepicker.ISO_8601, 
                             // showOn: 'both', 
@@ -129,20 +133,23 @@ RDFauthor.registerWidget({
                         });
                         $('#ui-datepicker-div').css('z-index', 10000);
                     break;
-                case self.datatype['dateTime']:
+                case self.datatypes['dateTime']:
+                        self.datatype = self.datatypes['dateTime'];
                         this.element().datetimepicker({
                             separator: 'T',
                             dateFormat: $.datepicker.ISO_8601,
                             showSecond: true,
                             timeFormat: 'hh:mm:ss',
-                            showTimezone: true
+                            showTimezone: false,
+                            firstDay: 1
                         });
                     break;
-                case self.datatype['time']:
+                case self.datatypes['time']:
+                        self.datatype = self.datatypes['time'];
                         this.element().timepicker({
                             showSecond: true,
                             timeFormat: 'hh:mm:ss',
-                            showTimezone: true
+                            showTimezone: false
                         });
                     break;
                 default: alert('no matched datatype');
