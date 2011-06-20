@@ -2,6 +2,7 @@
  * This file is part of the RDFauthor project.
  * http://code.google.com/p/rdfauthor
  * Author: Norman Heino <norman.heino@gmail.com>
+ *         Clemens Hoffmann <cannelony@gmail.com>
  */
 RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
@@ -26,8 +27,6 @@ RDFauthor.registerWidget({
             self._init();
         });
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.css');
-
-        // this.statement.registerDatatype('http://www.w3.org/2001/XMLSchema#time','/^.*$/',true);
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
@@ -141,7 +140,7 @@ RDFauthor.registerWidget({
                             dateFormat: $.datepicker.ISO_8601,
                             showSecond: true,
                             timeFormat: 'hh:mm:ss',
-                            showTimezone: false,
+                            showTimezone: true,
                             firstDay: 1
                         });
                     break;
@@ -150,7 +149,7 @@ RDFauthor.registerWidget({
                         this.element().timepicker({
                             showSecond: true,
                             timeFormat: 'hh:mm:ss',
-                            showTimezone: false
+                            showTimezone: true
                         });
                     break;
                 default: alert('no matched datatype');

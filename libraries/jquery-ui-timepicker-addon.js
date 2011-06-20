@@ -101,10 +101,10 @@ $.extend(Timepicker.prototype, {
 	formattedDate: '',
 	formattedTime: '',
 	formattedDateTime: '',
-	timezoneList: ["-1100", "-1000", "-0900", "-0800", "-0700", "-0600",
-			"-0500", "-0400", "-0300", "-0200", "-0100", "+0000",
-			"+0100", "+0200", "+0300", "+0400", "+0500", "+0600",
-			"+0700", "+0800", "+0900", "+1000", "+1100", "+1200"],
+	timezoneList: ["-11:00", "-10:00", "-09:00", "-08:00", "-07:00", "-06:00",
+			"-05:00", "-04:00", "-03:00", "-02:00", "-01:00", "+00:00",
+			"+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00",
+			"+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00"],
 
 	/* Override the default settings for all instances of the time picker.
 	   @param  settings  object - the new settings to use as defaults (anonymous object)
