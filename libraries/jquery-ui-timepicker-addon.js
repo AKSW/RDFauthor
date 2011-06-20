@@ -90,7 +90,7 @@ $.extend(Timepicker.prototype, {
 	hour: 0,
 	minute: 0,
 	second: 0,
-	timezone: '+0000',
+	timezone: '+00:00',
 	hourMinOriginal: null,
 	minuteMinOriginal: null,
 	secondMinOriginal: null,
@@ -192,6 +192,7 @@ $.extend(Timepicker.prototype, {
 	// parse the time string from input value or _setTime
 	//########################################################################
 	_parseTime: function(timeString, withDate) {
+        console.log(timeString);
 		var regstr = this._defaults.timeFormat.toString()
 				.replace(/h{1,2}/ig, '(\\d?\\d)')
 				.replace(/m{1,2}/ig, '(\\d?\\d)')
@@ -231,7 +232,7 @@ $.extend(Timepicker.prototype, {
 
 			if (order.m !== -1) this.minute = Number(treg[order.m]);
 			if (order.s !== -1) this.second = Number(treg[order.s]);
-			if (order.z !== -1) this.timezone = treg[order.z];
+			if (order.z !== -1) this.timezone = treg[order.z]; 
 			
 			return true;
 
@@ -268,7 +269,7 @@ $.extend(Timepicker.prototype, {
 			minMax  = (o.minuteMax - (o.minuteMax % o.stepMinute)).toFixed(0),
 			secMax  = (o.secondMax - (o.secondMax % o.stepSecond)).toFixed(0),
 			dp_id = this.inst.id.toString().replace(/([^A-Za-z0-9_])/g, '');
-
+            console.log(this.hour);
 		// Prevent displaying twice
 		//if ($dp.find("div#ui-timepicker-div-"+ dp_id).length === 0) {
 		if ($dp.find("div#ui-timepicker-div-"+ dp_id).length === 0 && o.showTimepicker) {
@@ -602,6 +603,7 @@ $.extend(Timepicker.prototype, {
 			minute = (this.minute_slider) ? this.minute_slider.slider('value') : false,
 			second = (this.second_slider) ? this.second_slider.slider('value') : false,
 			timezone = (this.timezone_select) ? this.timezone_select.val() : false;
+        console.log(timezone);
 		
 		if (hour !== false) hour = parseInt(hour,10);
 		if (minute !== false) minute = parseInt(minute,10);
@@ -697,13 +699,13 @@ $.extend(Timepicker.prototype, {
 			return;
 
 		if (this._defaults.timeOnly === true) {
-			formattedDateTime = this.formattedTime;
+			formattedDateTime = this.formattedTime + this.timezone_select.val();
 		} else if (this._defaults.timeOnly !== true && (this._defaults.alwaysSetTime || timeAvailable)) {
-			formattedDateTime += this._defaults.separator + this.formattedTime;
+			formattedDateTime += this._defaults.separator + this.formattedTime + this.timezone_select.val();
 		}
 
 		this.formattedDateTime = formattedDateTime;
-
+        console.log(this.formattedDateTime);
 		if(!this._defaults.showTimepicker) {
 			this.$input.val(this.formattedDate);
 		} else if (this.$altInput && this._defaults.altFieldTimeOnly === true) {

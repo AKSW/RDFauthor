@@ -112,7 +112,6 @@ RDFauthor.registerWidget({
     
     value: function () {
         var value = this.element().val();
-        console.log(String(value));
         if (String(value).length > 0) {
             return value;
         }
