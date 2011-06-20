@@ -1601,9 +1601,7 @@ RDFauthor = (function($, undefined) {
                         }
                     }
                 }
-                if (typeof(hookSpec.callback) == 'function') {
-                    hookSpec.callback();
-                }
+                _callIfIsFunction(hookSpec.callback);
             }
         },
         
