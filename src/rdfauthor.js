@@ -100,7 +100,8 @@ RDFauthor = (function($, undefined) {
     /** Whether predicate infos have been loaded */
     var _predicateInfoLoaded = false;
     
-    /** Predicates to be queried for */
+    /** Predicates to be queried for */ 
+
     var _predicates = {};
     
     /** Callbacks to be executed when script loading finishes */
@@ -1034,7 +1035,8 @@ RDFauthor = (function($, undefined) {
         }
     }
     
-    // RDFauthor setup code ///////////////////////////////////////////////////
+    // RDFauthor setup code ///////////09:27:33+02:00
+////////////////////////////////////////
     
     if (RDFAUTHOR_BASE.charAt(RDFAUTHOR_BASE.length - 1) !== '/') {
         RDFAUTHOR_BASE = RDFAUTHOR_BASE + '/';
@@ -1598,6 +1600,9 @@ RDFauthor = (function($, undefined) {
                             _registeredWidgets[hookSpec.name][value] = _createWidget(widgetSpec);
                         }
                     }
+                }
+                if (typeof(hookSpec.callback) == 'function') {
+                    hookSpec.callback();
                 }
             }
         },

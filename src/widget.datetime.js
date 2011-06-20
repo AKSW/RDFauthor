@@ -19,13 +19,15 @@ RDFauthor.registerWidget({
         
         if (undefined === jQuery.ui.datepicker) {
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.js');
-            RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.css');
+            // RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.css');
         }
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.js', function () {
             self._datetimepickerLoaded = true;
             self._init();
         });
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.css');
+
+        // this.statement.registerDatatype('http://www.w3.org/2001/XMLSchema#time','/^.*$/',true);
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
@@ -125,7 +127,6 @@ RDFauthor.registerWidget({
             switch(datatype) {
                 case self.datatypes['date']:
                         self.datatype = self.datatypes['date'];
-                        console.log(self.datatype);
                         this.element().datepicker({
                             dateFormat: $.datepicker.ISO_8601, 
                             // showOn: 'both', 
@@ -161,6 +162,17 @@ RDFauthor.registerWidget({
         name: 'datatype',
         values: ['http://www.w3.org/2001/XMLSchema#dateTime',
                  'http://www.w3.org/2001/XMLSchema#date',
-                 'http://www.w3.org/2001/XMLSchema#time']
+                 'http://www.w3.org/2001/XMLSchema#time'],
+        callback : function () {
+            $.typedValue.types['http://www.w3.org/2001/XMLSchema#time'] = {
+                regex: /^.*$/,
+                strip: true,
+                /** @ignore */
+                value: function (v, options) {
+                  var opts = $.extend({}, $.typedValue.defaults, options);
+                  return v;
+                }
+            };
+        }
     }
 );
