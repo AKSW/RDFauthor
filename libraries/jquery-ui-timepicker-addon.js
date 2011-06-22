@@ -90,7 +90,7 @@ $.extend(Timepicker.prototype, {
 	hour: 0,
 	minute: 0,
 	second: 0,
-	timezone: '+00:00',
+	// timezone: '+00:00',
 	hourMinOriginal: null,
 	minuteMinOriginal: null,
 	secondMinOriginal: null,
@@ -192,7 +192,40 @@ $.extend(Timepicker.prototype, {
 	// parse the time string from input value or _setTime
 	//########################################################################
 	_parseTime: function(timeString, withDate) {
+        var self = this;
         console.log(timeString);
+        if ( timeString.search('T') != -1 ) {
+            var splitDT = timeString.split("T");
+            var date = splitDT[0];
+            var time = splitDT[1];
+            var timeParts;
+            if ( time.search('-') != -1 ) {
+                timeParts = time.split("-");
+                console.log('-');
+            } else if ( time.search('Z') != -1 ) {
+                timeParts = time.split("Z");
+                console.log("Z");
+            } else {
+                timeParts = time.split("+");
+                console.log('+');
+            }
+            timeString = date + 'T' + timeParts[0];
+        } else {
+            var timeParts;
+            if ( timeString.search('-') != -1 ) {
+                timeParts = timeString.split("-");
+                console.log('-');
+            } else if ( timeString.search('Z') != -1 ) {
+                timeParts = timeString.split("Z");
+                console.log("Z");
+            } else {
+                timeParts = timeString.split("+");
+                console.log('+');
+            }
+            timeString = timeParts[0];
+        }
+        console.log('nach substr '+timeString);
+        //TODO timeString anpassen bzw regular expression
 		var regstr = this._defaults.timeFormat.toString()
 				.replace(/h{1,2}/ig, '(\\d?\\d)')
 				.replace(/m{1,2}/ig, '(\\d?\\d)')
@@ -232,8 +265,7 @@ $.extend(Timepicker.prototype, {
 
 			if (order.m !== -1) this.minute = Number(treg[order.m]);
 			if (order.s !== -1) this.second = Number(treg[order.s]);
-			if (order.z !== -1) this.timezone = treg[order.z]; 
-			
+            if (order.z !== -1) this.timezone = treg[order.z];
 			return true;
 
 		}
@@ -603,8 +635,7 @@ $.extend(Timepicker.prototype, {
 			minute = (this.minute_slider) ? this.minute_slider.slider('value') : false,
 			second = (this.second_slider) ? this.second_slider.slider('value') : false,
 			timezone = (this.timezone_select) ? this.timezone_select.val() : false;
-        console.log(timezone);
-		
+        console.log(hour + ' - ' + minute + ' - ' + second + ' ' + timezone);
 		if (hour !== false) hour = parseInt(hour,10);
 		if (minute !== false) minute = parseInt(minute,10);
 		if (second !== false) second = parseInt(second,10);
@@ -650,7 +681,11 @@ $.extend(Timepicker.prototype, {
 		if (ampm == undefined) ampm = this._defaults.ampm;
 		time = time || { hour: this.hour, minute: this.minute, second: this.second, ampm: this.ampm, timezone: this.timezone };
 		var tmptime = format || this._defaults.timeFormat.toString();
-
+        // time.hour = "12";
+        // time.minute = "12";
+        // time.second = "12";
+        // time.timezone = "+00:00";
+        // console.log(tmptime + ' am anfang' + ' ' + time.timezone);
 		if (ampm) {
 			var hour12 = ((time.ampm == 'AM') ? (time.hour) : (time.hour % 12));
 			hour12 = (Number(hour12) === 0) ? 12 : hour12;
@@ -679,7 +714,8 @@ $.extend(Timepicker.prototype, {
 				.replace(/z/g, time.timezone);
 			tmptime = $.trim(tmptime.replace(/t/gi, ''));
 		}
-
+        // tmptime="12:12:12";
+        console.log(tmptime + ' ' + this.formattedTime);
 		if (arguments.length) return tmptime;
 		else this.formattedTime = tmptime;
 	},

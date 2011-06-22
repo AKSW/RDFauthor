@@ -133,6 +133,8 @@ RDFauthor.registerWidget({
                         $('#ui-datepicker-div').css('z-index', 10000);
                     break;
                 case self.datatypes['dateTime']:
+                        var timezone = this.element().val().substr(19,25);
+                        if ( timezone == "Z" ) { timezone = "+00:00" };
                         self.datatype = self.datatypes['dateTime'];
                         this.element().datetimepicker({
                             separator: 'T',
@@ -140,15 +142,19 @@ RDFauthor.registerWidget({
                             showSecond: true,
                             timeFormat: 'hh:mm:ss',
                             showTimezone: true,
+                            timezone: timezone,
                             firstDay: 1
                         });
                     break;
                 case self.datatypes['time']:
+                        var timezone = this.element().val().substr(8,14);
+                        if ( timezone == "Z" ) { timezone = "+00:00" };
                         self.datatype = self.datatypes['time'];
                         this.element().timepicker({
                             showSecond: true,
                             timeFormat: 'hh:mm:ss',
-                            showTimezone: true
+                            showTimezone: true,
+                            timezone: timezone
                         });
                     break;
                 default: alert('no matched datatype');
