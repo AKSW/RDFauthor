@@ -8,6 +8,8 @@ RDFauthor.registerWidget({
         this.disclosureID = 'disclosure-' + RDFauthor.nextID();
         this.languages    = RDFauthor.literalLanguages();
         this.datatypes    = RDFauthor.literalDatatypes();
+        this.bool         = ["http://www.w3.org/2001/XMLSchema#boolean"];
+        this.integer      = "http://www.w3.org/2001/XMLSchema#integer";
         this.namespaces   = RDFauthor.namespaces();
 
         this.languages.unshift('');
@@ -20,7 +22,6 @@ RDFauthor.registerWidget({
     
     ready: function () {
         var widget = this;
-        
         // disclosure button
         jQuery('#' + widget.disclosureID).click(function () {
             var close = $(this).hasClass('open') ? true : false;
@@ -48,21 +49,68 @@ RDFauthor.registerWidget({
             }
         });
         
+        var typeb = this.bool[0];
+        $('.literal-datatype select').change(function(){
+            var selected = $(this).find('option:selected').text();
+            if( selected == typeb ) {
+                $(this).parent().parent().parent().parent().find('.boolean').show();
+                $(this).parent().parent().parent().parent().find('.notboolean').hide();
+            } else {
+                $(this).parent().parent().parent().parent().find('.boolean').hide();
+                $(this).parent().parent().parent().parent().find('.notboolean').show();
+            }
+        });
+        
+        $('.literal-value .radio').click(function() {
+            var textarea = $(this).parent().parent().parent().find('textarea');
+            if( $(this).val() == 'true' ) { 
+                textarea.val('true'); 
+            } else if ( $(this).val() == 'false' ) {
+                textarea.val('false');
+            }
+        });
         // literal options
         $('.literal-type .radio').click(function() {
+            var textarea = $(this).parent().parent().parent().find('textarea');
+            if ( (textarea.val() != 'true' ) && (textarea.val() != 'false') ) {
+                $(this).data('val',textarea.val());
+            }
             var jDatatypeSelect = $('#' + $(this).attr('name').replace('literal-type', 'literal-datatype')).eq(0);
             var jLangSelect     = $('#' + $(this).attr('name').replace('literal-type', 'literal-lang')).eq(0);
 
             if ($(this).val() == 'plain') {
+                textarea.attr('readonly','');
+                if(textarea.val() == 'true' || textarea.val() == 'false'){
+                    textarea.val('');
+                }
+                $('.notboolean').show();
+                $('.boolean').hide();
+                textarea.val($(this).data('val'));
                 jDatatypeSelect.closest('div').hide();
                 jLangSelect.closest('div').show();
                 // clear datatype
                 jDatatypeSelect.val('');
-            } else {
+            } else if ($(this).val() == 'typed') {
+                textarea.attr('readonly','');
+                if(textarea.val() == 'true' || textarea.val() == 'false'){
+                    textarea.val('');
+                }
+                $('.notboolean').show();
+                $('.boolean').hide();
+                textarea.val($(this).data('val'));
                 jDatatypeSelect.closest('div').show();
                 jLangSelect.closest('div').hide();
                 // clear lang
                 jLangSelect.val('');
+            } else if ( ( $(this).val() == 'true' ) || ( $(this).val() == 'false' ) ) {
+                textarea.attr('readonly','true');
+                textarea.val($(this).val());
+                $('.boolean').show();
+                $('.notboolean').hide();
+                jDatatypeSelect.closest('div').hide();
+                jLangSelect.closest('div').hide();
+                jLangSelect.val('');
+                jDatatypeSelect.val('');
             }
         });
         
@@ -145,11 +193,22 @@ RDFauthor.registerWidget({
             buttonClass: /*(this.isLarge()) ? 'disclosure-button-horizontal' :*/ 'disclosure-button-vertical', 
             containerClass: this.valueClass()
         }
-
+        var readonly = '';
+        if (this.statement.objectValue() == 'true' || this.statement.objectValue() == 'false') {
+            readonly = 'readonly="true"';
+        }
+        
+        var isBoolean = this.statement.objectDatatype() == this.bool[0] ? true : false;
         var areaMarkup = '\
             <div class="container ' + areaConfig.containerClass + '" style="width:100%">\
-                <textarea rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' + 
+                <div class="notboolean" style="' + ( isBoolean ? 'display:none;' : 'display:block;' ) + '">\
+                <textarea rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' +
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
+                </div>\
+                <div class="boolean" style="' + ( isBoolean ? 'display:block;' : 'display:none;' ) + '">\
+                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'true' ? 'checked="checked"' : '' ) + ' value="true" />True</label>\
+                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'false' ? 'checked="checked"' : '' ) + ' value="false" />False</label>\
+                </div>\
             </div>\
             <div class="container util" style="clear:left">\
                 <a class="disclosure-button ' + areaConfig.buttonClass + ' open" id="' + this.disclosureID 
@@ -211,7 +270,6 @@ RDFauthor.registerWidget({
                     databank.remove(String(rdfqTriple));
                 }
             }
-            
             if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
                 try {
                     var objectOptions = {};

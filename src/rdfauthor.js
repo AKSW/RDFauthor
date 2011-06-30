@@ -1012,11 +1012,11 @@ RDFauthor = (function($, undefined) {
                     var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     
-                    /*
-                    alert('Added: ' + addedJSON);
-                    alert('Removed: ' + $.toJSON(indexes));
-                    return;
-                    // */
+                    
+                    // alert('Added: ' + addedJSON);
+                    // alert('Removed: ' + $.toJSON(indexes));
+                    // return;
+                    
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
                         $.post(updateURI, {
@@ -1090,6 +1090,7 @@ RDFauthor = (function($, undefined) {
         _require(RDFAUTHOR_BASE + 'src/widget.date.js');
         _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
         _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.geo.js');
         _requirePending--;
     });
     

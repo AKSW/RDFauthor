@@ -8,11 +8,11 @@
     
     <link about="http://localhost/rdfauthor/test/" rel="update:queryEndpoint" href="http://localhost/OntoWiki/sparql" />
     <link about="http://localhost/rdfauthor/test/" rel="update:updateEndpoint" href="http://localhost/OntoWiki/update/" />
-    
+    <link rel="stylesheet" href="http://dev.openlayers.org/releases/OpenLayers-2.10/theme/default/style.css" />
+
     <script type="text/javascript" src="../../libraries/jquery.js"></script>
     <script type="text/javascript" src="../../libraries/jquery-ui.js"></script>
     <!--script type="text/javascript" src="../../libraries/jquery.rdfquery.core.js"></script-->
-    
     <script type="text/javascript">
         var RDFAUTHOR_BASE = 'http://localhost/rdfauthor';
         RDFAUTHOR_READY_CALLBACK = function() {
@@ -31,17 +31,22 @@
 </head>
 
 <body xmlns:update="http://ns.aksw.org/update/">
-    <div update:from="http://localhost/rdfauthor/test/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ldap="http://purl.net/net/ldap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" class="vcard" about="http://bis.ontowiki.net/ThomasRiechert" typeof="foaf:Person">
+    <div update:from="http://localhost/rdfauthor/test/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:ldap="http://purl.net/net/ldap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" class="vcard" about="http://bis.ontowiki.net/ThomasRiechert" typeof="foaf:Person">
         
         <span rel="foaf:depiction">
             <img src="http://bis.informatik.uni-leipzig.de/images/jpegPhoto.php?name=sn&amp;value=Riechert" alt="depiction of Thomas Riechert"/>
         </span>
+        <p>
+            <span property="geo:lat" datatype="xsd:decimal">51.355971</span>
+            <span property="geo:long" datatype="xsd:decimal">12.328634</span>
+        </p>
         <p>
             <span class="block" property="foaf:name">Thomas Riechert</span>
             <span property="ldap:sreet" datatype="xsd:string">Johannisgasse 26</span>, Room
             <span property="ldap:roomNumber" datatype="xsd:string">5-09</span>
             <span class="block" property="ldap:postalCode" datatype="xsd:integer">04103</span>
             <span property="ldap:locality" datatype="xsd:string">Leipzig</span>
+            <span property="ldap:locality" datatype="xsd:boolean">false</span>
         </p>
         <p>Day of birth: <span property="foaf:birthDate" datatype="xsd:date">1973-05-09</span></p>
         <p>
@@ -52,6 +57,6 @@
             </span>
         </p>
     </div>
-</body>
+    </body>
 
 </html>
