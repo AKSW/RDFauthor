@@ -1602,6 +1602,7 @@ RDFauthor = (function($, undefined) {
                         }
                     }
                 }
+                _callIfIsFunction(hookSpec.callback);
             }
         },
         
