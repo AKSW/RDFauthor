@@ -38,10 +38,11 @@
 					previewTemplatePath:	'~/templates/preview.html',
 					previewParserPath:		'',
 					previewParserVar:		'data',
+                    returnParserData:       '',
 					resizeHandle:			true,
 					beforeInsert:			'',
 					afterInsert:			'',
-					onEnter:				{},
+                    onEnter:				{},
 					onShiftEnter:			{},
 					onCtrlEnter:			{},
 					onTab:					{},
@@ -458,29 +459,33 @@
 
 			function renderPreview() {		
 				var phtml;
-				if (options.previewParserPath !== '') {
-					$.ajax({
-						type: 'POST',
-						dataType: 'text',
-						global: false,
-						url: options.previewParserPath,
-						data: options.previewParserVar+'='+encodeURIComponent($$.val()),
-						success: function(data) {
-							writeInPreview( localize(data, 1) ); 
-						}
-					});
-				} else {
-					if (!template) {
-						$.ajax({
-							url: options.previewTemplatePath,
-							dataType: 'text',
-							global: false,
-							success: function(data) {
-								writeInPreview( localize(data, 1).replace(/<!-- content -->/g, $$.val()) );
-							}
-						});
-					}
-				}
+                if ($.isFunction(options.returnParserData)){
+                    writeInPreview(options.returnParserData($$.val()));
+                } else {
+                    if (options.previewParserPath !== '') {
+                        $.ajax({
+                            type: 'POST',
+                            dataType: 'text',
+                            global: false,
+                            url: options.previewParserPath,
+                            data: options.previewParserVar+'='+encodeURIComponent($$.val()),
+                            success: function(data) {
+                                writeInPreview( localize(data, 1) ); 
+                            }
+                        });
+                    } else {
+                        if (!template) {
+                            $.ajax({
+                                url: options.previewTemplatePath,
+                                dataType: 'text',
+                                global: false,
+                                success: function(data) {
+                                    writeInPreview( localize(data, 1).replace(/<!-- content -->/g, $$.val()) );
+                                }
+                            });
+                        }
+                    }
+                }
 				return false;
 			}
 			

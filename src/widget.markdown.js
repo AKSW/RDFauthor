@@ -8,40 +8,69 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
     init: function () {
+        var self = this;
         this.datatype = 'http://ns.ontowiki.net/SysOnt/markdown';
         this._domRdy = false;
         this._markitupRdy = false;
-        var self = this;
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/markitup/sets/default/style.css');
-        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/markitup/skins/markitup/style.css');
+        this._showdownRdy = false;
+        this._converter;
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/markitup/sets/markdown/style.css');
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/markitup/skins/simple/style.css');
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/markitup/jquery.markitup.js', function () {
-           self._markitupRdy = true;
-           self._init();
+            self._markitupRdy = true;
+            self._init();
         });
-
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/markitup/sets/markdown/showdown.js', function () {
+            self._showdownRdy = true;
+            // showdown converter
+            self._converter = new Showdown.converter();
+            self._init();
+        });
+        // mIu nameSpace to avoid conflict. For h1 and h2 headings (==,-- instead of #,##).
+        this._miu = {
+            markdownTitle: function(markItUp, char) {
+                heading = '';
+                n = $.trim(markItUp.selection||markItUp.placeHolder).length;
+                for(i = 0; i < n; i++) {
+                    heading += char;
+                }
+                return '\n'+heading+'\n';
+            }
+        };
+        // markItUp settings
         this._settings = {	
-          onShiftEnter:  	{keepDefault:false, replaceWith:'<br />\n'},
-          onCtrlEnter:  	{keepDefault:false, openWith:'\n<p>', closeWith:'</p>'},
-          onTab:    		{keepDefault:false, replaceWith:'    '},
-          markupSet:  [ 	
-            {name:'Bold', key:'B', openWith:'(!(<strong>|!|<b>)!)', 
-             closeWith:'(!(</strong>|!|</b>)!)' },
-            {name:'Italic', key:'I', openWith:'(!(<em>|!|<i>)!)', 
-             closeWith:'(!(</em>|!|</i>)!)'  },
-            {name:'Stroke through', key:'S', openWith:'<del>', 
-             closeWith:'</del>' },
-            {separator:'---------------' },
-            {name:'Picture', key:'P', 
-             replaceWith:'<img src="[![Source:!:http://]!]" alt="[![Alternative text]!]" />' },
-            {name:'Link', key:'L', 
-             openWith:'<a href="[![Link:!:http://]!]"(!( title="[![Title]!]")!)>', 
-             closeWith:'</a>', placeHolder:'Your text to link...' },
-            {separator:'---------------' },
-            {name:'Clean', className:'clean', replaceWith:function(markitup) { 
-                  return markitup.selection.replace(/<(.*?)>/g, "") 
-              } 
+            nameSpace: 'markdown', // Useful to prevent multi-instances CSS conflict
+            onShiftEnter: {keepDefault:false, openWith:'\n\n'},
+            returnParserData: function(data){
+                //added new callback in markItUp to use json markdown parser (in this case: showdown)
+                return self._converter.makeHtml(data);
             },
-            {name:'Preview', className:'preview',  call:'preview'}
+            markupSet: [
+            {name:'First Level Heading', key:"1", placeHolder:'Your title here...', 
+             closeWith:function(markItUp) { return self._miu.markdownTitle(markItUp, '=') } },
+            {name:'Second Level Heading', key:"2", placeHolder:'Your title here...', 
+             closeWith:function(markItUp) { return self._miu.markdownTitle(markItUp, '-') } },
+            {name:'Heading 3', key:"3", openWith:'### ', placeHolder:'Your title here...' },
+            {name:'Heading 4', key:"4", openWith:'#### ', placeHolder:'Your title here...' },
+            {name:'Heading 5', key:"5", openWith:'##### ', placeHolder:'Your title here...' },
+            {name:'Heading 6', key:"6", openWith:'###### ', placeHolder:'Your title here...' },
+            {separator:'---------------' },        
+            {name:'Bold', key:"B", openWith:'**', closeWith:'**'},
+            {name:'Italic', key:"I", openWith:'_', closeWith:'_'},
+            {separator:'---------------' },
+            {name:'Bulleted List', openWith:'- ' },
+            {name:'Numeric List', openWith:function(markItUp) {
+              return markItUp.line+'. ';
+            }},
+            {separator:'---------------' },
+            {name:'Picture', key:"P", replaceWith:'![[![Alternative text]!]]([![Url:!:http://]!] "[![Title]!]")'},
+            {name:'Link', key:"L", openWith:'[', closeWith:']([![Url:!:http://]!] "[![Title]!]")', 
+             placeHolder:'Your text to link here...' },
+            {separator:'---------------'},    
+            {name:'Quotes', openWith:'> '},
+            {name:'Code Block / Code', openWith:'(!(\t|!|`)!)', closeWith:'(!(`)!)'},
+            {separator:'---------------'},
+            {name:'Preview', call:'preview', className:"preview"}
           ]
         };
     },
@@ -135,8 +164,8 @@ RDFauthor.registerWidget({
 
     _init: function () {
        var self = this;
-       console.log('called '+self._domRdy+self._markitupRdy);
-       if (self._domRdy && self._markitupRdy) {
+       console.log('called '+self._domRdy+self._markitupRdy+self._showdownRdy);
+       if (self._domRdy && self._markitupRdy && self._showdownRdy) {
           console.log(self._settings);
           self.element().markItUp(self._settings);
        }
