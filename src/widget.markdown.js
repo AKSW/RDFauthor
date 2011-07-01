@@ -154,7 +154,6 @@ RDFauthor.registerWidget({
     
     value: function () {
         var value = this.element().val();
-        console.log(value);
         if (String(value).length > 0) {
             return value;
         }
@@ -164,7 +163,6 @@ RDFauthor.registerWidget({
 
     _init: function () {
        var self = this;
-       console.log('called '+self._domRdy+self._markitupRdy+self._showdownRdy);
        if (self._domRdy && self._markitupRdy && self._showdownRdy) {
           console.log(self._settings);
           self.element().markItUp(self._settings);
@@ -176,7 +174,7 @@ RDFauthor.registerWidget({
         callback : function () {
             $.typedValue.types['http://ns.ontowiki.net/SysOnt/markdown'] = {
                 regex: /^.*$/,
-                strip: true,
+                strip: false,
                 /** @ignore */
                 value: function (v, options) {
                   var opts = $.extend({}, $.typedValue.defaults, options);
