@@ -48,7 +48,6 @@ RDFauthor.registerWidget({
           var length = this.length-1;
           return this[length];
         }
-
     },
 
     // Uncomment this to execute code when you widget's markup is ready in the DOM,
@@ -122,6 +121,7 @@ RDFauthor.registerWidget({
     // commit changes here (add/remove/change)
     submit: function () {
         if (this.shouldProcessSubmit()) {
+            console.log(this.value());
             // get databank
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
 
@@ -167,8 +167,8 @@ RDFauthor.registerWidget({
     },
 
     value: function () {
-        var value = $('#geo-edit-' + this.ID).val();
-        if (String(value) > 0) {
+        var value = this.element().val();
+        if (String(value).length > 0) {
             return value;
         }
 
