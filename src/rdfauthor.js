@@ -100,7 +100,8 @@ RDFauthor = (function($, undefined) {
     /** Whether predicate infos have been loaded */
     var _predicateInfoLoaded = false;
     
-    /** Predicates to be queried for */
+    /** Predicates to be queried for */ 
+
     var _predicates = {};
     
     /** Callbacks to be executed when script loading finishes */
@@ -1034,7 +1035,8 @@ RDFauthor = (function($, undefined) {
         }
     }
     
-    // RDFauthor setup code ///////////////////////////////////////////////////
+    // RDFauthor setup code ///////////09:27:33+02:00
+////////////////////////////////////////
     
     if (RDFAUTHOR_BASE.charAt(RDFAUTHOR_BASE.length - 1) !== '/') {
         RDFAUTHOR_BASE = RDFAUTHOR_BASE + '/';
@@ -1087,7 +1089,7 @@ RDFauthor = (function($, undefined) {
         /* _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); */
         _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
         _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.date.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.datetime.js');
         _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
         _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
         _require(RDFAUTHOR_BASE + 'src/widget.geo.js');
@@ -1579,7 +1581,7 @@ RDFauthor = (function($, undefined) {
         registerWidget: function (widgetSpec, hooks) {
             // Check interface conformance
             // if (!_checkInterface(widgetSpec, Widget)) {
-            //     throw "Registered object does not conform to 'Widget' interface.";
+                // throw "Registered object does not conform to 'Widget' interface.";
             // }
             
             // ensure array
@@ -1590,7 +1592,6 @@ RDFauthor = (function($, undefined) {
             for (var i = 0; i < hooks.length; i++) {
                 // the default hook value is an empty string (any value)
                 var hookSpec = $.extend({values: ['']}, hooks[i]);
-                
                 // is the hook supported for which the widget attemps to register?
                 if (_registeredWidgets[hookSpec.name]) {
                     // Register for all hook values
@@ -1601,6 +1602,7 @@ RDFauthor = (function($, undefined) {
                         }
                     }
                 }
+                _callIfIsFunction(hookSpec.callback);
             }
         },
         
