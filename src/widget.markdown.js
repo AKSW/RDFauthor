@@ -153,7 +153,7 @@ RDFauthor.registerWidget({
     },
     
     value: function () {
-        var value = this.element().val();
+        var value = this.element().val().replace(/\n/gm,"\r");
         if (String(value).length > 0) {
             return value;
         }
@@ -173,7 +173,7 @@ RDFauthor.registerWidget({
         values: ['http://ns.ontowiki.net/SysOnt/markdown'],
         callback : function () {
             $.typedValue.types['http://ns.ontowiki.net/SysOnt/markdown'] = {
-                regex: /^.*$/,
+                regex: /.*/,
                 strip: false,
                 /** @ignore */
                 value: function (v, options) {
