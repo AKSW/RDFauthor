@@ -9,7 +9,7 @@ RDFauthor.registerWidget({
     // e.g. load scripts/stylesheets etc.
     init: function () {
         var self = this;
-        this.datatype = 'http://ns.ontowiki.net/SysOnt/markdown';
+        this.datatype = 'http://ns.ontowiki.net/SysOnt/Markdown';
         this._domRdy = false;
         this._markitupRdy = false;
         this._showdownRdy = false;
@@ -170,9 +170,9 @@ RDFauthor.registerWidget({
     }
 }, {
         name: 'datatype',
-        values: ['http://ns.ontowiki.net/SysOnt/markdown'],
+        values: ['http://ns.ontowiki.net/SysOnt/Markdown'],
         callback : function () {
-            $.typedValue.types['http://ns.ontowiki.net/SysOnt/markdown'] = {
+            $.typedValue.types['http://ns.ontowiki.net/SysOnt/Markdown'] = {
                 regex: /.*/,
                 strip: false,
                 /** @ignore */
