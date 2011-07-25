@@ -1089,6 +1089,7 @@ RDFauthor = (function($, undefined) {
         /* _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); */
         _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
         _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.html.js');
         _require(RDFAUTHOR_BASE + 'src/widget.datetime.js');
         _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
         _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
