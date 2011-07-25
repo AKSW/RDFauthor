@@ -342,6 +342,7 @@ RDFauthor.registerWidget({
 }, {
         name: '__LITERAL__',
         callback: function () {
+
             // register new datatype sysont:Markdown
             $.typedValue.types['http://ns.ontowiki.net/SysOnt/Markdown'] = {
                  regex: /.*/,
@@ -362,6 +363,17 @@ RDFauthor.registerWidget({
                    return v;
                  }
             };
+            // register new datatype xsd:time
+            $.typedValue.types['http://www.w3.org/2001/XMLSchema#time'] = {
+                regex: /^.*$/,
+                strip: true,
+                /** @ignore */
+                value: function (v, options) {
+                  var opts = $.extend({}, $.typedValue.defaults, options);
+                  return v;
+                }
+            };
+
         }
     }
 );
