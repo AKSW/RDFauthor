@@ -158,10 +158,10 @@ RDFauthor.registerWidget({
         var optionString = '';
         for (var i = 0; i < options.length; i++) {
             var display = options[i];
-            if (replaceNS) {
-                for (var s in this.ns) {
-                    if (options[i].match(this.ns[s])) {
-                        display = options[i].replace(this.ns[s], s + ':');
+            if (true) {
+                for (var s in this.namespaces) {
+                    if (options[i].match(this.namespaces[s])) {
+                        display = options[i].replace(this.namespaces[s], s + ':');
                         break;
                     }
                 }
@@ -340,6 +340,28 @@ RDFauthor.registerWidget({
         return null;
     }
 }, {
-        name: '__LITERAL__'
+        name: '__LITERAL__',
+        callback: function () {
+            // register new datatype sysont:Markdown
+            $.typedValue.types['http://ns.ontowiki.net/SysOnt/Markdown'] = {
+                 regex: /.*/,
+                 strip: false,
+                 /** @ignore */
+                 value: function (v, options) {
+                   var opts = $.extend({}, $.typedValue.defaults, options);
+                   return v;
+                 }
+            };
+            // register new datatype sysont:HTML
+            $.typedValue.types['http://ns.ontowiki.net/SysOnt/HTML'] = {
+                 regex: /.*/,
+                 strip: false,
+                 /** @ignore */
+                 value: function (v, options) {
+                   var opts = $.extend({}, $.typedValue.defaults, options);
+                   return v;
+                 }
+            };
+        }
     }
 );

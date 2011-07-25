@@ -121,7 +121,7 @@ RDFauthor.registerWidget({
     // commit changes here (add/remove/change)
     submit: function () {
         if (this.shouldProcessSubmit()) {
-            console.log(this.value());
+            //console.log(this.value());
             // get databank
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
 
