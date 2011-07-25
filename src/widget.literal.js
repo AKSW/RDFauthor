@@ -8,7 +8,7 @@ RDFauthor.registerWidget({
         this.disclosureID = 'disclosure-' + RDFauthor.nextID();
         this.languages    = RDFauthor.literalLanguages();
         this.datatypes    = RDFauthor.literalDatatypes();
-        this.bool         = ["http://www.w3.org/2001/XMLSchema#boolean"];
+        this.bool         = "http://www.w3.org/2001/XMLSchema#boolean";
         this.integer      = "http://www.w3.org/2001/XMLSchema#integer";
         this.namespaces   = RDFauthor.namespaces();
 
@@ -49,7 +49,7 @@ RDFauthor.registerWidget({
             }
         });
         
-        var typeb = this.bool[0];
+        var typeb = this.bool;
         $('.literal-datatype select').change(function(){
             var selected = $(this).find('option:selected').text();
             if( selected == typeb ) {
@@ -198,7 +198,7 @@ RDFauthor.registerWidget({
             readonly = 'readonly="true"';
         }
         
-        var isBoolean = this.statement.objectDatatype() == this.bool[0] ? true : false;
+        var isBoolean = this.statement.objectDatatype() == this.bool ? true : false;
         var areaMarkup = '\
             <div class="container ' + areaConfig.containerClass + '" style="width:100%">\
                 <div class="notboolean" style="' + ( isBoolean ? 'display:none;' : 'display:block;' ) + '">\
@@ -206,8 +206,8 @@ RDFauthor.registerWidget({
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
                 </div>\
                 <div class="boolean" style="' + ( isBoolean ? 'display:block;' : 'display:none;' ) + '">\
-                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'true' ? 'checked="checked"' : '' ) + ' value="true" />True</label>\
-                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'false' ? 'checked="checked"' : '' ) + ' value="false" />False</label>\
+                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool && this.statement.objectValue() == 'true' ? 'checked="checked"' : '' ) + ' value="true" />True</label>\
+                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool && this.statement.objectValue() == 'false' ? 'checked="checked"' : '' ) + ' value="false" />False</label>\
                 </div>\
             </div>\
             <div class="container util" style="clear:left">\
