@@ -153,9 +153,10 @@ RDFauthor.registerWidget({
     },
     
     value: function () {
-        var value = this.element().val().replace(/\n/gm,"\r");
-        if (String(value).length > 0) {
-            return value;
+        var value = this.element().val();
+        if (String(value).length > 0 && typeof(value) != "undefined") {
+            console.log(value);
+            return value.replace(/\n/gm,"\r");
         }
         
         return null;
