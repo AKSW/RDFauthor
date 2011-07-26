@@ -7,7 +7,7 @@
 RDFauthor.registerWidget({    
     _loadMCE: function () {
         if (this._mceLoaded && this._domReady) {
-            $('#xmlliteral-edit-input-' + this.ID).tinymce({
+            $('#html-edit-input-' + this.ID).tinymce({
                 script_url: RDFAUTHOR_BASE + 'libraries/tiny_mce/tiny_mce.js', 
                 theme: 'advanced', 
                 skin: 'default', 
@@ -30,8 +30,7 @@ RDFauthor.registerWidget({
     init: function () {
         this._mceLoaded = false;
         this._domReady  = false;
-        this._datatype  = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral';
-        this._newDatatype = 'http://ns.ontowiki.net/SysOnt/HTML';
+        this._datatype  = 'http://ns.ontowiki.net/SysOnt/HTML';
         
         var self = this;
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/tiny_mce/jquery.tinymce.js', function () {
@@ -49,20 +48,20 @@ RDFauthor.registerWidget({
     
     // return your jQuery-wrapped main input element here
     element: function () {
-        return jQuery('#xmlliteral-edit-input-' + this.ID);
+        return jQuery('#html-edit-input-' + this.ID);
     }, 
     
     // Uncomment to give focus to your widget.
     // Default implementation will giver focus to the return value of element().
     focus: function () {
-        jQuery('#xmlliteral-edit-input-' + this.ID).focus();
+        jQuery('#html-edit-input-' + this.ID).focus();
     },
     
     // return your widget's markup code here
     markup: function () {
         var markup = '\
-            <div class="container xmlliteral-value" style="width:100%">\
-                <textarea id="xmlliteral-edit-input-' + this.ID + '" class="xmlliteral-edit-input" style="width:100%">' 
+            <div class="container html-value" style="width:100%">\
+                <textarea id="html-edit-input-' + this.ID + '" class="html-edit-input" style="width:100%">' 
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + 
                 '</textarea>\
             </div>';
@@ -154,9 +153,10 @@ RDFauthor.registerWidget({
     }
 }, [{
         name: 'range', 
-        values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
+        values: ['http://ns.ontowiki.net/SysOnt/HTML']
     }, {
         name: 'datatype',
-        values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
+        values: ['http://ns.ontowiki.net/SysOnt/HTML']
     }]
 );
+
