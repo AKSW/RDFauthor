@@ -17,11 +17,11 @@ RDFauthor.registerWidget({
         
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.imagepicker.css');
         
-        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.js', function(){
-            self._slimboxLoaded = true;
-            self._init();
-        });
-
+        // RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.js', function(){
+            // self._slimboxLoaded = true;
+            // self._init();
+        // });
+        self._slimboxLoaded = true;
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.EmbedPicasaGallery.js', function(){
             self._embedPicasaGalleryLoaded = true;
             self._init();
@@ -53,7 +53,7 @@ RDFauthor.registerWidget({
     markup: function () {
         var markup = 
             '<div class="container" style="width:100%">\
-                <input type="text" style="width:50%" class="text" name="imagepicker" id="imagepicker-edit-' + this.ID + '" value="' 
+                <input type="text" class="text" name="imagepicker" id="imagepicker-edit-' + this.ID + '" value="' 
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
             </div>';
 
@@ -67,7 +67,7 @@ RDFauthor.registerWidget({
                  </div>\
                </div>\
                <div class="content">\
-                 <div id="gallery" class="width99" style="height:500px;border:1px solid #ccc;">\
+                 <div id="gallery" class="width99" style="height:500px;border:1px solid transparent;">\
                  </div>\
               </div>\
              </div>\
@@ -149,6 +149,7 @@ RDFauthor.registerWidget({
                                  .css('top',top)
                                  .data('input',$(this))
                                  .show();
+
                 $("#gallery").EmbedPicasaGallery('oetiker',{
                     albumid: "5484803453430469713",
                     size: 144, // thumb size (32,48,64,72,144,160))
@@ -183,6 +184,12 @@ RDFauthor.registerWidget({
 
             $('#imagepicker .button-windowclose').live('click', function() {
                 $('#imagepicker').fadeOut();
+            });
+
+            $('#imagepicker #gallery .album a').live('click', function(event){
+                event.preventDefault();
+                var picURI = $(this).find('img').attr('src');
+                self.element().val(picURI);
             });
 
         }
