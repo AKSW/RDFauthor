@@ -67,7 +67,7 @@ RDFauthor.registerWidget({
                  </div>\
                </div>\
                <div class="content">\
-                 <div id="gallery" class="width99" style="height:500px;border:1px solid transparent;">\
+                 <div id="gallery" class="width99" style="max-height:500px;border:1px solid transparent;">\
                  </div>\
               </div>\
              </div>\
