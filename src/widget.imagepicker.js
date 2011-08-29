@@ -82,41 +82,39 @@ RDFauthor.registerWidget({
     
     // commit changes here (add/remove/change)
     submit: function () {
-        if (this.shouldProcessSubmit()) {
+                if (this.shouldProcessSubmit()) {
             // get databank
-            var databank = RDFauthor.databankForGraph(this.statement.graphURI());
-            
-            var somethingChanged = (
-                this.statement.hasObject() && 
-                    this.statement.objectValue() !== this.value()
+            var databank   = RDFauthor.databankForGraph(this.statement.graphURI());
+            var hasChanged = (
+                this.statement.hasObject() 
+                && this.statement.objectValue() !== this.value()
+                && null !== this.value()
             );
             
-            var isNew = !this.statement.hasObject() && (null !== this.value());
-            
-            if (somethingChanged || this.removeOnSubmit) {
+            if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
                     databank.remove(String(rdfqTriple));
                 }
             }
             
-            if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
+            if (!this.removeOnSubmit && this.value()) {
+                var self = this;
                 try {
                     var newStatement = this.statement.copyWithObject({
-                        value: this.value(), 
+                        value: '<' + this.value() + '>', 
                         type: 'uri'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;
-                    alert('Could not save literal for the following reason: \n' + msg);
+                    alert('Could not save resource for the following reason: \n' + msg);
                     return false;
                 }
             }
         }
         
-        return true;
-    }, 
+        return true;    }, 
     
     shouldProcessSubmit: function () {
         var t1 = !this.statement.hasObject();
