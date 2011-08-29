@@ -8,10 +8,25 @@ RDFauthor.registerWidget({
     // Uncomment this to execute code when your widget is instantiated, 
     // e.g. load scripts/stylesheets etc.
     init: function () {
-        this._pwiLoaded = false;
+        this._embedPicasaGalleryLoaded = false;
+        this._slimboxLoaded = false;
         this._domRdy = false;
         var self = this;
+
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.css');
         
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.imagepicker.css');
+        
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.js', function(){
+            self._slimboxLoaded = true;
+            self._init();
+        });
+
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.EmbedPicasaGallery.js', function(){
+            self._embedPicasaGalleryLoaded = true;
+            self._init();
+        });
+
     },
     
     // Uncomment this to execute code when you widget's markup is ready in the DOM, 
@@ -38,9 +53,29 @@ RDFauthor.registerWidget({
     markup: function () {
         var markup = 
             '<div class="container" style="width:100%">\
-                <input type="text" style="width:50%" class="text" id="imagepicker-edit-' + this.ID + '" value="' 
+                <input type="text" style="width:50%" class="text" name="imagepicker" id="imagepicker-edit-' + this.ID + '" value="' 
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
             </div>';
+
+        var imagePicker = 
+            '<div id="imagepicker" class="window" style="display: none;">\
+               <h1 class="title">ImagePicker</h1>\
+               <div class="window-buttons">\
+                 <div class="window-buttons-left"></div>\
+                 <div class="window-buttons-right">\
+                   <span class="button button-windowclose"><span>\
+                 </div>\
+               </div>\
+               <div class="content">\
+                 <div id="gallery" class="width99" style="height:500px;border:1px solid #ccc;">\
+                 </div>\
+              </div>\
+             </div>\
+            ';
+        
+        if( $('#imagepicker').length == 0 ) {
+            $('body').append(imagePicker);
+        }
 
         return markup;
     }, 
@@ -99,15 +134,64 @@ RDFauthor.registerWidget({
         
         return null;
     },
+
     _init: function () {
         var self = this;
-        if (self._pwmLoaded && self._domRdy) {
-            //do something
+        var focus;
+        if (self._embedPicasaGalleryLoaded && self._slimboxLoaded && self._domRdy) {
+            self.element().click(function(){
+                focus = true;
+                // positioning
+                var left = self._getPosition().left + 'px !important;';
+                var top = self._getPosition().top + 'px !important';
+
+                $('#imagepicker').css('left',left)
+                                 .css('top',top)
+                                 .data('input',$(this))
+                                 .show();
+            });
+            
+            $("html").click(function(){
+                if ($('#imagepicker').css("display") != "none" && focus == false) {
+                    $('#imagepicker').fadeOut();
+                }else if (focus == true){
+                    $('#imagepicker').fadeIn();
+                }
+            });
+            $('#imagepicker,input[name="imagepicker"]').mouseover(function(){
+                focus = true;
+            });
+            $('#imagepicker,input[name="imagepicker"]').mouseout(function(){
+                focus = false;
+            });
+
+            $('.rdfauthor-view-content,html').scroll(function() {
+                var left = self._getPosition().left + 'px !important;';
+                var top = self._getPosition().top + 'px !important';
+                    
+                $('#imagepicker').css('left',left)
+                                .css('top',top);
+                $('#imagepicker').fadeOut();
+            });
+
+            $('#imagepicker .button-windowclose').live('click', function() {
+                $('#imagepicker').fadeOut();
+            });
+
         }
+    },
+
+    _getPosition: function() {
+        var pos = {
+            'top' : this.element().offset().top + this.element().outerHeight(),
+            'left': this.element().offset().left
+        };
+        return pos;
     }
+
 }, {
         name: 'property',
-        values: ['http://xmlns.com/foaf/0.1/Depiction',
-                 'http://xmlns.com/foaf/0.1/Image']
+        values: ['http://xmlns.com/foaf/0.1/depiction',
+                 'http://xmlns.com/foaf/0.1/image']
    }
 );
