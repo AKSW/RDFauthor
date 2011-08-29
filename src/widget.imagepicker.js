@@ -150,8 +150,9 @@ RDFauthor.registerWidget({
                                  .data('input',$(this))
                                  .show();
 
-                $("#gallery").EmbedPicasaGallery('oetiker',{
-                    albumid: "5484803453430469713",
+                $("#gallery").EmbedPicasaGallery('aksw.group',{
+                    albumid: "5646308221729665137",
+                    authkey: "Gv1sRgCISL87-luIbGXg",
                     size: 144, // thumb size (32,48,64,72,144,160))
                     loading_animation: "http://oss.oetiker.ch/jquery/css/loading.gif",
                     msg_more: 'show<br/>more',
