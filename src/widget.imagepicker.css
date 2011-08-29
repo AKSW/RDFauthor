@@ -1,7 +1,6 @@
 #imagepicker {
   z-index: 10000;
   width: 500px;
-  height: 600px;
   overflow: auto;
   position: absolute;
   top: 0px;
