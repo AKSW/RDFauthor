@@ -1,6 +1,6 @@
 #imagepicker {
+  display: none;
   z-index: 10000;
-  max-width: 500px;
   overflow: auto;
   position: absolute;
   top: 0px;
@@ -9,4 +9,10 @@
   padding-top: 0px !important;
   margin-left: 0px !important;
   margin-top: 0px !important;
+}
+
+#gallery {
+  max-height: 450px;
+  max-width: 477px;
+  border: 1px solid transparent;
 }

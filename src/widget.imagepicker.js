@@ -67,7 +67,7 @@ RDFauthor.registerWidget({
                  </div>\
                </div>\
                <div class="content">\
-                 <div id="gallery" class="width99" style="max-height:500px;border:1px solid transparent;">\
+                 <div id="gallery">\
                  </div>\
               </div>\
              </div>\
@@ -152,12 +152,16 @@ RDFauthor.registerWidget({
                     albumid: "5646308221729665137",
                     authkey: "Gv1sRgCISL87-luIbGXg",
                     size: 144, // thumb size (32,48,64,72,144,160))
-                    loading_animation: "http://oss.oetiker.ch/jquery/css/loading.gif",
-                    msg_more: 'show<br/>more',
+                    loading_animation: RDFAUTHOR_BASE + "libraries/slimbox/loading.gif",
+                    msg_more: '<span style="font-weight: bolder;">MORE</span>',
                     show_more: 5
-                 });
                 });
-            
+
+                
+            });
+            $('img').load(function(){
+                    alert('loaded!');
+                });
             $("html").click(function(){
                 if ($('#imagepicker').css("display") != "none" && focus == false) {
                     $('#imagepicker').fadeOut();

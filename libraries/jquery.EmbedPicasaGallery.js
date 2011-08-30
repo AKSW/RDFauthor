@@ -285,12 +285,12 @@
 
                var $img = $('<img/>')
                	   .css('borderWidth','0px')
-	           .hide()
+                   .hide()
                    .load(function(){                   
                        if (meta_opts.thumb_tuner){
                            meta_opts.thumb_tuner(this,item);
                        }
-		       $img.show();
+                       $img.show();
                    });
 
 
@@ -316,7 +316,8 @@
 
                $div
                    .attr("id", meta_opts.thumb_id_prefix + item.gphoto$id.$t )
-                   .append($a);
+                   .append($a)
+                   .css('background-image','none'); //hack for transparent images - disabling of loading animation
 
 
                return $div; 
