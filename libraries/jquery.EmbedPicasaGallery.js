@@ -85,6 +85,7 @@
             loading_animation: null,
             show_more: null,
             hide_back: false,
+            keywords: [],
             link_mapper: function(el){
                     return [
                         el.href,
@@ -282,7 +283,7 @@
             function makeImage(i,item){
                var title = item.media$group.media$description.$t || item.media$group.media$title.$t;  
                var $div = albumPics[i] || makeDiv();
-
+               var keywords = item.media$group.media$description.$t.split(" ");
                var $img = $('<img/>')
                	   .css('borderWidth','0px')
                    .hide()
@@ -291,17 +292,21 @@
                            meta_opts.thumb_tuner(this,item);
                        }
                        $img.show();
-                   });
-
-
-
-
+                   })
+                   .data('keywords',keywords);
+               
+               // adds new keywords to meta_opts.keywords
+               for ( var i in keywords ) {
+                  if ( $.inArray(keywords[i],meta_opts.keywords) == -1 && keywords[i].length != 0 ) {
+                      meta_opts.keywords.push(keywords[i]);
+                  }
+               }
                var thumbs = item.media$group.media$thumbnail;
-	       var gotOne = false;
+               var gotOne = false;
                for (var i = 0; i<thumbs.length;i++){
                     if (thumbs[i].width == meta_opts.size && thumbs[i].height == meta_opts.size){
                         $img.attr("src", thumbs[i].url);
-			gotOne = true;
+                        gotOne = true;
                         break;
                     }
                }

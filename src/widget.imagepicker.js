@@ -60,7 +60,10 @@ RDFauthor.registerWidget({
 
         var imagePicker = 
             '<div id="imagepicker" class="window" style="display: none;">\
-               <h1 class="title">ImagePicker - Album: ' + this._album + '<a href="https://picasaweb.google.com/lh/webUpload?uname=aksw.group&aid=5646308221729665137&continue=https://picasaweb.google.com/aksw.group/AkswOrg%3Fauthkey%3DGv1sRgCIebodK_ssfhUg" target="_blank" ><img style="height: 14px; float:right; margin-right:15px;" src="'+ RDFAUTHOR_BASE+'libraries/images/upload_photo.png' +'" alt="upload pictures to album "'+ this._album +'</img></a></h1>\
+               <h1 class="title">ImagePicker - Album: ' + this._album + '<a href="https://picasaweb.google.com/lh/webUpload?uname=aksw.group&aid=5646308221729665137&continue=https://picasaweb.google.com/aksw.group/AkswOrg%3Fauthkey%3DGv1sRgCIebodK_ssfhUg" target="_blank" ><img style="height: 15px; float:right; margin-right:15px;" src="'+ RDFAUTHOR_BASE+'libraries/images/upload_photo.png' +'" alt="upload pictures to album "'+ this._album +'</img></a>\
+                 <br/>\
+                 <input id="filterGallery" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
+               </h1>\
                <div class="window-buttons">\
                  <div class="window-buttons-left"></div>\
                  <div class="window-buttons-right">\
@@ -152,16 +155,36 @@ RDFauthor.registerWidget({
                 $("#gallery").EmbedPicasaGallery('aksw.group',{
                     albumid: "5646308221729665137",
                     authkey: "Gv1sRgCISL87-luIbGXg",
+                    matcher: "Screenshot",
                     size: 144, // thumb size (32,48,64,72,144,160))
                     loading_animation: RDFAUTHOR_BASE + "libraries/slimbox/loading.gif",
                     msg_more: '<span style="font-weight: bolder;">MORE</span>',
                     show_more: 5
                 });
 
-                
             });
             
-            $("html").click(function(){
+            $('#filterGallery').click(function(){
+                $(this).autocomplete({
+                    source: $.EmbedPicasaGallery.defaultOptions.keywords
+                }).bind('change cut input',function(){
+                    console.log('change');
+                    $('#gallery img').each(function(){
+                       var keywords = $(this).data('keywords');
+                       console.log(keywords);
+                       var valueFilterGallery = $('#filterGallery').val();
+                       $(this).parent().parent().hide();
+                       for ( var i in keywords ) {
+
+                           if ( keywords[i].search(valueFilterGallery) != -1 ) {
+                              $(this).parent().parent().show();
+                           }
+                       }
+                    });
+                });
+            })
+
+            $('html').click(function(){
                 if ($('#imagepicker').css("display") != "none" && focus == false) {
                     $('#imagepicker').fadeOut();
                 }else if (focus == true){
