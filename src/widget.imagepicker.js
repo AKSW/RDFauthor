@@ -187,7 +187,7 @@ RDFauthor.registerWidget({
 
             $('#imagepicker #gallery .album a').live('click', function(event){
                 event.preventDefault();
-                var picURI = $(this).find('img').attr('src');
+                var picURI = $(this).attr('href');
                 self.element().val(picURI);
             });
 
