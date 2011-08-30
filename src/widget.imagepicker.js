@@ -11,6 +11,7 @@ RDFauthor.registerWidget({
         this._embedPicasaGalleryLoaded = false;
         this._slimboxLoaded = false;
         this._domRdy = false;
+        this._album = 'aksw.org';
         var self = this;
 
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.css');
@@ -59,7 +60,7 @@ RDFauthor.registerWidget({
 
         var imagePicker = 
             '<div id="imagepicker" class="window" style="display: none;">\
-               <h1 class="title">ImagePicker</h1>\
+               <h1 class="title">ImagePicker - Album: ' + this._album + '<a href="https://picasaweb.google.com/lh/webUpload?uname=aksw.group&aid=5646308221729665137&continue=https://picasaweb.google.com/aksw.group/AkswOrg%3Fauthkey%3DGv1sRgCIebodK_ssfhUg" target="_blank" ><img style="height: 14px; float:right; margin-right:15px;" src="'+ RDFAUTHOR_BASE+'libraries/images/upload_photo.png' +'" alt="upload pictures to album "'+ this._album +'</img></a></h1>\
                <div class="window-buttons">\
                  <div class="window-buttons-left"></div>\
                  <div class="window-buttons-right">\
@@ -159,9 +160,7 @@ RDFauthor.registerWidget({
 
                 
             });
-            $('img').load(function(){
-                    alert('loaded!');
-                });
+            
             $("html").click(function(){
                 if ($('#imagepicker').css("display") != "none" && focus == false) {
                     $('#imagepicker').fadeOut();
