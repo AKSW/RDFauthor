@@ -456,7 +456,7 @@ RDFauthor.registerWidget({
                 select: function (event, ui) {
                     self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
-                    self.element().val(this.selectedResourceLabel);
+                    // self.element().val(this.selectedResourceLabel);
                     
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
