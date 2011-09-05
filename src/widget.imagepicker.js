@@ -158,29 +158,48 @@ RDFauthor.registerWidget({
                     matcher: "Screenshot",
                     size: 144, // thumb size (32,48,64,72,144,160))
                     loading_animation: RDFAUTHOR_BASE + "libraries/slimbox/loading.gif",
-                    msg_more: '<span style="font-weight: bolder;">MORE</span>',
+                    msg_more: '<span id="gallery_more" style="font-weight: bolder;">MORE</span>',
                     show_more: 5
                 });
 
             });
             
             $('#filterGallery').click(function(){
+                var noInput;
                 $(this).autocomplete({
                     source: $.EmbedPicasaGallery.defaultOptions.keywords
-                }).bind('change cut input',function(){
-                    console.log('change');
-                    $('#gallery img').each(function(){
-                       var keywords = $(this).data('keywords');
-                       console.log(keywords);
-                       var valueFilterGallery = $('#filterGallery').val();
-                       $(this).parent().parent().hide();
-                       for ( var i in keywords ) {
-
-                           if ( keywords[i].search(valueFilterGallery) != -1 ) {
-                              $(this).parent().parent().show();
-                           }
-                       }
-                    });
+                }).keydown(function(){
+                    if ( $('#filterGallery').val().length == 0 ) {
+                        console.log('keydown');
+                        noInput = $('#gallery .album');
+                        console.log(noInput);
+                    }
+                }).bind('change cut input keyup',function(){
+                    if ( $('#filterGallery').val().length == 0 ) {
+                        console.log('no input');
+                        $('#gallery .album div').each(function(i){
+                            if( i < 5 ) {
+                               $(this).show();
+                            } else {
+                               $(this).hide();
+                            }
+                        });
+                        $('#gallery_more').parent().parent().show();
+                        $('#gallery_more').parent().show();
+                    } else {
+                        var moreButton = $('#gallery_more').parent().parent();
+                        moreButton.hide();
+                        $('#gallery img').each(function(){
+                            var keywords = $(this).data('keywords');
+                            var valueFilterGallery = $('#filterGallery').val();
+                            $(this).parent().parent().hide();
+                            for ( var i in keywords ) {
+                                if ( keywords[i].search(valueFilterGallery) != -1 ) {
+                                   $(this).parent().parent().show();
+                                }
+                            }
+                        });
+                    }
                 });
             })
 
