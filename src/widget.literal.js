@@ -8,7 +8,7 @@ RDFauthor.registerWidget({
         this.disclosureID = 'disclosure-' + RDFauthor.nextID();
         this.languages    = RDFauthor.literalLanguages();
         this.datatypes    = RDFauthor.literalDatatypes();
-        this.bool         = ["http://www.w3.org/2001/XMLSchema#boolean"];
+        this.bool         = "http://www.w3.org/2001/XMLSchema#boolean";
         this.integer      = "http://www.w3.org/2001/XMLSchema#integer";
         this.namespaces   = RDFauthor.namespaces();
 
@@ -49,7 +49,7 @@ RDFauthor.registerWidget({
             }
         });
         
-        var typeb = this.bool[0];
+        var typeb = this.bool;
         $('.literal-datatype select').change(function(){
             var selected = $(this).find('option:selected').text();
             if( selected == typeb ) {
@@ -158,10 +158,10 @@ RDFauthor.registerWidget({
         var optionString = '';
         for (var i = 0; i < options.length; i++) {
             var display = options[i];
-            if (replaceNS) {
-                for (var s in this.ns) {
-                    if (options[i].match(this.ns[s])) {
-                        display = options[i].replace(this.ns[s], s + ':');
+            if (true) {
+                for (var s in this.namespaces) {
+                    if (options[i].match(this.namespaces[s])) {
+                        display = options[i].replace(this.namespaces[s], s + ':');
                         break;
                     }
                 }
@@ -198,7 +198,7 @@ RDFauthor.registerWidget({
             readonly = 'readonly="true"';
         }
         
-        var isBoolean = this.statement.objectDatatype() == this.bool[0] ? true : false;
+        var isBoolean = this.statement.objectDatatype() == this.bool ? true : false;
         var areaMarkup = '\
             <div class="container ' + areaConfig.containerClass + '" style="width:100%">\
                 <div class="notboolean" style="' + ( isBoolean ? 'display:none;' : 'display:block;' ) + '">\
@@ -206,8 +206,8 @@ RDFauthor.registerWidget({
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
                 </div>\
                 <div class="boolean" style="' + ( isBoolean ? 'display:block;' : 'display:none;' ) + '">\
-                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'true' ? 'checked="checked"' : '' ) + ' value="true" />True</label>\
-                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool[0] && this.statement.objectValue() == 'false' ? 'checked="checked"' : '' ) + ' value="false" />False</label>\
+                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool && this.statement.objectValue() == 'true' ? 'checked="checked"' : '' ) + ' value="true" />True</label>\
+                    <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool && this.statement.objectValue() == 'false' ? 'checked="checked"' : '' ) + ' value="false" />False</label>\
                 </div>\
             </div>\
             <div class="container util" style="clear:left">\
@@ -340,6 +340,40 @@ RDFauthor.registerWidget({
         return null;
     }
 }, {
-        name: '__LITERAL__'
+        name: '__LITERAL__',
+        callback: function () {
+
+            // register new datatype sysont:Markdown
+            $.typedValue.types['http://ns.ontowiki.net/SysOnt/Markdown'] = {
+                 regex: /.*/,
+                 strip: false,
+                 /** @ignore */
+                 value: function (v, options) {
+                   var opts = $.extend({}, $.typedValue.defaults, options);
+                   return v;
+                 }
+            };
+            // register new datatype sysont:HTML
+            $.typedValue.types['http://ns.ontowiki.net/SysOnt/HTML'] = {
+                 regex: /.*/,
+                 strip: false,
+                 /** @ignore */
+                 value: function (v, options) {
+                   var opts = $.extend({}, $.typedValue.defaults, options);
+                   return v;
+                 }
+            };
+            // register new datatype xsd:time
+            $.typedValue.types['http://www.w3.org/2001/XMLSchema#time'] = {
+                regex: /^.*$/,
+                strip: true,
+                /** @ignore */
+                value: function (v, options) {
+                  var opts = $.extend({}, $.typedValue.defaults, options);
+                  return v;
+                }
+            };
+
+        }
     }
 );

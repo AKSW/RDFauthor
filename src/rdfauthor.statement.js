@@ -452,9 +452,9 @@ Statement.prototype = {
      */
     registerDatatype: function (datatypeURI, regex, strip, valueFunction) {
         jQuery.typedValue.types[datatypeURI] = {
-            regex: regex | /^.*$/, 
-            strip: strip | false, 
-            value: valueFunction | function(v) {return v;}
+          regex: regex ? regex : /.*/, 
+          strip: strip ? strip : false, 
+          value: $.isFunction(valueFunction) ? valueFunction : function(v) {return v;}
         }
     }
 }

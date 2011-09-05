@@ -31,6 +31,7 @@ RDFauthor.registerWidget({
         this._mceLoaded = false;
         this._domReady  = false;
         this._datatype  = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral';
+        this._newDatatype = 'http://ns.ontowiki.net/SysOnt/HTML';
         
         var self = this;
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/tiny_mce/jquery.tinymce.js', function () {
