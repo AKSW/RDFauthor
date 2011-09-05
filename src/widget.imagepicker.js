@@ -168,12 +168,6 @@ RDFauthor.registerWidget({
                 var noInput;
                 $(this).autocomplete({
                     source: $.EmbedPicasaGallery.defaultOptions.keywords
-                }).keydown(function(){
-                    if ( $('#filterGallery').val().length == 0 ) {
-                        console.log('keydown');
-                        noInput = $('#gallery .album');
-                        console.log(noInput);
-                    }
                 }).bind('change cut input keyup',function(){
                     if ( $('#filterGallery').val().length == 0 ) {
                         console.log('no input');
