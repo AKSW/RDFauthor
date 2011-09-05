@@ -186,9 +186,10 @@ RDFauthor.registerWidget({
                         $('#gallery img').each(function(){
                             var keywords = $(this).data('keywords');
                             var valueFilterGallery = $('#filterGallery').val();
+                            var regex = new RegExp(valueFilterGallery,'gi');
                             $(this).parent().parent().hide();
                             for ( var i in keywords ) {
-                                if ( keywords[i].search(valueFilterGallery) != -1 ) {
+                                if ( keywords[i].search(regex) != -1 ) {
                                    $(this).parent().parent().show();
                                 }
                             }
