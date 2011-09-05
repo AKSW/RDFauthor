@@ -1095,6 +1095,7 @@ RDFauthor = (function($, undefined) {
         _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
         _require(RDFAUTHOR_BASE + 'src/widget.geo.js');
         _require(RDFAUTHOR_BASE + 'src/widget.markdown.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.imagepicker.js');
         _requirePending--;
     });
     
