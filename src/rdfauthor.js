@@ -1084,6 +1084,7 @@ RDFauthor = (function($, undefined) {
     
     // load widgets; widget prototype is required before all other widgets
     _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
+        _require(RDFAUTHOR_BASE + 'src/widget.property.js');
         _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
         _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
         /* _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); */
