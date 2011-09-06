@@ -97,7 +97,7 @@ RDFauthor.registerWidget({
     },
 
     element: function () {
-        return jQuery('#resource-input-' + this.ID);
+        return jQuery('#property-input-' + this.ID);
     },
 
     markup: function () {
@@ -107,7 +107,7 @@ RDFauthor.registerWidget({
                   : (this.statement.hasObject() ? this.statement.objectValue() : '');
         var markup = '\
             <div class="container resource-value">\
-                <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input" \
+                <input type="text" id="property-input-' + this.ID + '" class="text resource-edit-input" \
                        value="' + value + '"/>\
             </div>';
 
@@ -523,6 +523,6 @@ RDFauthor.registerWidget({
         }
     }
 }, [{
-        name: '__OBJECT__'
+        name: '__PROPERTY__'
     }]
 );

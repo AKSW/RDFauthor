@@ -152,7 +152,8 @@ RDFauthor = (function($, undefined) {
         '__LITERAL__':  {},
         '__OBJECT__': {}, 
         '__DEFAULT__': {}, 
-        '__DEBUG__': {}, 
+        '__DEBUG__': {},
+        '__PROPERTY__': {},
         'resource':   {}, 
         'property':   {}, 
         'range':      {}, 
@@ -678,7 +679,6 @@ RDFauthor = (function($, undefined) {
             }
             
             document.getElementsByTagName('head')[0].appendChild(s);
-            
             // set script to loading
             _loadedScripts[scriptURI] = SCRIPT_STATE_LOADING;
         } else if (_loadedScripts[scriptURI] === SCRIPT_STATE_LOADING) {
@@ -1084,10 +1084,9 @@ RDFauthor = (function($, undefined) {
     
     // load widgets; widget prototype is required before all other widgets
     _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
-        _require(RDFAUTHOR_BASE + 'src/widget.property.js');
         _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
         _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
-        /* _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); */
+        // _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); 
         _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
         _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
         _require(RDFAUTHOR_BASE + 'src/widget.html.js');
@@ -1097,6 +1096,7 @@ RDFauthor = (function($, undefined) {
         _require(RDFAUTHOR_BASE + 'src/widget.geo.js');
         _require(RDFAUTHOR_BASE + 'src/widget.markdown.js');
         _require(RDFAUTHOR_BASE + 'src/widget.imagepicker.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.property.js');
         _requirePending--;
     });
     
@@ -1593,7 +1593,6 @@ RDFauthor = (function($, undefined) {
             if (!$.isArray(hooks)) {
                 hooks = [hooks];
             }
-            
             for (var i = 0; i < hooks.length; i++) {
                 // the default hook value is an empty string (any value)
                 var hookSpec = $.extend({values: ['']}, hooks[i]);
