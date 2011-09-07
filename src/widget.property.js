@@ -32,6 +32,9 @@ RDFauthor.registerWidget({
             // Autocomplete options:
             minChars:           3,      /* minmum chars needed to be typed before search starts */
             delay:              1000,   /* delay in ms before search starts */
+            // Callbacks
+            selectionCallback:  null,   /* the function to be called when a new selection is made */
+            selectOnReturn:     false   /* executes selection callback if the user hits return in the search field */
         }, this.options);
 
         var self = this;
@@ -230,6 +233,27 @@ RDFauthor.registerWidget({
                                     .css('top',top)
                                     .data('input',$(this))
                                     .show();
+            }).keydown(function (e) {
+                if ((e.which === 13) && self._options.selectOnReturn) {
+                    $('#propertypicker').hide();
+                    var val = jQuery(e.target).val();
+                    self._normalizeValue(val);
+
+                    var splits = val.split(':', 2);
+                    if (splits.length >= 2 && !self.isURI(val)) {
+                        if (splits[0] in self._namespaces) {
+                            self.selectedResource = self._namespaces[splits[0]] + splits[1];
+                            self.selectedResourceLabel = splits[1];
+                        }
+                    }
+
+                    self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
+
+                    // prevent newline in new widget field
+                    e.preventDefault();
+                } else if (e.which === 27) {
+                    e.stopPropagation();
+                }
             });
 
             $('html').click(function(){
