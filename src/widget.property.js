@@ -4,7 +4,6 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
-var MAX_TITLE_LENGTH = 50;
 
 RDFauthor.registerWidget({
     init: function () {
@@ -59,22 +58,17 @@ RDFauthor.registerWidget({
     },
 
     element: function () {
-        return jQuery('#property-input-' + this.ID);
+        return $('#property-input-' + this.ID);
     },
 
     markup: function () {
-        var l = this.statement.objectLabel();
-        var value = this.statement.objectLabel()
-                  ? this.statement.objectLabel()
-                  : (this.statement.hasObject() ? this.statement.objectValue() : '');
-        var markup = '\
+            var markup = '\
             <div class="container resource-value">\
-                <input type="text" id="property-input-' + this.ID + '" class="text resource-edit-input" \
-                       value="' + value + '"/>\
+                <input type="text" id="property-input-' + this.ID + '" name="propertpicker" class="text resource-edit-input" />\
             </div>';
             var propertyPicker = 
                         '<div id="propertypicker" class="window" style="display: none;">\
-                           <h1 class="title">Suggested Properties
+                           <h1 class="title">Suggested Properties\
                              <br/>\
                              <input id="filterProperties" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                            </h1>\
@@ -86,23 +80,26 @@ RDFauthor.registerWidget({
                            </div>\
                            <div class="content">\
                              <h1 class="propertyHeadline">\
-                               <span class="ui-icon ui-icon-plus"></span>\
-                               <span>In use elsewhere</span>\
-                               <span id="suggestedInUseCount">()</span>\
+                               <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                               <span>In use elsewhere (\
+                               <span id="suggestedInUseCount"></span>\
+                               )</span>\
                              </h1>\
                              <div id="suggestedInUse">\
                              </div>\
                              <h1 class="propertyHeadline">\
-                               <span class="ui-icon ui-icon-plus"></span>\
-                               <span>Gerenal applicable</span>\
+                               <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                               <span>Gerenal applicable (\
                                <span id="suggestedGernalCount"></span>\
+                               )</span>\
                              </h1>\
                              <div id="suggestedGernal">\
                              </div>\
                              <h1 class="propertyHeadline">\
-                               <span class="ui-icon ui-icon-plus"></span>\
-                               <span>Applicable</span>\
-                               <span id="suggestedApplicableCount"></span>\
+                               <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
+                               <span>Applicable (\
+                                <span id="suggestedApplicableCount"></span>\
+                               )</span>\
                              </h1>\
                              <div id="suggestedApplicable">\
                              </div>\
@@ -221,10 +218,58 @@ RDFauthor.registerWidget({
 
     _init: function () {
         var self = this;
+        var focus;
         if (this._pluginLoaded && this._domReady) {
-        
+            self.element().click(function() {
+                focus = true;
+                // positioning
+                var left = self._getPosition().left + 'px !important;';
+                var top = self._getPosition().top + 'px !important';
+
+                $('#propertypicker').css('left',left)
+                                    .css('top',top)
+                                    .data('input',$(this))
+                                    .show();
+            });
+
+            $('html').click(function(){
+                if ($('#propertypicker').css("display") != "none" && focus == false) {
+                    $('#propertypicker').fadeOut();
+                }else if (focus == true){
+                    $('#propertypicker').fadeIn();
+                }
+            });
+            $('#propertypicker,input[name="propertypicker"]').mouseover(function(){
+                focus = true;
+            });
+            $('#propertypicker,input[name="propertypicker"]').mouseout(function(){
+                focus = false;
+            });
+
+            $('.rdfauthor-view-content,html').scroll(function() {
+                var left = self._getPosition().left + 'px !important;';
+                var top = self._getPosition().top + 'px !important';
+                    
+                $('#propertypicker').css('left',left)
+                                .css('top',top);
+                $('#propertypicker').fadeOut();
+            });
+
+            $('#propertypicker .button-windowclose').live('click', function() {
+                $('#propertypicker').fadeOut();
+            });
+
         }
+    },
+
+    _getPosition: function() {
+        var pos = {
+            'top' : this.element().offset().top + this.element().outerHeight(),
+            'left': this.element().offset().left
+        };
+        return pos;
     }
+
 }, [{
         name: '__PROPERTY__'
     }]
