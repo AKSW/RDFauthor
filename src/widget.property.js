@@ -302,7 +302,7 @@ RDFauthor.registerWidget({
     _listProperty: function (resourceUri,label) {
         var self = this;
         label = label == null ? self.localName(resourceUri) : label;
-        return '<li><a class="show-property Resource" about="'+resourceUri+'" \
+        return '<li><a name="propertypicker" class="show-property Resource" about="'+resourceUri+'" \
                 title="' + label + '">' + label + '</a></li>';
     },
 
@@ -396,7 +396,16 @@ RDFauthor.registerWidget({
                                                            .addClass('ui-icon-minus');
                 $(this).find('div').eq(0).slideToggle();
             });
-
+            
+            /** CLICK EVENT ON PROPERTY */
+            $('#propertypicker a[name="propertypicker"]').live('click', function(event){
+                event.preventDefault();
+                console.log($(this));
+                var resourceUri = $(this).attr('about');
+                var keydownEvent = $.Event("keydown");
+                keydownEvent.which=13;
+                self.element().val(resourceUri).trigger(keydownEvent);
+            })
         }
     },
 
