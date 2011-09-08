@@ -58,7 +58,6 @@ RDFauthor.registerWidget({
         // returns the size of an object
         Object.size = function(obj) {
             var size = 0, key;
-            console.log(obj);
             for (key in obj) {
                 size++;
             }
@@ -252,9 +251,11 @@ RDFauthor.registerWidget({
             callbackSuccess: function(data) {
                 var results = data.results.bindings;
                 for (var i in results) {
-                    var resourceUri = results[i].resourceUri.value;
-                    typeof(results[i].label) != "undefined" ? propertiesInUse[resourceUri] = results[i].label.value
-                                                            : propertiesInUse[resourceUri] = null;
+                    if( (typeof(results[i].resourceUri) != "undefined")  && (i != "last") ) {
+                        var resourceUri = results[i].resourceUri.value;
+                        typeof(results[i].label) != "undefined" ? propertiesInUse[resourceUri] = results[i].label.value
+                                                                : propertiesInUse[resourceUri] = null;
+                    } 
                 }
                 self._hasProperties(function(hasProperties){
                     for (var resourceUri in propertiesInUse) {
@@ -286,7 +287,9 @@ RDFauthor.registerWidget({
             callbackSuccess: function(data) {
                 var results = data.results.bindings;
                 for (var i in results) {
-                    hasProperties.push(results[i].resourceUri.value);
+                    if( (results[i].resourceUri != "undefined") && (i != "last") ) {
+                        hasProperties.push(results[i].resourceUri.value);
+                    }
                 }
                 $.isFunction(callback) ? callback(hasProperties) : null;
             },
@@ -297,6 +300,8 @@ RDFauthor.registerWidget({
     },
 
     _listProperty: function (resourceUri,label) {
+        var self = this;
+        label = label == null ? self.localName(resourceUri) : label;
         return '<li><a class="show-property Resource" about="'+resourceUri+'" \
                 title="' + label + '">' + label + '</a></li>';
     },
