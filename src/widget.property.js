@@ -101,6 +101,8 @@ RDFauthor.registerWidget({
                       )</span>\
                     </h1>\
                     <div id="suggestedInUse">\
+                      <ul class="inline separated">\
+                      </ul>\
                     </div>\
                     <h1 class="propertyHeadline">\
                       <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
@@ -292,6 +294,11 @@ RDFauthor.registerWidget({
         });
     },
 
+    _listProperty: function (resourceUri,label) {
+        return '<li><a class="show-property Resource" about="'+resourceUri+'" \
+                title="' + label + '">' + label + '</a></li>';
+    },
+
     _normalizeValue: function (value) {
         if (!this.selectedResource) {
             this.selectedResource      = this.expandNamespace(value);
@@ -316,6 +323,9 @@ RDFauthor.registerWidget({
                 // query
                 self._suggestions(function(propertiesInUse) {
                     $('#suggestedInUseCount').html(Object.size(propertiesInUse));
+                    for (var resourceUri in propertiesInUse) {
+                        $('#suggestedInUse ul').append(self._listProperty(resourceUri,propertiesInUse[resourceUri]));
+                    }
                 });
             }).keydown(function (e) {
                 if ((e.which === 13) && self._options.selectOnReturn) {

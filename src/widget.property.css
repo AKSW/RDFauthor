@@ -14,3 +14,10 @@
   width: 477px;
 }
 
+#propertypicker h1 {
+  font-size: 100%;
+}
+
+#propertypicker ul li {
+  padding-left: 5px;
+}
