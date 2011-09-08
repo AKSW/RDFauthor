@@ -98,9 +98,7 @@ RDFauthor.registerWidget({
                       <li>\
                         <h1 class="propertyHeadline">\
                           <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>In use elsewhere (\
-                          <span id="suggestedInUseCount"></span>\
-                          )</span>\
+                          <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
                         </h1>\
                         <div id="suggestedInUse">\
                           <ul class="inline separated">\
@@ -110,9 +108,7 @@ RDFauthor.registerWidget({
                       <li>\
                         <h1 class="propertyHeadline">\
                           <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>Gerenal applicable (\
-                          <span id="suggestedGernalCount"></span>\
-                          )</span>\
+                          <span>Gerenal applicable (<span id="suggestedGernalCount"></span>)</span>\
                         </h1>\
                         <div id="suggestedGernal">\
                         </div>\
@@ -120,9 +116,7 @@ RDFauthor.registerWidget({
                       <li>\
                         <h1 class="propertyHeadline">\
                           <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
-                          <span>Applicable (\
-                           <span id="suggestedApplicableCount"></span>\
-                          )</span>\
+                          <span>Applicable (<span id="suggestedApplicableCount"></span>)</span>\
                         </h1>\
                         <div id="suggestedApplicable">\
                         </div>\
@@ -328,7 +322,7 @@ RDFauthor.registerWidget({
                                     .css('top',top)
                                     .data('input',$(this))
                                     .show();
-                // query
+                // query - fills the everywhere in use part
                 self._suggestions(function(propertiesInUse) {
                     $('#suggestedInUseCount').html(Object.size(propertiesInUse));
                     for (var resourceUri in propertiesInUse) {
@@ -378,12 +372,24 @@ RDFauthor.registerWidget({
                 var top = self._getPosition().top + 'px !important';
                     
                 $('#propertypicker').css('left',left)
-                                .css('top',top);
+                                    .css('top',top);
                 $('#propertypicker').fadeOut();
             });
 
             $('#propertypicker .button-windowclose').live('click', function() {
                 $('#propertypicker').fadeOut();
+            });
+
+            /** TOGGLE EVENT */
+            $('#propertypicker .content ul li').live('click', function(){
+                $(this).find('h1 .ui-icon')
+                       .hasClass('ui-icon-minus') ? $(this).find('h1 .ui-icon')
+                                                           .removeClass('ui-icon-minus')
+                                                           .addClass('ui-icon-plus')
+                                                  : $(this).find('h1 .ui-icon')
+                                                           .removeClass('ui-icon-plus')
+                                                           .addClass('ui-icon-minus');
+                $(this).find('div').eq(0).slideToggle();
             });
 
         }
