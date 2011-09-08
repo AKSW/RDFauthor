@@ -94,32 +94,40 @@ RDFauthor.registerWidget({
                     </div>\
                   </div>\
                   <div class="content">\
-                    <h1 class="propertyHeadline">\
-                      <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                      <span>In use elsewhere (\
-                      <span id="suggestedInUseCount"></span>\
-                      )</span>\
-                    </h1>\
-                    <div id="suggestedInUse">\
-                      <ul class="inline separated">\
-                      </ul>\
-                    </div>\
-                    <h1 class="propertyHeadline">\
-                      <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                      <span>Gerenal applicable (\
-                      <span id="suggestedGernalCount"></span>\
-                      )</span>\
-                    </h1>\
-                    <div id="suggestedGernal">\
-                    </div>\
-                    <h1 class="propertyHeadline">\
-                      <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
-                      <span>Applicable (\
-                       <span id="suggestedApplicableCount"></span>\
-                      )</span>\
-                    </h1>\
-                    <div id="suggestedApplicable">\
-                    </div>\
+                    <ul class="bullets-none separated">\
+                      <li>\
+                        <h1 class="propertyHeadline">\
+                          <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                          <span>In use elsewhere (\
+                          <span id="suggestedInUseCount"></span>\
+                          )</span>\
+                        </h1>\
+                        <div id="suggestedInUse">\
+                          <ul class="inline separated">\
+                          </ul>\
+                        </div>\
+                      </li>\
+                      <li>\
+                        <h1 class="propertyHeadline">\
+                          <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                          <span>Gerenal applicable (\
+                          <span id="suggestedGernalCount"></span>\
+                          )</span>\
+                        </h1>\
+                        <div id="suggestedGernal">\
+                        </div>\
+                      </li>\
+                      <li>\
+                        <h1 class="propertyHeadline">\
+                          <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
+                          <span>Applicable (\
+                           <span id="suggestedApplicableCount"></span>\
+                          )</span>\
+                        </h1>\
+                        <div id="suggestedApplicable">\
+                        </div>\
+                      </li>\
+                    </ul>\
                  </div>\
                 </div>';
                     
