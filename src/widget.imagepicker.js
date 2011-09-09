@@ -5,7 +5,7 @@
  *         Clemens Hoffmann <cannelony@gmail.com>
  */
 RDFauthor.registerWidget({
-    // Uncomment this to execute code when your widget is instantiated, 
+    // Uncomment this to execute code when your widget is instantiated,
     // e.g. load scripts/stylesheets etc.
     init: function () {
         this._embedPicasaGalleryLoaded = false;
@@ -15,9 +15,9 @@ RDFauthor.registerWidget({
         var self = this;
 
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.css');
-        
+
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.imagepicker.css');
-        
+
         // RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.js', function(){
             // self._slimboxLoaded = true;
             // self._init();
@@ -29,36 +29,36 @@ RDFauthor.registerWidget({
         });
 
     },
-    
-    // Uncomment this to execute code when you widget's markup is ready in the DOM, 
+
+    // Uncomment this to execute code when you widget's markup is ready in the DOM,
     // e.g. load jQuery plug-ins, attach event handlers etc.
     ready: function () {
         var self = this;
         self._domRdy = true;
         self._init();
     },
-    
+
     // return your jQuery-wrapped main input element here
     element: function () {
         return $('#imagepicker-edit-' + this.ID);
-    }, 
-    
+    },
+
     /*
     // Uncomment to give focus to your widget.
-    // The default implementation will give focus to the first match in the 
+    // The default implementation will give focus to the first match in the
     // return value of element().
     focus: function () {},
-    */ 
-    
+    */
+
     // return your widget's markup code here
     markup: function () {
-        var markup = 
+        var markup =
             '<div class="container" style="width:100%">\
-                <input type="text" style="width:100%;" class="text" name="imagepicker" id="imagepicker-edit-' + this.ID + '" value="' 
+                <input type="text" style="width:100%;" class="text" name="imagepicker" id="imagepicker-edit-' + this.ID + '" value="'
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
             </div>';
 
-        var imagePicker = 
+        var imagePicker =
             '<div id="imagepicker" class="window" style="display: none;">\
                <h1 class="title">ImagePicker - Album: ' + this._album + '<a href="https://picasaweb.google.com/lh/webUpload?uname=aksw.group&aid=5646308221729665137&continue=https://picasaweb.google.com/aksw.group/AkswOrg%3Fauthkey%3DGv1sRgCIebodK_ssfhUg" target="_blank" ><img style="height: 15px; float:right; margin-right:15px;" src="'+ RDFAUTHOR_BASE+'libraries/images/upload_photo.png' +'" alt="upload pictures to album "'+ this._album +'</img></a>\
                  <br/>\
@@ -76,37 +76,37 @@ RDFauthor.registerWidget({
               </div>\
              </div>\
             ';
-        
+
         if( $('#imagepicker').length == 0 ) {
             $('body').append(imagePicker);
         }
 
         return markup;
-    }, 
-    
+    },
+
     // commit changes here (add/remove/change)
     submit: function () {
                 if (this.shouldProcessSubmit()) {
             // get databank
             var databank   = RDFauthor.databankForGraph(this.statement.graphURI());
             var hasChanged = (
-                this.statement.hasObject() 
+                this.statement.hasObject()
                 && this.statement.objectValue() !== this.value()
                 && null !== this.value()
             );
-            
+
             if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
                     databank.remove(String(rdfqTriple));
                 }
             }
-            
+
             if (!this.removeOnSubmit && this.value()) {
                 var self = this;
                 try {
                     var newStatement = this.statement.copyWithObject({
-                        value: '<' + this.value() + '>', 
+                        value: '<' + this.value() + '>',
                         type: 'uri'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
@@ -117,23 +117,23 @@ RDFauthor.registerWidget({
                 }
             }
         }
-        
-        return true;    }, 
-    
+
+        return true;    },
+
     shouldProcessSubmit: function () {
         var t1 = !this.statement.hasObject();
         var t2 = null === this.value();
         var t3 = this.removeOnSubmit;
-        
+
         return (!(t1 && t2) || t3);
     },
-    
+
     value: function () {
         var value = this.element().val();
         if (String(value).length > 0) {
             return value;
         }
-        
+
         return null;
     },
 
@@ -163,7 +163,7 @@ RDFauthor.registerWidget({
                 });
 
             });
-            
+
             $('#filterGallery').click(function(){
                 var noInput;
                 $(this).autocomplete({
@@ -215,7 +215,7 @@ RDFauthor.registerWidget({
             $('.rdfauthor-view-content,html').scroll(function() {
                 var left = self._getPosition().left + 'px !important;';
                 var top = self._getPosition().top + 'px !important';
-                    
+
                 $('#imagepicker').css('left',left)
                                 .css('top',top);
                 $('#imagepicker').fadeOut();
@@ -245,6 +245,7 @@ RDFauthor.registerWidget({
 }, {
         name: 'property',
         values: ['http://xmlns.com/foaf/0.1/depiction',
-                 'http://xmlns.com/foaf/0.1/image']
+                 'http://aksw.org/schema/screenshot'
+                 'http://xmlns.com/foaf/0.1/img']
    }
 );
