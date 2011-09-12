@@ -246,6 +246,8 @@ RDFauthor.registerWidget({
         name: 'property',
         values: ['http://xmlns.com/foaf/0.1/depiction',
                  'http://open.vocab.org/terms/screenshot',
+                 'http://xmlns.com/foaf/0.1/logo',
+                 'http://purl.org/ontology/mo/image',
                  'http://xmlns.com/foaf/0.1/img']
    }
 );
