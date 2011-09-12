@@ -253,7 +253,8 @@ RDFauthor.registerWidget({
                 for (var i in results) {
                     if( (typeof(results[i].resourceUri) != "undefined")  && (i != "last") ) {
                         var resourceUri = results[i].resourceUri.value;
-                        typeof(results[i].label) != "undefined" ? propertiesInUse[resourceUri] = results[i].label.value
+                        (typeof(results[i].label) != "undefined") && 
+                        (results[i].label != null)              ? propertiesInUse[resourceUri] = results[i].label.value
                                                                 : propertiesInUse[resourceUri] = null;
                     } 
                 }
