@@ -245,7 +245,7 @@ RDFauthor.registerWidget({
 }, {
         name: 'property',
         values: ['http://xmlns.com/foaf/0.1/depiction',
-                 'http://aksw.org/schema/screenshot',
+                 'http://open.vocab.org/terms/screenshot',
                  'http://xmlns.com/foaf/0.1/img']
    }
 );
