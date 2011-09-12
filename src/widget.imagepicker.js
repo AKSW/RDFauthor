@@ -79,8 +79,7 @@ RDFauthor.registerWidget({
 
         if( $('#imagepicker').length == 0 ) {
             $('body').append(imagePicker);
-        }
-
+        } 
         return markup;
     },
 
@@ -143,16 +142,19 @@ RDFauthor.registerWidget({
         if (self._embedPicasaGalleryLoaded && self._slimboxLoaded && self._domRdy) {
             self.element().click(function(){
                 focus = true;
+                $('#imagepicker').data('current',self.element().attr('id'));
                 // positioning
                 var left = self._getPosition().left + 'px !important;';
                 var top = self._getPosition().top + 'px !important';
-
+                
                 $('#imagepicker').css('left',left)
                                  .css('top',top)
                                  .data('input',$(this))
                                  .show();
 
-                $("#gallery").EmbedPicasaGallery('aksw.group',{
+            });
+            
+            $("#gallery").EmbedPicasaGallery('aksw.group',{
                     albumid: "5646308221729665137",
                     authkey: "Gv1sRgCISL87-luIbGXg",
                     matcher: "Screenshot",
@@ -161,8 +163,6 @@ RDFauthor.registerWidget({
                     msg_more: '<span id="gallery_more" style="font-weight: bolder;">MORE</span>',
                     show_more: 5
                 });
-
-            });
 
             $('#filterGallery').click(function(){
                 var noInput;
@@ -196,8 +196,8 @@ RDFauthor.registerWidget({
                     }
                 });
             })
-
-            $('html').click(function(){
+            
+            $('html').unbind('click').click(function(event){
                 if ($('#imagepicker').css("display") != "none" && focus == false) {
                     $('#imagepicker').fadeOut();
                 }else if (focus == true){
@@ -227,21 +227,21 @@ RDFauthor.registerWidget({
             $('#imagepicker #gallery .album a').live('click', function(event){
                 event.preventDefault();
                 var picURI = $(this).attr('href');
-                self.element().val(picURI);
+                var current = $('#imagepicker').data('current');
+                $('#' + current).val(picURI);
                 $('#imagepicker').hide();
             });
-
         }
     },
 
-    _getPosition: function() {
+    _getPosition: function () {
         var pos = {
             'top' : this.element().offset().top + this.element().outerHeight(),
             'left': this.element().offset().left
         };
         return pos;
     }
-
+    
 }, {
         name: 'property',
         values: ['http://xmlns.com/foaf/0.1/depiction',
