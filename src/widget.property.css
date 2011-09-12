@@ -1,0 +1,23 @@
+#propertypicker {
+  display: none;
+  z-index: 10000;
+  overflow: auto;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  padding-left: 0px !important;
+  padding-top: 0px !important;
+  margin-left: 0px !important;
+  margin-top: 0px !important;
+  margin-bottom: 10px !important;
+  height: 450px;
+  width: 477px;
+}
+
+#propertypicker h1 {
+  font-size: 100%;
+}
+
+#propertypicker ul li {
+  padding-left: 5px;
+}
