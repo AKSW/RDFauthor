@@ -117,7 +117,7 @@ RDFauthor.registerWidget({
                 }
             }
         }
-
+        $('#imagepicker').remove();
         return true;    },
 
     shouldProcessSubmit: function () {
@@ -170,7 +170,6 @@ RDFauthor.registerWidget({
                     source: $.EmbedPicasaGallery.defaultOptions.keywords
                 }).bind('change cut input keyup',function(){
                     if ( $('#filterGallery').val().length == 0 ) {
-                        console.log('no input');
                         $('#gallery .album div').each(function(i){
                             if( i < 5 ) {
                                $(this).show();
@@ -229,6 +228,7 @@ RDFauthor.registerWidget({
                 event.preventDefault();
                 var picURI = $(this).attr('href');
                 self.element().val(picURI);
+                $('#imagepicker').hide();
             });
 
         }
