@@ -69,6 +69,7 @@ RDFauthor.registerWidget({
     ready: function () {
         this._domReady = true;
         this._init();
+        this.element().trigger('click');
     },
 
     element: function () {
@@ -78,10 +79,10 @@ RDFauthor.registerWidget({
     markup: function () {
             var markup = '\
             <div class="container resource-value">\
-                <input type="text" id="property-input-' + this.ID + '" name="propertpicker" class="text resource-edit-input" />\
+                <input type="hidden" id="property-input-' + this.ID + '" name="propertpicker" class="text resource-edit-input" />\
             </div>';
             var propertyPicker = '\
-                <div id="propertypicker" class="window" style="display: none;">\
+                <div id="propertypicker" class="window ui-draggable ui-resizable" style="display: block;">\
                   <h1 class="title">Suggested Properties\
                     <br/>\
                     <input id="filterProperties" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
@@ -107,7 +108,7 @@ RDFauthor.registerWidget({
                       <li>\
                         <h1 class="propertyHeadline">\
                           <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>Gerenal applicable (<span id="suggestedGernalCount"></span>)</span>\
+                          <span>General applicable (<span id="suggestedGernalCount"></span>)</span>\
                         </h1>\
                         <div id="suggestedGernal">\
                         </div>\
@@ -123,9 +124,10 @@ RDFauthor.registerWidget({
                     </ul>\
                  </div>\
                 </div>';
-                    
+        var modalwrapper = '<div class="modal-wrapper" style="display:none"></div>';
         if( $('#propertypicker').length == 0 ) {
-            $('body').append(propertyPicker);
+            $('body').append(modalwrapper);
+            $('.modal-wrapper').append(propertyPicker);
         }
 
         return markup;
@@ -323,11 +325,11 @@ RDFauthor.registerWidget({
                 // positioning
                 var left = self._getPosition().left + 'px !important;';
                 var top = self._getPosition().top + 'px !important';
+                self._position();
 
-                $('#propertypicker').css('left',left)
-                                    .css('top',top)
-                                    .data('input',$(this))
-                                    .show();
+                $('#propertypicker').data('input',$(this))
+                                    .draggable()
+                                    .parent().fadeIn();
                 // query - fills the everywhere in use part
                 self._suggestions(function(propertiesInUse) {
                     $('#suggestedInUseCount').html(Object.size(propertiesInUse));
@@ -335,6 +337,8 @@ RDFauthor.registerWidget({
                         $('#suggestedInUse ul').append(self._listProperty(resourceUri,propertiesInUse[resourceUri]));
                     }
                 });
+                //center propetypicker
+                // self._position();
             }).keydown(function (e) {
                 if ((e.which === 13) && self._options.selectOnReturn) {
                     $('#propertypicker').hide();
@@ -359,11 +363,12 @@ RDFauthor.registerWidget({
             });
 
             /** SHOW-HIDE-SCROLL EVENTS */
-            $('html').click(function(){
+            $('html').unbind('click').click(function(){
                 if ($('#propertypicker').css("display") != "none" && focus == false) {
-                    $('#propertypicker').fadeOut();
+                    $('#propertypicker').parent().fadeOut();
+                    self._reinitialization();
                 }else if (focus == true){
-                    $('#propertypicker').fadeIn();
+                    $('#propertypicker').parent().fadeIn();
                 }
             });
             $('#propertypicker,input[name="propertypicker"]').mouseover(function(){
@@ -379,15 +384,16 @@ RDFauthor.registerWidget({
                     
                 $('#propertypicker').css('left',left)
                                     .css('top',top);
-                $('#propertypicker').fadeOut();
+                $('#propertypicker').parent().fadeOut();
             });
 
             $('#propertypicker .button-windowclose').live('click', function() {
-                $('#propertypicker').fadeOut();
+                $('#propertypicker').parent().fadeOut();
+                self._reinitialization();
             });
 
             /** TOGGLE EVENT */
-            $('#propertypicker .content ul li').live('click', function(){
+            $('#propertypicker .content ul li').die('click').live('click', function(){
                 $(this).find('h1 .ui-icon')
                        .hasClass('ui-icon-minus') ? $(this).find('h1 .ui-icon')
                                                            .removeClass('ui-icon-minus')
@@ -401,21 +407,46 @@ RDFauthor.registerWidget({
             /** CLICK EVENT ON PROPERTY */
             $('#propertypicker a[name="propertypicker"]').live('click', function(event){
                 event.preventDefault();
-                console.log($(this));
                 var resourceUri = $(this).attr('about');
                 var keydownEvent = $.Event("keydown");
                 keydownEvent.which=13;
                 self.element().val(resourceUri).trigger(keydownEvent);
+                $('.modal-wrapper').remove();
             })
         }
     },
 
-    _getPosition: function() {
+    _getPosition: function () {
         var pos = {
             'top' : this.element().offset().top + this.element().outerHeight(),
             'left': this.element().offset().left
         };
         return pos;
+    },
+
+    _position: function () {
+        var bodyh = $('body').height();
+        var bodyw = $('body').width();
+        //trick to get the height and width from a non visible object using jquery
+        $(".modal-wrapper").show();
+        var ww = $('#propertypicker').outerWidth();
+        var wh = $('#propertypicker').outerHeight();
+        $(".modal-wrapper").hide();
+        var test = (bodyw - ww) * 0.5;
+        console.log('aktuelle weite ' + test + ' bodyh ' + bodyh + ' bodyw ' + bodyw + ' wh ' + wh + ' ww ' + ww );
+        var offsetPosition = {
+            'top': 20,
+            'left': Math.max( (bodyw - ww) * 0.5 , 50 )
+        }
+        $('#propertypicker').offset(offsetPosition);
+    },
+
+    _reinitialization: function () {
+        var self = this;
+        //remove tr row (propertyselector)
+        self.element().parent().parent().parent().parent().parent().remove();
+        //remove model-wrapper div including propertypicker
+        $('#propertypicker').parent().remove();
     }
 
 }, [{

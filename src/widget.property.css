@@ -12,6 +12,10 @@
   margin-bottom: 10px !important;
   height: 450px;
   width: 477px;
+  /* shadow */
+  -moz-box-shadow: 0.2em 0.5em 2.5em #000;
+  -webkit-box-shadow: 0.2em 0.5em 2.5em #000;
+
 }
 
 #propertypicker h1 {
