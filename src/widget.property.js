@@ -163,7 +163,7 @@ RDFauthor.registerWidget({
                 }
             }
         }
-
+        $('#propertypicker').remove();
         return true;
     },
 
