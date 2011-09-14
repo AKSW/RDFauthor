@@ -321,6 +321,7 @@ RDFauthor.registerWidget({
         var focus;
         if (this._pluginLoaded && this._domReady) {
             self.element().click(function() {
+                console.log(RDFauthor.infoForPredicate('http://www.w3.org/1999/02/22-rdf-syntax-ns#type','comment'));
                 focus = true;
                 // positioning
                 var left = self._getPosition().left + 'px !important;';

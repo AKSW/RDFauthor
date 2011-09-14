@@ -63,6 +63,9 @@ RDFauthor = (function($, undefined) {
 
     /** Wheather the property axiom cache has been loaded */
     var _cacheLoaded = false;
+
+    /** Wheather the property widget cache has been loaded */
+    var _propertycacheLoaded = false;
     
     /** Original databanks as extracted by graph URI. */
     var _extractedByGraph = {};
@@ -480,6 +483,16 @@ RDFauthor = (function($, undefined) {
             }); 
             _cacheLoaded = true;
         };
+    }
+
+    function _loadPropertyCache() {
+        console.log('propertycache');
+        if (!_propertycacheLoaded) {
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.propertycache.js', function () {
+                $.extend(_predicateInfo, __propertycache['generalapplicable']);
+            });
+            _propertycache = true;
+        }
     }
     
     /**
@@ -1055,6 +1068,9 @@ RDFauthor = (function($, undefined) {
     // Cache
     _loadCache();
     
+    // PropertyCache
+    _loadPropertyCache();
+
     // jQuery UI
     if (undefined === $.ui) {
         _require(RDFAUTHOR_BASE + 'libraries/jquery-ui.js');
