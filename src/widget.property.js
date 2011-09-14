@@ -108,9 +108,11 @@ RDFauthor.registerWidget({
                       <li>\
                         <h1 class="propertyHeadline">\
                           <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>General applicable (<span id="suggestedGernalCount"></span>)</span>\
+                          <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
                         </h1>\
-                        <div id="suggestedGernal">\
+                        <div id="suggestedGeneral">\
+                          <ul class="inline separated">\
+                          </ul>\
                         </div>\
                       </li>\
                       <li>\
@@ -333,9 +335,15 @@ RDFauthor.registerWidget({
                                     .parent().fadeIn();
                 // query - fills the everywhere in use part
                 self._suggestions(function(propertiesInUse) {
+                    // add in use everywhere to dom
                     $('#suggestedInUseCount').html(Object.size(propertiesInUse));
                     for (var resourceUri in propertiesInUse) {
                         $('#suggestedInUse ul').append(self._listProperty(resourceUri,propertiesInUse[resourceUri]));
+                    }
+                    // add general applicable to dom
+                    $('#suggestedGeneralCount').html(Object.size(__propertycache['generalapplicable']));
+                    for (var resourceUri in __propertycache['generalapplicable']) {
+                        $('#suggestedGeneral ul').append(self._listProperty(resourceUri,__propertycache['generalapplicable'].label));
                     }
                 });
                 //center propetypicker

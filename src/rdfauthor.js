@@ -486,7 +486,6 @@ RDFauthor = (function($, undefined) {
     }
 
     function _loadPropertyCache() {
-        console.log('propertycache');
         if (!_propertycacheLoaded) {
             _require(RDFAUTHOR_BASE + 'src/rdfauthor.propertycache.js', function () {
                 $.extend(_predicateInfo, __propertycache['generalapplicable']);
