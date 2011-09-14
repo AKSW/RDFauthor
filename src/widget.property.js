@@ -304,11 +304,12 @@ RDFauthor.registerWidget({
         });
     },
 
-    _listProperty: function (resourceUri,label) {
+    _listProperty: function (resourceUri,label,comment) {
         var self = this;
         label = label == null ? self.localName(resourceUri) : label;
+        title = typeof(comment) != "undefined" ? comment : label;
         return '<li><a name="propertypicker" class="show-property Resource" about="'+resourceUri+'" \
-                title="' + label + '">' + label + '</a></li>';
+                title="' + title + '">' + label + '</a></li>';
     },
 
     _normalizeValue: function (value) {
@@ -343,7 +344,9 @@ RDFauthor.registerWidget({
                     // add general applicable to dom
                     $('#suggestedGeneralCount').html(Object.size(__propertycache['generalapplicable']));
                     for (var resourceUri in __propertycache['generalapplicable']) {
-                        $('#suggestedGeneral ul').append(self._listProperty(resourceUri,__propertycache['generalapplicable'].label));
+                        $('#suggestedGeneral ul').append(self._listProperty(resourceUri,
+                                                                            __propertycache['generalapplicable'][resourceUri].label,
+                                                                            __propertycache['generalapplicable'][resourceUri].comment));
                     }
                 });
             }).keydown(function (e) {
