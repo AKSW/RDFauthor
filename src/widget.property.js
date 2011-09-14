@@ -328,7 +328,7 @@ RDFauthor.registerWidget({
                 // positioning
                 var left = self._getPosition().left + 'px !important;';
                 var top = self._getPosition().top + 'px !important';
-                self._position();
+                self._positioning();
 
                 $('#propertypicker').data('input',$(this))
                                     .draggable()
@@ -346,8 +346,6 @@ RDFauthor.registerWidget({
                         $('#suggestedGeneral ul').append(self._listProperty(resourceUri,__propertycache['generalapplicable'].label));
                     }
                 });
-                //center propetypicker
-                // self._position();
             }).keydown(function (e) {
                 if ((e.which === 13) && self._options.selectOnReturn) {
                     $('#propertypicker').hide();
@@ -433,7 +431,7 @@ RDFauthor.registerWidget({
         return pos;
     },
 
-    _position: function () {
+    _positioning: function () {
         var bodyh = $('body').height();
         var bodyw = $('body').width();
         //trick to get the height and width from a non visible object using jquery
