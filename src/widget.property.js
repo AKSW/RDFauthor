@@ -8,7 +8,7 @@
 
 RDFauthor.registerWidget({
     init: function () {
-        this.results         = [];
+        this._propertiesInUse = [];
 
         this._domReady     = false;
         this._pluginLoaded = false;
@@ -249,7 +249,7 @@ RDFauthor.registerWidget({
                                   + uriPattern
                                   + labelPattern
                                   + '}';
-        var propertiesInUse = {};
+        var everywhereInUse = {};
         // request properties in use
         RDFauthor.queryGraph(graphURI, query, {
             callbackSuccess: function(data) {
@@ -258,16 +258,17 @@ RDFauthor.registerWidget({
                     if( (typeof(results[i].resourceUri) != "undefined")  && (i != "last") ) {
                         var resourceUri = results[i].resourceUri.value;
                         (typeof(results[i].label) != "undefined") && 
-                        (results[i].label != null)              ? propertiesInUse[resourceUri] = results[i].label.value
-                                                                : propertiesInUse[resourceUri] = null;
+                        (results[i].label != null)              ? everywhereInUse[resourceUri] = results[i].label.value
+                                                                : everywhereInUse[resourceUri] = null;
                     } 
                 }
                 self._hasProperties(function(hasProperties){
-                    for (var resourceUri in propertiesInUse) {
-                        $.inArray(resourceUri, hasProperties) != -1 ? delete propertiesInUse[resourceUri]
+                    $.merge(self._propertiesInUse, hasProperties);
+                    for (var resourceUri in everywhereInUse) {
+                        $.inArray(resourceUri, hasProperties) != -1 ? delete everywhereInUse[resourceUri]
                                                                     : null;
                     }
-                    $.isFunction(callback) ? callback(propertiesInUse) : null;
+                    $.isFunction(callback) ? callback(everywhereInUse) : null;
                 })
             }
         });
@@ -335,13 +336,15 @@ RDFauthor.registerWidget({
                                     .draggable()
                                     .parent().fadeIn();
                 // query - fills the everywhere in use part
-                self._suggestions(function(propertiesInUse) {
+                self._suggestions(function(everywhereInUse) {
                     // add in use everywhere to dom
-                    $('#suggestedInUseCount').html(Object.size(propertiesInUse));
-                    for (var resourceUri in propertiesInUse) {
-                        $('#suggestedInUse ul').append(self._listProperty(resourceUri,propertiesInUse[resourceUri]));
+                    $('#suggestedInUseCount').html(Object.size(everywhereInUse));
+                    for (var resourceUri in everywhereInUse) {
+                        $('#suggestedInUse ul').append(self._listProperty(resourceUri,everywhereInUse[resourceUri]));
                     }
                     // add general applicable to dom
+                    var generalapplicaple = __propertycache['generalapplicable'];
+                    console.log(self._propertiesInUse);
                     $('#suggestedGeneralCount').html(Object.size(__propertycache['generalapplicable']));
                     for (var resourceUri in __propertycache['generalapplicable']) {
                         $('#suggestedGeneral ul').append(self._listProperty(resourceUri,
