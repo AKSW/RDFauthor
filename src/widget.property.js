@@ -328,7 +328,6 @@ RDFauthor.registerWidget({
         var focus;
         if (this._pluginLoaded && this._domReady) {
             self.element().click(function() {
-                console.log(RDFauthor.infoForPredicate('http://www.w3.org/1999/02/22-rdf-syntax-ns#type','comment'));
                 focus = true;
                 // positioning
                 var left = self._getPosition().left + 'px !important;';
@@ -348,13 +347,14 @@ RDFauthor.registerWidget({
 
                     // add general applicable to dom
                     var generalapplicable = __propertycache['generalapplicable'];
+                    // show only new suggested general applicable properties
                     for (var resourceUri in generalapplicable) {
                         if($.inArray(resourceUri,self._propertiesInUse) != -1) {
                             delete generalapplicable[resourceUri];
                         } else {
                             $('#suggestedGeneral ul').append(self._listProperty(resourceUri,
-                                                                                    generalapplicable[resourceUri].label,
-                                                                                    generalapplicable[resourceUri].comment));
+                                                                                generalapplicable[resourceUri].label,
+                                                                                generalapplicable[resourceUri].comment));
                         }
                     }
                     $('#suggestedGeneralCount').html(Object.size(generalapplicable));
