@@ -265,8 +265,11 @@ RDFauthor.registerWidget({
                 self._hasProperties(function(hasProperties){
                     $.merge(self._propertiesInUse, hasProperties);
                     for (var resourceUri in everywhereInUse) {
-                        $.inArray(resourceUri, hasProperties) != -1 ? delete everywhereInUse[resourceUri]
-                                                                    : null;
+                        if ($.inArray(resourceUri, hasProperties) != -1) {
+                            delete everywhereInUse[resourceUri];
+                        } else {
+                            self._propertiesInUse.push(resourceUri);
+                        }
                     }
                     $.isFunction(callback) ? callback(everywhereInUse) : null;
                 })
@@ -338,19 +341,23 @@ RDFauthor.registerWidget({
                 // query - fills the everywhere in use part
                 self._suggestions(function(everywhereInUse) {
                     // add in use everywhere to dom
-                    $('#suggestedInUseCount').html(Object.size(everywhereInUse));
                     for (var resourceUri in everywhereInUse) {
                         $('#suggestedInUse ul').append(self._listProperty(resourceUri,everywhereInUse[resourceUri]));
                     }
+                    $('#suggestedInUseCount').html(Object.size(everywhereInUse));
+
                     // add general applicable to dom
-                    var generalapplicaple = __propertycache['generalapplicable'];
-                    console.log(self._propertiesInUse);
-                    $('#suggestedGeneralCount').html(Object.size(__propertycache['generalapplicable']));
-                    for (var resourceUri in __propertycache['generalapplicable']) {
-                        $('#suggestedGeneral ul').append(self._listProperty(resourceUri,
-                                                                            __propertycache['generalapplicable'][resourceUri].label,
-                                                                            __propertycache['generalapplicable'][resourceUri].comment));
+                    var generalapplicable = __propertycache['generalapplicable'];
+                    for (var resourceUri in generalapplicable) {
+                        if($.inArray(resourceUri,self._propertiesInUse) != -1) {
+                            delete generalapplicable[resourceUri];
+                        } else {
+                            $('#suggestedGeneral ul').append(self._listProperty(resourceUri,
+                                                                                    generalapplicable[resourceUri].label,
+                                                                                    generalapplicable[resourceUri].comment));
+                        }
                     }
+                    $('#suggestedGeneralCount').html(Object.size(generalapplicable));
                 });
             }).keydown(function (e) {
                 if ((e.which === 13) && self._options.selectOnReturn) {
