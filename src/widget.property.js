@@ -126,10 +126,10 @@ RDFauthor.registerWidget({
                     </ul>\
                  </div>\
                 </div>';
-        var modalwrapper = '<div class="modal-wrapper" style="display:none"></div>';
+        var modalwrapper = '<div class="modal-wrapper-propertyselector" style="display:none"></div>';
         if( $('#propertypicker').length == 0 ) {
             $('body').append(modalwrapper);
-            $('.modal-wrapper').append(propertyPicker);
+            $('.modal-wrapper-propertyselector').append(propertyPicker);
         }
 
         return markup;
@@ -398,14 +398,14 @@ RDFauthor.registerWidget({
                 focus = false;
             });
 
-            $('.rdfauthor-view-content,html').scroll(function() {
-                var left = self._getPosition().left + 'px !important;';
-                var top = self._getPosition().top + 'px !important';
+            // $('.rdfauthor-view-content,html').scroll(function() {
+                // var left = self._getPosition().left + 'px !important;';
+                // var top = self._getPosition().top + 'px !important';
                     
-                $('#propertypicker').css('left',left)
-                                    .css('top',top);
-                $('#propertypicker').parent().fadeOut();
-            });
+                // $('#propertypicker').css('left',left)
+                                    // .css('top',top);
+                // $('#propertypicker').parent().fadeOut();
+            // });
 
             $('#propertypicker .button-windowclose').live('click', function() {
                 $('#propertypicker').parent().fadeOut();
@@ -431,7 +431,7 @@ RDFauthor.registerWidget({
                 var keydownEvent = $.Event("keydown");
                 keydownEvent.which=13;
                 self.element().val(resourceUri).trigger(keydownEvent);
-                $('.modal-wrapper').remove();
+                $('.modal-wrapper-propertyselector').remove();
             })
         }
     },
@@ -448,10 +448,10 @@ RDFauthor.registerWidget({
         var bodyh = $('body').height();
         var bodyw = $('body').width();
         //trick to get the height and width from a non visible object using jquery
-        $(".modal-wrapper").show();
+        $(".modal-wrapper-propertyselector").show();
         var ww = $('#propertypicker').outerWidth();
         var wh = $('#propertypicker').outerHeight();
-        $(".modal-wrapper").hide();
+        $(".modal-wrapper-propertyselector").hide();
         var test = (bodyw - ww) * 0.5;
         console.log('aktuelle weite ' + test + ' bodyh ' + bodyh + ' bodyw ' + bodyw + ' wh ' + wh + ' ww ' + ww );
         var offsetPosition = {
@@ -463,8 +463,13 @@ RDFauthor.registerWidget({
 
     _reinitialization: function () {
         var self = this;
-        //remove tr row (propertyselector)
-        self.element().parent().parent().parent().parent().parent().remove();
+        var propertyselectorInlineController = self.element().parent().parent().parent().parent().parent();
+        var propertyselectorPopOverController = $('.rdfauthor-selector');
+        if(propertyselectorInlineController.attr('id') != "rdfauthor-view") {
+            propertyselectorInlineController.remove();
+        } else {
+            // propertyselectorPopOverSelector.remove();
+        }
         //remove model-wrapper div including propertypicker
         $('#propertypicker').parent().remove();
     }
