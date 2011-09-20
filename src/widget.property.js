@@ -79,7 +79,7 @@ RDFauthor.registerWidget({
     markup: function () {
             var markup = '\
             <div class="container resource-value">\
-                <input type="hidden" id="property-input-' + this.ID + '" name="propertpicker" class="text resource-edit-input" />\
+                <input type="hidden" id="property-input-' + this.ID + '" name="propertypicker" class="text resource-edit-input" />\
             </div>';
             var propertyPicker = '\
                 <div id="propertypicker" class="window ui-draggable ui-resizable" style="display: block;">\
@@ -464,11 +464,11 @@ RDFauthor.registerWidget({
     _reinitialization: function () {
         var self = this;
         var propertyselectorInlineController = self.element().parent().parent().parent().parent().parent();
-        var propertyselectorPopOverController = $('.rdfauthor-selector');
+        var propertyselectorPopOverController = self.element().parent().parent();
         if(propertyselectorInlineController.attr('id') != "rdfauthor-view") {
             propertyselectorInlineController.remove();
         } else {
-            // propertyselectorPopOverSelector.remove();
+            propertyselectorPopOverController.remove();
         }
         //remove model-wrapper div including propertypicker
         $('#propertypicker').parent().remove();
