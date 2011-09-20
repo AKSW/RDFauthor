@@ -140,7 +140,6 @@ function PopoverController(options) {
         jQuery('#rdfauthor-button-property').live('click', function () {
             // jQuery('body').trigger('rdfauthor.view.property');
             var subjectGroup = self.activeSubjectGroup();
-            console.log(subjectGroup);
             var propertySelector = subjectGroup.getPropertySelector(function (widgetID) {
                 var rowTop          = jQuery('#' + widgetID).closest('.rdfauthor-predicate-row').offset().top;
                 var containerTop    = jQuery('.' + self._options.contentContainerClass).offset().top;
