@@ -349,7 +349,9 @@ RDFauthor.registerWidget({
                 var top = self._getPosition().top + 'px !important';
 
                 $('#propertypicker').data('input',$(this))
-                                    .draggable();
+                                    .draggable({
+                                        cancel: '#propertypicker .content'
+                                    });
                 // query - fills the everywhere in use part
                 self._suggestions(function(everywhereInUse) {
                     // add in use everywhere to dom
