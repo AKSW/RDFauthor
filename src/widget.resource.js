@@ -159,14 +159,15 @@ RDFauthor.registerWidget({
     },
 
     value: function () {
-        if (null !== this.selectedResource) {
-            return this.selectedResource;
-        }
-
-        // var typedValue = this.element().val();
-        // if ('' !== typedValue) {
-        //     return typedValue;
+        // if (null !== this.selectedResource) {
+            // console.log(this.selectedResource);
+            // return this.selectedResource;
         // }
+
+        var value = this.element().val();
+        if (String(value).length > 0) {
+            return value;
+        }
 
         return null;
     },
