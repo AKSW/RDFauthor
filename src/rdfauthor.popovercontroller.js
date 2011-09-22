@@ -138,7 +138,7 @@ function PopoverController(options) {
         });
         
         jQuery('#rdfauthor-button-property').live('click', function () {
-            jQuery('body').trigger('rdfauthor.view.property');
+            // jQuery('body').trigger('rdfauthor.view.property');
             var subjectGroup = self.activeSubjectGroup();
             var propertySelector = subjectGroup.getPropertySelector(function (widgetID) {
                 var rowTop          = jQuery('#' + widgetID).closest('.rdfauthor-predicate-row').offset().top;

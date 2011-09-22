@@ -63,6 +63,9 @@ RDFauthor = (function($, undefined) {
 
     /** Wheather the property axiom cache has been loaded */
     var _cacheLoaded = false;
+
+    /** Wheather the property widget cache has been loaded */
+    var _propertycacheLoaded = false;
     
     /** Original databanks as extracted by graph URI. */
     var _extractedByGraph = {};
@@ -152,7 +155,8 @@ RDFauthor = (function($, undefined) {
         '__LITERAL__':  {},
         '__OBJECT__': {}, 
         '__DEFAULT__': {}, 
-        '__DEBUG__': {}, 
+        '__DEBUG__': {},
+        '__PROPERTY__': {},
         'resource':   {}, 
         'property':   {}, 
         'range':      {}, 
@@ -480,6 +484,15 @@ RDFauthor = (function($, undefined) {
             _cacheLoaded = true;
         };
     }
+
+    function _loadPropertyCache() {
+        if (!_propertycacheLoaded) {
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.propertycache.js', function () {
+                $.extend(_predicateInfo, __propertycache['generalapplicable']);
+            });
+            _propertycache = true;
+        }
+    }
     
     /**
      * Loads info predicates for all predicates
@@ -678,7 +691,6 @@ RDFauthor = (function($, undefined) {
             }
             
             document.getElementsByTagName('head')[0].appendChild(s);
-            
             // set script to loading
             _loadedScripts[scriptURI] = SCRIPT_STATE_LOADING;
         } else if (_loadedScripts[scriptURI] === SCRIPT_STATE_LOADING) {
@@ -1055,6 +1067,9 @@ RDFauthor = (function($, undefined) {
     // Cache
     _loadCache();
     
+    // PropertyCache
+    _loadPropertyCache();
+
     // jQuery UI
     if (undefined === $.ui) {
         _require(RDFAUTHOR_BASE + 'libraries/jquery-ui.js');
@@ -1086,7 +1101,7 @@ RDFauthor = (function($, undefined) {
     _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
         _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
         _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
-        /* _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); */
+        // _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); 
         _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
         _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
         _require(RDFAUTHOR_BASE + 'src/widget.html.js');
@@ -1096,6 +1111,7 @@ RDFauthor = (function($, undefined) {
         _require(RDFAUTHOR_BASE + 'src/widget.geo.js');
         _require(RDFAUTHOR_BASE + 'src/widget.markdown.js');
         _require(RDFAUTHOR_BASE + 'src/widget.imagepicker.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.property.js');
         _requirePending--;
     });
     
@@ -1592,7 +1608,6 @@ RDFauthor = (function($, undefined) {
             if (!$.isArray(hooks)) {
                 hooks = [hooks];
             }
-            
             for (var i = 0; i < hooks.length; i++) {
                 // the default hook value is an empty string (any value)
                 var hookSpec = $.extend({values: ['']}, hooks[i]);
