@@ -454,7 +454,6 @@ RDFauthor.registerWidget({
                     self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
                     self.element().val(self.selectedResource);
-                    console.log(self.selectedResource + ' - ' + self.selectedResourceLabel);
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
                         .originalEvent          /* menuselected */
