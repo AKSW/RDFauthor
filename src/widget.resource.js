@@ -159,13 +159,9 @@ RDFauthor.registerWidget({
     },
 
     value: function () {
-        // if (null !== this.selectedResource) {
-            // console.log(this.selectedResource);
-            // return this.selectedResource;
-        // }
-
-        var value = this.element().val();
-        if (String(value).length > 0) {
+        var self = this;
+        var value = self.element().val();
+        if ( self.isURI(value) || (String(value).indexOf(':') > -1) ) {
             return value;
         }
 
@@ -457,8 +453,8 @@ RDFauthor.registerWidget({
                 select: function (event, ui) {
                     self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
-                    // self.element().val(this.selectedResourceLabel);
-
+                    self.element().val(self.selectedResource);
+                    console.log(self.selectedResource + ' - ' + self.selectedResourceLabel);
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
                         .originalEvent          /* menuselected */
