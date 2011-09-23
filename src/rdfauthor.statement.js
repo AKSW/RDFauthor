@@ -159,9 +159,16 @@ Statement.prototype = {
         if (this._object) {
             this._object.value = String(this._object.value).replace('&amp;', '&').replace('&amp;', '&');
         }
-        
+
         if (null !== this._object) {
-            return jQuery.rdf.triple(this._subject, this._predicate, this._object);
+            var object;
+            if (!this._object instanceof jQuery.rdf.literal) {
+                object = this._object.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+            } else {
+                object = this._object;
+            }
+
+            return jQuery.rdf.triple(this._subject, this._predicate, object);
         }
         
         return undefined;
@@ -222,7 +229,8 @@ Statement.prototype = {
         
         if (containsDoubleQuotes) {
             // escape double quotes
-            objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');
+            // objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');
+            objectSpec.value = objectSpec.value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
         }
         
         if (quoteLiteral/* || longLiteral*/) {
@@ -444,9 +452,9 @@ Statement.prototype = {
      */
     registerDatatype: function (datatypeURI, regex, strip, valueFunction) {
         jQuery.typedValue.types[datatypeURI] = {
-            regex: regex | /^.*$/, 
-            strip: strip | false, 
-            value: valueFunction | function(v) {return v;}
+          regex: regex ? regex : /.*/, 
+          strip: strip ? strip : false, 
+          value: $.isFunction(valueFunction) ? valueFunction : function(v) {return v;}
         }
     }
 }

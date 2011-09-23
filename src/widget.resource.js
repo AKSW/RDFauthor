@@ -13,25 +13,25 @@ RDFauthor.registerWidget({
         this.searchTerm            = '';
         this.ongoingSearches       = 0;
         this.searchResults         = [];
-        
+
         this._domReady     = false;
         this._pluginLoaded = false;
         this._initialized  = false;
         this._autocomplete = null;
-        
+
         this._namespaces = jQuery.extend({
-            foaf: 'http://xmlns.com/foaf/0.1/', 
-            dc:   'http://purl.org/dc/terms/', 
-            owl:  'http://www.w3.org/2002/07/owl#', 
-            rdf:  'http://www.w3.org/1999/02/22-rdf-syntax-ns#', 
-            rdfs: 'http://www.w3.org/2000/01/rdf-schema#', 
-            skos: 'http://www.w3.org/2004/02/skos/core#', 
-            geo:  'http://www.w3.org/2003/01/geo/wgs84_pos#', 
+            foaf: 'http://xmlns.com/foaf/0.1/',
+            dc:   'http://purl.org/dc/terms/',
+            owl:  'http://www.w3.org/2002/07/owl#',
+            rdf:  'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+            skos: 'http://www.w3.org/2004/02/skos/core#',
+            geo:  'http://www.w3.org/2003/01/geo/wgs84_pos#',
             dbp:  'http://dbpedia.org/property/',
-            xsd:  'http://www.w3.org/2001/XMLSchema#', 
+            xsd:  'http://www.w3.org/2001/XMLSchema#',
             sioc: 'http://rdfs.org/sioc/ns#'
         }, RDFauthor.namespaces());
-        
+
         /* default options */
         this._options = jQuery.extend({
             // Autocomplete options:
@@ -51,10 +51,10 @@ RDFauthor.registerWidget({
             // Callbacks
             selectionCallback:  null,   /* the function to be called when a new selection is made */
             selectOnReturn:     false   /* executes selection callback if the user hits return in the search field */
-            
+
         }, this.options);
-        
-        
+
+
         // check conflicting and implied options
         if (this._options.filterRange) {
             this._options.filterDomain     = false;
@@ -63,16 +63,16 @@ RDFauthor.registerWidget({
             this._options.filterRange      = false;
             this._options.filterProperties = true;
         }
-        
+
         // search sources appearence config
         this.sources = {
             local:      {label: 'Local result',     color: '#efe',  border: '#e3ffe3',  rank: 0},
-            sparql:     {label: 'Local result',         color: '#efe', border: '#e3ffe3', rank:  1}, 
-            sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2}, 
-            sindice:    {lael: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6}, 
+            sparql:     {label: 'Local result',         color: '#efe', border: '#e3ffe3', rank:  1},
+            sparqlmm:   {label: 'Possible domain violation',      color: '#fee', border: '#ffe3e3', rank:  2},
+            sindice:    {lael: 'Sindice result',       color: '#eef', border: '#e3e3ff', rank:  6},
             uri:        {label: 'Auto-generated URI',   color: '#eee', border: '#e3e3e3', rank:  8}
         }
-        
+
         var self = this;
         if (undefined === jQuery.ui.autocomplete) {
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.js', function () {
@@ -83,59 +83,59 @@ RDFauthor.registerWidget({
             self._pluginLoaded = true;
             self._initAutocomplete();
         }
-        
+
         // jQuery UI styles
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.autocomplete.css');
-        
+
         // load stylesheets
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
-    }, 
-    
+    },
+
     ready: function () {
         this._domReady = true;
         this._initAutocomplete();
     },
-    
+
     element: function () {
         return jQuery('#resource-input-' + this.ID);
-    }, 
-    
+    },
+
     markup: function () {
         var l = this.statement.objectLabel();
-        var value = this.statement.objectLabel() 
-                  ? this.statement.objectLabel() 
+        var value = this.statement.objectLabel()
+                  ? this.statement.objectLabel()
                   : (this.statement.hasObject() ? this.statement.objectValue() : '');
         var markup = '\
             <div class="container resource-value">\
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input" \
                        value="' + value + '"/>\
             </div>';
-        
+
         return markup;
-    }, 
-    
+    },
+
     submit: function () {
         if (this.shouldProcessSubmit()) {
             // get databank
             var databank   = RDFauthor.databankForGraph(this.statement.graphURI());
             var hasChanged = (
-                this.statement.hasObject() 
+                this.statement.hasObject()
                 && this.statement.objectValue() !== this.value()
                 && null !== this.value()
             );
-            
+
             if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
                     databank.remove(String(rdfqTriple));
                 }
             }
-            
+
             if (!this.removeOnSubmit && this.value()) {
                 var self = this;
                 try {
                     var newStatement = this.statement.copyWithObject({
-                        value: '<' + this.value() + '>', 
+                        value: '<' + this.value() + '>',
                         type: 'uri'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
@@ -146,37 +146,34 @@ RDFauthor.registerWidget({
                 }
             }
         }
-        
+
         return true;
-    }, 
-    
+    },
+
     shouldProcessSubmit: function () {
         var t1 = !this.statement.hasObject();
         var t2 = null === this.value();
         var t3 = this.removeOnSubmit;
-        
+
         return (!(t1 && t2) || t3);
-    }, 
-    
+    },
+
     value: function () {
-        if (null !== this.selectedResource) {
-            return this.selectedResource;
+        var self = this;
+        var value = self.element().val();
+        if ( self.isURI(value) || (String(value).indexOf(':') > -1) ) {
+            return value;
         }
-        
-        // var typedValue = this.element().val();
-        // if ('' !== typedValue) {
-        //     return typedValue;
-        // }
-        
+
         return null;
-    }, 
-    
+    },
+
     performSearch: function (searchTerm, responseCallback) {
         this.searchResults = [];
         var self = this;
 
         if (this._options.sparql) {
-            // SPARQL endpoint    
+            // SPARQL endpoint
             var prologue      = '\
                 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
                 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>';
@@ -185,18 +182,18 @@ RDFauthor.registerWidget({
             var domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
             var rangePattern  = '';
             var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
-            
+
             if (this._options.filterProperties) {
                 propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
             }
-            
+
             if (this._options.filterRange) {
                 var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
-                if (range.length > 0) {
+                if ( (range.length > 0) && (range != 'http://www.w3.org/2002/07/owl#Thing') ) {
                     rangePattern = '?uri a <' + range.join('> .\n?uri a <') + '> .\n';
                 }
             }
-            
+
             var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
                 FROM <' + this.statement.graphURI() + '>\
                 WHERE {\
@@ -212,11 +209,11 @@ RDFauthor.registerWidget({
                         && REGEX(?literal, "^.{1,' + MAX_TITLE_LENGTH + '}$"))\
                 }\
                 LIMIT ' + this._options.maxResults;
-            
+
             // TODO: if domain is bound, check if current subject is an instance of it
 
             RDFauthor.queryGraph(this.statement.graphURI(), query, {
-                callbackSuccess: function (data) {                
+                callbackSuccess: function (data) {
                     var sparqlResults = [];
                     if (data && data['results'] && data['results']['bindings']) {
                         var bindings  = data['results']['bindings'];
@@ -233,31 +230,31 @@ RDFauthor.registerWidget({
                                     if (binding['literal']) {
                                         label = binding['literal']['value'];
                                     }
-                                    
+
                                     if (undefined == resources[uri]) {
                                         resources[uri] = true;
-                                        
+
                                         var domain = binding['domain'];
                                         var type   = binding['type'];
-                                        
+
                                         if (domain && type) {
                                             if (domain['value'] != type['value']) {
                                                 sparqlResults.push({
-                                                    source: 'sparqlmm', 
-                                                    value:  uri, 
+                                                    source: 'sparqlmm',
+                                                    value:  uri,
                                                     label:  label
                                                 });
                                             } else {
                                                 sparqlResults.push({
-                                                    source: 'sparql', 
-                                                    value:  uri, 
+                                                    source: 'sparql',
+                                                    value:  uri,
                                                     label:  label
                                                 });
                                             }
                                         } else {
                                             sparqlResults.push({
-                                                source: 'sparql', 
-                                                value:  uri, 
+                                                source: 'sparql',
+                                                value:  uri,
                                                 label:  label
                                             });
                                         }
@@ -272,22 +269,22 @@ RDFauthor.registerWidget({
             });
             this.ongoingSearches++;
         }
-        
+
         // Sindice search
         if (this._options.sindice) {
             jQuery.ajax({
-                timeout: 10, 
-                dataType: 'json', 
-                url: 'http://api.sindice.com/v2/search?callback=?', 
+                timeout: 10,
+                dataType: 'json',
+                url: 'http://api.sindice.com/v2/search?callback=?',
                 data: {
-                    qt: 'term', 
-                    page: 1, 
-                    format: 'json', 
+                    qt: 'term',
+                    page: 1,
+                    format: 'json',
                     q: encodeURIComponent(searchTerm)
-                }, 
+                },
                 error: function (request, status, error) {
                     self.results([], responseCallback);
-                }, 
+                },
                 success: function (data, status) {
                     var sindiceResults = [];
                     for (var i = 0; i < Math.min(data.entries.length, self._options.maxResults); ++i) {
@@ -304,8 +301,8 @@ RDFauthor.registerWidget({
                         }
 
                         sindiceResults.push({
-                            source: 'sindice', 
-                            value: String(current.link), 
+                            source: 'sindice',
+                            value: String(current.link),
                             label: title
                         });
                     }
@@ -315,32 +312,32 @@ RDFauthor.registerWidget({
             })
             this.ongoingSearches++;
         }
-        
+
         // static URI
         if (this._options.uri) {
             this.ongoingSearches++;
             this.results([{
-                source: 'uri', 
-                value: this.generateURI(searchTerm, this.statement.graphURI()), 
+                source: 'uri',
+                value: this.generateURI(searchTerm, this.statement.graphURI()),
                 label: searchTerm
             }], responseCallback, 'uri');
         }
-        
+
         if (this._options.local) {
             this.ongoingSearches++;
-            var results = [], 
+            var results = [],
                 searchResults = RDFauthor.searchCacheByLabel(searchTerm);
             for (var i = 0; i < searchResults.length; i++) {
                 results.push({
-                    source: 'local', 
-                    value: searchResults[i]['uri'], 
+                    source: 'local',
+                    value: searchResults[i]['uri'],
                     label: searchResults[i]['label'],
                 });
             };
             // Add results to global callback
             this.results(results, responseCallback, 'local');
         };
-    }, 
+    },
 
     results: function (partialResult, responseCallback, sourceKey) {
         var rank = this.sources[sourceKey].rank;
@@ -348,11 +345,11 @@ RDFauthor.registerWidget({
             this.searchResults[rank] = partialResult;
         }
         this.ongoingSearches--;
-        
+
         if (this.ongoingSearches <= 0) {
             var combinedResults = [],
                 uriDict = {};
-            
+
             for (var i = 0; i < this.searchResults.length; i++) {
                 var current = this.searchResults[i];
                 if (undefined !== current) {
@@ -364,30 +361,30 @@ RDFauthor.registerWidget({
                     }
                 }
             }
-            
+
             responseCallback(combinedResults);
         };
-    }, 
-    
+    },
+
     generateURI: function (item, prefix) {
         var lastChar = prefix.charAt(prefix.length - 1);
         if (!(lastChar == '/' || lastChar == '#')) {
             prefix += '/';
         }
-        
+
         return prefix + item;
-    }, 
-    
+    },
+
     isURI: function (term) {
         // TODO: more advanced URI check
         return (/(https?:\/\/|mailto:|tel:)/.exec(term) !== null);
-    }, 
-    
+    },
+
     highlight: function (text, term) {
         var highlight = text.replace(RegExp(term, 'i'), '<em>$&</em>');
         return highlight;
-    }, 
-    
+    },
+
     localName: function (uri) {
         var s = String(uri);
         var l;
@@ -396,10 +393,10 @@ RDFauthor.registerWidget({
         } else {
             l = s.substr(s.lastIndexOf('/') + 1);
         }
-        
+
         return (l !== '') ? l : s;
-    }, 
-    
+    },
+
     expandNamespace: function (prefixedName) {
         var splits = prefixedName.split(':', 2);
         if (splits.length >= 2) {
@@ -407,17 +404,17 @@ RDFauthor.registerWidget({
                 return this._namespaces[splits[0]] + splits[1];
             }
         }
-        
+
         return prefixedName;
-    }, 
-    
+    },
+
     _normalizeValue: function (value) {
         if (!this.selectedResource) {
             this.selectedResource      = this.expandNamespace(value);
             this.selectedResourceLabel = this.localName(value);
         }
-    }, 
-    
+    },
+
     _initAutocomplete: function () {
         var self = this;
         if (this._pluginLoaded && this._domReady && !this._initialized) {
@@ -425,19 +422,19 @@ RDFauthor.registerWidget({
             if (this.statement.hasObject()) {
                 this.element().addClass('resource-autocomplete-uri');
             }
-            
+
             var self = this;
             this.element().autocomplete({
                 minLength: self._options.minChars,
                 delay: self._options.delay,
-                max: self._options.max, 
+                max: self._options.max,
                 search: function (event, ui) {
                     var value = self.element().val();
                     // cancel search if URI entered
                     if (self.isURI(value) || (String(value).indexOf(':') > -1)) {
                         self.element().addClass('resource-autocomplete-uri');
                         self.element().data('autocomplete').close();
-                        
+
                         self._normalizeValue(value);
 
                         return false;
@@ -445,34 +442,33 @@ RDFauthor.registerWidget({
 
                     self.element().removeClass('resource-autocomplete-uri');
                     return true;
-                }, 
+                },
                 source: function (request, response) {
                     // keep for later
                     self.searchTerm = request.term;
 
                     // search
                     self.performSearch(request.term, response);
-                }, 
+                },
                 select: function (event, ui) {
                     self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
-                    self.element().val(this.selectedResourceLabel);
-                    
+                    self.element().val(self.selectedResource);
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
                         .originalEvent          /* menuselected */
                         .originalEvent          /* actual DOM event */;
-                    
-                    if (!(originalEvent.type == 'keydown' && originalEvent.which == 13) && 
+
+                    if (!(originalEvent.type == 'keydown' && originalEvent.which == 13) &&
                         typeof self._options.selectionCallback == 'function') {
-                        
+
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
                         return true;
                     }
 
                     // prevent jQuery UI default
                     return false;
-                }, 
+                },
                 focus: function (event, ui) {
                     self.element().val(ui.item.label)
 
@@ -485,7 +481,7 @@ RDFauthor.registerWidget({
                     self.element().data('autocomplete').destroy();
                     var val = jQuery(e.target).val();
                     self._normalizeValue(val);
-                    
+
                     var splits = val.split(':', 2);
                     if (splits.length >= 2 && !self.isURI(val)) {
                         if (splits[0] in self._namespaces) {
@@ -493,9 +489,9 @@ RDFauthor.registerWidget({
                             self.selectedResourceLabel = splits[1];
                         }
                     }
-                    
+
                     self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
-                    
+
                     // prevent newline in new widget field
                     e.preventDefault();
                 } else if (e.which === 27) {
@@ -517,7 +513,7 @@ RDFauthor.registerWidget({
                         .appendTo(ul);
                 }
             };
-            
+
             this._initialized  = true;
             this._autocomplete = this.element().data('autocomplete');
         }
