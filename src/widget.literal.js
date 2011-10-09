@@ -267,7 +267,7 @@ RDFauthor.registerWidget({
             if (somethingChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(String(rdfqTriple));
+                    databank.remove(rdfqTriple);
                 }
             }
             if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
@@ -278,8 +278,11 @@ RDFauthor.registerWidget({
                     } else if (null !== this.datatype()) {
                         objectOptions.datatype = this.datatype();
                     }
-                    var newStatement = this.statement.copyWithObject({
-                        value: this.value(), 
+                    var
+                      re = new RegExp('\\\\', 'g'),
+                      val = this.value().replace(re, '\\\\'),
+                      newStatement = this.statement.copyWithObject({
+                        value: this.value().replace('\\', '\\\\'), 
                         options: objectOptions, 
                         type: 'literal'
                     });
