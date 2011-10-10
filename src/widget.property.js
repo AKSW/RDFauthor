@@ -350,7 +350,7 @@ RDFauthor.registerWidget({
 
                 $('#propertypicker').data('input',$(this))
                                     .draggable({
-                                        cancel: '#propertypicker .content'
+                                        cancel: '#propertypicker .content, #propertypicker h1 input'
                                     });
                 // query - fills the everywhere in use part
                 self._suggestions(function(everywhereInUse) {
