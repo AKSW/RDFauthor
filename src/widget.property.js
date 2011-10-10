@@ -400,6 +400,22 @@ RDFauthor.registerWidget({
                     e.stopPropagation();
                 }
             });
+            
+            /** INPUT EVENTS */
+
+            $('#filterProperties').val('start typing to filter the results or enter a custom property uri')
+                                  .click(function() {
+                                      $(this).val('');
+                                  }).keydown(function(event) {
+                                      if(event.which == '13') {
+                                          event.preventDefault();
+                                          var resourceUri = $('#filterProperties').val();
+                                          var keydownEvent = $.Event("keydown");
+                                          keydownEvent.which=13;
+                                          self.element().val(resourceUri).trigger(keydownEvent);
+                                          $('.modal-wrapper-propertyselector').remove();
+                                      }
+                                  });
 
             /** SHOW-HIDE-SCROLL EVENTS */
             $('html').unbind('click').click(function(){
