@@ -323,12 +323,63 @@ RDFauthor.registerWidget({
         });
     },
 
+    _performSearch: function (requestTerm, callback) {
+        if ( typeof(requestTerm) == 'function' ) {
+            requestTerm = null;
+        }
+        var self = this;
+        var value = $('#filterProperties').val();
+        var subjectURI = self.statement.subjectURI();
+        var graphURI = self.statement.graphURI();
+        var prefixPattern = '\
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>\n';
+        var selectPattern = 'DISTINCT ?resourceUri\n';
+        var classPattern = '?resourceUri a ?class .\n';
+        var literalPattern = '?resourceUri ?p0 ?literal .\n';
+        var filter1 = 'FILTER (REGEX(?literal, "' + requestTerm + '", "i"))';
+        var filter2 = 'FILTER (sameTerm(?class, rdf:Property) || \
+                               !sameTerm(?class, owl:ObjectProperty)  || \
+                               !sameTerm(?class, owl:DatatypeProperty) || \
+                               !sameTerm(?class, owl:AnnotationProperty) ) .\n';
+        var query = prefixPattern + 'SELECT ' + selectPattern 
+                                  + 'WHERE { \n' 
+                                  + classPattern
+                                  + literalPattern
+                                  + filter1
+                                  + filter2
+                                  + '}';
+        //query
+        RDFauthor.queryGraph(graphURI, query, {
+            callbackSuccess: function(data) {
+                var results = data.results.bindings;
+                var queryResult = [];
+                for (var i in results) {
+                    queryResult.push(results[i].resourceUri.value);
+                }
+                $.isFunction(callback) ? callback(queryResult) : null;
+            },
+            callbackError: function() {
+                $.isFunction(callback) ? callback() : null;
+            }
+        });
+
+    },
+
     _listProperty: function (resourceUri,label,comment) {
         var self = this;
         label = label == null ? self.localName(resourceUri) : label;
         title = typeof(comment) != "undefined" ? comment : label;
         return '<li><a name="propertypicker" class="show-property Resource" about="'+resourceUri+'" \
                 title="' + title + '">' + label + '</a></li>';
+    },
+
+    _listPropertyAutocomplete: function (resourceUri) {
+        var self = this;
+        label = self.localName(resourceUri);
+        return '<li><a style="line-height:0.8em !important;">\
+                <span style="font-size: 15px;">' + label + '</span><br/>\
+                <span style="font-size:10px;">' + resourceUri + '</span></li>';
     },
 
     _normalizeValue: function (value) {
@@ -373,6 +424,12 @@ RDFauthor.registerWidget({
                         }
                     }
                     $('#suggestedGeneralCount').html(Object.size(generalapplicable));
+
+                    //TESTING
+                    self._performSearch(function(){
+                    
+                    });
+
                     // ready
                     self._positioning();
                     $('#spinner-propertyselector').remove();
@@ -403,9 +460,30 @@ RDFauthor.registerWidget({
             
             /** INPUT EVENTS */
 
-            $('#filterProperties').val('start typing to filter the results or enter a custom property uri')
-                                  .click(function() {
+            $('#filterProperties').val('search for properties or enter a custom property uri')
+                                  .focus(function() {
                                       $(this).val('');
+                                  }).autocomplete({
+                                      minLength: 3,
+                                      delay: 500,
+                                      source: function(request, response) {
+                                          self._performSearch(request.term, function(result) {
+                                              response(result);
+                                          });
+                                          $('.ui-autocomplete:last').css({
+                                              'max-height': '300px',
+                                              'overflow-y': 'auto',
+                                              'overflow-x': 'hidden',
+                                              'padding-right': '1px'
+                                          });
+                                      },
+                                      select: function(event, ui) {
+                                          var resourceUri = ui.item.value;
+                                          var keydownEvent = $.Event("keydown");
+                                          keydownEvent.which=13;
+                                          self.element().val(resourceUri).trigger(keydownEvent);
+                                          $('.modal-wrapper-propertyselector').remove();
+                                      }
                                   }).keydown(function(event) {
                                       if(event.which == '13') {
                                           event.preventDefault();
@@ -415,8 +493,11 @@ RDFauthor.registerWidget({
                                           self.element().val(resourceUri).trigger(keydownEvent);
                                           $('.modal-wrapper-propertyselector').remove();
                                       }
-                                  });
-
+                                  }).data( "autocomplete" )._renderItem = function( ul, item ) {
+                                      var li = self._listPropertyAutocomplete(item.value);
+                                      return $(li).data("item.autocomplete", item).appendTo(ul);
+                                  };
+            
             /** SHOW-HIDE-SCROLL EVENTS */
             $('html').unbind('click').click(function(){
                 if ($('#propertypicker').css("display") != "none" && focus == false) {
