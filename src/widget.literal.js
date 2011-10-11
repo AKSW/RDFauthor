@@ -278,11 +278,8 @@ RDFauthor.registerWidget({
                     } else if (null !== this.datatype()) {
                         objectOptions.datatype = this.datatype();
                     }
-                    var
-                      re = new RegExp('\\\\', 'g'),
-                      val = this.value().replace(re, '\\\\'),
-                      newStatement = this.statement.copyWithObject({
-                        value: this.value().replace('\\', '\\\\'), 
+                    var newStatement = this.statement.copyWithObject({
+                        value: this.value(), 
                         options: objectOptions, 
                         type: 'literal'
                     });
