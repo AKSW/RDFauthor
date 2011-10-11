@@ -163,7 +163,11 @@ Statement.prototype = {
         if (null !== this._object) {
             var object;
             if (!this._object instanceof jQuery.rdf.literal) {
-                object = this._object.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+              object = this.createLiteral({
+                value: this._object,
+                datatype: this._datatype ? this._datatype : undefined,
+                lang: this._lang ? this._lang : undefined
+              });
             } else {
                 object = this._object;
             }
@@ -199,23 +203,18 @@ Statement.prototype = {
     
     createLiteral: function (objectSpec) {
         var literalOpts = {};
-        var quoteLiteral = true;
-        var containsSingleQuotes = (String(objectSpec.value).indexOf('\'') > -1);
-        var containsDoubleQuotes = (String(objectSpec.value).indexOf('"') > -1);
-        var containsQuotes = (containsSingleQuotes || containsDoubleQuotes);
         
         if (objectSpec.lang) {
             literalOpts.lang = objectSpec.lang;
-            quoteLiteral = false;
         } else if (objectSpec.datatype) {
             literalOpts.datatype = objectSpec.datatype;
-            quoteLiteral = false;
-            // quoteLiteral = containsQuotes ? true : false;
-            
+
             // register user-defined datatype
             if (!this.isDatatypeValid(literalOpts.datatype)) {
                 this.registerDatatype(literalOpts.datatype);
             }
+        } else {
+          literalOpts.plain = true;
         }
         
         /*
@@ -223,21 +222,8 @@ Statement.prototype = {
          * /^("""((\\"|[^"])*)"""|"((\\"|[^"])*)")(@([a-z]+(-[a-z0-9]+)*)|\^\^(.+))?$/
          */
         
-        var longLiteralRegEx = /[\\\n\r]/
-        var longLiteral = (String(objectSpec.value).search(longLiteralRegEx) > -1);
-        var quoteChars  = longLiteral ? '"""' : '"';
-        
-        if (containsDoubleQuotes) {
-            // escape double quotes
-            // objectSpec.value = objectSpec.value.replace(new RegExp('"', 'g'), '\\\"');
-            objectSpec.value = objectSpec.value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-        }
-        
-        if (quoteLiteral/* || longLiteral*/) {
-            objectSpec.value = quoteChars + objectSpec.value + quoteChars;
-        }
-        
         return jQuery.rdf.literal(objectSpec.value, literalOpts);
+        // return jQuery.rdf.literal(objectSpec.value.replace('\\', '\\\\'), literalOpts);
     }, 
     
     /**
