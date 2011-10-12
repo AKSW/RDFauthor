@@ -127,7 +127,7 @@ RDFauthor.registerWidget({
             if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(String(rdfqTriple));
+                    databank.remove(rdfqTriple);
                 }
             }
 
@@ -159,14 +159,11 @@ RDFauthor.registerWidget({
     },
 
     value: function () {
-        if (null !== this.selectedResource) {
-            return this.selectedResource;
+        var self = this;
+        var value = self.element().val();
+        if ( self.isURI(value) || (String(value).indexOf(':') > -1) ) {
+            return value;
         }
-
-        // var typedValue = this.element().val();
-        // if ('' !== typedValue) {
-        //     return typedValue;
-        // }
 
         return null;
     },
@@ -456,8 +453,7 @@ RDFauthor.registerWidget({
                 select: function (event, ui) {
                     self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
-                    // self.element().val(this.selectedResourceLabel);
-
+                    self.element().val(self.selectedResource);
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
                         .originalEvent          /* menuselected */
