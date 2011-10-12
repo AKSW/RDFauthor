@@ -115,14 +115,14 @@ RDFauthor.registerWidget({
                           </ul>\
                         </div>\
                       </li>\
-                      <li>\
+                      <!--li>\
                         <h1 class="propertyHeadline">\
                           <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
                           <span>Applicable (<span id="suggestedApplicableCount"></span>)</span>\
                         </h1>\
                         <div id="suggestedApplicable">\
                         </div>\
-                      </li>\
+                      </li-->\
                     </ul>\
                  </div>\
                 </div>';
