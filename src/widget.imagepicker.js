@@ -79,7 +79,7 @@ RDFauthor.registerWidget({
 
         if( $('#imagepicker').length == 0 ) {
             $('body').append(imagePicker);
-        } 
+        }
         return markup;
     },
 
@@ -97,7 +97,7 @@ RDFauthor.registerWidget({
             if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(String(rdfqTriple));
+                    databank.remove(rdfqTriple);
                 }
             }
 
@@ -146,14 +146,14 @@ RDFauthor.registerWidget({
                 // positioning
                 var left = self._getPosition().left + 'px !important;';
                 var top = self._getPosition().top + 'px !important';
-                
+
                 $('#imagepicker').css('left',left)
                                  .css('top',top)
                                  .data('input',$(this))
                                  .show();
 
             });
-            
+
             $("#gallery").EmbedPicasaGallery('aksw.group',{
                     albumid: "5646308221729665137",
                     authkey: "Gv1sRgCISL87-luIbGXg",
@@ -196,7 +196,7 @@ RDFauthor.registerWidget({
                     }
                 });
             })
-            
+
             $('html').unbind('click').click(function(event){
                 if ($('#imagepicker').css("display") != "none" && focus == false) {
                     $('#imagepicker').fadeOut();
@@ -241,7 +241,7 @@ RDFauthor.registerWidget({
         };
         return pos;
     }
-    
+
 }, {
         name: 'property',
         values: ['http://xmlns.com/foaf/0.1/depiction',

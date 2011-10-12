@@ -107,9 +107,9 @@
   line-height: 1.3;
   text-decoration: none;
   font-weight: normal;
-  
+
   width: auto;
-  
+
   padding: 0.3em 0.5em 0.3em 0.5em;   /* Firefox */
 }
 
@@ -119,7 +119,7 @@
 /* -- RDFAuthor unique stuff ------------------------------------------------ */
 
 #rdfauthor-view {
-    /*z-index: 10000 !important; 
+    /*z-index: 10000 !important;
     position: absolute;
     background-color: #eee;
     width: 48em;*/
@@ -159,10 +159,10 @@
 }
 
 .widget-override {
-    
+
 }
 
-#rdfauthor-view .rdfauthor-predicate-row, #rdfauthor-view .container, #rdfauthor-view .inline-container, 
+#rdfauthor-view .rdfauthor-predicate-row, #rdfauthor-view .container, #rdfauthor-view .inline-container,
 .rdfAuthorInline .container, .rdfAuthorInline .inline-container {
 /*    border: 1px dotted red;*/
     padding: 0.3em 0.5em;
@@ -178,12 +178,12 @@
     display: block;
 }
 
-#rdfauthor-view .literal-lang select, #rdfauthor-view .literal-datatype select, 
+#rdfauthor-view .literal-lang select, #rdfauthor-view .literal-datatype select,
 .rdfAuthorInline    .literal-lang select, .rdfAuthorInline    .literal-datatype select {
     margin-left: 0.5em;
 }
 
-#rdfauthor-view .container, #rdfauthor-view .inline-container, 
+#rdfauthor-view .container, #rdfauthor-view .inline-container,
 .rdfAuthorInline    .container, .rdfAuthorInline    .inline-container {
     float: left;
     /* temporary width fix */
@@ -191,7 +191,7 @@
 /*    border: 1px dotted green;*/
 }
 
-#rdfauthor-view .widget, 
+#rdfauthor-view .widget,
 .rdfAuthorInline    .widget {
     min-height: 42px;
 /*    border: 1px solid green;*/
@@ -210,7 +210,7 @@
     display: none;
 }
 
-#rdfauthor-view .add-button, #rdfauthor-view .delete-button, 
+#rdfauthor-view .add-button, #rdfauthor-view .delete-button,
 .rdfAuthorInline .add-button, .rdfAuthorInline .delete-button {
     width: 16px;
     height: 16px;
@@ -245,7 +245,7 @@
     background-image: url('./../img/disclosure-indicator-horizontal.png') !important;
     background-repeat: no-repeat;
     background-position: -20px center !important;
-    
+
     /* mimic minibutton style */
     border-style: solid;
     border-width: 1px;
@@ -275,7 +275,7 @@
     background-image: url('./../img/disclosure-indicator-vertical.png') !important;
     background-repeat: no-repeat;
     background-position: center -20px !important;
-    
+
     /* mimic minibutton style */
     border-style: solid;
     border-width: 1px;
@@ -303,7 +303,7 @@
 
 .subject-group-selected {
     margin-top: 0.2em;
-    margin-bottom: 0.4em; 
+    margin-bottom: 0.4em;
     display: block;
 }
 

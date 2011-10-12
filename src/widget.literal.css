@@ -5,7 +5,7 @@
     resize: none;
 }
 
-.literal-value-medium textarea, 
+.literal-value-medium textarea,
 .literal-value-large textarea {
     width: 100%;
     resize: vertical;

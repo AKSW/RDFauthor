@@ -163,7 +163,7 @@ RDFauthor.registerWidget({
             if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(String(rdfqTriple));
+                    databank.remove(rdfqTriple);
                 }
             }
 
@@ -257,8 +257,8 @@ RDFauthor.registerWidget({
         var classPattern = '?others a ?class .\n';
         var uriPattern = '?others ?resourceUri ?object .\n';
         var labelPattern = 'OPTIONAL {?resourceUri rdfs:label ?label . } .\n';
-        var query = prefixPattern + 'SELECT ' + selectPattern 
-                                  + 'WHERE { \n' 
+        var query = prefixPattern + 'SELECT ' + selectPattern
+                                  + 'WHERE { \n'
                                   + typePattern
                                   + classPattern
                                   + uriPattern
@@ -272,10 +272,10 @@ RDFauthor.registerWidget({
                 for (var i in results) {
                     if( (typeof(results[i].resourceUri) != "undefined")  && (i != "last") ) {
                         var resourceUri = results[i].resourceUri.value;
-                        (typeof(results[i].label) != "undefined") && 
+                        (typeof(results[i].label) != "undefined") &&
                         (results[i].label != null)              ? everywhereInUse[resourceUri] = results[i].label.value
                                                                 : everywhereInUse[resourceUri] = null;
-                    } 
+                    }
                 }
                 self._hasProperties(function(hasProperties){
                     $.merge(self._propertiesInUse, hasProperties);
@@ -301,8 +301,8 @@ RDFauthor.registerWidget({
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n';
         var selectPattern = '?resourceUri\n';
         var uriPattern = '<' + subjectURI + '> ?resourceUri ?object .\n';
-        var query = prefixPattern + 'SELECT ' + selectPattern 
-                                  + 'WHERE { \n' 
+        var query = prefixPattern + 'SELECT ' + selectPattern
+                                  + 'WHERE { \n'
                                   + uriPattern
                                   + '}';
         var hasProperties = [];
@@ -342,8 +342,8 @@ RDFauthor.registerWidget({
                                !sameTerm(?class, owl:ObjectProperty)  || \
                                !sameTerm(?class, owl:DatatypeProperty) || \
                                !sameTerm(?class, owl:AnnotationProperty) ) .\n';
-        var query = prefixPattern + 'SELECT ' + selectPattern 
-                                  + 'WHERE { \n' 
+        var query = prefixPattern + 'SELECT ' + selectPattern
+                                  + 'WHERE { \n'
                                   + classPattern
                                   + literalPattern
                                   + filter1
@@ -427,7 +427,7 @@ RDFauthor.registerWidget({
 
                     //TESTING
                     self._performSearch(function(){
-                    
+
                     });
 
                     // ready
@@ -457,7 +457,7 @@ RDFauthor.registerWidget({
                     e.stopPropagation();
                 }
             });
-            
+
             /** INPUT EVENTS */
 
             $('#filterProperties').val('search for properties or enter a custom property uri')
@@ -497,7 +497,7 @@ RDFauthor.registerWidget({
                                       var li = self._listPropertyAutocomplete(item.value);
                                       return $(li).data("item.autocomplete", item).appendTo(ul);
                                   };
-            
+
             /** SHOW-HIDE-SCROLL EVENTS */
             $('html').unbind('click').click(function(){
                 if ($('#propertypicker').css("display") != "none" && focus == false) {
@@ -513,18 +513,18 @@ RDFauthor.registerWidget({
             $('#propertypicker,input[name="propertypicker"]').mouseout(function(){
                 focus = false;
             });
-            
+
             /** SCROLL EVENTS */
 
             // $('.rdfauthor-view-content,html').scroll(function() {
                 // var left = self._getPosition().left + 'px !important;';
                 // var top = self._getPosition().top + 'px !important';
-                    
+
                 // $('#propertypicker').css('left',left)
                                     // .css('top',top);
                 // $('#propertypicker').parent().fadeOut();
             // });
-            
+
             $(document).scroll(function() {
                 var height = $(document).height();
                 var width = $(document).width();
@@ -548,7 +548,7 @@ RDFauthor.registerWidget({
                                                            .addClass('ui-icon-minus');
                 $(this).find('div').eq(0).slideToggle();
             });
-            
+
             /** CLICK EVENT ON PROPERTY */
             $('#propertypicker a[name="propertypicker"]').live('click', function(event){
                 event.preventDefault();

@@ -43,7 +43,7 @@ RDFauthor.registerWidget({
             });
 
         });
-        
+
         Array.prototype.last = function() {
           var length = this.length-1;
           return this[length];
@@ -110,7 +110,7 @@ RDFauthor.registerWidget({
               </div>\
              </div>\
             ';
-        
+
         if( $('#geo-widget').length == 0 ) {
             $('body').append(geowidget);
         }
@@ -135,7 +135,7 @@ RDFauthor.registerWidget({
             if (somethingChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(String(rdfqTriple));
+                    databank.remove(rdfqTriple);
                 }
             }
 
@@ -182,7 +182,7 @@ RDFauthor.registerWidget({
         $('#geo-widget-map').data('clickMarkers',[]);
         $('#geo-widget-map').data('searchMarkers',[]);
 
-        OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
+        OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
             defaultHandlerOptions: {
                 'single': true,
                 'double': false,
@@ -197,13 +197,13 @@ RDFauthor.registerWidget({
                 );
                 OpenLayers.Control.prototype.initialize.apply(
                     this, arguments
-                ); 
+                );
                 this.handler = new OpenLayers.Handler.Click(
                     this, {
                         'click': this.trigger
                     }, this.handlerOptions
                 );
-            }, 
+            },
 
             trigger: function(e) {
                 // set visibility
@@ -218,9 +218,9 @@ RDFauthor.registerWidget({
                 if ( lastMarker != undefined ) {
                     clickOverlay.removeMarker(lastMarker);
                 }
-                
+
                 var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(
-                   new OpenLayers.Projection("EPSG:900913"), 
+                   new OpenLayers.Projection("EPSG:900913"),
                    new OpenLayers.Projection("EPSG:4326")
                 );
 
@@ -228,7 +228,7 @@ RDFauthor.registerWidget({
 
                 var size = new OpenLayers.Size(21,25);
                 var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-                var icon2 = new OpenLayers.Icon(RDFAUTHOR_BASE + 
+                var icon2 = new OpenLayers.Icon(RDFAUTHOR_BASE +
                                                 'libraries/openlayers/img/marker-blue.png',
                                                 size,offset);
                 var clickedMarker = new OpenLayers.Marker(new OpenLayers.LonLat(lonlat.lon,lonlat.lat)
@@ -283,7 +283,7 @@ RDFauthor.registerWidget({
             map.getProjectionObject()
         ),icon);
         $('#geo-widget-map').data('initMarker',initMarker);
-        markers.addMarker(initMarker); 
+        markers.addMarker(initMarker);
 
         // map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
             // new OpenLayers.Projection("EPSG:4326"),
@@ -299,7 +299,7 @@ RDFauthor.registerWidget({
         var click = new OpenLayers.Control.Click();
         map.addControl(click);
         click.activate();
-        
+
         $('input[name="lat"],input[name="long"]').live('change keyup cut input',function() {
             // set visibility
             searchOverlay.setVisibility(false);
@@ -357,12 +357,12 @@ RDFauthor.registerWidget({
                                 if ( data.Placemark.length == 1) {
                                     self._setLonLat(glon, glat);
                                     $('#geo-widget-map').data('initMarker').setOpacity(0.5);
-                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 
+                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE +
                                                                 'libraries/openlayers/img/marker.png',
                                                                 size,offset);
                                 } else {
                                     $('#geo-widget-map').data('initMarker').setOpacity(1);
-                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE + 
+                                    icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE +
                                                                 'libraries/openlayers/img/marker-green.png',
                                                                 size,offset);
                                 };
@@ -397,7 +397,7 @@ RDFauthor.registerWidget({
                                         "click" : true
                                     });
                                     self._setLonLat(glon, glat);
-                                    OpenLayers.Event.stop(evt); 
+                                    OpenLayers.Event.stop(evt);
                                 });
                                 searchOverlay.addMarker(searchMarker);
                             });
@@ -409,7 +409,7 @@ RDFauthor.registerWidget({
                             searchOverlay.clearMarkers();
                             $('#geo-widget-map').data('initMarker').setOpacity(1);
                             alert('no results - try again');
-                        } 
+                        }
                     }
                 });
             } // end if return
@@ -420,8 +420,8 @@ RDFauthor.registerWidget({
     _initGeo: function () {
         var self = this;
         var focus;
-        
-        if (this._openLayersLoaded && this._googleLoaded && 
+
+        if (this._openLayersLoaded && this._googleLoaded &&
             this._osmLoaded && this._bingLoaded && this._domRdy) {
             self.element().click(function() {
                 focus = true;
@@ -434,7 +434,7 @@ RDFauthor.registerWidget({
                                 .css('top',top)
                                 .data('input',$(this))
                                 .show();
-                
+
                 if( $('#geo-widget-map').children().length == 0 ) {
                     self._initOpenLayers(lonlat.lon,lonlat.lat);
                 }
@@ -469,7 +469,7 @@ RDFauthor.registerWidget({
         $('.rdfauthor-view-content,html').scroll(function() {
             var left = self._getPosition().left + 'px !important;';
             var top = self._getPosition().top + 'px !important';
-                
+
             $('#geo-widget').css('left',left)
                             .css('top',top);
             $('#geo-widget').fadeOut();
@@ -520,7 +520,7 @@ RDFauthor.registerWidget({
                    ),icon.clone());
     }
 
-    
+
 }, {
         name: 'property',
         values: ['http://www.w3.org/2003/01/geo/wgs84_pos#long',
