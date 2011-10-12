@@ -52,7 +52,7 @@ div.modal-wrapper-propertyselector {
   height: 54px;
   display: inline-block;
 }
-    
+
 #spinner-propertyselector div {
   width: 12%;
   height: 26%;
@@ -65,8 +65,8 @@ div.modal-wrapper-propertyselector {
   -webkit-border-radius: 50px;
   -webkit-box-shadow: 0 0 3px rgba(0,0,0,0.2);
 }
-    
-#spinner-propertyselector div.bar1 {-webkit-transform:rotate(0deg) translate(0, -142%); -webkit-animation-delay: 0s;}    
+
+#spinner-propertyselector div.bar1 {-webkit-transform:rotate(0deg) translate(0, -142%); -webkit-animation-delay: 0s;}
 #spinner-propertyselector div.bar2 {-webkit-transform:rotate(30deg) translate(0, -142%); -webkit-animation-delay: -0.9167s;}
 #spinner-propertyselector div.bar3 {-webkit-transform:rotate(60deg) translate(0, -142%); -webkit-animation-delay: -0.833s;}
 #spinner-propertyselector div.bar4 {-webkit-transform:rotate(90deg) translate(0, -142%); -webkit-animation-delay: -0.75s;}

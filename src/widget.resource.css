@@ -68,7 +68,7 @@ li.ui-menu-item a.resource-edit-item .resource-edit-uri {
     margin: 0;
     padding: 0.1em;
     display: block;
-    font-size: 0.7em; 
+    font-size: 0.7em;
     color: #888;
     font-family: monospace;
 }
@@ -78,7 +78,7 @@ li.ui-menu-item a.ui-state-hover {
     border: 1px solid #0073ea !important;
 }
 
-li.ui-menu-item a.ui-state-hover .resource-edit-source, 
+li.ui-menu-item a.ui-state-hover .resource-edit-source,
 li.ui-menu-item a.ui-state-hover .resource-edit-uri {
     color: #fff;
 }
