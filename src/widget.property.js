@@ -83,10 +83,7 @@ RDFauthor.registerWidget({
             </div>';
             var propertyPicker = '\
                 <div id="propertypicker" class="window ui-draggable ui-resizable">\
-                  <h1 class="title">Suggested Properties\
-                    <br/>\
-                    <input id="filterProperties" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
-                  </h1>\
+                  <h1 class="title">Suggested Properties</h1>\
                   <div class="window-buttons">\
                     <div class="window-buttons-left"></div>\
                     <div class="window-buttons-right">\
@@ -94,6 +91,7 @@ RDFauthor.registerWidget({
                     </div>\
                   </div>\
                   <div class="content">\
+                    <input id="filterProperties" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                     <ul class="bullets-none separated">\
                       <li>\
                         <h1 class="propertyHeadline">\
