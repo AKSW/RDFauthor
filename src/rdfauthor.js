@@ -1025,7 +1025,6 @@ RDFauthor = (function($, undefined) {
                     var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     
-                    
                     // alert('Added: ' + addedJSON);
                     // alert('Removed: ' + $.toJSON(indexes));
                     // return;
