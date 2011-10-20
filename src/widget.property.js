@@ -95,8 +95,13 @@ RDFauthor.registerWidget({
                     <ul class="bullets-none separated">\
                       <li>\
                         <h1 class="propertyHeadline">\
-                          <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                            <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
+                          </div>\
                         </h1>\
                         <div id="suggestedInUse">\
                           <ul class="inline separated">\
@@ -105,8 +110,13 @@ RDFauthor.registerWidget({
                       </li>\
                       <li>\
                         <h1 class="propertyHeadline">\
-                          <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                            <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
+                          </div>\
                         </h1>\
                         <div id="suggestedGeneral">\
                           <ul class="inline separated">\
@@ -115,8 +125,13 @@ RDFauthor.registerWidget({
                       </li>\
                       <li>\
                         <h1 class="propertyHeadline">\
-                          <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
-                          <span>Applicable (<span id="suggestedApplicableCount"></span>)</span>\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
+                            <span>Applicable (<span id="suggestedApplicableCount">?</span>)</span>\
+                          </div>\
                         </h1>\
                         <div id="suggestedApplicable">\
                         </div>\
@@ -335,7 +350,7 @@ RDFauthor.registerWidget({
         var selectPattern = 'DISTINCT ?resourceUri\n';
         var classPattern = '?resourceUri a ?class .\n';
         var literalPattern = '?resourceUri ?p0 ?literal .\n';
-        var filter1 = 'FILTER (REGEX(?literal, "' + requestTerm + '", "i"))';
+        var filter1 = 'FILTER (REGEX(?literal, "' + requestTerm + '", "i")). \n';
         var filter2 = 'FILTER ( ( ( (sameTerm(?class,owl:DatatypeProperty)) || (sameTerm(?class,owl:ObjectProperty)) ) || \
                                 (sameTerm(?class, rdf:Property)) ) || \
                                 (sameTerm(?class, owl:AnnotationProperty)) ).\n';
@@ -566,7 +581,7 @@ RDFauthor.registerWidget({
                                                   : $(this).find('h1 .ui-icon')
                                                            .removeClass('ui-icon-plus')
                                                            .addClass('ui-icon-minus');
-                $(this).find('div').eq(0).slideToggle();
+                $(this).find('h1').next('div').slideToggle();
             });
 
             /** CLICK EVENT ON PROPERTY */
