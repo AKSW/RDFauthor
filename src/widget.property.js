@@ -388,6 +388,13 @@ RDFauthor.registerWidget({
         }
     },
 
+    _validateURI: function (uri) {
+        var uriRE = new RegExp (
+            /^([a-zA-Z][a-zA-Z0-9+-.]*):((\/\/(((([a-zA-Z0-9\-._~!$&'()*+,;=':]|(%[0-9a-fA-F]{2}))*)@)?((\[((((([0-9a-fA-F]{1,4}:){6}|(::([0-9a-fA-F]{1,4}:){5})|(([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){4})|((([0-9a-fA-F]{1,4}:)?[0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){3})|((([0-9a-fA-F]{1,4}:){0,2}[0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){2})|((([0-9a-fA-F]{1,4}:){0,3}[0-9a-fA-F]{1,4})?::[0-9a-fA-F]{1,4}:)|((([0-9a-fA-F]{1,4}:){0,4}[0-9a-fA-F]{1,4})?::))((([0-9a-fA-F]{1,4}):([0-9a-fA-F]{1,4}))|(([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5])))))|((([0-9a-fA-F]{1,4}:){0,5}[0-9a-fA-F]{1,4})?::[0-9a-fA-F]{1,4})|((([0-9a-fA-F]{1,4}:){0,5}[0-9a-fA-F]{1,4})?::))|(v[0-9a-fA-F]+\.[a-zA-Z0-9\-._~!$&'()*+,;=':]+))\])|(([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5])))|(([a-zA-Z0-9\-._~!$&'()*+,;=']|(%[0-9a-fA-F]{2}))*))(:[0-9]*)?)((\/([a-zA-Z0-9\-._~!$&'()*+,;=':@]|(%[0-9a-fA-F]{2}))*)*))|(\/?(([a-zA-Z0-9\-._~!$&'()*+,;=':@]|(%[0-9a-fA-F]{2}))+(\/([a-zA-Z0-9\-._~!$&'()*+,;=':@]|(%[0-9a-fA-F]{2}))*)*)?))(\?(([a-zA-Z0-9\-._~!$&'()*+,;=':@\/?]|(%[0-9a-fA-F]{2}))*))?((#(([a-zA-Z0-9\-._~!$&'()*+,;=':@\/?]|(%[0-9a-fA-F]{2}))*)))?$/i
+        );
+        return uriRE.test(uri);
+    },
+
     _init: function () {
         var self = this;
         var focus;
@@ -484,13 +491,29 @@ RDFauthor.registerWidget({
                                           $('.modal-wrapper-propertyselector').remove();
                                       }
                                   }).keydown(function(event) {
+                                      // uri check
+                                      var cssRed = 'rgb(255, 187, 187)';
+                                      if (!self._validateURI($(this).val())) {
+                                          var currentColour = $(this).css('background-color');
+                                          if (currentColour != cssRed) {
+                                              $(this).data('previousColour', $(this).css('background-color'));
+                                          }
+                                          $(this).css('background-color', cssRed);
+                                      } else {
+                                          $(this).css('background-color', $(this).data('previousColour'));
+                                      }
+                                      // return
                                       if(event.which == '13') {
-                                          event.preventDefault();
-                                          var resourceUri = $('#filterProperties').val();
-                                          var keydownEvent = $.Event("keydown");
-                                          keydownEvent.which=13;
-                                          self.element().val(resourceUri).trigger(keydownEvent);
-                                          $('.modal-wrapper-propertyselector').remove();
+                                          if(self._validateURI($(this).val())) {
+                                              event.preventDefault();
+                                              var resourceUri = $('#filterProperties').val();
+                                              var keydownEvent = $.Event("keydown");
+                                              keydownEvent.which=13;
+                                              self.element().val(resourceUri).trigger(keydownEvent);
+                                              $('.modal-wrapper-propertyselector').remove();
+                                          } else {
+                                              alert('Faulty entry! "' + $(this).val() + '" is not a valid uri.');
+                                          }
                                       }
                                   }).data( "autocomplete" )._renderItem = function( ul, item ) {
                                       var li = self._listPropertyAutocomplete(item.value);
