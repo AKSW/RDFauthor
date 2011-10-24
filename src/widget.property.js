@@ -9,7 +9,7 @@
 RDFauthor.registerWidget({
     init: function () {
         this._propertiesInUse = [];
-
+        this._filterProperties = "search for properties or enter a custom property uri";
         this._domReady     = false;
         this._pluginLoaded = false;
         this._initialized  = false;
@@ -77,6 +77,7 @@ RDFauthor.registerWidget({
     },
 
     markup: function () {
+            var self = this;
             var markup = '\
             <div class="container resource-value">\
                 <input type="hidden" id="property-input-' + this.ID + '" name="propertypicker" class="text resource-edit-input" />\
@@ -91,7 +92,8 @@ RDFauthor.registerWidget({
                     </div>\
                   </div>\
                   <div class="content">\
-                    <input id="filterProperties" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
+                    <input id="filterProperties" autocomplete="off" type="text" value="' + self._filterProperties + '"\
+                           class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                     <ul class="bullets-none separated">\
                       <li>\
                         <h1 class="propertyHeadline">\
@@ -479,8 +481,7 @@ RDFauthor.registerWidget({
 
             /** INPUT EVENTS */
 
-            $('#filterProperties').val('search for properties or enter a custom property uri')
-                                  .focus(function() {
+            $('#filterProperties').focus(function() {
                                       $(this).val('');
                                   }).autocomplete({
                                       minLength: 3,
@@ -503,10 +504,10 @@ RDFauthor.registerWidget({
                                           self.element().val(resourceUri).trigger(keydownEvent);
                                           $('.modal-wrapper-propertyselector').remove();
                                       }
-                                  }).keydown(function(event) {
+                                  }).keyup(function(event) {
                                       // uri check
                                       var cssRed = 'rgb(255, 187, 187)';
-                                      if (!self._validateURI($(this).val())) {
+                                      if (!self._validateURI($(this).val()) && $(this).val().length != 0) {
                                           var currentColour = $(this).css('background-color');
                                           if (currentColour != cssRed) {
                                               $(this).data('previousColour', $(this).css('background-color'));
