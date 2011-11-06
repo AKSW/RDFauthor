@@ -31,6 +31,9 @@ RDFauthor.registerWidget({
                 self.element().css('background-color', self.element().data('previousColour'));
             }
         });
+        if(this.element().val() == "null" ) {
+            this.element().val('');
+        }
     },
 
     // return your jQuery-wrapped main input element here
@@ -135,7 +138,6 @@ RDFauthor.registerWidget({
     URIForLabel: function (label) {
         var URI = String(label)
             .replace(/\ /g, '-');   // create "-" instead of spaces
-
         return 'tel:' + URI;
     }
 }, [{
