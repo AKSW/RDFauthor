@@ -92,7 +92,7 @@ RDFauthor.registerWidget({
                     </div>\
                   </div>\
                   <div class="content">\
-                    <input id="filterProperties" autocomplete="off" type="text" value="' + self._filterProperties + '"\
+                    <input id="filterProperties" autocomplete="off" type="text" \
                            class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                     <ul class="bullets-none separated">\
                       <li>\
@@ -454,7 +454,9 @@ RDFauthor.registerWidget({
                     // ready
                     self._positioning();
                     $('#spinner-propertyselector').remove();
-                    $('#propertypicker').fadeIn();
+                    $('#propertypicker').fadeIn('fast', function() {
+                        $('#filterProperties').focus();
+                    });
                 });
             }).keydown(function (e) {
                 if ((e.which === 13) && self._options.selectOnReturn) {
@@ -481,9 +483,7 @@ RDFauthor.registerWidget({
 
             /** INPUT EVENTS */
 
-            $('#filterProperties').focus(function() {
-                                      $(this).val('');
-                                  }).autocomplete({
+            $('#filterProperties').autocomplete({
                                       minLength: 3,
                                       delay: 500,
                                       source: function(request, response) {
