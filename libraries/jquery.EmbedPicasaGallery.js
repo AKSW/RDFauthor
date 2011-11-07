@@ -375,7 +375,7 @@
             }
             $.getJSON('http://picasaweb.google.com/data/feed/api/user/' 
                 + user + '/albumid/' 
-                + album + '?kind=photo&access=visible' + authkey + '&alt=json-in-script&thumbsize='+meta_opts.size+'c&imgmax=800&callback=?',
+                + album + '?kind=photo&access=visible' + authkey + '&alt=json-in-script&thumbsize='+meta_opts.size+'c&imgmax=1600&callback=?',
                 renderAlbum
             );
         };
