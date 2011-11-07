@@ -125,7 +125,7 @@ RDFauthor.registerWidget({
                           </ul>\
                         </div>\
                       </li>\
-                      <li>\
+                      <!--<li>\
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
@@ -137,7 +137,7 @@ RDFauthor.registerWidget({
                         </h1>\
                         <div id="suggestedApplicable">\
                         </div>\
-                      </li>\
+                      </li>-!>\
                     </ul>\
                  </div>\
                 </div>';
