@@ -9,7 +9,7 @@
 RDFauthor.registerWidget({
     init: function () {
         this._propertiesInUse = [];
-
+        this._filterProperties = "search for properties or enter a custom property uri";
         this._domReady     = false;
         this._pluginLoaded = false;
         this._initialized  = false;
@@ -77,16 +77,14 @@ RDFauthor.registerWidget({
     },
 
     markup: function () {
+            var self = this;
             var markup = '\
             <div class="container resource-value">\
                 <input type="hidden" id="property-input-' + this.ID + '" name="propertypicker" class="text resource-edit-input" />\
             </div>';
             var propertyPicker = '\
                 <div id="propertypicker" class="window ui-draggable ui-resizable">\
-                  <h1 class="title">Suggested Properties\
-                    <br/>\
-                    <input id="filterProperties" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
-                  </h1>\
+                  <h1 class="title">Suggested Properties</h1>\
                   <div class="window-buttons">\
                     <div class="window-buttons-left"></div>\
                     <div class="window-buttons-right">\
@@ -94,11 +92,18 @@ RDFauthor.registerWidget({
                     </div>\
                   </div>\
                   <div class="content">\
+                    <input id="filterProperties" autocomplete="off" type="text" value="' + self._filterProperties + '"\
+                           class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                     <ul class="bullets-none separated">\
                       <li>\
                         <h1 class="propertyHeadline">\
-                          <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                            <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
+                          </div>\
                         </h1>\
                         <div id="suggestedInUse">\
                           <ul class="inline separated">\
@@ -107,22 +112,32 @@ RDFauthor.registerWidget({
                       </li>\
                       <li>\
                         <h1 class="propertyHeadline">\
-                          <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                          <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                            <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
+                          </div>\
                         </h1>\
                         <div id="suggestedGeneral">\
                           <ul class="inline separated">\
                           </ul>\
                         </div>\
                       </li>\
-                      <!--li>\
+                      <li>\
                         <h1 class="propertyHeadline">\
-                          <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
-                          <span>Applicable (<span id="suggestedApplicableCount"></span>)</span>\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-plus"></span>\
+                            <span>Applicable (<span id="suggestedApplicableCount">?</span>)</span>\
+                          </div>\
                         </h1>\
                         <div id="suggestedApplicable">\
                         </div>\
-                      </li-->\
+                      </li>\
                     </ul>\
                  </div>\
                 </div>';
@@ -337,11 +352,10 @@ RDFauthor.registerWidget({
         var selectPattern = 'DISTINCT ?resourceUri\n';
         var classPattern = '?resourceUri a ?class .\n';
         var literalPattern = '?resourceUri ?p0 ?literal .\n';
-        var filter1 = 'FILTER (REGEX(?literal, "' + requestTerm + '", "i"))';
-        var filter2 = 'FILTER (sameTerm(?class, rdf:Property) || \
-                               !sameTerm(?class, owl:ObjectProperty)  || \
-                               !sameTerm(?class, owl:DatatypeProperty) || \
-                               !sameTerm(?class, owl:AnnotationProperty) ) .\n';
+        var filter1 = 'FILTER (REGEX(?literal, "' + requestTerm + '", "i")). \n';
+        var filter2 = 'FILTER ( ( ( (sameTerm(?class,owl:DatatypeProperty)) || (sameTerm(?class,owl:ObjectProperty)) ) || \
+                                (sameTerm(?class, rdf:Property)) ) || \
+                                (sameTerm(?class, owl:AnnotationProperty)) ).\n';
         var query = prefixPattern + 'SELECT ' + selectPattern
                                   + 'WHERE { \n'
                                   + classPattern
@@ -387,6 +401,13 @@ RDFauthor.registerWidget({
             this.selectedResource      = this.expandNamespace(value);
             this.selectedResourceLabel = this.localName(value);
         }
+    },
+
+    _validateURI: function (uri) {
+        var uriRE = new RegExp (
+            /^([a-zA-Z][a-zA-Z0-9+-.]*):((\/\/(((([a-zA-Z0-9\-._~!$&'()*+,;=':]|(%[0-9a-fA-F]{2}))*)@)?((\[((((([0-9a-fA-F]{1,4}:){6}|(::([0-9a-fA-F]{1,4}:){5})|(([0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){4})|((([0-9a-fA-F]{1,4}:)?[0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){3})|((([0-9a-fA-F]{1,4}:){0,2}[0-9a-fA-F]{1,4})?::([0-9a-fA-F]{1,4}:){2})|((([0-9a-fA-F]{1,4}:){0,3}[0-9a-fA-F]{1,4})?::[0-9a-fA-F]{1,4}:)|((([0-9a-fA-F]{1,4}:){0,4}[0-9a-fA-F]{1,4})?::))((([0-9a-fA-F]{1,4}):([0-9a-fA-F]{1,4}))|(([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5])))))|((([0-9a-fA-F]{1,4}:){0,5}[0-9a-fA-F]{1,4})?::[0-9a-fA-F]{1,4})|((([0-9a-fA-F]{1,4}:){0,5}[0-9a-fA-F]{1,4})?::))|(v[0-9a-fA-F]+\.[a-zA-Z0-9\-._~!$&'()*+,;=':]+))\])|(([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5]))\.([0-9]|(1[0-9]{2})|(2[0-4][0-9])|(25[0-5])))|(([a-zA-Z0-9\-._~!$&'()*+,;=']|(%[0-9a-fA-F]{2}))*))(:[0-9]*)?)((\/([a-zA-Z0-9\-._~!$&'()*+,;=':@]|(%[0-9a-fA-F]{2}))*)*))|(\/?(([a-zA-Z0-9\-._~!$&'()*+,;=':@]|(%[0-9a-fA-F]{2}))+(\/([a-zA-Z0-9\-._~!$&'()*+,;=':@]|(%[0-9a-fA-F]{2}))*)*)?))(\?(([a-zA-Z0-9\-._~!$&'()*+,;=':@\/?]|(%[0-9a-fA-F]{2}))*))?((#(([a-zA-Z0-9\-._~!$&'()*+,;=':@\/?]|(%[0-9a-fA-F]{2}))*)))?$/i
+        );
+        return uriRE.test(uri);
     },
 
     _init: function () {
@@ -460,8 +481,7 @@ RDFauthor.registerWidget({
 
             /** INPUT EVENTS */
 
-            $('#filterProperties').val('search for properties or enter a custom property uri')
-                                  .focus(function() {
+            $('#filterProperties').focus(function() {
                                       $(this).val('');
                                   }).autocomplete({
                                       minLength: 3,
@@ -484,14 +504,30 @@ RDFauthor.registerWidget({
                                           self.element().val(resourceUri).trigger(keydownEvent);
                                           $('.modal-wrapper-propertyselector').remove();
                                       }
-                                  }).keydown(function(event) {
+                                  }).keyup(function(event) {
+                                      // uri check
+                                      var cssRed = 'rgb(255, 187, 187)';
+                                      if (!self._validateURI($(this).val()) && $(this).val().length != 0) {
+                                          var currentColour = $(this).css('background-color');
+                                          if (currentColour != cssRed) {
+                                              $(this).data('previousColour', $(this).css('background-color'));
+                                          }
+                                          $(this).css('background-color', cssRed);
+                                      } else {
+                                          $(this).css('background-color', $(this).data('previousColour'));
+                                      }
+                                      // return
                                       if(event.which == '13') {
-                                          event.preventDefault();
-                                          var resourceUri = $('#filterProperties').val();
-                                          var keydownEvent = $.Event("keydown");
-                                          keydownEvent.which=13;
-                                          self.element().val(resourceUri).trigger(keydownEvent);
-                                          $('.modal-wrapper-propertyselector').remove();
+                                          if(self._validateURI($(this).val())) {
+                                              event.preventDefault();
+                                              var resourceUri = $('#filterProperties').val();
+                                              var keydownEvent = $.Event("keydown");
+                                              keydownEvent.which=13;
+                                              self.element().val(resourceUri).trigger(keydownEvent);
+                                              $('.modal-wrapper-propertyselector').remove();
+                                          } else {
+                                              alert('Faulty entry! "' + $(this).val() + '" is not a valid uri.');
+                                          }
                                       }
                                   }).data( "autocomplete" )._renderItem = function( ul, item ) {
                                       var li = self._listPropertyAutocomplete(item.value);
@@ -546,7 +582,7 @@ RDFauthor.registerWidget({
                                                   : $(this).find('h1 .ui-icon')
                                                            .removeClass('ui-icon-plus')
                                                            .addClass('ui-icon-minus');
-                $(this).find('div').eq(0).slideToggle();
+                $(this).find('h1').next('div').slideToggle();
             });
 
             /** CLICK EVENT ON PROPERTY */

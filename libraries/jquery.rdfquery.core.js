@@ -495,7 +495,13 @@
 (function ($) {
 
   var strip = function (value) {
-    return value.replace(/[ \t\n\r]+/, ' ').replace(/^ +/, '').replace(/ +$/, '');
+    if (typeof(value) === 'undefined') {
+        console.info('rdfquery value strip error: ' + value);
+        return false;
+    } else {
+        return value.replace(/[ \t\n\r]+/, ' ').replace(/^ +/, '').replace(/ +$/, '');
+    }
+    // return value;
   };
 
   /**
