@@ -485,7 +485,9 @@ RDFauthor.registerWidget({
 
             /** INPUT EVENTS */
 
-            $('#filterProperties').autocomplete({
+            $('#filterProperties').focus(function() {
+                                      $(this).val('').css('background-color', 'none');
+                                  }).autocomplete({
                                       minLength: 3,
                                       delay: 500,
                                       source: function(request, response) {
