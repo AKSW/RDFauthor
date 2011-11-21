@@ -91,7 +91,7 @@ RDFauthor.registerWidget({
                       <span class="button button-windowclose"><span>\
                     </div>\
                   </div>\
-                  <div class="content" style="height: 94%">\
+                  <div class="content" style="height: 93%">\
                     <input id="filterProperties" autocomplete="off" type="text" \
                            class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                     <ul class="bullets-none separated">\
@@ -125,7 +125,7 @@ RDFauthor.registerWidget({
                           </ul>\
                         </div>\
                       </li>\
-                      <li>\
+                      <!--li>\
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
@@ -137,7 +137,7 @@ RDFauthor.registerWidget({
                         </h1>\
                         <div id="suggestedApplicable">\
                         </div>\
-                      </li>\
+                      </li-->\
                     </ul>\
                  </div>\
                 </div>';
