@@ -99,7 +99,7 @@ RDFauthor.registerWidget({
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
-                              <a class="item" title="Those properties are currently in use of other resources of the same class."><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                              <a class="item" title="These properties are currently in use at other resources of the same class(es)."><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
                             </div>\
                             <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
                             <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
@@ -114,7 +114,7 @@ RDFauthor.registerWidget({
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
-                              <a class="item" title="Those properties are generally applicable to all classes. "><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                              <a class="item" title="These properties are generally applicable to all resources. "><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
                             </div>\
                             <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
                             <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
