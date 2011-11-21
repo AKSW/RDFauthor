@@ -91,15 +91,15 @@ RDFauthor.registerWidget({
                       <span class="button button-windowclose"><span>\
                     </div>\
                   </div>\
-                  <div class="content">\
-                    <input id="filterProperties" autocomplete="off" type="text" value="' + self._filterProperties + '"\
+                  <div class="content" style="height: 93%">\
+                    <input id="filterProperties" autocomplete="off" type="text" \
                            class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                     <ul class="bullets-none separated">\
                       <li>\
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
-                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                              <a class="item" title="Those properties are currently in use of other resources of the same class."><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
                             </div>\
                             <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
                             <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
@@ -114,7 +114,7 @@ RDFauthor.registerWidget({
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
-                              <a class="item" title="placeholder for infotext"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                              <a class="item" title="Those properties are generally applicable to all classes. "><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
                             </div>\
                             <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
                             <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
@@ -125,7 +125,7 @@ RDFauthor.registerWidget({
                           </ul>\
                         </div>\
                       </li>\
-                      <!--<li>\
+                      <!--li>\
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
@@ -137,7 +137,7 @@ RDFauthor.registerWidget({
                         </h1>\
                         <div id="suggestedApplicable">\
                         </div>\
-                      </li>-!>\
+                      </li-->\
                     </ul>\
                  </div>\
                 </div>';
@@ -454,7 +454,11 @@ RDFauthor.registerWidget({
                     // ready
                     self._positioning();
                     $('#spinner-propertyselector').remove();
-                    $('#propertypicker').fadeIn();
+                    $('#propertypicker').fadeIn('fast', function() {
+                        $('#filterProperties').focus().blur(function() {
+                            $(this).val(self._filterProperties);
+                        });
+                    });
                 });
             }).keydown(function (e) {
                 if ((e.which === 13) && self._options.selectOnReturn) {
@@ -482,7 +486,7 @@ RDFauthor.registerWidget({
             /** INPUT EVENTS */
 
             $('#filterProperties').focus(function() {
-                                      $(this).val('');
+                                      $(this).val('').css('background-color', 'none');
                                   }).autocomplete({
                                       minLength: 3,
                                       delay: 500,
