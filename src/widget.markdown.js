@@ -168,7 +168,7 @@ RDFauthor.registerWidget({
           self.element().markItUp(self._settings);
        }
     }
-}, {
+}, [{
         name: 'datatype',
         values: ['http://ns.ontowiki.net/SysOnt/Markdown'],
         callback : function () {
@@ -182,5 +182,9 @@ RDFauthor.registerWidget({
                 }
             };
         }
-    }
+    },
+    {
+        name: 'property',
+        values: ['http://ns.ontowiki.net/SysOnt/Site/content']
+    }]
 );
