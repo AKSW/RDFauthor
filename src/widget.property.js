@@ -428,7 +428,7 @@ RDFauthor.registerWidget({
                 self._suggestions(function(everywhereInUse) {
                     // add in use everywhere to dom
                     for (var resourceUri in everywhereInUse) {
-                        $('#suggestedInUse ul').append(self._listProperty(resourceUri,everywhereInUse[resourceUri]));
+                        $('#suggestedInUse ul').append(self._listProperty(resourceUri,everywhereInUse[resourceUri],resourceUri));
                     }
                     $('#suggestedInUseCount').html(Object.size(everywhereInUse));
 
