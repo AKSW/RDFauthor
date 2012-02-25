@@ -983,6 +983,23 @@ RDFauthor = (function($, undefined) {
     }
     
     /**
+     * Remove JSON key value pairs if invalid argument.
+     * E.g. empty string.
+     * @private
+     */
+    function _checkJSON(json) {
+        json = JSON.parse(json);
+        for (var r in json) {
+            for (var p in json[r]) {
+                if( json[r][p][0].value.length == 0 ) {
+                    delete json[r][p];
+                }
+            }
+        }
+        return JSON.stringify(json);
+    }
+
+    /**
      * Updates all sources via SPARQL/Update
      * @private
      */
@@ -1022,15 +1039,17 @@ RDFauthor = (function($, undefined) {
                     }, 'json');
                 } else {
                     // REST style
-                    var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
+                    var addedJSON = _checkJSON($.rdf.dump(added.triples(), {format: 'application/json', serialize: true}));
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     
-                    // alert('Added: ' + addedJSON);
-                    // alert('Removed: ' + $.toJSON(indexes));
+                    // console.log('Added: ' + addedJSON);
+                    // console.log('Removed: ' + $.toJSON(indexes));
                     // return;
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
+                        console.log(addedJSON);
+                        console.log(updateURI)
                         $.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
@@ -1038,6 +1057,7 @@ RDFauthor = (function($, undefined) {
                             'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
                         }, function (responseData, textStatus, XHR) {
                             _view.hide(true);
+                            console.log('textStatus' + textStatus);
                             _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
                         }, 'json');
                     }
@@ -1047,7 +1067,7 @@ RDFauthor = (function($, undefined) {
     }
     
     // RDFauthor setup code ///////////09:27:33+02:00
-////////////////////////////////////////
+    ////////////////////////////////////////
     
     if (RDFAUTHOR_BASE.charAt(RDFAUTHOR_BASE.length - 1) !== '/') {
         RDFAUTHOR_BASE = RDFAUTHOR_BASE + '/';
@@ -1077,7 +1097,7 @@ RDFauthor = (function($, undefined) {
     
     // rdfQuery
     if (undefined === $.rdf) {
-        _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
+        _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.rdfa-1.0.js');
     }
     
     // toJSON
