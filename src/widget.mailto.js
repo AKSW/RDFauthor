@@ -82,7 +82,7 @@ RDFauthor.registerWidget({
                 }
             }
 
-            if (!this.removeOnSubmit) {
+            if (!this.removeOnSubmit && this.value()) {
                 try {
                     var newStatement = this.statement.copyWithObject({
                         value: '<' + this.value() + '>',
