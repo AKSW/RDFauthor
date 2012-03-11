@@ -136,6 +136,9 @@ RDFauthor.registerWidget({
                 try {
                     var newStatement = this.statement.copyWithObject({
                         value: '<' + this.value() + '>',
+                        // value: ( self.statement._object.type == 'uri' ) ? '<' + this.value() + '>' 
+                                                                        // : '_:' + this.value(),
+                        // type: ( self.statement._object.type == 'bnode' ) ? 'bnode' : 'uri'
                         type: 'uri'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
