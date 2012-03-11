@@ -1048,8 +1048,6 @@ RDFauthor = (function($, undefined) {
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
-                        console.log(addedJSON);
-                        console.log(updateURI)
                         $.post(updateURI, {
                             'named-graph-uri': g, 
                             'insert': addedJSON ? addedJSON : '{}', 
@@ -1057,7 +1055,6 @@ RDFauthor = (function($, undefined) {
                             'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
                         }, function (responseData, textStatus, XHR) {
                             _view.hide(true);
-                            console.log('textStatus' + textStatus);
                             _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
                         }, 'json');
                     }
