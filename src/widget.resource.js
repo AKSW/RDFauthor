@@ -19,6 +19,12 @@ RDFauthor.registerWidget({
         this._initialized  = false;
         this._autocomplete = null;
 
+        this.labels = [
+            'http://www.w3.org/2000/01/rdf-schema#label',
+            'http://www.w3.org/2004/02/skos/core#prefLabel',
+            'http://xmlns.com/foaf/0.1/name'
+        ];
+
         this._namespaces = jQuery.extend({
             foaf: 'http://xmlns.com/foaf/0.1/',
             dc:   'http://purl.org/dc/terms/',
@@ -105,9 +111,10 @@ RDFauthor.registerWidget({
         var value = this.statement.objectLabel()
                   ? this.statement.objectLabel()
                   : (this.statement.hasObject() ? this.statement.objectValue() : '');
+
         var markup = '\
             <div class="container resource-value">\
-                <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input" \
+                <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input is-processing" \
                        value="' + value + '"/>\
             </div>';
 
@@ -163,12 +170,43 @@ RDFauthor.registerWidget({
 
     value: function () {
         var self = this;
-        var value = self.element().val();
+        var value = self.element().data('uri');
         if ( self.isURI(value) || (String(value).indexOf(':') > -1) ) {
             return value;
         }
 
         return null;
+    },
+    
+    getLabel: function (subjectUri, responseCallback) {
+        var label = subjectUri;
+        //build unionPattern string
+        var unionPattern = '';
+        for ( var pos in this.labels ) {
+            this.labels.length-1 != pos ? unionPattern += '{ <' + subjectUri + '> <' + this.labels[pos] + '> ?label } UNION '
+                                      : unionPattern += '{ <' + subjectUri + '> <' + this.labels[pos] + '> ?label }'
+        }
+        //build query
+        var query = 'SELECT ?label WHERE { ' + unionPattern + ' . } LIMIT 1';
+        //log query
+        console.log(query);
+        //query
+        RDFauthor.queryGraph(this.statement.graphURI(), query, {
+                callbackSuccess: function (data) {
+                    if (data['results']['bindings'].length != 0) {
+                        var label = data['results']['bindings'][0]['label'].value;
+                    }
+
+                    if ($.isFunction(responseCallback)) {
+                        responseCallback(label);
+                    }
+                },
+                callbackError: function () {
+                    if ($.isFunction(responseCallback)) {
+                        responseCallback(label);
+                    }
+                }
+        });
     },
 
     performSearch: function (searchTerm, responseCallback) {
@@ -420,7 +458,22 @@ RDFauthor.registerWidget({
 
     _initAutocomplete: function () {
         var self = this;
+
         if (this._pluginLoaded && this._domReady && !this._initialized) {
+            //set human-readable label for uri
+            self.getLabel(self.statement.objectValue(), function(label) {
+                console.log('label: '+ label);
+                self.element().data('uri', self.element().val());
+                self.element().data('label', label);
+                self.element().val(label);
+                self.element().removeClass('is-processing');
+            });
+            // toggle values
+            self.element().click(function() {
+                $(this).val($(this).data('uri'));
+            }).blur(function() {
+                $(this).val($(this).data('label'));
+            });
             // must be URI
             if (this.statement.hasObject()) {
                 this.element().addClass('resource-autocomplete-uri');
@@ -456,6 +509,8 @@ RDFauthor.registerWidget({
                 select: function (event, ui) {
                     self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
+                    self.element().data('uri', ui.item.value);
+                    self.element().data('label', ui.item.label);
                     self.element().val(self.selectedResource);
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
