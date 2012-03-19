@@ -179,6 +179,7 @@ RDFauthor.registerWidget({
     },
     
     getLabel: function (subjectUri, responseCallback) {
+        var self = this;
         var label = subjectUri;
         //build unionPattern string
         var unionPattern = '';
@@ -205,6 +206,7 @@ RDFauthor.registerWidget({
                     if ($.isFunction(responseCallback)) {
                         responseCallback(label);
                     }
+                    self.element().removeClass('is-processing');
                 }
         });
     },
