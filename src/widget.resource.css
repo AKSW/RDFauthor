@@ -31,6 +31,10 @@
     background: white url('../img/uri.png') right center no-repeat !important;
 }
 
+.resource-autocomplete-uri-name {
+    background: white url('../img/uri_name.png') right center no-repeat !important;
+}
+
 /* workarounds */
 * html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
 

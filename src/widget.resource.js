@@ -181,6 +181,7 @@ RDFauthor.registerWidget({
     getLabel: function (subjectUri, responseCallback) {
         var self = this;
         var label = subjectUri;
+        var hasLabel = false;
         //build unionPattern string
         var unionPattern = '';
         for ( var pos in this.labels ) {
@@ -195,16 +196,17 @@ RDFauthor.registerWidget({
         RDFauthor.queryGraph(this.statement.graphURI(), query, {
                 callbackSuccess: function (data) {
                     if (data['results']['bindings'].length != 0) {
-                        var label = data['results']['bindings'][0]['label'].value;
+                        label = data['results']['bindings'][0]['label'].value;
+                        hasLabel = true;
                     }
 
                     if ($.isFunction(responseCallback)) {
-                        responseCallback(label);
+                        responseCallback(label, hasLabel);
                     }
                 },
                 callbackError: function () {
                     if ($.isFunction(responseCallback)) {
-                        responseCallback(label);
+                        responseCallback(label, hasLabel);
                     }
                     self.element().removeClass('is-processing');
                 }
@@ -463,18 +465,23 @@ RDFauthor.registerWidget({
 
         if (this._pluginLoaded && this._domReady && !this._initialized) {
             //set human-readable label for uri
-            self.getLabel(self.statement.objectValue(), function(label) {
+            self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
                 console.log('label: '+ label);
                 self.element().data('uri', self.element().val());
                 self.element().data('label', label);
-                self.element().val(label);
+                if (hasLabel) {
+                    self.element().val(label);
+                    self.element().toggleClass('resource-autocomplete-uri resource-autocomplete-uri-name');
+                } 
                 self.element().removeClass('is-processing');
             });
             // toggle values
             self.element().focus(function() {
-                $(this).val($(this).data('uri'));
+                $(this).val($(this).data('uri'))
+                       .toggleClass('resource-autocomplete-uri resource-autocomplete-uri-name');
             }).blur(function() {
-                $(this).val($(this).data('label'));
+                $(this).val($(this).data('label'))
+                       .toggleClass('resource-autocomplete-uri resource-autocomplete-uri-name');
             });
             // must be URI
             if (this.statement.hasObject()) {
