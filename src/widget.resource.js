@@ -191,7 +191,7 @@ RDFauthor.registerWidget({
         //build query
         var query = 'SELECT ?label WHERE { ' + unionPattern + ' . } LIMIT 1';
         //log query
-        console.log(query);
+        // console.log(query);
         //query
         RDFauthor.queryGraph(this.statement.graphURI(), query, {
                 callbackSuccess: function (data) {
