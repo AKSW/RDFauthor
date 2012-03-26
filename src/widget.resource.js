@@ -115,7 +115,7 @@ RDFauthor.registerWidget({
         var markup = '\
             <div class="container resource-value">\
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input is-processing" \
-                       value="' + value + '"/>\
+                       value="' + value + '" title="' + value + '"/>\
             </div>';
 
         return markup;
@@ -513,6 +513,7 @@ RDFauthor.registerWidget({
                     self.selectedResourceLabel = ui.item.label;
                     self.element().data('uri', ui.item.value);
                     self.element().data('label', ui.item.label);
+                    self.element().attr('title', ui.item.value);
                     self.element().val(self.selectedResource);
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
