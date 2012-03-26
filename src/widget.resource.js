@@ -471,7 +471,7 @@ RDFauthor.registerWidget({
                 self.element().removeClass('is-processing');
             });
             // toggle values
-            self.element().click(function() {
+            self.element().focus(function() {
                 $(this).val($(this).data('uri'));
             }).blur(function() {
                 $(this).val($(this).data('label'));
