@@ -468,19 +468,27 @@ RDFauthor.registerWidget({
             self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
                 self.element().data('uri', self.element().val());
                 self.element().data('label', label);
+                self.element().data('hasLabel', hasLabel);
                 if (hasLabel) {
                     self.element().val(label);
-                    self.element().toggleClass('resource-autocomplete-uri resource-autocomplete-uri-name');
-                } 
+                    self.element().removeClass('resource-autocomplete-uri')
+                                  .addClass('resource-autocomplete-uri-name');
+                }
                 self.element().removeClass('is-processing');
             });
             // toggle values
             self.element().focus(function() {
-                $(this).val($(this).data('uri'))
-                       .toggleClass('resource-autocomplete-uri resource-autocomplete-uri-name');
+                if ($(this).data('hasLabel')) {
+                    $(this).val($(this).data('uri'))
+                       .addClass('resource-autocomplete-uri')
+                       .removeClass('resource-autocomplete-uri-name');
+                }
             }).blur(function() {
-                $(this).val($(this).data('label'))
-                       .toggleClass('resource-autocomplete-uri resource-autocomplete-uri-name');
+                if ($(this).data('hasLabel')) {
+                    $(this).val($(this).data('label'))
+                       .removeClass('resource-autocomplete-uri')
+                       .addClass('resource-autocomplete-uri-name');
+                }
             });
             // must be URI
             if (this.statement.hasObject()) {
@@ -519,6 +527,7 @@ RDFauthor.registerWidget({
                     self.selectedResourceLabel = ui.item.label;
                     self.element().data('uri', ui.item.value);
                     self.element().data('label', ui.item.label);
+                    self.element().data('hasLabel', true);
                     self.element().attr('title', ui.item.value);
                     self.element().val(self.selectedResource);
                     // callback
