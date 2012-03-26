@@ -526,7 +526,7 @@ RDFauthor.registerWidget({
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
                         return true;
                     }
-
+                    self.element().blur();
                     // prevent jQuery UI default
                     return false;
                 },
