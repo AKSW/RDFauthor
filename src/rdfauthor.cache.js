@@ -10,7 +10,7 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#bottomDataProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Literal"
@@ -121,10 +121,10 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#bottomObjectProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "type" : [
          "http://www.w3.org/2002/07/owl#ObjectProperty"
@@ -207,10 +207,10 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#differentFrom" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "label" : "differentFrom"
    },
@@ -295,10 +295,10 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#sameAs" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "label" : "sameAs"
    },
@@ -415,7 +415,7 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#topDataProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Literal"
@@ -481,10 +481,10 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#topObjectProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "type" : [
          "http://www.w3.org/2002/07/owl#ObjectProperty"
@@ -644,7 +644,7 @@ var __cache = {
          "http://www.w3.org/2002/07/owl#NegativePropertyAssertion"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "label" : "sourceIndividual"
    },
@@ -702,7 +702,7 @@ var __cache = {
          "http://www.w3.org/2002/07/owl#NegativePropertyAssertion"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "label" : "targetIndividual"
    },
