@@ -1080,11 +1080,11 @@ RDFauthor = (function($, undefined) {
         CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
     };
 
-    // Cache
-    _loadCache();
-    
     // PropertyCache
     _loadPropertyCache();
+
+    // Cache
+    _loadCache();
 
     // jQuery UI
     if (undefined === $.ui) {
