@@ -423,6 +423,13 @@ RDFauthor.registerWidget({
                 $('#propertypicker').data('input',$(this))
                                     .draggable({
                                         cancel: '#propertypicker .content, #propertypicker h1 input'
+                                    }).keydown(function (e) {
+                                        if (e.which === 27) {
+                                            e.stopPropagation();
+                                            $('#propertypicker').parent().fadeOut();
+                                            self._reinitialization();
+                                            console.log('removed');
+                                        }
                                     });
                 // query - fills the everywhere in use part
                 self._suggestions(function(everywhereInUse) {
