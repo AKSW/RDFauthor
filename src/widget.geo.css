@@ -12,3 +12,7 @@
   margin-left: 0px !important;
   margin-top: 0px !important;
 }
+
+.globe-icon { background: white url('../img/globe.png') left center no-repeat !important; }
+
+.geo { padding-left: 20px !important; }

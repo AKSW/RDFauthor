@@ -54,8 +54,8 @@ RDFauthor.registerWidget({
     markup: function () {
         var markup =
             '<div class="container" style="width:100%">\
-                <input type="text" style="width:100%;" class="text" name="imagepicker" id="imagepicker-edit-' + this.ID + '" value="'
-                    + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
+                <input type="text" style="width:100%;" class="text image-icon imagepicker" name="imagepicker" id="imagepicker-edit-' + this.ID + '" value="'
+                    + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" />\
             </div>';
 
         var imagePicker =

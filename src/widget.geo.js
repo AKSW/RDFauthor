@@ -82,7 +82,7 @@ RDFauthor.registerWidget({
 
         var markup =
             '<div class="container" style="width:100%">\
-              <input type="text" style="width:50%" class="text" id="geo-edit-' + this.ID + '" value="'
+              <input type="text" style="width:50%" class="text globe-icon geo" id="geo-edit-' + this.ID + '" value="'
                   + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" name="'
                   + predicateLabel + '"/>\
              </div>\
