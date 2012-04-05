@@ -426,6 +426,9 @@ var __cache = {
       "label" : "topDataProperty"
    },
    "http://www.w3.org/2004/02/skos/core#altLabel" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
       "type" : [
          "http://www.w3.org/2002/07/owl#AnnotationProperty"
       ],
@@ -649,6 +652,9 @@ var __cache = {
       "label" : "sourceIndividual"
    },
    "http://www.w3.org/2004/02/skos/core#prefLabel" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
       "type" : [
          "http://www.w3.org/2002/07/owl#AnnotationProperty"
       ],
@@ -683,6 +689,9 @@ var __cache = {
       "label" : "is in semantic relation with"
    },
    "http://www.w3.org/2004/02/skos/core#note" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
       "type" : [
          "http://www.w3.org/2002/07/owl#AnnotationProperty"
       ],
@@ -756,5 +765,35 @@ var __cache = {
          "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       ],
       "label" : "disjointUnionOf"
-   }
+   },
+  "http://purl.org/dc/terms/description" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
+      "label" : "description"
+  },
+  "http://purl.org/dc/terms/subject" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
+      "label" : "subject"
+  },
+  "http://rdfs.org/sioc/ns#feed" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      ],
+      "label" : "feed"
+  },
+  "http://xmlns.com/foaf/0.1/depiction" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      ],
+      "label" : "depiction"
+  },
+  "http://xmlns.com/foaf/0.1/depicts" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      ],
+      "label" : "depicts"
+  }
 }
