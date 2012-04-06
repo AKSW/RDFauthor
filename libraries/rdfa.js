@@ -1413,8 +1413,8 @@ RDFA.GRDDL.addProfile = function(js_url) {
 };
 
 RDFA.GRDDL.runProfiles = function(doc, callback) {
-    // patch for prototype <= 1.4
-    if (RDFA.GRDDL._profiles.length == 0) {
+    // patch for prototype <= 1.4 and Internet Explorer (populuate rdfauthor view)
+    if (RDFA.GRDDL._profiles.length == 0 || /msie/i.test(navigator.userAgent)) {
       callback();
       return;
     }
