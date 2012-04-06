@@ -135,11 +135,13 @@ function PopoverController(options) {
 
         jQuery('#rdfauthor-button-cancel').live('click', function () {
             RDFauthor.cancel();
+            // work-around for undefined subjectGroup, if view will be shown twice
+            location.reload();
         });
 
         jQuery('#rdfauthor-button-property').live('click', function () {
             // jQuery('body').trigger('rdfauthor.view.property');
-            var subjectGroup = self.activeSubjectGroup();
+            var subjectGroup = self.activeSubjectGroup(); //TODO fix work-around (see above)
             var propertySelector = subjectGroup.getPropertySelector(function (widgetID) {
                 var rowTop          = jQuery('#' + widgetID).closest('.rdfauthor-predicate-row').offset().top;
                 var containerTop    = jQuery('.' + self._options.contentContainerClass).offset().top;
