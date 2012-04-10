@@ -44,9 +44,9 @@ var __propertycache = {
             "label" : "feed",
             "comment" : "A feed (e.g. RSS, Atom, etc.) pertaining to this resource (e.g. for a Forum, Site, UserAccount, etc.)."
         },
-        "http://xmlns.com/foaf/0.1/depicts" : {
-            "label" : "depicts",
-            "comment" : "A thing depictet in this representation."
+        "http://xmlns.com/foaf/0.1/depiction" : {
+            "label" : "depiction",
+            "comment" : "An image / graphical representation of this resource"
         }
     }
 };
