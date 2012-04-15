@@ -144,14 +144,12 @@ RDFauthor.registerWidget({
                 focus = true;
                 $('#imagepicker').data('current',self.element().attr('id'));
                 // positioning
-                var left = self._getPosition().left + 'px !important;';
-                var top = self._getPosition().top + 'px !important';
+                var left = self._getPosition().left;
+                var top = self._getPosition().top;
 
-                $('#imagepicker').css('left',left)
-                                 .css('top',top)
-                                 .data('input',$(this))
-                                 .show();
-
+                $('#imagepicker').data('input',$(this))
+                                 .show()
+                                 .offset({left: left, top: top});
             });
 
             $("#gallery").EmbedPicasaGallery('aksw.group',{
