@@ -249,10 +249,6 @@ PopoverController.prototype = {
     },
 
     position: function () {
-        var cw = this._container.width();
-        var w  = jQuery(this.getElement()).width();
-        var wh = jQuery(window).height();
-        var h  = jQuery(this.getElement()).height();
         var self = this;
 
         // set container height
@@ -264,8 +260,16 @@ PopoverController.prototype = {
                 document.documentElement.clientHeight
             ) + 'px');
 
-        jQuery(this.getElement()).css('left', Math.max(0.5 * (cw - w), 50) + 'px');
-        jQuery(this.getElement()).css('top', 0.5 * (wh - h) + 'px');
+        //trick to get the height and width from a non visible object using jquery
+        var bodyh = $(document).height();
+        var bodyw = $(document).width();
+        var ww = $(self.getElement()).outerWidth();
+        var wh = $(self.getElement()).outerHeight();
+        var offsetPosition = {
+            'top': Math.max( (bodyh - wh) * 0.5 , 20),
+            'left': Math.max( (bodyw - ww) * 0.5 , 50 )
+        }
+        $(self.getElement()).offset(offsetPosition);
 
         if (!jQuery('#' + this.cssID()).hasClass('ui-resizable')) {
             jQuery('#' + this.cssID()).resizable({
@@ -321,20 +325,19 @@ PopoverController.prototype = {
     show: function (animated) {
         var self = this;
         if (arguments.length === 0 || !animated || !this._options.useAnimations) {
-            jQuery(this.getElement()).show();
+            this.position();
             this.activeSubjectGroup().show();
             this._container.show();
-            this.position();
             // TODO: trigger event
+            jQuery(this.getElement()).show();
         } else {
-            if (this.activeSubjectGroup()) {
-                this.activeSubjectGroup().show();
-            }
-            this._container.fadeIn(100, function () {
-                jQuery(self.getElement()).fadeIn(function () {
-                    self.position();
-                });
+            this._container.fadeIn(function () {
+                self.position();
+                jQuery(self.getElement()).show();
             });
+            if (this.activeSubjectGroup()) {
+                  this.activeSubjectGroup().show();
+            }
         }
     },
 
