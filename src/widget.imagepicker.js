@@ -149,7 +149,12 @@ RDFauthor.registerWidget({
 
                 $('#imagepicker').data('input',$(this))
                                  .show()
-                                 .offset({left: left, top: top});
+                                 .offset({left: left, top: top})
+                                 .resizable({
+                                    minHeight: 400,
+                                    minWidth: 550,
+                                    alsoResize: $('#gallery')
+                                 });
             });
 
             $("#gallery").EmbedPicasaGallery('aksw.group',{
