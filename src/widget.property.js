@@ -463,7 +463,9 @@ RDFauthor.registerWidget({
                     $('#spinner-propertyselector').remove();
                     $('#propertypicker').fadeIn('fast', function() {
                         $('#filterProperties').focus().blur(function() {
-                            $(this).val(self._filterProperties);
+                            if ($(this).val().length == 0) {
+                                $(this).val(self._filterProperties);                            
+                            }
                         });
                     });
                 });
@@ -492,8 +494,10 @@ RDFauthor.registerWidget({
 
             /** INPUT EVENTS */
 
-            $('#filterProperties').focus(function() {
-                                      $(this).val('').css('background-color', 'none');
+            $('#filterProperties').click(function() {
+                                      if ($(this).val() == self._filterProperties) {
+                                         $(this).val('').css('background-color', 'none');                                     
+                                      }
                                   }).autocomplete({
                                       minLength: 3,
                                       delay: 500,
