@@ -3,7 +3,7 @@
   /*background-color: #FFF;*/
   /*border: 1px solid #FFF;*/
   width: 300px;
-  overflow: auto;
+  overflow: hidden !important;
   position: absolute;
   top: 0px;
   left: 0px;

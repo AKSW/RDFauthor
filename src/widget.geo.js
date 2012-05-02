@@ -436,7 +436,12 @@ RDFauthor.registerWidget({
 
                 $('#geo-widget').offset({ left: left, top: top})
                                 .data('input',$(this))
-                                .show();
+                                .show()
+                                .resizable({
+                                    minHeight: 200,
+                                    minWidth: 200,
+                                    alsoResize: $('#geo-widget-map')
+                                 });
 
                 if( $('#geo-widget-map').children().length == 0 ) {
                     self._initOpenLayers(lonlat.lon,lonlat.lat);
