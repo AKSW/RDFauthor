@@ -430,12 +430,11 @@ RDFauthor.registerWidget({
             self.element().click(function() {
                 focus = true;
                 // positioning
-                var left = self._getPosition().left + 'px !important;';
-                var top = self._getPosition().top + 'px !important';
+                var left = self._getPosition().left;
+                var top = self._getPosition().top;
                 var lonlat = self._getLonLat()
 
-                $('#geo-widget').css('left',left)
-                                .css('top',top)
+                $('#geo-widget').offset({ left: left, top: top})
                                 .data('input',$(this))
                                 .show();
 
