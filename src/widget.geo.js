@@ -434,9 +434,9 @@ RDFauthor.registerWidget({
                 var top = self._getPosition().top;
                 var lonlat = self._getLonLat()
 
-                $('#geo-widget').offset({ left: left, top: top})
-                                .data('input',$(this))
+                $('#geo-widget').data('input',$(this))
                                 .show()
+                                .offset({ left: left, top: top})
                                 .resizable({
                                     minHeight: 200,
                                     minWidth: 200,
