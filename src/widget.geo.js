@@ -342,19 +342,23 @@ RDFauthor.registerWidget({
 
                 var searchTerm = $('#geo-widget-search').val();
                 $.ajax({
-                    url: "http://maps.google.com/maps/geo?q="+searchTerm,
+                    url: "http://nominatim.openstreetmap.org/search?",
                     dataType: "jsonp",
+                    jsonp: "json_callback",
                     cache: false,
-                    data: { "sensor":"false", "output":"json", "v":"2"},
+                    data: { 
+                        "q" : searchTerm,
+                        "format":"json"
+                    },
                     success: function(data){
-                        if ( data.Placemark != undefined ) {
+                        if ( data.length != 0 ) {
                             searchOverlay.clearMarkers();
                             $('#geo-widget-map').data('searchMarkers',[]);
-                            $(data.Placemark).each(function(i) {
-                                var glon = data.Placemark[i].Point.coordinates[0];
-                                var glat = data.Placemark[i].Point.coordinates[1];
+                            $(data).each(function(i) {
+                                var glon = data[i].lon;
+                                var glat = data[i].lat;
                                 var icon3;
-                                if ( data.Placemark.length == 1) {
+                                if ( data.length == 1) {
                                     self._setLonLat(glon, glat);
                                     $('#geo-widget-map').data('initMarker').setOpacity(0.5);
                                     icon3 = new OpenLayers.Icon(RDFAUTHOR_BASE +
