@@ -22,6 +22,14 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
+            // save events
+            $('#b_save').click(function() {
+                RDFauthor.commit();
+            });
+            // cancel events
+            $('#b_cancel').click(function(event) {
+                RDFauthor.cancel();
+            });
             // section of vcard1
             $('#b_vcard1').click(function() {
                 RDFauthor.setOptions({
@@ -73,6 +81,12 @@
 <body xmlns:update="http://ns.aksw.org/update/">
     <button id="b_vcard1" type="button">vcard1</button>
     <button id="b_vcard2" type="button">vcard2</button>
+    <button id="b_save" type="button">save</button>
+    <button id="b_save_vcard1" type="button">save vcard1</button>
+    <button id="b_save_vcard2" type="button">save vcard2</button>
+    <button id="b_cancel" type="button">cancel</button>
+    <button id="b_cancel_vcard1" type="button">cancel vcard1</button>
+    <button id="b_cancel_vcard2" type="button">cancel vcard2</button>
     <!-- section of vcard1 -->
     <div id="vcard1"
         update:from="http://localhost/rdfauthor/test/"
