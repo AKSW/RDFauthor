@@ -1052,9 +1052,9 @@ RDFauthor = (function($, undefined) {
                     var addedJSON = _checkJSON($.rdf.dump(added.triples(), {format: 'application/json', serialize: true}));
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     
-                    // console.log('Added: ' + addedJSON);
-                    // console.log('Removed: ' + $.toJSON(indexes));
-                    // return;
+                    console.log('Added: ' + addedJSON);
+                    console.log('Removed: ' + $.toJSON(indexes));
+                    return;
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
