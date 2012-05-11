@@ -14,7 +14,7 @@ RDFauthor.registerWidget({
 
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.treeselector.css');
 
-        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.jstree.js', function(){
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jstree/jquery.jstree.js', function(){
             self._jsTreeLoaded = true;
             self._init();
         });
@@ -45,7 +45,7 @@ RDFauthor.registerWidget({
     markup: function () {
         var markup =
             '<div class="container" style="width:100%">\
-                <input type="text" style="width:100%;" class="text image-icon treeselector" name="treeselector" id="treeselector-edit-' + this.ID + '" value="'
+                <input type="text" style="width:100%;" class="text treeselector" name="treeselector" id="treeselector-edit-' + this.ID + '" value="'
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" />\
             </div>';
 
