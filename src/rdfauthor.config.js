@@ -31,6 +31,10 @@ var __config = {
         'imagepicker' : {
             'path' : 'src/widget.imagepicker.js',
             'enabled' : true
+        },
+        'treeselector' : {
+            'path' : 'src/widget.treeselector.js',
+            'enabled' : true
         }
     }
 }
