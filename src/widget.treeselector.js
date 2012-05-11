@@ -165,6 +165,10 @@ RDFauthor.registerWidget({
                   "plugins" : [ "themes", "json_data", "ui" ]
             });
 
+            $('#treeselector-content a').live('click', function() {
+                self.element().val('http://testuri.de/project/ow');
+            });
+
             $('html').unbind('click').click(function(event){
                 if ($('#treeselector').css("display") != "none" && focus == false) {
                     $('#treeselector').fadeOut();
