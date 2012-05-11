@@ -145,6 +145,26 @@ RDFauthor.registerWidget({
                                   });
             });
 
+            $('#treeselector-content').jstree({
+                "json_data" : {
+                    "data" : [
+                         { 
+                           "data" : "A node", 
+                           "metadata" : { "id" : "23" },
+                           "children" : [ "Child 1", "A Child 2" ]
+                         },
+                         { 
+                           "attr" : { "id" : "li.node.id1" }, 
+                           "data" : { 
+                             "title" : "Long format demo", 
+                             "attr" : { "href" : "#" } 
+                           } 
+                         }
+                    ]
+                  },
+                  "plugins" : [ "themes", "json_data", "ui" ]
+            });
+
             $('html').unbind('click').click(function(event){
                 if ($('#treeselector').css("display") != "none" && focus == false) {
                     $('#treeselector').fadeOut();
