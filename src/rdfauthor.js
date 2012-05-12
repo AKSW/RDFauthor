@@ -11,7 +11,7 @@
  * @namespace
  * @requires Statement
  */
-RDFauthor = (function($, undefined) {
+RDFauthor = (function($) {
     /** Namespace for update predicates */
     var UPDATE_NS = 'http://ns.aksw.org/update/';
     
@@ -1553,7 +1553,7 @@ RDFauthor = (function($, undefined) {
             
             var serviceURI = o.sparqlEndpoint ? o.sparqlEndpoint : this.serviceURIForGraph(graphURI);
             if (undefined === serviceURI) {
-                throw 'Graph has no SPARQL endpoint defined.';
+                throw "Graph '" + graphURI + "'has no SPARQL endpoint defined.";
             }
             
             /* Request parameters */

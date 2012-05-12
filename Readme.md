@@ -38,11 +38,35 @@ Three steps are required in order to use RDFauthor within your project.
 
 4. Include `rdfauthor.js` (found under `RDFAUTHOR_BASE`) lazily.
 
+Options
+-------
+Currently, the following options exist:
+
+    var _defaultOptions = {
+        title: 'Title', 
+        saveButtonTitle: 'saveButtonTitle', 
+        cancelButtonTitle: 'cancelButtonTitle', 
+        showButtons: true, 
+        useAnimations: true, 
+        autoParse: true, 
+        usePredicateInfo: true, 
+        useSPARQL11: false, 
+        fetchAllPredicates: true, 
+        viewOptions: {
+            type: 'popover' /* inline or popover */
+        }
+    };
+
+Unless you are using the update-API up Ontowiki, you probably want to set useSPARQL11 to true, so it uses SPARQL-update.
+
+
 API Documentation
 -----------------
 RDFauthor's API documentation can be built with 
 [JsDoc Toolkit](http://code.google.com/p/jsdoc-toolkit/).
-You need to set two environment variables:
+Under Ubuntu, you can install this by running `sudo apt-get install jsdoc-toolkit`. Afterwards run `jsdoc -d=./doc ./src` in the directory of RDFauthor.
+
+If you manually downloaded the toolkit, you need to set two environment variables:
 
 - set `$JSDOCDIR` to the path under which you installed JsDoc (e.g. `/opt/local/jsdoc-toolkit`).
 - set `$JSDOCTEMPLATEDIR` to RDFauthor's documentation template dir (e.g. `/opt/local/rdfauthor/misc/jsdoc-template`). The template dir is located under `misc/jsdoc-templates` in your RDFauthor dir.
