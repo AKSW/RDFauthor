@@ -124,6 +124,56 @@ RDFauthor.registerWidget({
         return null;
     },
 
+    _getRootNode: function (callback) {
+        var self = this;
+        var subjectURI = self.statement.subjectURI();
+        var graphURI = self.statement.graphURI();
+        var prefixPattern = '\
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n';
+        var selectPattern = '?rootNode ?label\n';
+        var uriPattern1 = '?rootNode ?p ?o .\n';
+        var uriPattern2 = '?rootNode ?p <http://www.w3.org/2002/07/owl#Class> .\n';
+        var optional = 'OPTIONAL { ?rootNode <http://www.w3.org/2000/01/rdf-schema#label> ?label .} .\n';
+
+        var query = prefixPattern + 'SELECT ' + selectPattern
+                                  + 'WHERE { \n'
+                                  + uriPattern1
+                                  + uriPattern2
+                                  + optional
+                                  + '}';
+        var rootNode = {};
+        //query
+        RDFauthor.queryGraph(graphURI, query, {
+            callbackSuccess: function(data) {
+                var serializedNodes = {'data' : []};
+                var results = data.results.bindings;
+                console.log(results);
+                for (var i in results) {
+                    if( (results[i].rootNode != "undefined") && (i != "last") ) {
+                        console.log(results[i].rootNode.value + ' - ' + results[i].label.value);
+                        serializedNodes['data'].push({
+                          'data' : results[i].rootNode.value
+                        });
+                    }
+                }
+                console.log(serializedNodes);
+                $.isFunction(callback) ? callback(serializedNodes) : null;
+            },
+            callbackError: function() {
+                $.isFunction(callback) ? callback(serializedNodes) : null;
+            }
+        });
+    },
+
+    _serializeNodes: function (node, label) {
+        var node = node != undefined ? node : null;
+        var label = label != undefined ? label : null;
+        var data = {}
+        console.log(data);
+        return data;
+    },
+
     _init: function () {
         var self = this;
         var focus;
@@ -143,30 +193,20 @@ RDFauthor.registerWidget({
                                     minWidth: 550,
                                     alsoResize: $('#treeselector')
                                   });
+                //query
+                self._getRootNode();
+                self._serializeNodes()
             });
 
-            $('#treeselector-content').jstree({
-                "json_data" : {
-                    "data" : [
-                         { 
-                           "data" : "A node", 
-                           "metadata" : { "id" : "23" },
-                           "children" : [ "Child 1", "A Child 2" ]
-                         },
-                         { 
-                           "attr" : { "id" : "li.node.id1" }, 
-                           "data" : { 
-                             "title" : "Long format demo", 
-                             "attr" : { "href" : "#" } 
-                           } 
-                         }
-                    ]
-                  },
-                  "plugins" : [ "themes", "json_data", "ui" ]
-            });
-
-            $('#treeselector-content a').live('click', function() {
-                self.element().val('http://testuri.de/project/ow');
+            self._getRootNode(function(serializedNodes) {
+                $('#treeselector-content').jstree({
+                    "json_data" : serializedNodes,
+                    "plugins"   : [ "themes", "json_data", "ui" ]
+                });
+            })
+            
+            $('#treeselector-content a').live('click', function(event) {
+                self.element().val($(this).text());
             });
 
             $('html').unbind('click').click(function(event){
