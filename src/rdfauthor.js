@@ -1273,6 +1273,8 @@ RDFauthor = (function($) {
                  }
              }
              
+             console.debug("[RDFAuthor] Falling back to default graph ", _defaultGraphURI);
+
              return _defaultGraphURI;
         }, 
         
@@ -1553,7 +1555,11 @@ RDFauthor = (function($) {
             
             var serviceURI = o.sparqlEndpoint ? o.sparqlEndpoint : this.serviceURIForGraph(graphURI);
             if (undefined === serviceURI) {
-                throw "Graph '" + graphURI + "'has no SPARQL endpoint defined.";
+            	var errorMsg = "Graph '" + graphURI + "' has no SPARQL endpoint defined.";
+            	//console.error("[RDFAuthor]", errorMsg);
+            	//console.debug("[RDFAuthor] Registered graphs", _graphInfo);
+            	
+                throw errorMsg;
             }
             
             /* Request parameters */
@@ -1713,7 +1719,7 @@ RDFauthor = (function($) {
         /**
          * Sets the info predicates for the graph denoted by graphURI.
          * Currently the info spec keys 'queryEndpoint' and 'updateEndpoint' 
-         * (both pointing to a URI) are recodgnized.
+         * (both pointing to a URI) are recognized.
          */
         setInfoForGraph: function (graphURI, infoSpec, infoValue) {
             if (!(graphURI in _graphInfo)) {
