@@ -142,7 +142,6 @@ RDFauthor.registerWidget({
                                   + uriPattern2
                                   + optional
                                   + '}';
-        var rootNode = {};
         //query
         RDFauthor.queryGraph(graphURI, query, {
             callbackSuccess: function(data) {
@@ -153,9 +152,62 @@ RDFauthor.registerWidget({
                     if( (results[i].rootNode != "undefined") && (i != "last") ) {
                         console.log(results[i].rootNode.value + ' - ' + results[i].label.value);
                         var val = results[i].rootNode.value;
+                        var label = results[i].label.value
                         serializedNodes['data'].push({
                           'data' : val,
-                          'attr' : { 'id' : val},
+                          'attr' : {
+                              'id'   : val, 
+                              'name' : label
+                          },
+                          'state' : 'closed'
+                        });
+                    }
+                }
+                console.log(serializedNodes);
+                $.isFunction(callback) ? callback(serializedNodes) : null;
+            },
+            callbackError: function() {
+                $.isFunction(callback) ? callback(serializedNodes) : null;
+            }
+        });
+    },
+
+    _getChildNodes: function (parentID, callback) {
+        var self = this;
+        var subjectURI = self.statement.subjectURI();
+        var graphURI = self.statement.graphURI();
+        var prefixPattern = '\
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n';
+        var selectPattern = 'DISTINCT ?child ?label\n';
+        var uriPattern1 = '?child ?p ?o .\n';
+        var uriPattern2 = '?child ?p <' + parentID + '> .\n';
+        var optional = 'OPTIONAL { ?child <http://www.w3.org/2000/01/rdf-schema#label> ?label .} .\n';
+
+        var query = prefixPattern + 'SELECT ' + selectPattern
+                                  + 'WHERE { \n'
+                                  + uriPattern1
+                                  + uriPattern2
+                                  + optional
+                                  + '}';
+
+        var serializedNodes = {'data' : []};
+        //query
+        RDFauthor.queryGraph(graphURI, query, {
+            callbackSuccess: function(data) {
+                var results = data.results.bindings;
+                console.log(results);
+                for (var i in results) {
+                    if( (results[i].child != "undefined") && (i != "last") ) {
+                        console.log(results[i].child.value + ' - ' + results[i].child.value);
+                        var val = results[i].child.value;
+                        var label = results[i].label.hasOwnProperty('value') ? results[i].label.value : null;
+                        serializedNodes['data'].push({
+                          'data' : val,
+                          'attr' : { 
+                              'id' : val,
+                              'name' : label
+                          },
                           'state' : 'closed'
                         });
                     }
@@ -206,19 +258,29 @@ RDFauthor.registerWidget({
                     "json_data" : serializedNodes,
                     "plugins"   : [ "themes", "json_data", "ui" ]
                 });
+                $('#treeselector-content').jstree('toggle_node', this);
             })
             
             $('#treeselector-content a').live('click', function(event) {
                 self.element().val($(this).text());
-                var parent = $(this);
-                $('#treeselector-content').jstree('toggle_node', this).jstree(
-                                              'create_node',
-                                              parent,
-                                              'inside',
-                                              { 'data' : 'child', 'state' : 'closed'},
-                                              function() {},
-                                              true
-                                         );
+                var parentNode = $(this);
+                $('#treeselector-content').jstree('toggle_node', this);
+                // TODO only run this code below one only
+                if (!parentNode.parent().hasClass('jstree-closed')) {
+                    self._getChildNodes(parentNode.parent().attr('id'), function(serializedNodes) {
+                        console.log(serializedNodes);
+                        $(serializedNodes['data']).each(function(i) {
+                            $('#treeselector-content').jstree(
+                                                          'create_node',
+                                                          parentNode,
+                                                          'inside',
+                                                          serializedNodes['data'][i],
+                                                          function() {},
+                                                          true
+                                                      );
+                        });
+                    });
+                }
             });
 
             $('html').unbind('click').click(function(event){
