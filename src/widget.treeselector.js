@@ -155,7 +155,8 @@ RDFauthor.registerWidget({
                         var val = results[i].rootNode.value;
                         serializedNodes['data'].push({
                           'data' : val,
-                          'attr' : { 'id' : val}
+                          'attr' : { 'id' : val},
+                          'state' : 'closed'
                         });
                     }
                 }
@@ -210,15 +211,13 @@ RDFauthor.registerWidget({
             $('#treeselector-content a').live('click', function(event) {
                 self.element().val($(this).text());
                 var parent = $(this);
-                $('#treeselector-content').jstree(
+                $('#treeselector-content').jstree('toggle_node', this).jstree(
                                               'create_node',
                                               parent,
                                               'inside',
-                                              { 'data' : 'child', 'state' : 'open'},
+                                              { 'data' : 'child', 'state' : 'closed'},
                                               function() {},
                                               true
-                                         ).jstree(
-                                              'open_node'
                                          );
             });
 
