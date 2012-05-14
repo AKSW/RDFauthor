@@ -152,8 +152,10 @@ RDFauthor.registerWidget({
                 for (var i in results) {
                     if( (results[i].rootNode != "undefined") && (i != "last") ) {
                         console.log(results[i].rootNode.value + ' - ' + results[i].label.value);
+                        var val = results[i].rootNode.value;
                         serializedNodes['data'].push({
-                          'data' : results[i].rootNode.value
+                          'data' : val,
+                          'attr' : { 'id' : val}
                         });
                     }
                 }
@@ -207,6 +209,17 @@ RDFauthor.registerWidget({
             
             $('#treeselector-content a').live('click', function(event) {
                 self.element().val($(this).text());
+                var parent = $(this);
+                $('#treeselector-content').jstree(
+                                              'create_node',
+                                              parent,
+                                              'inside',
+                                              { 'data' : 'child', 'state' : 'open'},
+                                              function() {},
+                                              true
+                                         ).jstree(
+                                              'open_node'
+                                         );
             });
 
             $('html').unbind('click').click(function(event){
