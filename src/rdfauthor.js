@@ -1046,12 +1046,18 @@ RDFauthor = (function($) {
                     // console.log('Query: ' + updateQuery);
                     // return;
 
-                    $.post(updateURI, {
-                        'query': updateQuery
-                    }, function (responseData, textStatus, XHR) {
-                        _view.hide(true);
-                        _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
-                    }, 'json');
+                    // if no changes, don't run query due to bad request (sparql endpoint)
+                    if (updateQuery.length != 0) {
+                        $.post(updateURI, {
+                            'query': updateQuery
+                        }, function (responseData, textStatus, XHR) {
+                            _view.hide(true);
+                            _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                        }, 'json');
+                    } else {
+                        _callIfIsFunction(_options.onSubmitSuccess);
+                    }
+
                 } else {
                     // REST style
                     var addedJSON = _checkJSON($.rdf.dump(added.triples(), {format: 'application/json', serialize: true}));
