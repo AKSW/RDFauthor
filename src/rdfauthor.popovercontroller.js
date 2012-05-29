@@ -135,13 +135,11 @@ function PopoverController(options) {
 
         jQuery('#rdfauthor-button-submit').die().live('click', function () {
             RDFauthor.commit();
-            RDFauthor.reset();
             removePopoverView();
         });
 
         jQuery('#rdfauthor-button-cancel').die().live('click', function () {
             RDFauthor.cancel();
-            RDFauthor.reset();
             removePopoverView();
         });
 
