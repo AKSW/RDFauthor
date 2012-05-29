@@ -129,17 +129,17 @@ function PopoverController(options) {
             }
         }
 
-        jQuery('#rdfauthor-button-submit').live('click', function () {
+        jQuery('#rdfauthor-button-submit').die().live('click', function () {
             RDFauthor.commit();
         });
 
-        jQuery('#rdfauthor-button-cancel').live('click', function () {
+        jQuery('#rdfauthor-button-cancel').die().live('click', function () {
             RDFauthor.cancel();
             // work-around for undefined subjectGroup, if view will be shown twice
             location.reload();
         });
 
-        jQuery('#rdfauthor-button-property').live('click', function () {
+        jQuery('#rdfauthor-button-property').die().live('click', function () {
             // jQuery('body').trigger('rdfauthor.view.property');
             var subjectGroup = self.activeSubjectGroup(); //TODO fix work-around (see above)
             var propertySelector = subjectGroup.getPropertySelector(function (widgetID) {
