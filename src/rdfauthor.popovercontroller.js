@@ -115,6 +115,10 @@ function PopoverController(options) {
         }
     }
 
+    function removePopoverView() {
+        $('.modal-wrapper').remove();
+    }
+
     jQuery(document).bind('keydown.view', handleKeybordEvent);
 
     // view initialization
@@ -135,13 +139,14 @@ function PopoverController(options) {
 
         jQuery('#rdfauthor-button-cancel').die().live('click', function () {
             RDFauthor.cancel();
-            // work-around for undefined subjectGroup, if view will be shown twice
-            location.reload();
+            RDFauthor.reset();
+            removePopoverView();
         });
 
         jQuery('#rdfauthor-button-property').die().live('click', function () {
             // jQuery('body').trigger('rdfauthor.view.property');
-            var subjectGroup = self.activeSubjectGroup(); //TODO fix work-around (see above)
+            // var subjectGroup = self.activeSubjectGroup(); //TODO fix work-around (see above)
+            var subjectGroup = $('#rdfauthor-view').data('activeSubjectGroup');
             var propertySelector = subjectGroup.getPropertySelector(function (widgetID) {
                 var rowTop          = jQuery('#' + widgetID).closest('.rdfauthor-predicate-row').offset().top;
                 var containerTop    = jQuery('.' + self._options.contentContainerClass).offset().top;
@@ -187,6 +192,9 @@ PopoverController.prototype = {
                 this.activeSubject = subjectURI;
             }
         }
+
+        // bind active subjectgroup to rdfauthor-view
+        $('#rdfauthor-view').data('activeSubjectGroup', subjectGroup);
 
         return subjectGroup;
     },
