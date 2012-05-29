@@ -1040,7 +1040,12 @@ RDFauthor = (function($) {
                         updateQuery += '\nDELETE DATA FROM <' + g + '> {' + 
                         removedArray.join('\n').replace('""""', '"""') + '}';
                     }
-                    
+
+                    // console.log('Added: ' + $.makeArray(added.triples()));
+                    // console.log('Deleted: ' + $.makeArray(removed.triples()));
+                    // console.log('Query: ' + updateQuery);
+                    // return;
+
                     $.post(updateURI, {
                         'query': updateQuery
                     }, function (responseData, textStatus, XHR) {
