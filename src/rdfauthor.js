@@ -362,7 +362,7 @@ RDFauthor = (function($) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
-                _callIfIsFunction(_options.onCancel());
+                _callIfIsFunction(_options.onCancel);
                 RDFauthor.cancel();
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
@@ -390,7 +390,7 @@ RDFauthor = (function($) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
-                _callIfIsFunction(_options.onCancel());
+                _callIfIsFunction(_options.onCancel);
                 RDFauthor.cancel();
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
@@ -1222,6 +1222,7 @@ RDFauthor = (function($) {
             var self = this;
             var view = RDFauthor.getView();
             view.hide(true, function () {
+                _callIfIsFunction(_options.onCancel);
                 /* clean up */
                 _resetDatabanks();
                 _resetParser();
