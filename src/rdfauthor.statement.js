@@ -118,7 +118,7 @@ function Statement(statementSpec, statementOptions) {
     statementOptions  = statementOptions != undefined ? statementOptions : {};
     this._hidden      = statementOptions.hidden != undefined ? Boolean(statementOptions.hidden) : false;
     this._required    = statementOptions.required != undefined ? Boolean(statementOptions.required) : false;
-    this._protected   = statementOptions.protected != undefined ? Boolean(statementOptions.protected) : false;
+    this._protected   = statementOptions.protect != undefined ? Boolean(statementOptions.protect) : false;
     this._graph       = statementOptions.graph != undefined ? String(statementOptions.graph) : null;
     this._objectLabel = statementOptions.objectLabel != undefined ? String(statementOptions.objectLabel) : null;
 
@@ -193,7 +193,7 @@ Statement.prototype = {
             hidden: this.isHidden(),
             ignored: this.isIgnored(),
             required: this.isRequired(),
-            protected: this.isProtected(),
+            protect: this.isProtected(),
             graph: this.graphURI(),
             title: this.predicateLabel()
         });
@@ -214,7 +214,10 @@ Statement.prototype = {
                 this.registerDatatype(literalOpts.datatype);
             }
         } else {
-          literalOpts.plain = true;
+            // FIXME literalOpts.plain does not seem to be a valid option
+            // rather use literalOpts.lang
+            //literalOpts.plain = true;
+            literalOpts.lang = "";
         }
 
         /*

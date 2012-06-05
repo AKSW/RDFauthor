@@ -362,7 +362,7 @@ RDFauthor = (function($) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
-                _callIfIsFunction(_options.onCancel());
+                _callIfIsFunction(_options.onCancel);
                 RDFauthor.cancel();
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
@@ -390,7 +390,7 @@ RDFauthor = (function($) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
-                _callIfIsFunction(_options.onCancel());
+                _callIfIsFunction(_options.onCancel);
                 RDFauthor.cancel();
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
@@ -1040,13 +1040,24 @@ RDFauthor = (function($) {
                         updateQuery += '\nDELETE DATA FROM <' + g + '> {' + 
                         removedArray.join('\n').replace('""""', '"""') + '}';
                     }
-                    
-                    $.post(updateURI, {
-                        'query': updateQuery
-                    }, function (responseData, textStatus, XHR) {
-                        _view.hide(true);
-                        _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
-                    }, 'json');
+
+                    // console.log('Added: ' + $.makeArray(added.triples()));
+                    // console.log('Deleted: ' + $.makeArray(removed.triples()));
+                    // console.log('Query: ' + updateQuery);
+                    // return;
+
+                    // if no changes, don't run query due to bad request (sparql endpoint)
+                    if (updateQuery.length != 0) {
+                        $.post(updateURI, {
+                            'query': updateQuery
+                        }, function (responseData, textStatus, XHR) {
+                            _view.hide(true);
+                            _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                        }, 'json');
+                    } else {
+                        _callIfIsFunction(_options.onSubmitSuccess);
+                    }
+
                 } else {
                     // REST style
                     var addedJSON = _checkJSON($.rdf.dump(added.triples(), {format: 'application/json', serialize: true}));
@@ -1155,7 +1166,11 @@ RDFauthor = (function($) {
     } else {
         _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
     }
-    
+
+    // load ontowiki stylesheet when rdfauthor is used without ontowiki
+    // TODO check if classes already exist
+    _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
+
     // default info predicates
     _addInfoPredicate(RDF_NS + 'type', 'type');
     _addInfoPredicate(RDFS_NS + 'range', 'range');
@@ -1207,6 +1222,7 @@ RDFauthor = (function($) {
             var self = this;
             var view = RDFauthor.getView();
             view.hide(true, function () {
+                _callIfIsFunction(_options.onCancel);
                 /* clean up */
                 _resetDatabanks();
                 _resetParser();
@@ -1273,6 +1289,8 @@ RDFauthor = (function($) {
                  }
              }
              
+             console.debug("[RDFAuthor] Falling back to default graph ", _defaultGraphURI);
+
              return _defaultGraphURI;
         }, 
         
@@ -1553,7 +1571,11 @@ RDFauthor = (function($) {
             
             var serviceURI = o.sparqlEndpoint ? o.sparqlEndpoint : this.serviceURIForGraph(graphURI);
             if (undefined === serviceURI) {
-                throw "Graph '" + graphURI + "'has no SPARQL endpoint defined.";
+            	var errorMsg = "Graph '" + graphURI + "' has no SPARQL endpoint defined.";
+            	//console.error("[RDFAuthor]", errorMsg);
+            	//console.debug("[RDFAuthor] Registered graphs", _graphInfo);
+            	
+                throw errorMsg;
             }
             
             /* Request parameters */
@@ -1713,7 +1735,7 @@ RDFauthor = (function($) {
         /**
          * Sets the info predicates for the graph denoted by graphURI.
          * Currently the info spec keys 'queryEndpoint' and 'updateEndpoint' 
-         * (both pointing to a URI) are recodgnized.
+         * (both pointing to a URI) are recognized.
          */
         setInfoForGraph: function (graphURI, infoSpec, infoValue) {
             if (!(graphURI in _graphInfo)) {
