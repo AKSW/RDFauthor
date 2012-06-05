@@ -152,9 +152,9 @@ RDFauthor.registerWidget({
                     if( (results[i].rootNode != "undefined") && (i != "last") ) {
                         console.log(results[i].rootNode.value + ' - ' + results[i].label.value);
                         var val = results[i].rootNode.value;
-                        var label = results[i].label.value
+                        var label = results[i].label.hasOwnProperty('value') ? results[i].label.value : val;
                         serializedNodes['data'].push({
-                          'data' : val,
+                          'data' : label,
                           'attr' : {
                               'id'   : val, 
                               'name' : label
@@ -201,9 +201,9 @@ RDFauthor.registerWidget({
                     if( (results[i].child != "undefined") && (i != "last") ) {
                         console.log(results[i].child.value + ' - ' + results[i].child.value);
                         var val = results[i].child.value;
-                        var label = results[i].label.hasOwnProperty('value') ? results[i].label.value : null;
+                        var label = results[i].label.hasOwnProperty('value') ? results[i].label.value : val;
                         serializedNodes['data'].push({
-                          'data' : val,
+                          'data' : label,
                           'attr' : { 
                               'id' : val,
                               'name' : label
