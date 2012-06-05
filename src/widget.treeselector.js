@@ -275,12 +275,20 @@ RDFauthor.registerWidget({
                                                           parentNode,
                                                           'inside',
                                                           serializedNodes['data'][i],
-                                                          function() {},
+                                                          function() {
+                                                            var uri = serializedNodes['data'][i]['attr'].id;
+                                                            console.log(parentNode.find('ul li:last'));
+                                                          },
                                                           true
                                                       );
                         });
                     });
                 }
+            });
+
+            $('#treeselector-content a').live('mouseenter', function() {
+                var title = $(this).parent().attr('id');
+                $(this).attr('title', title);
             });
 
             $('html').unbind('click').click(function(event){
