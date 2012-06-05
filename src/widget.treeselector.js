@@ -262,7 +262,7 @@ RDFauthor.registerWidget({
             })
             
             $('#treeselector-content a').live('click', function(event) {
-                self.element().val($(this).text());
+                self.element().val($(this).parent().attr('id'));
                 var parentNode = $(this);
                 $('#treeselector-content').jstree('toggle_node', this);
                 // TODO only run this code below one only
