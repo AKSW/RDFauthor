@@ -103,8 +103,8 @@ div.modal-wrapper {
     padding: 0.5em;
 }
 
-.rdfauthor-widget.rdfauthor-container input.text,
-.rdfauthor-widget.rdfauthor-container textarea,
+.rdfauthor-widget-container input.text,
+.rdfauthor-widget-container textarea,
 .rdfauthor-selector input.text,
 .rdfauthor-selector textarea {
     display: inline-block;
@@ -212,7 +212,7 @@ div.modal-wrapper {
     background: #fff;
 }
 
-.rdfauthor-widget.rdfauthor-container * {min-width: 0 !important; min-height: 0 !important;}
+.rdfauthor-widget-container * {min-width: 0; min-height: 0;}
 
 #rdfauthor-view fieldset {
     border: 1px dotted grey;
@@ -238,7 +238,7 @@ div.modal-wrapper {
     padding: 0.3em 0.5em;
 }
 
-.rdfauthor-widget.rdfauthor-container textarea {
+.rdfauthor-widget-container textarea {
     padding-top: 0.2em !important;
 /*    font-size: 1.1em;*/
 }
@@ -252,7 +252,7 @@ div.modal-wrapper {
     margin-left: 0.5em;
 }
 
-.rdfauthor-predicate-row .rdfauthor-container, .rdfauthor-predicate-row .inline.rdfauthor-container {
+.rdfauthor-predicate-row .rdfauthor-container, .rdfauthor-predicate-row .inline-container {
     float: left;
 /*    border: 1px dotted green;*/
 }
