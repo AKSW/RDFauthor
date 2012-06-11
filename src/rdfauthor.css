@@ -103,8 +103,8 @@ div.modal-wrapper {
     padding: 0.5em;
 }
 
-.rdfauthor-widget-container input.text,
-.rdfauthor-widget-container textarea,
+.rdfauthor-widget.rdfauthor-container input.text,
+.rdfauthor-widget.rdfauthor-container textarea,
 .rdfauthor-selector input.text,
 .rdfauthor-selector textarea {
     display: inline-block;
@@ -212,7 +212,7 @@ div.modal-wrapper {
     background: #fff;
 }
 
-.rdfauthor-widget-container * {min-width: 0 !important; min-height: 0 !important;}
+.rdfauthor-widget.rdfauthor-container * {min-width: 0 !important; min-height: 0 !important;}
 
 #rdfauthor-view fieldset {
     border: 1px dotted grey;
@@ -233,12 +233,12 @@ div.modal-wrapper {
 
 }
 
-#rdfauthor-view .rdfauthor-predicate-row, .rdfauthor-predicate-row .container {
+#rdfauthor-view .rdfauthor-predicate-row, .rdfauthor-predicate-row .rdfauthor-container {
 /*    border: 1px dotted red;*/
     padding: 0.3em 0.5em;
 }
 
-.rdfauthor-widget-container textarea {
+.rdfauthor-widget.rdfauthor-container textarea {
     padding-top: 0.2em !important;
 /*    font-size: 1.1em;*/
 }
@@ -252,7 +252,7 @@ div.modal-wrapper {
     margin-left: 0.5em;
 }
 
-.rdfauthor-predicate-row .container, .rdfauthor-predicate-row .inline-container {
+.rdfauthor-predicate-row .rdfauthor-container, .rdfauthor-predicate-row .inline.rdfauthor-container {
     float: left;
 /*    border: 1px dotted green;*/
 }
@@ -295,7 +295,7 @@ div.modal-wrapper {
 
 .rdfauthor-predicate-row .actions.right {float: right !important;}
 .rdfauthor-predicate-row .actions.left {float: left !important;}
-.rdfauthor-predicate-row .container > * {display: block;}
+.rdfauthor-predicate-row .rdfauthor-container > * {display: block;}
 
 .disclosure-button-horizontal {
     height: 2em !important;

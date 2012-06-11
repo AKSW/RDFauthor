@@ -79,7 +79,7 @@ RDFauthor.registerWidget({
     markup: function () {
             var self = this;
             var markup = '\
-            <div class="container resource-value">\
+            <div class="rdfauthor-container resource-value">\
                 <input type="hidden" id="property-input-' + this.ID + '" name="propertypicker" class="text resource-edit-input" />\
             </div>';
             var propertyPicker = '\

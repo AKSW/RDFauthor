@@ -200,7 +200,7 @@ RDFauthor.registerWidget({
 
         var isBoolean = this.statement.objectDatatype() == this.bool ? true : false;
         var areaMarkup = '\
-            <div class="container ' + areaConfig.containerClass + '" style="width:100%">\
+            <div class="rdfauthor-container ' + areaConfig.containerClass + '" style="width:100%">\
                 <div class="notboolean" style="' + ( isBoolean ? 'display:none;' : 'display:block;' ) + '">\
                 <textarea rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' +
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
@@ -210,20 +210,20 @@ RDFauthor.registerWidget({
                     <label><input type="radio" class="radio" name="literal-type-'+this.ID+'-2"' + ( this.statement.objectDatatype() == this.bool && this.statement.objectValue() == 'false' ? 'checked="checked"' : '' ) + ' value="false" />False</label>\
                 </div>\
             </div>\
-            <div class="container util" style="clear:left">\
+            <div class="rdfauthor-container util" style="clear:left">\
                 <a class="disclosure-button ' + areaConfig.buttonClass + ' open" id="' + this.disclosureID
                         + '" title="Toggle details disclosure"></a>\
             </div>';
 
         var markup = '\
             ' + areaMarkup + '\
-            <div class="container literal-type util ' + this.disclosureID + '" style="display:none">\
+            <div class="rdfauthor-container literal-type util ' + this.disclosureID + '" style="display:none">\
                 <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"'
                         + (this.statement.objectDatatype() ? '' : ' checked="checked"') + ' value="plain" />Plain</label>\
                 <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"'
                         + (this.statement.objectDatatype() ? ' checked="checked"' : '') + ' value="typed" />Typed</label>\
             </div>\
-            <div class="container util ' + this.disclosureID + '" style="display:none">\
+            <div class="rdfauthor-container util ' + this.disclosureID + '" style="display:none">\
                 <div class="literal-lang"' + (this.statement.objectDatatype() ? ' style="display:none"' : '') + '>\
                     <label for="literal-lang-' + this.ID + '">Language:\
                         <select id="literal-lang-' + this.ID + '" name="literal-lang-' + this.ID + '">\

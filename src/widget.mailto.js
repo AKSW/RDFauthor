@@ -49,7 +49,7 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup = '\
-            <div class="container resource-value" style="width:100%">\
+            <div class="rdfauthor-container resource-value" style="width:100%">\
                 <input type="text" id="mail-value-' + this.ID + '" class="text"\
                  value="' + this.labelForURI(this.statement.objectValue()) + '"\
                  style="width:100%;\

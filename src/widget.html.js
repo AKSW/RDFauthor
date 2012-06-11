@@ -60,7 +60,7 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup = '\
-            <div class="container html-value" style="width:100%">\
+            <div class="rdfauthor-container html-value" style="width:100%">\
                 <textarea id="html-edit-input-' + this.ID + '" class="html-edit-input" style="width:100%">'
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') +
                 '</textarea>\
