@@ -529,9 +529,6 @@ RDFauthor.registerWidget({
     }
 
 
-}, {
-        name: 'property',
-        values: ['http://www.w3.org/2003/01/geo/wgs84_pos#long',
-                 'http://www.w3.org/2003/01/geo/wgs84_pos#lat']
-    }
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['geo']['hook']
 );

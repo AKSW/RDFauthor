@@ -11,7 +11,13 @@ RDFauthor.registerWidget({
         this._embedPicasaGalleryLoaded = false;
         this._slimboxLoaded = false;
         this._domRdy = false;
-        this._album = 'aksw.org';
+        this._album = __config['widgets']['imagepicker']['albumtitle'];
+        this._webuploadurl = __config['widgets']['imagepicker']['webuploadurl'];
+        this._albumid = __config['widgets']['imagepicker']['albumid'];
+        this._authkey = __config['widgets']['imagepicker']['authkey'];
+        this._matcher = __config['widgets']['imagepicker']['tag'];
+        this._thumbsize = __config['widgets']['imagepicker']['thumbsize'];
+        this._showmore = __config['widgets']['imagepicker']['showmore'];
         var self = this;
 
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/slimbox/slimbox2.css');
@@ -60,7 +66,7 @@ RDFauthor.registerWidget({
 
         var imagePicker =
             '<div id="imagepicker" class="window" style="display: none;">\
-               <h1 class="title">ImagePicker - Album: ' + this._album + '<a href="https://picasaweb.google.com/lh/webUpload?uname=aksw.group&aid=5646308221729665137&continue=https://picasaweb.google.com/aksw.group/AkswOrg%3Fauthkey%3DGv1sRgCIebodK_ssfhUg" target="_blank" ><img style="height: 15px; float:right; margin-right:15px;" src="'+ RDFAUTHOR_BASE+'libraries/images/upload_photo.png' +'" alt="upload pictures to album "'+ this._album +'</img></a>\
+               <h1 class="title">ImagePicker - Album: ' + this._album + '<a href="' + this._webuploadurl + '" target="_blank" ><img style="height: 15px; float:right; margin-right:15px;" src="'+ RDFAUTHOR_BASE+'libraries/images/upload_photo.png' +'" alt="upload pictures to album "'+ this._album +'</img></a>\
                  <br/>\
                  <input id="filterGallery" autocomplete="off" type="text" class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                </h1>\
@@ -158,13 +164,13 @@ RDFauthor.registerWidget({
             });
 
             $("#gallery").EmbedPicasaGallery('aksw.group',{
-                    albumid: "5646308221729665137",
-                    authkey: "Gv1sRgCISL87-luIbGXg",
-                    matcher: "Screenshot",
-                    size: 144, // thumb size (32,48,64,72,144,160))
+                    albumid: self._albumid,
+                    authkey: self._authkey,
+                    matcher: self._matcher,
+                    size: self._thumbsize, // thumb size (32,48,64,72,144,160))
                     loading_animation: RDFAUTHOR_BASE + "libraries/slimbox/loading.gif",
                     msg_more: '<span id="gallery_more" style="font-weight: bolder;">MORE</span>',
-                    show_more: 5
+                    show_more: self._showmore
                 });
 
             $('#filterGallery').click(function(){
@@ -245,12 +251,6 @@ RDFauthor.registerWidget({
         return pos;
     }
 
-}, {
-        name: 'property',
-        values: ['http://xmlns.com/foaf/0.1/depiction',
-                 'http://open.vocab.org/terms/screenshot',
-                 'http://xmlns.com/foaf/0.1/logo',
-                 'http://purl.org/ontology/mo/image',
-                 'http://xmlns.com/foaf/0.1/img']
-   }
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['imagepicker']['hook']
 );

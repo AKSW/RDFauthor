@@ -162,21 +162,6 @@ RDFauthor.registerWidget({
             }
         }
     }
-}, {
-        name: 'datatype',
-        values: ['http://www.w3.org/2001/XMLSchema#dateTime',
-                 'http://www.w3.org/2001/XMLSchema#date',
-                 'http://www.w3.org/2001/XMLSchema#time'],
-        callback : function () {
-            $.typedValue.types['http://www.w3.org/2001/XMLSchema#time'] = {
-                regex: /^.*$/,
-                strip: true,
-                /** @ignore */
-                value: function (v, options) {
-                  var opts = $.extend({}, $.typedValue.defaults, options);
-                  return v;
-                }
-            };
-        }
-    }
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['datetime']['hook']
 );

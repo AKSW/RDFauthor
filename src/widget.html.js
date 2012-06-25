@@ -151,12 +151,7 @@ RDFauthor.registerWidget({
             return replacement = replace[match];
         });
     }
-}, [{
-        name: 'range',
-        values: ['http://ns.ontowiki.net/SysOnt/HTML']
-    }, {
-        name: 'datatype',
-        values: ['http://ns.ontowiki.net/SysOnt/HTML']
-    }]
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['html']['hook']
 );
 

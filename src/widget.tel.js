@@ -140,19 +140,6 @@ RDFauthor.registerWidget({
             .replace(/\ /g, '-');   // create "-" instead of spaces
         return 'tel:' + URI;
     }
-}, [{
-    // hooks to register your widget for
-        // Uncomment this if your widgets binds to the property hook,
-        // and denote the type of property (ObjectProperty or DatatypeProperty).
-        // For other hooks this can be inferred automatically.
-        type: 'ObjectProperty',
-        // name of first hook
-        name: 'property',
-        // array of values for first hook
-        values: ['http://xmlns.com/foaf/0.1/phone',
-                 'http://purl.org/net/ldap#mobile',
-                 'http://purl.org/net/ldap#homePhone',
-                 'http://purl.org/net/ldap#telephoneNumber',
-                 'http://purl.org/net/ldap#fax']
-    }]
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['tel']['hook']
 );

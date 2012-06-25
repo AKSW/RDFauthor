@@ -152,11 +152,6 @@ RDFauthor.registerWidget({
             return replacement = replace[match];
         });
     }
-}, [{
-        name: 'range',
-        values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
-    }, {
-        name: 'datatype',
-        values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
-    }]
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['xmlliteral']['hook']
 );

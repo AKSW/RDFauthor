@@ -141,15 +141,6 @@ RDFauthor.registerWidget({
 
         return 'mailto:' + URI;
     }
-}, [{
-    // hooks to register your widget for
-        // Uncomment this if your widgets binds to the property hook,
-        // and denote the type of property (ObjectProperty or DatatypeProperty).
-        // For other hooks this can be inferred automatically.
-        type: 'ObjectProperty',
-        // name of first hook
-        name: 'property',
-        // array of values for first hook
-        values: ['http://xmlns.com/foaf/0.1/mbox', 'http://rdfs.org/sioc/ns#email', 'http://usefulinc.com/ns/doap#mailing-list']
-    }]
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['mailto']['hook']
 );
