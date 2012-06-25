@@ -131,7 +131,7 @@ var __config = {
             },
             'albumtitle' : 'aksw.org',
             'webuploadurl' : 'https://picasaweb.google.com/lh/webUpload?uname=aksw.group&aid=5646308221729665137&continue=https://picasaweb.google.com/aksw.group/AkswOrg%3Fauthkey%3DGv1sRgCIebodK_ssfhUg', // Link for webupload
-            'albumid' : 5646308221729665137, // Picasa Album ID
+            'albumid' : '5646308221729665137', // Picasa Album ID
             'authkey' : 'Gv1sRgCISL87-luIbGXg', // Picasa Auth Key
             'tag' : 'Screenshot', // show pics with tag
             'thumbsize' : 144, // size of thumbnails
