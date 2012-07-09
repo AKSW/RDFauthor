@@ -136,6 +136,14 @@ var __config = {
             'tag' : 'Screenshot', // show pics with tag
             'thumbsize' : 144, // size of thumbnails
             'showmore' : 5 // number of thumbnails
+        },
+        'treeselector' : {
+            'path' : 'src/widget.treeselector.js',
+            'enabled' : true,
+            'hook' : {
+                name: 'property',
+                values: ['http://foo.bar/treeselector']
+            }
         }
     }
 }
