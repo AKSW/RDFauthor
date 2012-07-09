@@ -445,7 +445,7 @@ div.versatile.centered
 
 ul, ol {
     list-style-position: outside;
-    margin-left: 1em;
+    /* margin-left: 1em; */
 }
 
 ul ol, ol ul, ul ul, ol ol {

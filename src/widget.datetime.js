@@ -55,7 +55,7 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup =
-            '<div class="container" style="width:100%">\
+            '<div class="rdfauthor-container" style="width:100%">\
                 <input type="text" style="width:50%" class="text" id="date-edit-' + this.ID + '" value="'
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') + '"/>\
             </div>';
@@ -162,21 +162,6 @@ RDFauthor.registerWidget({
             }
         }
     }
-}, {
-        name: 'datatype',
-        values: ['http://www.w3.org/2001/XMLSchema#dateTime',
-                 'http://www.w3.org/2001/XMLSchema#date',
-                 'http://www.w3.org/2001/XMLSchema#time'],
-        callback : function () {
-            $.typedValue.types['http://www.w3.org/2001/XMLSchema#time'] = {
-                regex: /^.*$/,
-                strip: true,
-                /** @ignore */
-                value: function (v, options) {
-                  var opts = $.extend({}, $.typedValue.defaults, options);
-                  return v;
-                }
-            };
-        }
-    }
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['datetime']['hook']
 );

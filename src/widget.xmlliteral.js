@@ -61,7 +61,7 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup = '\
-            <div class="container xmlliteral-value" style="width:100%">\
+            <div class="rdfauthor-container xmlliteral-value" style="width:100%">\
                 <textarea id="xmlliteral-edit-input-' + this.ID + '" class="xmlliteral-edit-input" style="width:100%">'
                     + (this.statement.hasObject() ? this.statement.objectValue() : '') +
                 '</textarea>\
@@ -152,11 +152,6 @@ RDFauthor.registerWidget({
             return replacement = replace[match];
         });
     }
-}, [{
-        name: 'range',
-        values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
-    }, {
-        name: 'datatype',
-        values: ['http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral']
-    }]
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['xmlliteral']['hook']
 );

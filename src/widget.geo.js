@@ -81,7 +81,7 @@ RDFauthor.registerWidget({
         }
 
         var markup =
-            '<div class="container" style="width:100%">\
+            '<div class="rdfauthor-container" style="width:100%">\
               <input type="text" style="width:50%" class="text globe-icon geo" id="geo-edit-' + this.ID + '" value="'
                   + (this.statement.hasObject() ? this.statement.objectValue() : '') + '" name="'
                   + predicateLabel + '"/>\
@@ -529,9 +529,6 @@ RDFauthor.registerWidget({
     }
 
 
-}, {
-        name: 'property',
-        values: ['http://www.w3.org/2003/01/geo/wgs84_pos#long',
-                 'http://www.w3.org/2003/01/geo/wgs84_pos#lat']
-    }
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['geo']['hook']
 );

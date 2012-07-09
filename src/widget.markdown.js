@@ -98,7 +98,7 @@ RDFauthor.registerWidget({
     // return your widget's markup code here
     markup: function () {
         var markup =
-            '<div class="container" style="width:100%">\
+            '<div class="rdfauthor-container" style="width:100%">\
                 <textarea class="text markItUp" id="markdown-edit-' + this.ID + '">'
                 + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
             </div>';
@@ -168,23 +168,6 @@ RDFauthor.registerWidget({
           self.element().markItUp(self._settings);
        }
     }
-}, [{
-        name: 'datatype',
-        values: ['http://ns.ontowiki.net/SysOnt/Markdown'],
-        callback : function () {
-            $.typedValue.types['http://ns.ontowiki.net/SysOnt/Markdown'] = {
-                regex: /.*/,
-                strip: false,
-                /** @ignore */
-                value: function (v, options) {
-                  var opts = $.extend({}, $.typedValue.defaults, options);
-                  return v;
-                }
-            };
-        }
-    },
-    {
-        name: 'property',
-        values: ['http://ns.ontowiki.net/SysOnt/Site/content']
-    }]
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['markdown']['hook']
 );

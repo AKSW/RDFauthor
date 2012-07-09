@@ -19,7 +19,7 @@ div.modal-wrapper {
 /*    background-color: transparent;*/
     background-color: rgba(255, 255, 255, 0.75);
     /* background-color: rgba(0, 0, 0, 0.2); */
-    z-index: 1000;
+    z-index: 1095;
 }
 
 #rdfauthor-view {
@@ -35,7 +35,7 @@ div.modal-wrapper {
     /* taken from div.versatile */
     position: absolute;
     width: 48em;
-    z-index: 1001;
+    z-index: 1099;
 
     /* shadow */
     -moz-box-shadow: 0.2em 0.5em 2.5em #000;
@@ -212,7 +212,7 @@ div.modal-wrapper {
     background: #fff;
 }
 
-.rdfauthor-widget-container * {min-width: 0 !important; min-height: 0 !important;}
+.rdfauthor-widget-container * {min-width: 0; min-height: 0;}
 
 #rdfauthor-view fieldset {
     border: 1px dotted grey;
@@ -233,7 +233,7 @@ div.modal-wrapper {
 
 }
 
-#rdfauthor-view .rdfauthor-predicate-row, .rdfauthor-predicate-row .container {
+#rdfauthor-view .rdfauthor-predicate-row, .rdfauthor-predicate-row .rdfauthor-container {
 /*    border: 1px dotted red;*/
     padding: 0.3em 0.5em;
 }
@@ -252,7 +252,7 @@ div.modal-wrapper {
     margin-left: 0.5em;
 }
 
-.rdfauthor-predicate-row .container, .rdfauthor-predicate-row .inline-container {
+.rdfauthor-predicate-row .rdfauthor-container, .rdfauthor-predicate-row .inline-container {
     float: left;
 /*    border: 1px dotted green;*/
 }
@@ -295,7 +295,7 @@ div.modal-wrapper {
 
 .rdfauthor-predicate-row .actions.right {float: right !important;}
 .rdfauthor-predicate-row .actions.left {float: left !important;}
-.rdfauthor-predicate-row .container > * {display: block;}
+.rdfauthor-predicate-row .rdfauthor-container > * {display: block;}
 
 .disclosure-button-horizontal {
     height: 2em !important;

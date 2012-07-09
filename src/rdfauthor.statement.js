@@ -118,7 +118,7 @@ function Statement(statementSpec, statementOptions) {
     statementOptions  = statementOptions != undefined ? statementOptions : {};
     this._hidden      = statementOptions.hidden != undefined ? Boolean(statementOptions.hidden) : false;
     this._required    = statementOptions.required != undefined ? Boolean(statementOptions.required) : false;
-    this._protected   = statementOptions.protect != undefined ? Boolean(statementOptions.protect) : false;
+    this._protected   = statementOptions.protected != undefined ? Boolean(statementOptions.protected) : false;
     this._graph       = statementOptions.graph != undefined ? String(statementOptions.graph) : null;
     this._objectLabel = statementOptions.objectLabel != undefined ? String(statementOptions.objectLabel) : null;
 

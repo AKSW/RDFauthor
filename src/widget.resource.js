@@ -113,7 +113,7 @@ RDFauthor.registerWidget({
                   : (this.statement.hasObject() ? this.statement.objectValue() : '');
 
         var markup = '\
-            <div class="container resource-value">\
+            <div class="rdfauthor-container resource-value">\
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input is-processing" \
                        value="' + value + '" title="' + value + '"/>\
             </div>';

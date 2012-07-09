@@ -329,8 +329,6 @@ RDFauthor.registerWidget({
         return pos;
     }
 
-}, {
-        name: 'property',
-        values: ['http://mytest.de/treeselector']
-   }
+}, //load hook settings from rdfauthor.config.js
+    __config['widgets']['treeselector']['hook']
 );

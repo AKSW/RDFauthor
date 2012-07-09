@@ -69,7 +69,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         var overrideID = RDFauthor.nextID();
 
         if (this._allowOverride) {
-            override += '<div class="container actions right">\
+            override += '<div class="rdfauthor-container actions right">\
                 <div class="widget-override" id="widget-override-' + overrideID + '" style="display:block">\
                     <select name="widget-override-' + overrideID + '" title="Override widget selection">\
                         <option selected="selected">Literal</option>\
@@ -87,7 +87,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     function getWidgetChrome(widgetID, widgetHTML) {
         var html = '\
             <div class="widget" id="' + self._widgetIDPrefix + widgetID + '">\
-                <div class="container actions right">\
+                <div class="rdfauthor-container actions right">\
                     <a class="delete-button" title="Remove widget and data."></a>\
                     <a class="add-button" title="Add another widget of the same type."></a>\
                 </div>' + getOverride() + '<div class="rdfauthor-widget-container" style="width:90%">' + widgetHTML + '</div>\
