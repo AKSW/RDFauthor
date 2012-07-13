@@ -1,4 +1,4 @@
-Source: lilbjs-rdfauthor
+Source: libjs-rdfauthor
 Section: web
 Priority: extra
 Maintainer: Clemens Hoffmann <cannelony@googlemail.com>
@@ -8,7 +8,7 @@ Homepage: https://github.com/AKSW/RDFauthor/
 Vcs-Git: git://github.com/AKSW/RDFauthor.git
 Vcs-Browser: https://github.com/AKSW/RDFauthor
 
-Package: lilbjs-rdfauthor
+Package: libjs-rdfauthor
 Architecture: all
 Depends: ${misc:Depends}
 Description: RDFauthor is a javascript library used to create formular widgets out of RDFa-enhanced webpages
