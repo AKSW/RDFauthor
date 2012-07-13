@@ -1,0 +1,5 @@
+libjs-rdfauthor (0.9) lod2; urgency=low
+
+  * initial rdfauthor package from tag v0.9
+
+ -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Mon, 13 Jul 2012 10:42:49 +0100
