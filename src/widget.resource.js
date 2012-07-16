@@ -8,11 +8,13 @@ var MAX_TITLE_LENGTH = 50;
 
 RDFauthor.registerWidget({
     init: function () {
+        var self = this;
         this.selectedResource      = null;
         this.selectedResourceLabel = null;
         this.searchTerm            = '';
         this.ongoingSearches       = 0;
         this.searchResults         = [];
+        this.rangePattern          = '';
 
         this._domReady     = false;
         this._pluginLoaded = false;
@@ -65,6 +67,9 @@ RDFauthor.registerWidget({
         if (this._options.filterRange) {
             this._options.filterDomain     = false;
             this._options.filterProperties = false;
+            this.getRange(function(rangePattern) {
+                self.rangePattern = rangePattern;
+            })
         } else if (this._options.filterDomain) {
             this._options.filterRange      = false;
             this._options.filterProperties = true;
@@ -213,6 +218,34 @@ RDFauthor.registerWidget({
         });
     },
 
+    getRange: function(responseCallback) {
+        var self = this;
+        var rangePattern = '';
+        var rangeQuery = '\
+            SELECT ?range\
+            WHERE {\
+                <' + self.statement.predicateURI() +'> <http://www.w3.org/2000/01/rdf-schema#range> ?range .\
+            }';
+        RDFauthor.queryGraph(this.statement.graphURI(), rangeQuery, {
+            callbackSuccess: function(data) {
+                range = data['results']['bindings'];
+                if (range.length != 0) {
+                    $(range).each(function(i) {
+                        rangePattern += '?uri a <' + range[i]['range'].value + '> . \n';
+                    });
+                }
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(rangePattern);
+                }
+            },
+            callbackError: function () {
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(rangePattern);
+                }
+            }
+        });
+    },
+
     performSearch: function (searchTerm, responseCallback) {
         this.searchResults = [];
         var self = this;
@@ -226,19 +259,22 @@ RDFauthor.registerWidget({
             var propertyPattern = '';
             var domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
             var rangePattern  = '';
-            var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
+            var typePattern   = '';
+            //var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
 
             if (this._options.filterProperties) {
                 propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
             }
 
-            if (this._options.filterRange) {
+            if (self._options.filterRange) {
                 var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
                 if ( (range.length > 0) && (range != 'http://www.w3.org/2002/07/owl#Thing') ) {
                     rangePattern = '?uri a <' + range.join('> .\n?uri a <') + '> .\n';
+                } else {
+                    rangePattern = self.rangePattern;
                 }
             }
-
+            
             var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
                 FROM <' + this.statement.graphURI() + '>\
                 WHERE {\
@@ -254,9 +290,8 @@ RDFauthor.registerWidget({
                         && REGEX(?literal, "^.{1,' + MAX_TITLE_LENGTH + '}$"))\
                 }\
                 LIMIT ' + this._options.maxResults;
-
+            
             // TODO: if domain is bound, check if current subject is an instance of it
-
             RDFauthor.queryGraph(this.statement.graphURI(), query, {
                 callbackSuccess: function (data) {
                     var sparqlResults = [];
@@ -485,7 +520,6 @@ RDFauthor.registerWidget({
                 }
             }).blur(function() {
                 if (!($(this).data('uri') == $(this).val())) {
-                    console.log('hier müsste dann uri und label und hasLabel neugesetzt werden');
                     var value = $(this).val();
                     $(this).data('uri', value);
                     $(this).data('label', value);
