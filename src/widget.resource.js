@@ -580,8 +580,10 @@ RDFauthor.registerWidget({
                 } else if (e.which === 27) {
                     e.stopPropagation();
                 }
-            })
-            .data('autocomplete')._renderItem = function(ul, item) {
+            });
+
+            var elem = this.element().data('autocomplete');
+            elem && (elem._renderItem = function(ul, item) {
                 // TODO: item sometimes undefiend
                 if (item) {
                     return jQuery('<li></li>')
@@ -595,7 +597,7 @@ RDFauthor.registerWidget({
                         .css('width', self.element().innerWidth() - 4)
                         .appendTo(ul);
                 }
-            };
+            });
 
             this._initialized  = true;
             this._autocomplete = this.element().data('autocomplete');

@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
+    "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head xmlns:update="http://ns.aksw.org/update/">
+    <title>RDFauthor vCard Test Page</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+    <link about="http://localhost/rdfauthor/test/" rel="update:queryEndpoint" href="http://localhost/OntoWiki/sparql" />
+    <link about="http://localhost/rdfauthor/test/" rel="update:updateEndpoint" href="http://localhost/OntoWiki/update/" />
+    <link rel="stylesheet" href="../../libraries/bootstrap/css/bootstrap.css" />
+
+    <script type="text/javascript" src="../../libraries/jquery.js"></script>
+    <script type="text/javascript" src="../../libraries/jquery-ui.js"></script>
+    <script type="text/javascript" src="../../libraries/bootstrap/js/bootstrap.js"></script>
+    <!--script type="text/javascript" src="../../libraries/jquery.rdfquery.core.js"></script-->
+
+    <!-- <script type="text/javascript"> -->
+        <!-- var RDFAUTHOR_BASE = 'http://localhost/rdfauthor'; -->
+        <!-- RDFAUTHOR_READY_CALLBACK = function() { -->
+            <!-- $.typedValue.types['http://www.w3.org/2001/XMLSchema#time'] = { -->
+                <!-- regex: /^.*$/, -->
+                <!-- strip: true, -->
+                <!-- /** @ignore */ -->
+                <!-- value: function (v, options) { -->
+                  <!-- var opts = $.extend({}, $.typedValue.defaults, options); -->
+                  <!-- return v; -->
+                <!-- } -->
+            <!-- }; -->
+            <!-- //RDFauthor.start(); -->
+        <!-- } -->
+    <!-- </script> -->
+    <!-- <script type="text/javascript" src="../../src/rdfauthor.js"></script> -->
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $(".resource-widget").typeahead({
+          source: ['foobar', 'foo', 'bar'],
+          highlighter: function(item) {
+            return '<div><p>' + item + '</p><p>http://foobar.foo</p></div>'
+          }
+        });
+        $('.rdfauthor-btn-start-add-property').live('click', function() {
+          $('#rdfauthor-popover').modal('toggle');
+          $('#rdfauthor-add-property').modal('toggle');
+        });
+        $('.rdfauthor-btn-stop-add-property').live('click', function() {
+          $('#rdfauthor-popover').modal('toggle');
+          $('#rdfauthor-add-property').modal('toggle');
+        });
+        $('[rel=tooltip]').tooltip();
+        $('#rdfauthor-popover .btn').live('click', function() {
+          var controlGroup = $(this).parent('div').parent().parent();
+          var btnMarkup = '<div style="display: none;" class="line input-prepend input-append">\
+                <span class="add-on">\
+                  <i class="icon-bookmark" ></i></button>\
+                </span><input type="text" placeholder="insert uri" value="" class="input-xlarge resource-widget"><button class="btn" type="button"><i class="icon-plus-sign" ></i></button><button class="btn" type="button"><i class="icon-minus-sign" ></i></button>\
+            </div>';
+          if($(this).find('i').hasClass('icon-plus-sign')) {
+            $(this).parent('div').parent().append(btnMarkup);
+            $(this).parent('div').parent().find('div:last').fadeIn();
+          }
+          if($(this).find('i').hasClass('icon-minus-sign')) {
+            if(controlGroup.find('input').length == 1) {
+              controlGroup.fadeOut(function() {
+                controlGroup.remove();
+              });
+            } else {
+              $(this).parent('div').fadeOut(function() {
+                $(this).remove();
+              });
+            }
+          }
+        });
+        $('#rdfauthor-popover .icon-minus-sign').live('click', function() {
+          
+        });
+      });
+    </script>
+    <style type="text/css">
+      .add-property-label {
+        text-decoration: none !important;
+      }
+
+      form .line {
+        margin-bottom: 5px !important;
+      }
+    </style>
+</head>
+
+<body xmlns:update="http://ns.aksw.org/update/">
+  <p>
+    <a class="btn" data-toggle="modal" href="#rdfauthor-popover" >Edit Resource</a>
+  </p>
+  <div class="modal hide" id="rdfauthor-popover" style="width: 650px;">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3>Edit Resource</h3>
+    </div>
+    <div class="modal-body">
+      <div class="tabbable">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tab1" data-toggle="tab">Resource 1</a></li>
+          <li><a href="#tab2" data-toggle="tab">Resource 2</a></li>
+        </ul>
+      <div class="tab-content">
+      <div class="tab-pane fade in active" id="tab1">
+      <form class="form-horizontal">
+        <fieldset>
+          <div class="control-group">
+            <label class="control-label">rdf:type</label>
+            <div class="controls">
+              <div class="line input-prepend input-append">
+                <span class="add-on">
+                  <i class="icon-bookmark" ></i></button>
+                </span><input type="text" value="http://xmlns.com/foaf/0.1/Person" class="input-xlarge resource-widget"><button class="btn" type="button"><i class="icon-plus-sign" ></i></button><button class="btn" type="button"><i class="icon-minus-sign" ></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">foaf:name</label>
+            <div class="controls">
+              <div class="line input-prepend input-append">
+                <span class="add-on">
+                  <i class="icon-bookmark" ></i></button>
+                </span><input type="text" value="Foo Bar" class="input-xlarge"><button class="btn" type="button"><i class="icon-plus-sign" ></i></button><button class="btn" type="button"><i class="icon-minus-sign" ></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">foaf:mbox</label>
+            <div class="controls">
+              <div class="line input-prepend input-append">
+                <span class="add-on">
+                  <i class="icon-envelope" ></i></button>
+                </span><input type="text" value="foo@bar.com"class="input-xlarge"><button class="btn" type="button"><i class="icon-plus-sign" ></i></button><button class="btn" type="button"><i class="icon-minus-sign" ></i></button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+      </div>
+      <div class="tab-pane fade" id="tab2">
+      <form class="form-horizontal">
+        <fieldset>
+          <div class="control-group">
+            <label class="control-label">rdf:type</label>
+            <div class="controls">
+              <div class="line input-prepend input-append">
+                <span class="add-on">
+                  <i class="icon-bookmark" ></i></button>
+                </span><input type="text" value="http://xmlns.com/foaf/0.1/Person" class="input-xlarge"><button class="btn" type="button"><i class="icon-plus-sign" ></i></button><button class="btn" type="button"><i class="icon-minus-sign" ></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">foaf:name</label>
+            <div class="controls">
+              <div class="line input-prepend input-append">
+                <span class="add-on">
+                  <i class="icon-bookmark" ></i></button>
+                </span><input type="text" value="Bar" class="input-xlarge"><button class="btn" type="button"><i class="icon-plus-sign" ></i></button><button class="btn" type="button"><i class="icon-minus-sign" ></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">foaf:mbox</label>
+            <div class="controls">
+              <div class="line input-prepend input-append">
+                <span class="add-on">
+                  <i class="icon-envelope" ></i></button>
+                </span><input type="text" value="foobar@bar.com"class="input-xlarge"><button class="btn" type="button"><i class="icon-plus-sign" ></i></button><button class="btn" type="button"><i class="icon-minus-sign" ></i></button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+      </div>
+      </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" data-dismiss="modal">Close</a>
+      <a href="#" class="btn rdfauthor-btn-start-add-property">Add property</a>
+      <a href="#" class="btn btn-primary">Save changes</a>
+    </div>
+  </div>
+  <!--AddProperty-->
+  <div class="modal hide" id="rdfauthor-add-property" style="width: 650px;">
+    <div class="modal-header">
+      <button type="button" class="close rdfauthor-btn-stop-add-property">×</button>
+      <h3>Add property</h3>
+    </div>
+    <div class="modal-body">
+      <input type="text" style="width: 98%;" placeholder="Insert a custom property uri">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <td><strong>In use elsewhere</strong> <span class="badge badge-info">0</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>General applicable</strong> <span class="badge badge-info">3</span></td>
+            <td><a href="#" class="add-property-label" rel="tooltip" data-original-title="http://www.w3.org/1999/02/22-rdf-syntax-ns#label"><span class="label">label</span></a> <span class="add-property-label label">comment</span> <span class="add-property-label label">seeAlso</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn rdfauthor-btn-stop-add-property">Close</a>
+    </div>
+  </div>
+</body>
+
+</html>

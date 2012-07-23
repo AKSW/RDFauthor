@@ -348,9 +348,9 @@ RDFauthor = (function($) {
     }
     
     function _createPopoverView() {
-        if ($('.modal-wrapper').length < 1) {
+        // if ($('.modal-wrapper').length < 1) {
             $('body').append('<div class="modal-wrapper" style="display:none"></div>');
-        }
+        // }
                         
         var self = this;
         var options = $.extend({}, _options, {

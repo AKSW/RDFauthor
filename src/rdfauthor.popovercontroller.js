@@ -58,7 +58,7 @@ function PopoverController(options) {
 
     function getChrome() {
         html = '\
-            <div class="window" id="' + self.cssID() + '" style="display:none">\
+            <div class="window modal hide fade in" id="' + self.cssID() + '" style="display:none">\
                 ' + getContent() + '\
             </div>';
 
@@ -67,9 +67,15 @@ function PopoverController(options) {
 
     function getContent() {
         html = '\
-            <h2 class="title">' + self._options.title + '</h2>\
-            <div class="' + self._options.contentContainerClass + '">\
-            </div>' + getButtons() + '<div style="clear:both"></div>';
+            <div class="modal-header">\
+            <a class="close" data-dismiss="modal">x</a>\
+            <h3 class="title">' + self._options.title + '</h3>\
+            </div>\
+            <div class="' + self._options.contentContainerClass + ' modal-body">\
+            <!--p class="' + self._options.contentContainerClass + '"></p-->\
+            </div>\
+            ' + getButtons() + '\
+            <!--div style="clear:both"></div-->';
 
         return html;
     };
@@ -79,14 +85,14 @@ function PopoverController(options) {
         if (self._options.showButtons) {
             var propertyButton = '';
             if (self._options.showPropertyButton) {
-                propertyButton = '<button type="button" id="rdfauthor-button-property">' + self._options.propertyButtonTitle + '</button>';
+                propertyButton = '<a href="#" class="btn" id="rdfauthor-button-property">' + self._options.propertyButtonTitle + '</a>';
             }
 
             buttonHTML = '\
-                <div id="rdfauthor-buttons">\
+                <div class="modal-footer"id="rdfauthor-buttons">\
                     ' + propertyButton + '\
-                    <button type="button" id="rdfauthor-button-cancel">' + self._options.cancelButtonTitle + '</button>\
-                    <button type="button" id="rdfauthor-button-submit">' + self._options.saveButtonTitle + '</button>\
+                    <a href="#" class="btn btn-danger" id="rdfauthor-button-cancel">' + self._options.cancelButtonTitle + '</a>\
+                    <a href="#" class="btn btn-success" id="rdfauthor-button-submit">' + self._options.saveButtonTitle + '</a>\
                 </div>';
         }
 
@@ -129,7 +135,7 @@ function PopoverController(options) {
         // make draggable if jQuery UI loaded
         if (typeof jQuery.ui != 'undefined') {
             if (!jQuery('#' + this.cssID()).hasClass('ui-draggable')) {
-                jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
+                // jQuery('#' + this.cssID()).draggable({handle: 'h2', zIndex: 10000});
             }
         }
 
@@ -258,41 +264,41 @@ PopoverController.prototype = {
 
     position: function () {
         var self = this;
+        $('#' + self.cssID()).modal('toggle');
+/*         set container height */
+        // this._container.height(
+            // Math.max(
+                // jQuery(document).height(),
+                // jQuery(window).height(),
+                // for Opera: 
+                // document.documentElement.clientHeight
+            // ) + 'px');
 
-        // set container height
-        this._container.height(
-            Math.max(
-                jQuery(document).height(),
-                jQuery(window).height(),
-                /* for Opera: */
-                document.documentElement.clientHeight
-            ) + 'px');
+        // trick to get the height and width from a non visible object using jquery
+        // var bodyh = $(document).height();
+        // var bodyw = $(document).width();
+        // var ww = $(self.getElement()).outerWidth();
+        // var wh = $(self.getElement()).outerHeight();
+        // var offsetPosition = {
+            // 'top': Math.max( (bodyh - wh) * 0.5 , 20),
+            // 'left': Math.max( (bodyw - ww) * 0.5 , 50 )
+        // }
+        // $(self.getElement()).offset(offsetPosition);
 
-        //trick to get the height and width from a non visible object using jquery
-        var bodyh = $(document).height();
-        var bodyw = $(document).width();
-        var ww = $(self.getElement()).outerWidth();
-        var wh = $(self.getElement()).outerHeight();
-        var offsetPosition = {
-            'top': Math.max( (bodyh - wh) * 0.5 , 20),
-            'left': Math.max( (bodyw - ww) * 0.5 , 50 )
-        }
-        $(self.getElement()).offset(offsetPosition);
-
-        if (!jQuery('#' + this.cssID()).hasClass('ui-resizable')) {
-            jQuery('#' + this.cssID()).resizable({
-                alsoResize: '.rdfauthor-subject-group',
-                minWidth: jQuery('#rdfauthor-buttons').outerWidth(),
-                minHeight: Math.min(jQuery('#' + this.cssID()).outerHeight(), 100),
-                stop: function (event, ui) {
-                    var vChange   = ui.size.height - ui.originalSize.height;
-                    var height    = jQuery('#rdfauthor-view .rdfauthor-view-content').css('max-height').replace('px', '');
-                    var newHeight = Number(height) + vChange;
-                    jQuery('#rdfauthor-view .rdfauthor-view-content').css('max-height', newHeight + 'px');
-                    self.layout();
-                }
-            });
-        }
+        // if (!jQuery('#' + this.cssID()).hasClass('ui-resizable')) {
+            // jQuery('#' + this.cssID()).resizable({
+                // alsoResize: '.rdfauthor-subject-group',
+                // minWidth: jQuery('#rdfauthor-buttons').outerWidth(),
+                // minHeight: Math.min(jQuery('#' + this.cssID()).outerHeight(), 100),
+                // stop: function (event, ui) {
+                    // var vChange   = ui.size.height - ui.originalSize.height;
+                    // var height    = jQuery('#rdfauthor-view .rdfauthor-view-content').css('max-height').replace('px', '');
+                    // var newHeight = Number(height) + vChange;
+                    // jQuery('#rdfauthor-view .rdfauthor-view-content').css('max-height', newHeight + 'px');
+                    // self.layout();
+                // }
+            // });
+       /*  } */
     },
 
     layout: function (layoutInfo) {
