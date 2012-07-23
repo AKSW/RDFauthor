@@ -311,19 +311,27 @@ RDFauthor.registerWidget({
                                         label = binding['literal']['value'];
                                     }
 
-                                    if (undefined == resources[uri]) {
-                                        resources[uri] = true;
+                                    if ($.inArray(uri,self.element().data('objects')) == -1) {
+                                        if (undefined == resources[uri]) {
+                                            resources[uri] = true;
 
-                                        var domain = binding['domain'];
-                                        var type   = binding['type'];
+                                            var domain = binding['domain'];
+                                            var type   = binding['type'];
 
-                                        if (domain && type) {
-                                            if (domain['value'] != type['value']) {
-                                                sparqlResults.push({
-                                                    source: 'sparqlmm',
-                                                    value:  uri,
-                                                    label:  label
-                                                });
+                                            if (domain && type) {
+                                                if (domain['value'] != type['value']) {
+                                                    sparqlResults.push({
+                                                        source: 'sparqlmm',
+                                                        value:  uri,
+                                                        label:  label
+                                                    });
+                                                } else {
+                                                    sparqlResults.push({
+                                                        source: 'sparql',
+                                                        value:  uri,
+                                                        label:  label
+                                                    });
+                                                }
                                             } else {
                                                 sparqlResults.push({
                                                     source: 'sparql',
@@ -331,12 +339,6 @@ RDFauthor.registerWidget({
                                                     label:  label
                                                 });
                                             }
-                                        } else {
-                                            sparqlResults.push({
-                                                source: 'sparql',
-                                                value:  uri,
-                                                label:  label
-                                            });
                                         }
                                     }
                                 }
@@ -497,8 +499,12 @@ RDFauthor.registerWidget({
 
     _initAutocomplete: function () {
         var self = this;
-
         if (this._pluginLoaded && this._domReady && !this._initialized) {
+            self.element().data('objects',[]);
+            self.element().parent().parent().parent().parent().parent().parent().find('input').each(function() {
+              self.element().data('objects').push($(this).attr('title'));
+            });
+            
             //set human-readable label for uri
             self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
                 self.element().data('uri', self.element().val());
