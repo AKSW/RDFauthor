@@ -189,10 +189,18 @@ RDFauthor.registerWidget({
         var hasLabel = false;
         //build unionPattern string
         var unionPattern = '';
-        for ( var pos in this.labels ) {
-            this.labels.length-1 != pos ? unionPattern += '{ <' + subjectUri + '> <' + this.labels[pos] + '> ?label } UNION '
-                                      : unionPattern += '{ <' + subjectUri + '> <' + this.labels[pos] + '> ?label }'
-        }
+
+        for (var i = 0; i < this.labels.length; ++i) {
+            var propertyUri = this.labels[i];
+	
+            unionPattern += '{ <' + subjectUri + '> <' + propertyUri + '> ?label }';
+        	
+            if(i != this.labels.length - 1) {
+                unionPattern += " UNION ";
+            }
+	}
+
+
         //build query
         var query = 'SELECT ?label WHERE { ' + unionPattern + ' . } LIMIT 1';
         //log query
