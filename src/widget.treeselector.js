@@ -258,7 +258,7 @@ RDFauthor.registerWidget({
                     "json_data" : serializedNodes,
                     "plugins"   : [ "themes", "json_data", "ui" ]
                 });
-                $('#treeselector-content').jstree('toggle_node', this);
+                //$('#treeselector-content').jstree('toggle_node', this);
             })
             
             $('#treeselector-content a').live('click', function(event) {
