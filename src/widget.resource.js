@@ -105,6 +105,7 @@ RDFauthor.registerWidget({
     ready: function () {
         this._domReady = true;
         this._initAutocomplete();
+        this.element().css('height', '20px');
     },
 
     element: function () {
@@ -257,108 +258,145 @@ RDFauthor.registerWidget({
     performSearch: function (searchTerm, responseCallback) {
         this.searchResults = [];
         var self = this;
-
+        // semweb hack for sparql autocomplete
         if (this._options.sparql) {
-            // SPARQL endpoint
-            var prologue      = '\
-                PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
-                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>';
-            var uriPattern    = '?uri ?v1 ?literal .\n';
-            var propertyPattern = '';
-            var domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
-            var rangePattern  = '';
-            var typePattern   = '';
-            //var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
-
-            if (this._options.filterProperties) {
-                propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
-            }
-
-            if (self._options.filterRange) {
-                var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
-                if ( (range.length > 0) && (range != 'http://www.w3.org/2002/07/owl#Thing') ) {
-                    rangePattern = '?uri a <' + range.join('> .\n?uri a <') + '> .\n';
-                } else {
-                    rangePattern = self.rangePattern;
-                }
-            }
-            
-            var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
-                FROM <' + this.statement.graphURI() + '>\
-                WHERE {\
-                    ' + uriPattern + '\
-                    ' + propertyPattern + '\
-                    ' + domainPattern + '\
-                    ' + rangePattern + '\
-                    ' + typePattern + '\
-                    FILTER (\
-                        isURI(?uri) \
-                        && isLITERAL(?literal) \
-                        && REGEX(?literal, "' + searchTerm + '", "i") \
-                        && REGEX(?literal, "^.{1,' + MAX_TITLE_LENGTH + '}$"))\
-                }\
-                LIMIT ' + this._options.maxResults;
-            
-            // TODO: if domain is bound, check if current subject is an instance of it
-            RDFauthor.queryGraph(this.statement.graphURI(), query, {
+          var predicate = self.statement._predicate.value.toString();
+          var value = self.element().val();
+          var query = 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
+                      'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
+                      'SELECT DISTINCT ?o ' +
+                      'WHERE { ' +
+                      '<http://linkedgeodata.org/triplify/node26876754> a ?type. ' +
+                      '?s <' + predicate + '> ?o . ' +
+                      '?s rdf:type ?type . ' +
+                      'FILTER( REGEX(?o, "' + value +'", "i") && REGEX(?o, ".{1,50}$")). ' +
+                      '}' + 
+                      'LIMIT ' + this._options.maxResults;
+          var alreadyInUse = [];
+          self.element().parents('fieldset').find('input').each(function(i) {
+            alreadyInUse.push($(this).attr('title'));
+          });
+          RDFauthor.queryGraph(this.statement.graphURI(), query, {
                 callbackSuccess: function (data) {
                     var sparqlResults = [];
-                    if (data && data['results'] && data['results']['bindings']) {
-                        var bindings  = data['results']['bindings'];
-                        var resources = {};
+                    for (var i=0; i < data.results.bindings.length; i++) {
+                        var uri = data.results.bindings[i].o.value;
+                        if ($.inArray(uri, alreadyInUse)) {
+                               sparqlResults.push({
+                                   source: 'sparql',
+                                   value:  uri,
+                                   label:  self.localName(uri)
+                               });
 
-                        for (var i = 0, max = bindings.length; i < max; i++) {
-                            var binding = bindings[i];
-                            if (binding['uri']) {
-                                var current = binding['uri'];
-                                if (current.type == 'uri') {
-                                    var uri = current.value;
-                                    var label;
-
-                                    if (binding['literal']) {
-                                        label = binding['literal']['value'];
-                                    }
-
-                                    if ($.inArray(uri,self.element().data('objects')) == -1) {
-                                        if (undefined == resources[uri]) {
-                                            resources[uri] = true;
-
-                                            var domain = binding['domain'];
-                                            var type   = binding['type'];
-
-                                            if (domain && type) {
-                                                if (domain['value'] != type['value']) {
-                                                    sparqlResults.push({
-                                                        source: 'sparqlmm',
-                                                        value:  uri,
-                                                        label:  label
-                                                    });
-                                                } else {
-                                                    sparqlResults.push({
-                                                        source: 'sparql',
-                                                        value:  uri,
-                                                        label:  label
-                                                    });
-                                                }
-                                            } else {
-                                                sparqlResults.push({
-                                                    source: 'sparql',
-                                                    value:  uri,
-                                                    label:  label
-                                                });
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                         }
                     }
-
                     self.results(sparqlResults, responseCallback, 'sparql');
                 }
-            });
-            this.ongoingSearches++;
+          });
+            
+          this.ongoingSearches++;
         }
+        // if (this._options.sparql) {
+            // // SPARQL endpoint
+            // var prologue      = '\
+                // PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\
+                // PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>';
+            // var uriPattern    = '?uri ?v1 ?literal .\n';
+            // var propertyPattern = '';
+            // var domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
+            // var rangePattern  = '';
+            // var typePattern   = '';
+            // //var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
+
+            // if (this._options.filterProperties) {
+                // propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
+            // }
+
+            // if (self._options.filterRange) {
+                // var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
+                // if ( (range.length > 0) && (range != 'http://www.w3.org/2002/07/owl#Thing') ) {
+                    // rangePattern = '?uri a <' + range.join('> .\n?uri a <') + '> .\n';
+                // } else {
+                    // rangePattern = self.rangePattern;
+                // }
+            // }
+            
+            // var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
+                // FROM <' + this.statement.graphURI() + '>\
+                // WHERE {\
+                    // ' + uriPattern + '\
+                    // ' + propertyPattern + '\
+                    // ' + domainPattern + '\
+                    // ' + rangePattern + '\
+                    // ' + typePattern + '\
+                    // FILTER (\
+                        // isURI(?uri) \
+                        // && isLITERAL(?literal) \
+                        // && REGEX(?literal, "' + searchTerm + '", "i") \
+                        // && REGEX(?literal, "^.{1,' + MAX_TITLE_LENGTH + '}$"))\
+                // }\
+                // LIMIT ' + this._options.maxResults;
+            
+            // // TODO: if domain is bound, check if current subject is an instance of it
+            // RDFauthor.queryGraph(this.statement.graphURI(), query, {
+                // callbackSuccess: function (data) {
+                    // var sparqlResults = [];
+                    // if (data && data['results'] && data['results']['bindings']) {
+                        // var bindings  = data['results']['bindings'];
+                        // var resources = {};
+
+                        // for (var i = 0, max = bindings.length; i < max; i++) {
+                            // var binding = bindings[i];
+                            // if (binding['uri']) {
+                                // var current = binding['uri'];
+                                // if (current.type == 'uri') {
+                                    // var uri = current.value;
+                                    // var label;
+
+                                    // if (binding['literal']) {
+                                        // label = binding['literal']['value'];
+                                    // }
+
+                                    // if ($.inArray(uri,self.element().data('objects')) == -1) {
+                                        // if (undefined == resources[uri]) {
+                                            // resources[uri] = true;
+
+                                            // var domain = binding['domain'];
+                                            // var type   = binding['type'];
+
+                                            // if (domain && type) {
+                                                // if (domain['value'] != type['value']) {
+                                                    // sparqlResults.push({
+                                                        // source: 'sparql',
+                                                        // value:  uri,
+                                                        // label:  label
+                                                    // });
+                                                // } else {
+                                                    // sparqlResults.push({
+                                                        // source: 'sparql',
+                                                        // value:  uri,
+                                                        // label:  label
+                                                    // });
+                                                // }
+                                            // } else {
+                                                // sparqlResults.push({
+                                                    // source: 'sparql',
+                                                    // value:  uri,
+                                                    // label:  label
+                                                // });
+                                            // }
+                                        // }
+                                    // }
+                                // }
+                            // }
+                        // }
+                    // }
+
+                    // self.results(sparqlResults, responseCallback, 'sparql');
+                // }
+            // });
+            // this.ongoingSearches++;
+        // }
 
         // Sindice search
         if (this._options.sindice) {
