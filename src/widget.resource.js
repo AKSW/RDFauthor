@@ -264,11 +264,10 @@ RDFauthor.registerWidget({
           var value = self.element().val();
           var query = 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' +
                       'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' +
-                      'SELECT DISTINCT ?o ' +
+                      'SELECT DISTINCT ?o ?label' +
                       'WHERE { ' +
-                      '<http://linkedgeodata.org/triplify/node26876754> a ?type. ' +
                       '?s <' + predicate + '> ?o . ' +
-                      '?s rdf:type ?type . ' +
+                      'OPTIONAL { ?o rdfs:label ?label . }' +
                       'FILTER( REGEX(?o, "' + value +'", "i") && REGEX(?o, ".{1,50}$")). ' +
                       '}' + 
                       'LIMIT ' + this._options.maxResults;
@@ -281,11 +280,12 @@ RDFauthor.registerWidget({
                     var sparqlResults = [];
                     for (var i=0; i < data.results.bindings.length; i++) {
                         var uri = data.results.bindings[i].o.value;
+                        var label = data.results.bindings[i].hasOwnProperty('label') ? data.results.bindings[i].label.value : null;
                         if ($.inArray(uri, alreadyInUse)) {
                                sparqlResults.push({
                                    source: 'sparql',
                                    value:  uri,
-                                   label:  self.localName(uri)
+                                   label:  label == null ? self.localName(uri) : label
                                });
 
                         }
