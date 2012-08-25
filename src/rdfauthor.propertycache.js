@@ -47,6 +47,14 @@ var __propertycache = {
         "http://xmlns.com/foaf/0.1/depiction" : {
             "label" : "depiction",
             "comment" : "An image / graphical representation of this resource"
+        },
+        "http://www.w3.org/2003/01/geo/wgs84_pos#lat" : {
+            "label" : "latitude",
+            "comment" : "The WGS84 altitude of a SpatialThing (decimal meters above the local reference ellipsoid)."
+        },
+        "http://www.w3.org/2003/01/geo/wgs84_pos#long" : {
+            "label" : "longitude",
+            "comment" : "The WGS84 longitude of a SpatialThing (decimal degrees)."
         }
     }
 };
