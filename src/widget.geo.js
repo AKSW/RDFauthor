@@ -30,12 +30,15 @@ RDFauthor.registerWidget({
                 self._osmLoaded = true;
                 self._initGeo();
             });
+/* TODO THIS APPROACH TOTALLY SUCKS - IT BREAKS AT RANDOM WITH "YOU NEED ANOTHER GOOGLE MAP KEY YADA YADA" rant done. ~Claus
+TODO Make the map key configurable. Document that google maps will only be loaded, if a key is provided is some config.js file.
             // load Google Maps
             RDFauthor.loadScript('http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC'
                                  +'9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ', function() {
                 self._googleLoaded = true;
                 self._initGeo();
             });
+*/
             // load Bing Maps
             RDFauthor.loadScript('http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=en-us', function() {
                 self._bingLoaded = true;
