@@ -265,7 +265,7 @@ RDFauthor.registerWidget({
                 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>';
             var uriPattern    = '?uri ?v1 ?literal .\n';
             var propertyPattern = '';
-            var domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
+            var domainPattern = '';
             var rangePattern  = '';
             var typePattern   = '';
             //var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
@@ -276,8 +276,9 @@ RDFauthor.registerWidget({
 
             if (self._options.filterRange) {
                 var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
-                if ( (range.length > 0) && (range != 'http://www.w3.org/2002/07/owl#Thing') ) {
+                if (range.length > 0) {
                     rangePattern = '?uri a <' + range.join('> .\n?uri a <') + '> .\n';
+                    domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
                 } else {
                     rangePattern = self.rangePattern;
                 }

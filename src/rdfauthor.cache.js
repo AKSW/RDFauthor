@@ -294,11 +294,8 @@ var __cache = {
       "label" : "someValuesFrom"
    },
    "http://www.w3.org/2002/07/owl#sameAs" : {
-      "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
-      ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "sameAs"
    },
