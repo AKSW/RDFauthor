@@ -1168,8 +1168,9 @@ RDFauthor = (function($) {
     }
 
     // load ontowiki stylesheet when rdfauthor is used without ontowiki
-    // TODO check if classes already exist
-    _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
+    if (!/ontowiki/gi.test($('head title').text())) {
+        _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
+    }
 
     // default info predicates
     _addInfoPredicate(RDF_NS + 'type', 'type');
