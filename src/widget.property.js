@@ -91,7 +91,7 @@ RDFauthor.registerWidget({
                       <span class="button button-windowclose"><span>\
                     </div>\
                   </div>\
-                  <div class="content" style="height: 93%">\
+                  <div class="content" style="height: 92%">\
                     <input id="filterProperties" autocomplete="off" type="text" \
                            class="text inner-label width99" style="margin: 5px 5px 0px 0px;"/>\
                     <ul class="bullets-none separated">\
