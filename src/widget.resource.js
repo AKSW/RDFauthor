@@ -579,9 +579,11 @@ RDFauthor.registerWidget({
                     self.performSearch(request.term, response);
                 },
                 select: function (event, ui) {
-                    self.selectedResource      = ui.item.value;
+                    self.selectedResource      = encodeURI(ui.item.value);
                     self.selectedResourceLabel = ui.item.label;
-                    self.element().data('uri', ui.item.value);
+                    console.log(ui.item.value);
+                    console.log()
+                    self.element().data('uri', encodeURI(ui.item.value));
                     self.element().data('label', ui.item.label);
                     self.element().data('hasLabel', true);
                     self.element().attr('title', ui.item.value);
@@ -639,7 +641,7 @@ RDFauthor.registerWidget({
                                 border:1px solid ' + self.sources[item.source]['border'] + ';">\
                             <span class="resource-edit-source">' + self.sources[item.source]['label'] + '</span>\
                             <span class="resource-edit-label">' + self.highlight(item.label, self.searchTerm) + '</span>\
-                            <span class="resource-edit-uri">' + self.highlight(item.value, self.searchTerm) + '</span>\
+                            <span class="resource-edit-uri">' + self.highlight(encodeURI(item.value), self.searchTerm) + '</span>\
                         </a>')
                         .css('width', self.element().innerWidth() - 4)
                         .appendTo(ul);
