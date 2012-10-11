@@ -5,7 +5,7 @@
  *         Clemens Hoffmann <cannelony@gmail.com>
  */
 RDFauthor.registerWidget({
-    // Uncomment this to execute code when your widget is instantiated, 
+    // Uncomment this to execute code when your widget is instantiated,
     // e.g. load scripts/stylesheets etc.
     init: function () {
         var self = this;
@@ -38,7 +38,7 @@ RDFauthor.registerWidget({
             }
         };
         // markItUp settings
-        this._settings = {	
+        this._settings = {
             nameSpace: 'markdown', // Useful to prevent multi-instances CSS conflict
             onShiftEnter: {keepDefault:false, openWith:'\n\n'},
             returnParserData: function(data){
@@ -46,15 +46,15 @@ RDFauthor.registerWidget({
                 return self._converter.makeHtml(data);
             },
             markupSet: [
-            {name:'First Level Heading', key:"1", placeHolder:'Your title here...', 
+            {name:'First Level Heading', key:"1", placeHolder:'Your title here...',
              closeWith:function(markItUp) { return self._miu.markdownTitle(markItUp, '=') } },
-            {name:'Second Level Heading', key:"2", placeHolder:'Your title here...', 
+            {name:'Second Level Heading', key:"2", placeHolder:'Your title here...',
              closeWith:function(markItUp) { return self._miu.markdownTitle(markItUp, '-') } },
             {name:'Heading 3', key:"3", openWith:'### ', placeHolder:'Your title here...' },
             {name:'Heading 4', key:"4", openWith:'#### ', placeHolder:'Your title here...' },
             {name:'Heading 5', key:"5", openWith:'##### ', placeHolder:'Your title here...' },
             {name:'Heading 6', key:"6", openWith:'###### ', placeHolder:'Your title here...' },
-            {separator:'---------------' },        
+            {separator:'---------------' },
             {name:'Bold', key:"B", openWith:'**', closeWith:'**'},
             {name:'Italic', key:"I", openWith:'_', closeWith:'_'},
             {separator:'---------------' },
@@ -64,9 +64,9 @@ RDFauthor.registerWidget({
             }},
             {separator:'---------------' },
             {name:'Picture', key:"P", replaceWith:'![[![Alternative text]!]]([![Url:!:http://]!] "[![Title]!]")'},
-            {name:'Link', key:"L", openWith:'[', closeWith:']([![Url:!:http://]!] "[![Title]!]")', 
+            {name:'Link', key:"L", openWith:'[', closeWith:']([![Url:!:http://]!] "[![Title]!]")',
              placeHolder:'Your text to link here...' },
-            {separator:'---------------'},    
+            {separator:'---------------'},
             {name:'Quotes', openWith:'> '},
             {name:'Code Block / Code', openWith:'(!(\t|!|`)!)', closeWith:'(!(`)!)'},
             {separator:'---------------'},
@@ -74,62 +74,62 @@ RDFauthor.registerWidget({
           ]
         };
     },
-    
-    // Uncomment this to execute code when you widget's markup is ready in the DOM, 
+
+    // Uncomment this to execute code when you widget's markup is ready in the DOM,
     // e.g. load jQuery plug-ins, attach event handlers etc.
     ready: function () {
         var self = this;
         self._domRdy = true;
         self._init();
     },
-    
+
     // return your jQuery-wrapped main input element here
     element: function () {
         return $('#markdown-edit-' + this.ID);
-    }, 
-    
+    },
+
     /*
     // Uncomment to give focus to your widget.
-    // The default implementation will give focus to the first match in the 
+    // The default implementation will give focus to the first match in the
     // return value of element().
     focus: function () {},
-    */ 
-    
+    */
+
     // return your widget's markup code here
     markup: function () {
-        var markup = 
-            '<div class="container" style="width:100%">\
-                <textarea class="text markItUp" id="markdown-edit-' + this.ID + '">' 
+        var markup =
+            '<div class="rdfauthor-container" style="width:100%">\
+                <textarea class="text markItUp" id="markdown-edit-' + this.ID + '">'
                 + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
             </div>';
         return markup;
-    }, 
-    
+    },
+
     // commit changes here (add/remove/change)
     submit: function () {
         if (this.shouldProcessSubmit()) {
             // get databank
             var databank = RDFauthor.databankForGraph(this.statement.graphURI());
-            
+
             var somethingChanged = (
-                this.statement.hasObject() && 
+                this.statement.hasObject() &&
                     this.statement.objectValue() !== this.value()
             );
-            
+
             var isNew = !this.statement.hasObject() && (null !== this.value());
-            
+
             if (somethingChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(String(rdfqTriple));
+                    databank.remove(rdfqTriple);
                 }
             }
-            
+
             if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
                 try {
                     var newStatement = this.statement.copyWithObject({
-                        value: this.value(), 
-                        options: {datatype: this.datatype}, 
+                        value: this.value(),
+                        options: {datatype: this.datatype},
                         type: 'literal'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
@@ -140,24 +140,24 @@ RDFauthor.registerWidget({
                 }
             }
         }
-        
+
         return true;
-    }, 
-    
+    },
+
     shouldProcessSubmit: function () {
         var t1 = !this.statement.hasObject();
         var t2 = null === this.value();
         var t3 = this.removeOnSubmit;
-        
+
         return (!(t1 && t2) || t3);
     },
-    
+
     value: function () {
         var value = this.element().val();
         if (String(value).length > 0 && typeof(value) != "undefined") {
             return value;
         }
-        
+
         return null;
     },
 
@@ -168,19 +168,6 @@ RDFauthor.registerWidget({
           self.element().markItUp(self._settings);
        }
     }
-}, {
-        name: 'datatype',
-        values: ['http://ns.ontowiki.net/SysOnt/Markdown'],
-        callback : function () {
-            $.typedValue.types['http://ns.ontowiki.net/SysOnt/Markdown'] = {
-                regex: /.*/,
-                strip: false,
-                /** @ignore */
-                value: function (v, options) {
-                  var opts = $.extend({}, $.typedValue.defaults, options);
-                  return v;
-                }
-            };
-        }
-    }
+},  //load hook settings from rdfauthor.config.js
+    __config['widgets']['markdown']['hook']
 );

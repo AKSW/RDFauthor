@@ -11,7 +11,7 @@
  * @namespace
  * @requires Statement
  */
-RDFauthor = (function($, undefined) {
+RDFauthor = (function($) {
     /** Namespace for update predicates */
     var UPDATE_NS = 'http://ns.aksw.org/update/';
     
@@ -63,7 +63,13 @@ RDFauthor = (function($, undefined) {
 
     /** Wheather the property axiom cache has been loaded */
     var _cacheLoaded = false;
-    
+
+    /** Wheather the property widget cache has been loaded */
+    var _propertycacheLoaded = false;
+
+    /** Wheather the config has been loaded */
+    var _configLoaded = false;
+
     /** Original databanks as extracted by graph URI. */
     var _extractedByGraph = {};
     
@@ -152,7 +158,8 @@ RDFauthor = (function($, undefined) {
         '__LITERAL__':  {},
         '__OBJECT__': {}, 
         '__DEFAULT__': {}, 
-        '__DEBUG__': {}, 
+        '__DEBUG__': {},
+        '__PROPERTY__': {},
         'resource':   {}, 
         'property':   {}, 
         'range':      {}, 
@@ -355,7 +362,7 @@ RDFauthor = (function($, undefined) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
-                _callIfIsFunction(_options.onCancel());
+                _callIfIsFunction(_options.onCancel);
                 RDFauthor.cancel();
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
@@ -383,7 +390,7 @@ RDFauthor = (function($, undefined) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
-                _callIfIsFunction(_options.onCancel());
+                _callIfIsFunction(_options.onCancel);
                 RDFauthor.cancel();
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
@@ -480,7 +487,23 @@ RDFauthor = (function($, undefined) {
             _cacheLoaded = true;
         };
     }
-    
+
+    function _loadPropertyCache() {
+        if (!_propertycacheLoaded) {
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.propertycache.js', function () {
+                $.extend(_predicateInfo, __propertycache['generalapplicable']);
+            });
+            _propertycache = true;
+        }
+    }
+
+    function _loadConfig() {
+        if (!_configLoaded) {
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.config.js');
+        }
+        _configLoaded = true;
+    }
+
     /**
      * Loads info predicates for all predicates
      * @private
@@ -678,7 +701,6 @@ RDFauthor = (function($, undefined) {
             }
             
             document.getElementsByTagName('head')[0].appendChild(s);
-            
             // set script to loading
             _loadedScripts[scriptURI] = SCRIPT_STATE_LOADING;
         } else if (_loadedScripts[scriptURI] === SCRIPT_STATE_LOADING) {
@@ -971,6 +993,23 @@ RDFauthor = (function($, undefined) {
     }
     
     /**
+     * Remove JSON key value pairs if invalid argument.
+     * E.g. empty string.
+     * @private
+     */
+    function _checkJSON(json) {
+        json = JSON.parse(json);
+        for (var r in json) {
+            for (var p in json[r]) {
+                if( json[r][p][0].value.length == 0 ) {
+                    delete json[r][p];
+                }
+            }
+        }
+        return JSON.stringify(json);
+    }
+
+    /**
      * Updates all sources via SPARQL/Update
      * @private
      */
@@ -1001,21 +1040,31 @@ RDFauthor = (function($, undefined) {
                         updateQuery += '\nDELETE DATA FROM <' + g + '> {' + 
                         removedArray.join('\n').replace('""""', '"""') + '}';
                     }
-                    
-                    $.post(updateURI, {
-                        'query': updateQuery
-                    }, function (responseData, textStatus, XHR) {
-                        _view.hide(true);
-                        _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
-                    }, 'json');
+
+                    // console.log('Added: ' + $.makeArray(added.triples()));
+                    // console.log('Deleted: ' + $.makeArray(removed.triples()));
+                    // console.log('Query: ' + updateQuery);
+                    // return;
+
+                    // if no changes, don't run query due to bad request (sparql endpoint)
+                    if (updateQuery.length != 0) {
+                        $.post(updateURI, {
+                            'query': updateQuery
+                        }, function (responseData, textStatus, XHR) {
+                            _view.hide(true);
+                            _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                        }, 'json');
+                    } else {
+                        _callIfIsFunction(_options.onSubmitSuccess);
+                    }
+
                 } else {
                     // REST style
-                    var addedJSON = $.rdf.dump(added.triples(), {format: 'application/json', serialize: true});
+                    var addedJSON = _checkJSON($.rdf.dump(added.triples(), {format: 'application/json', serialize: true}));
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     
-                    
-                    // alert('Added: ' + addedJSON);
-                    // alert('Removed: ' + $.toJSON(indexes));
+                    // console.log('Added: ' + addedJSON);
+                    // console.log('Removed: ' + $.toJSON(indexes));
                     // return;
                     
                     if (addedJSON || removedJSON) {
@@ -1036,7 +1085,7 @@ RDFauthor = (function($, undefined) {
     }
     
     // RDFauthor setup code ///////////09:27:33+02:00
-////////////////////////////////////////
+    ////////////////////////////////////////
     
     if (RDFAUTHOR_BASE.charAt(RDFAUTHOR_BASE.length - 1) !== '/') {
         RDFAUTHOR_BASE = RDFAUTHOR_BASE + '/';
@@ -1052,9 +1101,15 @@ RDFauthor = (function($, undefined) {
         CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
     };
 
+    // Config
+    _loadConfig();
+
+    // PropertyCache
+    _loadPropertyCache();
+
     // Cache
     _loadCache();
-    
+
     // jQuery UI
     if (undefined === $.ui) {
         _require(RDFAUTHOR_BASE + 'libraries/jquery-ui.js');
@@ -1063,7 +1118,7 @@ RDFauthor = (function($, undefined) {
     
     // rdfQuery
     if (undefined === $.rdf) {
-        _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.core.js');
+        _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.rdfa-1.0.js');
     }
     
     // toJSON
@@ -1084,18 +1139,24 @@ RDFauthor = (function($, undefined) {
     
     // load widgets; widget prototype is required before all other widgets
     _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
+        // global widgets
         _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
         _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
-        /* _require(RDFAUTHOR_BASE + 'src/widget.alida.js'); */
         _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
         _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.html.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.datetime.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.mailto.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.tel.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.geo.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.markdown.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.imagepicker.js');
+        _require(RDFAUTHOR_BASE + 'src/widget.property.js');
+        // additional widgets
+        for ( var widget in __config['widgets']) {
+            // grab widget
+            var wConfig = __config['widgets'][widget];
+            // if enabled the widget will be loaded
+            if (wConfig['enabled']) {
+                // console.log('enabled: ' + widget);
+                _require(RDFAUTHOR_BASE + wConfig['path']);
+            } else {
+                // console.log('disabled: ' + widget);
+            }
+        }
         _requirePending--;
     });
     
@@ -1105,7 +1166,12 @@ RDFauthor = (function($, undefined) {
     } else {
         _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
     }
-    
+
+    // load ontowiki stylesheet when rdfauthor is used without ontowiki
+    if (!/ontowiki/gi.test($('head title').text())) {
+        _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
+    }
+
     // default info predicates
     _addInfoPredicate(RDF_NS + 'type', 'type');
     _addInfoPredicate(RDFS_NS + 'range', 'range');
@@ -1157,6 +1223,7 @@ RDFauthor = (function($, undefined) {
             var self = this;
             var view = RDFauthor.getView();
             view.hide(true, function () {
+                _callIfIsFunction(_options.onCancel);
                 /* clean up */
                 _resetDatabanks();
                 _resetParser();
@@ -1223,6 +1290,8 @@ RDFauthor = (function($, undefined) {
                  }
              }
              
+             console.debug("[RDFAuthor] Falling back to default graph ", _defaultGraphURI);
+
              return _defaultGraphURI;
         }, 
         
@@ -1503,7 +1572,11 @@ RDFauthor = (function($, undefined) {
             
             var serviceURI = o.sparqlEndpoint ? o.sparqlEndpoint : this.serviceURIForGraph(graphURI);
             if (undefined === serviceURI) {
-                throw 'Graph has no SPARQL endpoint defined.';
+            	var errorMsg = "Graph '" + graphURI + "' has no SPARQL endpoint defined.";
+            	//console.error("[RDFAuthor]", errorMsg);
+            	//console.debug("[RDFAuthor] Registered graphs", _graphInfo);
+            	
+                throw errorMsg;
             }
             
             /* Request parameters */
@@ -1592,7 +1665,6 @@ RDFauthor = (function($, undefined) {
             if (!$.isArray(hooks)) {
                 hooks = [hooks];
             }
-            
             for (var i = 0; i < hooks.length; i++) {
                 // the default hook value is an empty string (any value)
                 var hookSpec = $.extend({values: ['']}, hooks[i]);
@@ -1664,7 +1736,7 @@ RDFauthor = (function($, undefined) {
         /**
          * Sets the info predicates for the graph denoted by graphURI.
          * Currently the info spec keys 'queryEndpoint' and 'updateEndpoint' 
-         * (both pointing to a URI) are recodgnized.
+         * (both pointing to a URI) are recognized.
          */
         setInfoForGraph: function (graphURI, infoSpec, infoValue) {
             if (!(graphURI in _graphInfo)) {

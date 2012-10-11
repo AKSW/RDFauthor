@@ -10,7 +10,7 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#bottomDataProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Literal"
@@ -21,11 +21,8 @@ var __cache = {
       "label" : "bottomDataProperty"
    },
    "http://www.w3.org/2000/01/rdf-schema#seeAlso" : {
-      "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
-      ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "seeAlso"
    },
@@ -121,10 +118,10 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#bottomObjectProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "type" : [
          "http://www.w3.org/2002/07/owl#ObjectProperty"
@@ -154,7 +151,7 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#propertyDisjointWith" : {
       "domain" : [
-         "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+         "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       ],
       "range" : [
          "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
@@ -197,20 +194,14 @@ var __cache = {
       "label" : "has exact match"
    },
    "http://www.w3.org/2002/07/owl#annotatedSource" : {
-      "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
-      ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "annotatedSource"
    },
    "http://www.w3.org/2002/07/owl#differentFrom" : {
-      "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
-      ],
-      "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "differentFrom"
    },
@@ -243,20 +234,14 @@ var __cache = {
       "label" : "has close match"
    },
    "http://www.w3.org/2000/01/rdf-schema#member" : {
-      "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
-      ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "member"
    },
    "http://www.w3.org/1999/02/22-rdf-syntax-ns#value" : {
-      "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
-      ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "value"
    },
@@ -294,20 +279,14 @@ var __cache = {
       "label" : "someValuesFrom"
    },
    "http://www.w3.org/2002/07/owl#sameAs" : {
-      "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
-      ],
-      "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "sameAs"
    },
    "http://www.w3.org/1999/02/22-rdf-syntax-ns#first" : {
-      "domain" : [
-         "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
-      ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "first"
    },
@@ -341,7 +320,7 @@ var __cache = {
    },
    "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : {
       "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+         "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Resource"
@@ -359,7 +338,7 @@ var __cache = {
    },
    "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : {
       "domain" : [
-         "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+         "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       ],
       "range" : [
          "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
@@ -397,7 +376,7 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#equivalentProperty" : {
       "domain" : [
-         "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
+         "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       ],
       "range" : [
          "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"
@@ -415,7 +394,7 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#topDataProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Literal"
@@ -426,6 +405,9 @@ var __cache = {
       "label" : "topDataProperty"
    },
    "http://www.w3.org/2004/02/skos/core#altLabel" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
       "type" : [
          "http://www.w3.org/2002/07/owl#AnnotationProperty"
       ],
@@ -441,11 +423,8 @@ var __cache = {
       "label" : "minQualifiedCardinality"
    },
    "http://www.w3.org/2002/07/owl#annotatedTarget" : {
-      "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
-      ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
       ],
       "label" : "annotatedTarget"
    },
@@ -481,10 +460,10 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#topObjectProperty" : {
       "domain" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "type" : [
          "http://www.w3.org/2002/07/owl#ObjectProperty"
@@ -562,7 +541,7 @@ var __cache = {
    },
    "http://www.w3.org/2000/01/rdf-schema#comment" : {
       "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Literal"
@@ -587,7 +566,7 @@ var __cache = {
    },
    "http://www.w3.org/2000/01/rdf-schema#label" : {
       "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Literal"
@@ -644,11 +623,14 @@ var __cache = {
          "http://www.w3.org/2002/07/owl#NegativePropertyAssertion"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "label" : "sourceIndividual"
    },
    "http://www.w3.org/2004/02/skos/core#prefLabel" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
       "type" : [
          "http://www.w3.org/2002/07/owl#AnnotationProperty"
       ],
@@ -683,6 +665,9 @@ var __cache = {
       "label" : "is in semantic relation with"
    },
    "http://www.w3.org/2004/02/skos/core#note" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
       "type" : [
          "http://www.w3.org/2002/07/owl#AnnotationProperty"
       ],
@@ -702,7 +687,7 @@ var __cache = {
          "http://www.w3.org/2002/07/owl#NegativePropertyAssertion"
       ],
       "range" : [
-         "http://www.w3.org/2002/07/owl#Thing"
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
       "label" : "targetIndividual"
    },
@@ -714,7 +699,7 @@ var __cache = {
    },
    "http://www.w3.org/2002/07/owl#annotatedProperty" : {
       "domain" : [
-         "http://www.w3.org/2000/01/rdf-schema#Resource"
+         "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       ],
       "range" : [
          "http://www.w3.org/2000/01/rdf-schema#Resource"
@@ -756,5 +741,35 @@ var __cache = {
          "http://www.w3.org/1999/02/22-rdf-syntax-ns#List"
       ],
       "label" : "disjointUnionOf"
-   }
+   },
+  "http://purl.org/dc/terms/description" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
+      "label" : "description"
+  },
+  "http://purl.org/dc/terms/subject" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Literal"
+      ],
+      "label" : "subject"
+  },
+  "http://rdfs.org/sioc/ns#feed" : {
+      "type" : [
+          "http://www.w3.org/2002/07/owl#ObjectProperty"
+      ],
+      "label" : "feed"
+  },
+  "http://xmlns.com/foaf/0.1/depiction" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      ],
+      "label" : "depiction"
+  },
+  "http://xmlns.com/foaf/0.1/depicts" : {
+      "range" : [
+         "http://www.w3.org/2000/01/rdf-schema#Resource"
+      ],
+      "label" : "depicts"
+  }
 }

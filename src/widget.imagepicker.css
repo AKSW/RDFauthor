@@ -1,7 +1,7 @@
 #imagepicker {
   display: none;
   z-index: 10000;
-  overflow: auto;
+  overflow: hidden !important;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -10,10 +10,17 @@
   margin-left: 0px !important;
   margin-top: 0px !important;
   margin-bottom: 10px !important;
+  /* max-Height: 400px !important; */
+  /* max-Width: 500px !important; */
 }
 
 #gallery {
-  max-height: 450px;
-  max-width: 477px;
+  height: 450px;
+  width: 477px;
   border: 1px solid transparent;
+  overflow-x: hidden !important;
 }
+
+.image-icon { background: white url('../img/image.png') left center no-repeat !important; }
+
+.imagepicker { padding-left: 20px !important; }

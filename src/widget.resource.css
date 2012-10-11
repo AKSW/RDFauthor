@@ -31,6 +31,10 @@
     background: white url('../img/uri.png') right center no-repeat !important;
 }
 
+.resource-autocomplete-uri-name {
+    background: white url('../img/uri_name.png') right center no-repeat !important;
+}
+
 /* workarounds */
 * html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
 
@@ -68,7 +72,7 @@ li.ui-menu-item a.resource-edit-item .resource-edit-uri {
     margin: 0;
     padding: 0.1em;
     display: block;
-    font-size: 0.7em; 
+    font-size: 0.7em;
     color: #888;
     font-family: monospace;
 }
@@ -78,7 +82,7 @@ li.ui-menu-item a.ui-state-hover {
     border: 1px solid #0073ea !important;
 }
 
-li.ui-menu-item a.ui-state-hover .resource-edit-source, 
+li.ui-menu-item a.ui-state-hover .resource-edit-source,
 li.ui-menu-item a.ui-state-hover .resource-edit-uri {
     color: #fff;
 }

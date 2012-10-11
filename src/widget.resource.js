@@ -8,16 +8,24 @@ var MAX_TITLE_LENGTH = 50;
 
 RDFauthor.registerWidget({
     init: function () {
+        var self = this;
         this.selectedResource      = null;
         this.selectedResourceLabel = null;
         this.searchTerm            = '';
         this.ongoingSearches       = 0;
         this.searchResults         = [];
+        this.rangePattern          = '';
 
         this._domReady     = false;
         this._pluginLoaded = false;
         this._initialized  = false;
         this._autocomplete = null;
+
+        this.labels = [
+            'http://www.w3.org/2000/01/rdf-schema#label',
+            'http://www.w3.org/2004/02/skos/core#prefLabel',
+            'http://xmlns.com/foaf/0.1/name'
+        ];
 
         this._namespaces = jQuery.extend({
             foaf: 'http://xmlns.com/foaf/0.1/',
@@ -59,6 +67,9 @@ RDFauthor.registerWidget({
         if (this._options.filterRange) {
             this._options.filterDomain     = false;
             this._options.filterProperties = false;
+            this.getRange(function(rangePattern) {
+                self.rangePattern = rangePattern;
+            })
         } else if (this._options.filterDomain) {
             this._options.filterRange      = false;
             this._options.filterProperties = true;
@@ -105,10 +116,11 @@ RDFauthor.registerWidget({
         var value = this.statement.objectLabel()
                   ? this.statement.objectLabel()
                   : (this.statement.hasObject() ? this.statement.objectValue() : '');
+
         var markup = '\
-            <div class="container resource-value">\
-                <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input" \
-                       value="' + value + '"/>\
+            <div class="rdfauthor-container resource-value">\
+                <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input is-processing" \
+                       value="' + value + '" title="' + value + '"/>\
             </div>';
 
         return markup;
@@ -127,7 +139,7 @@ RDFauthor.registerWidget({
             if (hasChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(String(rdfqTriple));
+                    databank.remove(rdfqTriple);
                 }
             }
 
@@ -136,6 +148,9 @@ RDFauthor.registerWidget({
                 try {
                     var newStatement = this.statement.copyWithObject({
                         value: '<' + this.value() + '>',
+                        // value: ( self.statement._object.type == 'uri' ) ? '<' + this.value() + '>' 
+                                                                        // : '_:' + this.value(),
+                        // type: ( self.statement._object.type == 'bnode' ) ? 'bnode' : 'uri'
                         type: 'uri'
                     });
                     databank.add(newStatement.asRdfQueryTriple());
@@ -160,12 +175,83 @@ RDFauthor.registerWidget({
 
     value: function () {
         var self = this;
-        var value = self.element().val();
+        var value = self.element().data('uri');
         if ( self.isURI(value) || (String(value).indexOf(':') > -1) ) {
             return value;
         }
 
         return null;
+    },
+    
+    getLabel: function (subjectUri, responseCallback) {
+        var self = this;
+        var label = subjectUri;
+        var hasLabel = false;
+        //build unionPattern string
+        var unionPattern = '';
+
+        for (var i = 0; i < this.labels.length; ++i) {
+            var propertyUri = this.labels[i];
+	
+            unionPattern += '{ <' + subjectUri + '> <' + propertyUri + '> ?label }';
+        	
+            if(i != this.labels.length - 1) {
+                unionPattern += " UNION ";
+            }
+	}
+
+
+        //build query
+        var query = 'SELECT ?label WHERE { ' + unionPattern + ' . } LIMIT 1';
+        //log query
+        // console.log(query);
+        //query
+        RDFauthor.queryGraph(this.statement.graphURI(), query, {
+                callbackSuccess: function (data) {
+                    if (data['results']['bindings'].length != 0) {
+                        label = data['results']['bindings'][0]['label'].value;
+                        hasLabel = true;
+                    }
+
+                    if ($.isFunction(responseCallback)) {
+                        responseCallback(label, hasLabel);
+                    }
+                },
+                callbackError: function () {
+                    if ($.isFunction(responseCallback)) {
+                        responseCallback(label, hasLabel);
+                    }
+                    self.element().removeClass('is-processing');
+                }
+        });
+    },
+
+    getRange: function(responseCallback) {
+        var self = this;
+        var rangePattern = '';
+        var rangeQuery = '\
+            SELECT ?range\
+            WHERE {\
+                <' + self.statement.predicateURI() +'> <http://www.w3.org/2000/01/rdf-schema#range> ?range .\
+            }';
+        RDFauthor.queryGraph(this.statement.graphURI(), rangeQuery, {
+            callbackSuccess: function(data) {
+                range = data['results']['bindings'];
+                if (range.length != 0) {
+                    $(range).each(function(i) {
+                        rangePattern += '?uri a <' + range[i]['range'].value + '> . \n';
+                    });
+                }
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(rangePattern);
+                }
+            },
+            callbackError: function () {
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(rangePattern);
+                }
+            }
+        });
     },
 
     performSearch: function (searchTerm, responseCallback) {
@@ -179,21 +265,25 @@ RDFauthor.registerWidget({
                 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>';
             var uriPattern    = '?uri ?v1 ?literal .\n';
             var propertyPattern = '';
-            var domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
+            var domainPattern = '';
             var rangePattern  = '';
-            var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
+            var typePattern   = '';
+            //var typePattern   = 'OPTIONAL {<' + self.statement.subjectURI() + '> a ?type . }'
 
             if (this._options.filterProperties) {
                 propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
             }
 
-            if (this._options.filterRange) {
+            if (self._options.filterRange) {
                 var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
-                if ( (range.length > 0) && (range != 'http://www.w3.org/2002/07/owl#Thing') ) {
+                if (range.length > 0) {
                     rangePattern = '?uri a <' + range.join('> .\n?uri a <') + '> .\n';
+                    domainPattern = 'OPTIONAL {?uri rdfs:domain ?domain .}\n';
+                } else {
+                    rangePattern = self.rangePattern;
                 }
             }
-
+            
             var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
                 FROM <' + this.statement.graphURI() + '>\
                 WHERE {\
@@ -209,9 +299,8 @@ RDFauthor.registerWidget({
                         && REGEX(?literal, "^.{1,' + MAX_TITLE_LENGTH + '}$"))\
                 }\
                 LIMIT ' + this._options.maxResults;
-
+            
             // TODO: if domain is bound, check if current subject is an instance of it
-
             RDFauthor.queryGraph(this.statement.graphURI(), query, {
                 callbackSuccess: function (data) {
                     var sparqlResults = [];
@@ -231,19 +320,27 @@ RDFauthor.registerWidget({
                                         label = binding['literal']['value'];
                                     }
 
-                                    if (undefined == resources[uri]) {
-                                        resources[uri] = true;
+                                    if ($.inArray(uri,self.element().data('objects')) == -1) {
+                                        if (undefined == resources[uri]) {
+                                            resources[uri] = true;
 
-                                        var domain = binding['domain'];
-                                        var type   = binding['type'];
+                                            var domain = binding['domain'];
+                                            var type   = binding['type'];
 
-                                        if (domain && type) {
-                                            if (domain['value'] != type['value']) {
-                                                sparqlResults.push({
-                                                    source: 'sparqlmm',
-                                                    value:  uri,
-                                                    label:  label
-                                                });
+                                            if (domain && type) {
+                                                if (domain['value'] != type['value']) {
+                                                    sparqlResults.push({
+                                                        source: 'sparqlmm',
+                                                        value:  uri,
+                                                        label:  label
+                                                    });
+                                                } else {
+                                                    sparqlResults.push({
+                                                        source: 'sparql',
+                                                        value:  uri,
+                                                        label:  label
+                                                    });
+                                                }
                                             } else {
                                                 sparqlResults.push({
                                                     source: 'sparql',
@@ -251,12 +348,6 @@ RDFauthor.registerWidget({
                                                     label:  label
                                                 });
                                             }
-                                        } else {
-                                            sparqlResults.push({
-                                                source: 'sparql',
-                                                value:  uri,
-                                                label:  label
-                                            });
                                         }
                                     }
                                 }
@@ -418,6 +509,43 @@ RDFauthor.registerWidget({
     _initAutocomplete: function () {
         var self = this;
         if (this._pluginLoaded && this._domReady && !this._initialized) {
+            self.element().data('objects',[]);
+            self.element().parent().parent().parent().parent().parent().parent().find('input').each(function() {
+              self.element().data('objects').push($(this).attr('title'));
+            });
+            
+            //set human-readable label for uri
+            self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
+                self.element().data('uri', self.element().val());
+                self.element().data('label', label);
+                self.element().data('hasLabel', hasLabel);
+                if (hasLabel) {
+                    self.element().val(label);
+                    self.element().removeClass('resource-autocomplete-uri')
+                                  .addClass('resource-autocomplete-uri-name');
+                }
+                self.element().removeClass('is-processing');
+            });
+            // toggle values
+            self.element().focus(function() {
+                if ($(this).data('hasLabel')) {
+                    $(this).val($(this).data('uri'))
+                       .addClass('resource-autocomplete-uri')
+                       .removeClass('resource-autocomplete-uri-name');
+                }
+            }).blur(function() {
+                if (!($(this).data('uri') == $(this).val())) {
+                    var value = $(this).val();
+                    $(this).data('uri', value);
+                    $(this).data('label', value);
+                    $(this).data('hasLabel', false);
+                }
+                if ($(this).data('hasLabel')) {
+                    $(this).val($(this).data('label'))
+                       .removeClass('resource-autocomplete-uri')
+                       .addClass('resource-autocomplete-uri-name');
+                }
+            });
             // must be URI
             if (this.statement.hasObject()) {
                 this.element().addClass('resource-autocomplete-uri');
@@ -451,8 +579,12 @@ RDFauthor.registerWidget({
                     self.performSearch(request.term, response);
                 },
                 select: function (event, ui) {
-                    self.selectedResource      = ui.item.value;
+                    self.selectedResource      = encodeURI(ui.item.value);
                     self.selectedResourceLabel = ui.item.label;
+                    self.element().data('uri', encodeURI(ui.item.value));
+                    self.element().data('label', ui.item.label);
+                    self.element().data('hasLabel', true);
+                    self.element().attr('title', ui.item.value);
                     self.element().val(self.selectedResource);
                     // callback
                     var originalEvent = event   /* autocompleteselected*/
@@ -465,7 +597,7 @@ RDFauthor.registerWidget({
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
                         return true;
                     }
-
+                    self.element().blur();
                     // prevent jQuery UI default
                     return false;
                 },
@@ -507,7 +639,7 @@ RDFauthor.registerWidget({
                                 border:1px solid ' + self.sources[item.source]['border'] + ';">\
                             <span class="resource-edit-source">' + self.sources[item.source]['label'] + '</span>\
                             <span class="resource-edit-label">' + self.highlight(item.label, self.searchTerm) + '</span>\
-                            <span class="resource-edit-uri">' + self.highlight(item.value, self.searchTerm) + '</span>\
+                            <span class="resource-edit-uri">' + self.highlight(encodeURI(item.value), self.searchTerm) + '</span>\
                         </a>')
                         .css('width', self.element().innerWidth() - 4)
                         .appendTo(ul);
