@@ -581,8 +581,6 @@ RDFauthor.registerWidget({
                 select: function (event, ui) {
                     self.selectedResource      = encodeURI(ui.item.value);
                     self.selectedResourceLabel = ui.item.label;
-                    console.log(ui.item.value);
-                    console.log()
                     self.element().data('uri', encodeURI(ui.item.value));
                     self.element().data('label', ui.item.label);
                     self.element().data('hasLabel', true);
