@@ -463,7 +463,7 @@ RDFauthor.registerWidget({
             prefix += '/';
         }
 
-        return prefix + item;
+        return prefix + encodeURIComponent(item);
     },
 
     isURI: function (term) {
@@ -559,7 +559,9 @@ RDFauthor.registerWidget({
                 search: function (event, ui) {
                     var value = self.element().val();
                     // cancel search if URI entered
-                    if (self.isURI(value) || (String(value).indexOf(':') > -1)) {
+                    // commented out - if no bugs, remove it permanently
+                    // if (self.isURI(value) || (String(value).indexOf(':') > -1)) {
+                    if (self.isURI(value)) {
                         self.element().addClass('resource-autocomplete-uri');
                         self.element().data('autocomplete').close();
 
@@ -579,9 +581,9 @@ RDFauthor.registerWidget({
                     self.performSearch(request.term, response);
                 },
                 select: function (event, ui) {
-                    self.selectedResource      = encodeURI(ui.item.value);
+                    self.selectedResource      = ui.item.value;
                     self.selectedResourceLabel = ui.item.label;
-                    self.element().data('uri', encodeURI(ui.item.value));
+                    self.element().data('uri', ui.item.value);
                     self.element().data('label', ui.item.label);
                     self.element().data('hasLabel', true);
                     self.element().attr('title', ui.item.value);
@@ -612,6 +614,7 @@ RDFauthor.registerWidget({
                 if ((e.which === 13) && self._options.selectOnReturn) {
                     self.element().data('autocomplete').destroy();
                     var val = jQuery(e.target).val();
+                    console.log(val);
                     self._normalizeValue(val);
 
                     var splits = val.split(':', 2);
@@ -639,7 +642,7 @@ RDFauthor.registerWidget({
                                 border:1px solid ' + self.sources[item.source]['border'] + ';">\
                             <span class="resource-edit-source">' + self.sources[item.source]['label'] + '</span>\
                             <span class="resource-edit-label">' + self.highlight(item.label, self.searchTerm) + '</span>\
-                            <span class="resource-edit-uri">' + self.highlight(encodeURI(item.value), self.searchTerm) + '</span>\
+                            <span class="resource-edit-uri">' + self.highlight(item.value, self.searchTerm) + '</span>\
                         </a>')
                         .css('width', self.element().innerWidth() - 4)
                         .appendTo(ul);
