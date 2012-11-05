@@ -499,7 +499,10 @@ RDFauthor = (function($) {
 
     function _loadConfig() {
         if (!_configLoaded) {
-            _require(RDFAUTHOR_BASE + 'src/rdfauthor.config.js');
+            _requirePending++;
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.config.js', function() {
+                _requirePending--;
+            });
         }
         _configLoaded = true;
     }
@@ -843,20 +846,17 @@ RDFauthor = (function($) {
             // reset old view
             _resetView();
         }
-        
         if (undefined === view) {
             view = RDFauthor.getView();
         }
-        
         /* make sure, view has predicate info available */
         _fetchPredicateInfo(function() {
-            
             if (null !== root) {
                 root.find('.rdfauthor-statement-provider').each(function () {
                     var statement = $(this).data('rdfauthor.statement');
                     view.addWidget(statement);
                 });
-            } else {                
+            } else {
                 // add all parsed statements
                 for (var graph in _databanksByGraph) {
                     var updateEndpoint = RDFauthor.updateURIForGraph(graph);
@@ -998,15 +998,16 @@ RDFauthor = (function($) {
      * @private
      */
     function _checkJSON(json) {
-        json = JSON.parse(json);
         for (var r in json) {
             for (var p in json[r]) {
-                if( json[r][p][0].value.length == 0 ) {
-                    delete json[r][p];
+                for (var o in json[r][p]) {
+                    if( json[r][p][o].value.length === 0 ) {
+                        delete json[r][p][o];
+                    }
                 }
             }
         }
-        return JSON.stringify(json);
+        return json;
     }
 
     /**
@@ -1018,7 +1019,9 @@ RDFauthor = (function($) {
             var updateURI = RDFauthor.updateURIForGraph(g);
             var databank  = RDFauthor.databankForGraph(g);
             var original  = _extractedByGraph[g];
-            
+            // console.log('updateURI', updateURI);
+            // console.log('databank', databank);
+            // console.log('original', original);
             if (undefined !== updateURI && undefined !== databank) {
                 var added   = databank.except(original);
                 var removed = original.except(databank);
@@ -1026,6 +1029,7 @@ RDFauthor = (function($) {
                 _insertSpecialStatements(added, g);
                 
                 if (_options.useSPARQL11) {
+                    // console.log('useSPARQL11');
                     // SPARQL/Update
                     var updateQuery = '';
                     
@@ -1041,43 +1045,62 @@ RDFauthor = (function($) {
                         removedArray.join('\n').replace('""""', '"""') + '}';
                     }
 
-                    // console.log('Added: ' + $.makeArray(added.triples()));
-                    // console.log('Deleted: ' + $.makeArray(removed.triples()));
-                    // console.log('Query: ' + updateQuery);
+                    // console.log('SPARQL Added: ', $.makeArray(added.triples()));
+                    // console.log('SPARQL Deleted: ', $.makeArray(removed.triples()));
+                    // console.log('SPARQL Query: ', updateQuery);
                     // return;
 
                     // if no changes, don't run query due to bad request (sparql endpoint)
                     if (updateQuery.length != 0) {
-                        $.post(updateURI, {
-                            'query': updateQuery
-                        }, function (responseData, textStatus, XHR) {
+                        $.ajax({
+                            type: 'POST',
+                            url: updateURI, 
+                            data: {
+                                'query': updateQuery
+                            },
+                            dataType: 'json'
+                        }).done(function (responseData, textStatus, XHR) {
                             _view.hide(true);
                             _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
-                        }, 'json');
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert('error while post request: ' + errorThrown);
+                        });
                     } else {
                         _callIfIsFunction(_options.onSubmitSuccess);
+                        _view.hide(true);
                     }
 
                 } else {
+                    // console.log('use REST');
                     // REST style
-                    var addedJSON = _checkJSON($.rdf.dump(added.triples(), {format: 'application/json', serialize: true}));
+                    var addedJSON = _checkJSON($.rdf.dump(added.triples()));
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
-                    
-                    // console.log('Added: ' + addedJSON);
-                    // console.log('Removed: ' + $.toJSON(indexes));
+                    // , {format: 'application/json', serialize: true})
+                    // console.log('JSON Added: ' + $.toJSON(addedJSON));
+                    // console.log('JSON Removed: ' + $.toJSON(indexes));
                     // return;
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
-                        $.post(updateURI, {
-                            'named-graph-uri': g, 
-                            'insert': addedJSON ? addedJSON : '{}', 
-                            'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
-                            'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
-                        }, function (responseData, textStatus, XHR) {
+                        $.ajax({
+                            type: 'POST',
+                            url: updateURI, 
+                            data: {
+                                'named-graph-uri': g, 
+                                'insert': addedJSON ? $.toJSON(addedJSON) : '{}', 
+                                'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
+                                'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
+                            },
+                            dataType: 'json'
+                        }).done(function (responseData, textStatus, XHR) {
                             _view.hide(true);
                             _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
-                        }, 'json');
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert('error while post request: ' + errorThrown);
+                        });
+                    } else {
+                        _view.hide(true);
+                        _callIfIsFunction(_options.onSubmitSuccess);
                     }
                 }
             }
@@ -1318,6 +1341,148 @@ RDFauthor = (function($) {
              return _defaultSubjectURI;
         },
         
+        /**
+         * Edit resources.
+         * @param config type, targetService, targetGraph, targetResource, [targetResourceData]
+         */
+        edit: function (config) {
+            var self = this;
+
+            var loadingRdy = function() {
+                // reset rdfauthor settings
+                _resetOptions();
+                // set rdfauthor settings
+                self.setInfoForGraph(config.targetGraph, 'queryEndpoint', config.targetService);
+                self.setInfoForGraph(config.targetGraph, 'updateEndpoint', config.targetService);
+                _options.viewOptions.type = config.view;
+                _options.useSPARQL11 = config.useSPARQL11 | false;
+                var data = config.targetResourceData;
+                // console.log('config', config);
+                // console.log('_graphInfo', _graphInfo);
+                // console.log('_options', _options);
+                // console.log('data', data);
+
+                // create statements
+                var protect  = arguments.length >= 2 ? protect : true;
+                var resource = arguments.length >= 3 ? resource : null;
+                var graph    = arguments.length >= 4 ? graph : null;
+                for (var currentProperty in data[config.targetResource]) {
+                    var objects = data[config.targetResource][currentProperty];
+
+                    for (var i = 0; i < objects.length; i++) {
+                        var objSpec = objects[i];
+                        var value;
+                        if ( objSpec.type == 'uri' ) { 
+                            value = '<' + objSpec.value + '>'; 
+                        } else if ( objSpec.type == 'bnode' ) { 
+                            value = '_:' + objSpec.value;
+                        } else {
+                            // IE fix, object keys with empty strings are removed
+                            value = objSpec.value ? objSpec.value : ""; 
+                        }
+
+                        var newObjectSpec = {
+                            value : value,
+                            type: String(objSpec.type).replace('typed-', '')
+                        };
+
+                        if (objSpec.value) {
+                            if (/literal/.test(objSpec.type)) {
+                                if (objSpec.datatype) {
+                                    newObjectSpec.options = {
+                                        'datatype': objSpec.datatype
+                                    };
+                                }
+                                if (objSpec.lang) {
+                                    newObjectSpec.options = {
+                                        'lang': objSpec.lang
+                                    };
+                                }
+                            }
+                        }
+
+                        // console.log('newObjectSpec', newObjectSpec);
+                        var stmt = new Statement({
+                            subject: '<' + config.targetResource + '>', 
+                            predicate: '<' + currentProperty + '>', 
+                            object: newObjectSpec
+                        }, {
+                            graph: config.targetGraph, 
+                            title: objSpec.title, 
+                            protect: protect ? true : false, 
+                            hidden: objSpec.hidden ? objSpec.hidden : false
+                        });
+
+                        // console.log("Adding statement ", stmt);
+                        // console.log('Statement Graph', stmt.graphURI());
+                        self.addStatement(stmt);
+                    }
+                }
+
+                // set gui/editing options
+                self.setOptions({
+                    saveButtonTitle: config.saveButtonTitle ? config.saveButtonTitle : 'Save',
+                    cancelButtonTitle: config.cancelButtonTitle ? config.cancelButtonTitle : 'Cancel',
+                    title: config.title ? config.title : 'Edit Resource: ' + config.targetResource,  
+                    autoParse: false, 
+                    showPropertyButton: config.showPropertyButton ? config.showPropertyButton : true,
+                    onSubmitSuccess: function (responseData) {
+                        // run callback
+                        _callIfIsFunction(config.onSubmitSuccess);
+                    }
+                });
+
+                // create editing view
+                var view = self.getView();
+                for (var graph in _databanksByGraph) {
+                    var updateEndpoint = config.targetService
+                    if (undefined !== updateEndpoint) {
+                        var triples = _databanksByGraph[graph].triples();
+                        for (var i = 0, length = triples.length; i < length; i++) {
+                            // init statement
+                            var statement = new Statement(triples[i], {'graph': config.targetGraph});
+                            // handle object label callback
+                            var element = RDFauthor.elementForStatement(statement);
+                            var label = null;
+                            if (typeof _options.objectLabel == 'function') {
+                                label = _options.objectLabel(element);
+                            }
+                            // init statement
+                            var statement2 = new Statement(triples[i], {'graph': graph, objectLabel: label});
+                            view.addWidget(statement2);
+                        }
+                    }
+                }
+
+                // show view
+                view.show(true);
+            }
+
+            // if rdfauthor is rdy, start editing
+            // the code tries to run the editing mode within 15 seconds otherwise 
+            // checks the loading state of rdfauthor every 10 ms
+            var loading = true;
+            var count = 0;
+            var idInterval = window.setInterval(function(){
+                count++;
+                // _requirePending indicates how many scripts still have to be appended to dom
+                _requirePending > 0 ? loading = true : loading = false;
+                // count == 1500 equals 15 seconds
+                if (count < 1500) {
+                    if (!loading) {
+                        // stop interval
+                        window.clearInterval(idInterval);
+                        // run editing mode
+                        loadingRdy();
+                    }
+                } else {
+                    // stop interval check after 15seconds
+                    window.clearInterval(idInterval);
+                    console.err('error while using EDIT function (timeout for loading rdfauthor)');
+                }
+            }, 10);
+        },
+
         /**
          * Returns the element a given statement was found on.
          */

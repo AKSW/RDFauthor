@@ -54,6 +54,15 @@ var __config = {
                             return v;
                         }
                     };
+                    $.typedValue.types['http://www.w3.org/2001/XMLSchema#dateTime'] = {
+                        regex: /^.*$/,
+                        strip: true,
+                        /** @ignore */
+                        value: function (v, options) {
+                            var opts = $.extend({}, $.typedValue.defaults, options);
+                            return v;
+                        }
+                    };
                 }
             }
         },
