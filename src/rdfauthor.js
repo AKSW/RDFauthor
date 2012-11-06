@@ -497,14 +497,19 @@ RDFauthor = (function($) {
         }
     }
 
-    function _loadConfig() {
+    function _loadConfig(callback) {
+        var dfd = $.Deferred();
         if (!_configLoaded) {
-            _requirePending++;
             _require(RDFAUTHOR_BASE + 'src/rdfauthor.config.js', function() {
-                _requirePending--;
+                _configLoaded = true;
+
+                dfd.resolve();
             });
+        } else {
+            _configLoaded = true;
+            dfd.resolve();
         }
-        _configLoaded = true;
+        return dfd.promise();
     }
 
     /**
@@ -1163,24 +1168,26 @@ RDFauthor = (function($) {
     // load widgets; widget prototype is required before all other widgets
     _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
         // global widgets
-        _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
-        _require(RDFAUTHOR_BASE + 'src/widget.property.js');
-        // additional widgets
-        for ( var widget in __config['widgets']) {
-            // grab widget
-            var wConfig = __config['widgets'][widget];
-            // if enabled the widget will be loaded
-            if (wConfig['enabled']) {
-                // console.log('enabled: ' + widget);
-                _require(RDFAUTHOR_BASE + wConfig['path']);
-            } else {
-                // console.log('disabled: ' + widget);
+        $.when(_loadConfig()).then(function() {
+            _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
+            _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
+            _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
+            _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
+            _require(RDFAUTHOR_BASE + 'src/widget.property.js');
+            // additional widgets
+            for ( var widget in __config['widgets']) {
+                // grab widget
+                var wConfig = __config['widgets'][widget];
+                // if enabled the widget will be loaded
+                if (wConfig['enabled']) {
+                    // console.log('enabled: ' + widget);
+                   _require(RDFAUTHOR_BASE + wConfig['path']);
+                } else {
+                    // console.log('disabled: ' + widget);
+                }
             }
-        }
-        _requirePending--;
+            _requirePending--;
+        });
     });
     
     // load stylesheets
