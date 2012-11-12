@@ -1006,8 +1006,8 @@ RDFauthor = (function($) {
         for (var r in json) {
             for (var p in json[r]) {
                 for (var o in json[r][p]) {
-                    if( json[r][p][o].value.length === 0 ) {
-                        delete json[r][p][o];
+                    if( json[r][p][o].value.length === 0 || json[r][p][o].value == null) {
+                        delete json[r][p];
                     }
                 }
             }
