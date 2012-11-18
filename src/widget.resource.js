@@ -121,6 +121,12 @@ RDFauthor.registerWidget({
             <div class="rdfauthor-container resource-value">\
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input is-processing" \
                        value="' + value + '" title="' + value + '"/>\
+                <div class="rdfauthor-container util" style="padding:0px;">\
+                    <label><span style="padding-right: 5px;">Filter by</span>\
+                    <input class="checkbox checkbox-range" type="checkbox" name="range"\
+                    '+ (this._options.filterRange ? 'checked="checked"' : '') + '">\
+                    <label>Range</label></label>\
+                </div>\
             </div>';
 
         return markup;
@@ -509,6 +515,11 @@ RDFauthor.registerWidget({
     _initAutocomplete: function () {
         var self = this;
         if (this._pluginLoaded && this._domReady && !this._initialized) {
+            // set range option
+            self.element().parent().find('input[name=range]').click(function() {
+                self._options.filterRange = $(this).is(':checked');
+            });
+
             self.element().data('objects',[]);
             self.element().parent().parent().parent().parent().parent().parent().find('input').each(function() {
               self.element().data('objects').push($(this).attr('title'));
