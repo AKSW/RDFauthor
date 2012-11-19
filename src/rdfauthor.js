@@ -1356,82 +1356,157 @@ RDFauthor = (function($) {
         
         /**
          * Edit resources.
-         * @param config type, targetService, targetGraph, targetResource, [targetResourceData]
+         * @param config type, targetSparqlEndpoint, targetUpdateEndpoint, targetGraph, targetResource, [targetResourceData]
          */
         edit: function (config) {
             var self = this;
 
-            var loadingRdy = function() {
-                // reset rdfauthor settings
-                _resetOptions();
-                // set rdfauthor settings
-                self.setInfoForGraph(config.targetGraph, 'queryEndpoint', config.targetService);
-                self.setInfoForGraph(config.targetGraph, 'updateEndpoint', config.targetService);
-                _options.viewOptions.type = config.view;
-                _options.useSPARQL11 = config.useSPARQL11 | false;
-                var data = config.targetResourceData;
-                // console.log('config', config);
-                // console.log('_graphInfo', _graphInfo);
-                // console.log('_options', _options);
-                // console.log('data', data);
-
-                // create statements
-                var protect  = arguments.length >= 2 ? protect : true;
-                var resource = arguments.length >= 3 ? resource : null;
-                var graph    = arguments.length >= 4 ? graph : null;
-                for (var currentProperty in data[config.targetResource]) {
-                    var objects = data[config.targetResource][currentProperty];
-
-                    for (var i = 0; i < objects.length; i++) {
-                        var objSpec = objects[i];
-                        var value;
-                        if ( objSpec.type == 'uri' ) { 
-                            value = '<' + objSpec.value + '>'; 
-                        } else if ( objSpec.type == 'bnode' ) { 
-                            value = '_:' + objSpec.value;
-                        } else {
-                            // IE fix, object keys with empty strings are removed
-                            value = objSpec.value ? objSpec.value : ""; 
-                        }
-
-                        var newObjectSpec = {
-                            value : value,
-                            type: String(objSpec.type).replace('typed-', '')
-                        };
-
-                        if (objSpec.value) {
-                            if (/literal/.test(objSpec.type)) {
-                                if (objSpec.datatype) {
-                                    newObjectSpec.options = {
-                                        'datatype': objSpec.datatype
-                                    };
+            var createStatements = function() {
+                var dfd = $.Deferred();
+                // if resourceTargetData is not defined, query the endpoint
+                if (typeof config.targetResourceData == 'undefined') {
+                    var query = '\
+                        SELECT ?p ?o\
+                        FROM <' + config.targetGraph + '>\
+                        WHERE {\
+                            <' + config.targetResource + '> ?p ?o.\
+                        }';
+                    self.queryGraph(config.targetGraph, query, {
+                        callbackSuccess: function(data, status) {
+                            console.log('data', data);
+                            // create statements
+                            data = data['results']['bindings'];
+                            for (var currentPropertyIndex in data) {
+                                console.log(data[currentPropertyIndex]);
+                                var currentProperty = data[currentPropertyIndex]['p'].value;
+                                var currentPropertyObject = data[currentPropertyIndex]['o'];
+                                var objSpec = currentPropertyObject;
+                                var value;
+                                if ( objSpec.type == 'uri' ) { 
+                                    value = '<' + objSpec.value + '>'; 
+                                } else if ( objSpec.type == 'bnode' ) { 
+                                    value = '_:' + objSpec.value;
+                                } else {
+                                    // IE fix, object keys with empty strings are removed
+                                    value = objSpec.value ? objSpec.value : ""; 
                                 }
-                                if (objSpec.lang) {
-                                    newObjectSpec.options = {
-                                        'lang': objSpec.lang
-                                    };
+
+                                var newObjectSpec = {
+                                    value : value,
+                                    type: String(objSpec.type).replace('typed-', '')
+                                };
+
+
+                                if (objSpec.value) {
+                                    if (/literal/.test(objSpec.type)) {
+                                        if (objSpec.datatype) {
+                                            newObjectSpec.options = {
+                                                'datatype': objSpec.datatype
+                                            };
+                                        }
+                                        if (objSpec.lang) {
+                                            newObjectSpec.options = {
+                                                'lang': objSpec.lang
+                                            };
+                                        }
+                                        if (objSpec['xml:lang']) {
+                                            newObjectSpec.options = {
+                                                'lang': objSpec['xml:lang']
+                                            };
+                                        }
+                                    }
+                                }
+
+                                console.log('newObjectSpec', newObjectSpec);
+
+                                var stmt = new Statement({
+                                    subject: '<' + config.targetResource + '>', 
+                                    predicate: '<' + currentProperty + '>', 
+                                    object: newObjectSpec
+                                }, {
+                                    graph: config.targetGraph, 
+                                    title: objSpec.title, 
+                                    protect: protect ? true : false, 
+                                    hidden: objSpec.hidden ? objSpec.hidden : false
+                                });
+
+                                console.log("Adding statement ", stmt);
+                                // console.log('Statement Graph', stmt.graphURI());
+                                self.addStatement(stmt);
+
+                            }
+                            dfd.resolve();
+                        }
+                    });
+
+                } else {
+                    // resourceTargetData was defined and will be used to create the statements
+                    console.log('resourceData');
+                    var data = config.targetResourceData;
+
+                    // create statements
+                    var protect  = arguments.length >= 2 ? protect : true;
+                    var resource = arguments.length >= 3 ? resource : null;
+                    var graph    = arguments.length >= 4 ? graph : null;
+                    for (var currentProperty in data[config.targetResource]) {
+                        var objects = data[config.targetResource][currentProperty];
+
+                        for (var i = 0; i < objects.length; i++) {
+                            var objSpec = objects[i];
+                            var value;
+                            if ( objSpec.type == 'uri' ) { 
+                                value = '<' + objSpec.value + '>'; 
+                            } else if ( objSpec.type == 'bnode' ) { 
+                                value = '_:' + objSpec.value;
+                            } else {
+                                // IE fix, object keys with empty strings are removed
+                                value = objSpec.value ? objSpec.value : ""; 
+                            }
+
+                            var newObjectSpec = {
+                                value : value,
+                                type: String(objSpec.type).replace('typed-', '')
+                            };
+
+                            if (objSpec.value) {
+                                if (/literal/.test(objSpec.type)) {
+                                    if (objSpec.datatype) {
+                                        newObjectSpec.options = {
+                                            'datatype': objSpec.datatype
+                                        };
+                                    }
+                                    if (objSpec.lang) {
+                                        newObjectSpec.options = {
+                                            'lang': objSpec.lang
+                                        };
+                                    }
                                 }
                             }
+
+                            // console.log('newObjectSpec', newObjectSpec);
+                            var stmt = new Statement({
+                                subject: '<' + config.targetResource + '>', 
+                                predicate: '<' + currentProperty + '>', 
+                                object: newObjectSpec
+                            }, {
+                                graph: config.targetGraph, 
+                                title: objSpec.title, 
+                                protect: protect ? true : false, 
+                                hidden: objSpec.hidden ? objSpec.hidden : false
+                            });
+
+                            // console.log("Adding statement ", stmt);
+                            // console.log('Statement Graph', stmt.graphURI());
+                            self.addStatement(stmt);
                         }
-
-                        // console.log('newObjectSpec', newObjectSpec);
-                        var stmt = new Statement({
-                            subject: '<' + config.targetResource + '>', 
-                            predicate: '<' + currentProperty + '>', 
-                            object: newObjectSpec
-                        }, {
-                            graph: config.targetGraph, 
-                            title: objSpec.title, 
-                            protect: protect ? true : false, 
-                            hidden: objSpec.hidden ? objSpec.hidden : false
-                        });
-
-                        // console.log("Adding statement ", stmt);
-                        // console.log('Statement Graph', stmt.graphURI());
-                        self.addStatement(stmt);
                     }
+                    dfd.resolve();
                 }
+                return dfd.promise();
+            }
 
+            var setOptions = function() {
+                // var dfd = $.Deferred();
                 // set gui/editing options
                 self.setOptions({
                     saveButtonTitle: config.saveButtonTitle ? config.saveButtonTitle : 'Save',
@@ -1444,11 +1519,16 @@ RDFauthor = (function($) {
                         _callIfIsFunction(config.onSubmitSuccess);
                     }
                 });
+                // dfd.resolve();
+                // return dfd.promise();
+            }
 
+            var createView = function() {
+                // var dfd = $.Deferred();
                 // create editing view
                 var view = self.getView();
                 for (var graph in _databanksByGraph) {
-                    var updateEndpoint = config.targetService
+                    var updateEndpoint = config.targetUpdateEndpoint;
                     if (undefined !== updateEndpoint) {
                         var triples = _databanksByGraph[graph].triples();
                         for (var i = 0, length = triples.length; i < length; i++) {
@@ -1466,9 +1546,30 @@ RDFauthor = (function($) {
                         }
                     }
                 }
-
                 // show view
                 view.show(true);
+                // dfd.resolve();
+                // return dfd.promise();
+            }
+
+            var init = function() {
+                // reset rdfauthor settings
+                _resetOptions();
+                // set rdfauthor settings
+                self.setInfoForGraph(config.targetGraph, 'queryEndpoint', config.targetSparqlEndpoint);
+                self.setInfoForGraph(config.targetGraph, 'updateEndpoint', config.targetUpdateEndpoint);
+                _options.viewOptions.type = config.view;
+                _options.useSPARQL11 = config.useSPARQL11 | false;
+
+                // console.log('config', config);
+                // console.log('_graphInfo', _graphInfo);
+                // console.log('_options', _options);
+                // console.log('data', data);
+                $.when(createStatements()).then(function() {
+                    setOptions();
+                    createView();
+                });
+
             }
 
             // if rdfauthor is rdy, start editing
@@ -1486,7 +1587,7 @@ RDFauthor = (function($) {
                         // stop interval
                         window.clearInterval(idInterval);
                         // run editing mode
-                        loadingRdy();
+                        init();
                     }
                 } else {
                     // stop interval check after 15seconds
@@ -1773,6 +1874,7 @@ RDFauthor = (function($) {
                 /* request application/sparql-results+json */
                 beforeSend: function (XMLHTTPRequest) {
                     XMLHTTPRequest.setRequestHeader('Accept', 'application/sparql-results+json');
+                    // XMLHTTPRequest.setRequestHeader('Accept', 'application/javascript');
                 }
             };
             
