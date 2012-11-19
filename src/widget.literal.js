@@ -12,7 +12,28 @@ RDFauthor.registerWidget({
         this.integer      = "http://www.w3.org/2001/XMLSchema#integer";
         this.namespaces   = RDFauthor.namespaces();
 
+        this._domRdy      = false;
+        this._shiftenter  = false;
+        this._elastic     = false;
         this.languages.unshift('');
+        
+        var self = this;
+
+        // load shiftenter plugin
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.shiftenter.js', function () {
+            self._shiftenter = true;
+            self._init();
+
+        });
+
+        // load shiftenter stylesheet
+        RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.shiftenter.css');
+
+        // load elastic plugin
+        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.elastic.js', function () {
+            self._elastic = true;
+            self._init();
+        });
 
         // modify Safari input behaviour (CSS3)
         if ($.browser.webkit) {
@@ -114,6 +135,8 @@ RDFauthor.registerWidget({
             }
         });
 
+        this._domRdy = true;
+        this._init();
     },
 
     valueClass: function () {
@@ -202,7 +225,7 @@ RDFauthor.registerWidget({
         var areaMarkup = '\
             <div class="rdfauthor-container ' + areaConfig.containerClass + '" style="width:100%">\
                 <div class="notboolean" style="' + ( isBoolean ? 'display:none;' : 'display:block;' ) + '">\
-                <textarea rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' +
+                <textarea class="width99" rows="' + String(areaConfig.rows) + '" cols="20" id="literal-value-' +
                     this.ID + '">' + (this.statement.hasObject() ? this.statement.objectValue() : '') + '</textarea>\
                 </div>\
                 <div class="boolean" style="' + ( isBoolean ? 'display:block;' : 'display:none;' ) + '">\
@@ -338,6 +361,21 @@ RDFauthor.registerWidget({
         }
 
         return null;
+    },
+
+    _init: function () {
+        var self = this;
+        if (self._domRdy && self._shiftenter && self._elastic) {
+            // bind plugins
+            self.element()
+                .elastic()
+                .shiftenter({
+                    hint: 'Shift+Enter for line break - Enter for submitting changes',
+                    onReturn: function() {
+                        RDFauthor.commit();
+                    }
+                });
+        }
     }
 }, {
         name: '__LITERAL__',
