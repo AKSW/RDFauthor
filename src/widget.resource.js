@@ -520,6 +520,15 @@ RDFauthor.registerWidget({
                 self._options.filterRange = $(this).is(':checked');
             });
 
+            // keypress events
+            self.element().keypress(function(event) {
+                // commit results on enter
+                if(event.which == 13) {
+                    event.preventDefault();
+                    RDFauthor.commit();
+                }
+            });
+
             self.element().data('objects',[]);
             self.element().parent().parent().parent().parent().parent().parent().find('input').each(function() {
               self.element().data('objects').push($(this).attr('title'));
@@ -610,7 +619,10 @@ RDFauthor.registerWidget({
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
                         return true;
                     }
-                    self.element().blur();
+
+                    // remove focus from input
+                    // self.element().blur();
+
                     // prevent jQuery UI default
                     return false;
                 },
@@ -637,7 +649,6 @@ RDFauthor.registerWidget({
                     }
 
                     self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
-
                     // prevent newline in new widget field
                     e.preventDefault();
                 } else if (e.which === 27) {
