@@ -1198,7 +1198,7 @@ RDFauthor = (function($) {
     }
 
     // load ontowiki stylesheet when rdfauthor is used without ontowiki
-    if (!/ontowiki/gi.test($('head title').text())) {
+    if (!/ontowiki|aksw/gi.test($('head title').text())) {
         _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
         // _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.update.css');
         // preparation for new theme
