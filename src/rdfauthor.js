@@ -1200,6 +1200,12 @@ RDFauthor = (function($) {
     // load ontowiki stylesheet when rdfauthor is used without ontowiki
     if (!/ontowiki/gi.test($('head title').text())) {
         _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
+        // _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.update.css');
+        // preparation for new theme
+        // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/default.css');
+        // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/default.dev.css');
+        // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/deprecated.dev.css');
+        // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/old.css');
     }
 
     // default info predicates
