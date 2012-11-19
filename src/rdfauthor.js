@@ -1373,11 +1373,9 @@ RDFauthor = (function($) {
                         }';
                     self.queryGraph(config.targetGraph, query, {
                         callbackSuccess: function(data, status) {
-                            console.log('data', data);
                             // create statements
                             data = data['results']['bindings'];
                             for (var currentPropertyIndex in data) {
-                                console.log(data[currentPropertyIndex]);
                                 var currentProperty = data[currentPropertyIndex]['p'].value;
                                 var currentPropertyObject = data[currentPropertyIndex]['o'];
                                 var objSpec = currentPropertyObject;
@@ -1417,7 +1415,7 @@ RDFauthor = (function($) {
                                     }
                                 }
 
-                                console.log('newObjectSpec', newObjectSpec);
+                                // console.log('newObjectSpec', newObjectSpec);
 
                                 var stmt = new Statement({
                                     subject: '<' + config.targetResource + '>', 
@@ -1430,7 +1428,7 @@ RDFauthor = (function($) {
                                     hidden: objSpec.hidden ? objSpec.hidden : false
                                 });
 
-                                console.log("Adding statement ", stmt);
+                                // console.log("Adding statement ", stmt);
                                 // console.log('Statement Graph', stmt.graphURI());
                                 self.addStatement(stmt);
 
@@ -1441,7 +1439,6 @@ RDFauthor = (function($) {
 
                 } else {
                     // resourceTargetData was defined and will be used to create the statements
-                    console.log('resourceData');
                     var data = config.targetResourceData;
 
                     // create statements
