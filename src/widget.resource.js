@@ -53,7 +53,7 @@ RDFauthor.registerWidget({
             //sindice:           true,   /* use Sindice semantic search */
             uri:                true,   /* provide generated URI */
             // Filter options:
-            filterRange:        true,   /* show only resources in the rdfs:range of the statement's property */
+            filterRange:        false,   /* show only resources in the rdfs:range of the statement's property */
             filterDomain:       false,  /* show only properties whose domain matches the statement's subject */
             filterProperties:   false,  /* show only resources used as properties */
             // Callbacks
@@ -62,14 +62,15 @@ RDFauthor.registerWidget({
 
         }, this.options);
 
+        // query range
+        this.getRange(function(rangePattern) {
+            self.rangePattern = rangePattern;
+        });
 
         // check conflicting and implied options
         if (this._options.filterRange) {
             this._options.filterDomain     = false;
             this._options.filterProperties = false;
-            this.getRange(function(rangePattern) {
-                self.rangePattern = rangePattern;
-            })
         } else if (this._options.filterDomain) {
             this._options.filterRange      = false;
             this._options.filterProperties = true;
@@ -279,7 +280,6 @@ RDFauthor.registerWidget({
             if (this._options.filterProperties) {
                 propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
             }
-
             if (self._options.filterRange) {
                 var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
                 if (range.length > 0) {
@@ -289,7 +289,6 @@ RDFauthor.registerWidget({
                     rangePattern = self.rangePattern;
                 }
             }
-            
             var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
                 FROM <' + this.statement.graphURI() + '>\
                 WHERE {\
@@ -637,7 +636,6 @@ RDFauthor.registerWidget({
                 if ((e.which === 13) && self._options.selectOnReturn) {
                     self.element().data('autocomplete').destroy();
                     var val = jQuery(e.target).val();
-                    console.log(val);
                     self._normalizeValue(val);
 
                     var splits = val.split(':', 2);
