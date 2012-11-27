@@ -1,3 +1,18 @@
+libjs-rdfauthor (0.9.3) lod2; urgency=low
+
+  * Fixes for IE7
+  * fix misplaced popup
+  * add NOT-import stylesheet switch
+  * disable log output
+  * disable range by default for resource widget
+  * extend RDFauthor.edit functionality
+  * preparation for using the new ow theme also for a stand-alone rdfauthor
+  * extend literal widget
+  * add submit on return for resource widget
+  * extend resource widget to disable range restriction
+
+ -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Tue, 27 Nov 2012 16:08:01 +0100
+
 libjs-rdfauthor (0.9.2) lod2; urgency=low
 
   * fix AKSW/OntoWiki#159 and #20
