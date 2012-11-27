@@ -430,7 +430,7 @@ RDFauthor.registerWidget({
                                             e.stopPropagation();
                                             $('#propertypicker').parent().fadeOut();
                                             self._reinitialization();
-                                            console.log('removed');
+                                            // console.log('removed');
                                         }
                                     });
                 // query - fills the everywhere in use part
