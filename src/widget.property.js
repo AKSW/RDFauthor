@@ -78,6 +78,8 @@ RDFauthor.registerWidget({
 
     markup: function () {
             var self = this;
+            var height = $(document).height();
+            var width = $(document).width();
             var markup = '\
             <div class="rdfauthor-container resource-value">\
                 <input type="hidden" id="property-input-' + this.ID + '" name="propertypicker" class="text resource-edit-input" />\
@@ -141,7 +143,7 @@ RDFauthor.registerWidget({
                     </ul>\
                  </div>\
                 </div>';
-        var modalwrapper = '<div class="modal-wrapper-propertyselector"></div>';
+        var modalwrapper = '<div class="modal-wrapper-propertyselector" style="width: ' + width + 'px; height: ' + height + 'px;"></div>';
         var spinner = '<div id="spinner-propertyselector">\
             <div class="bar1"></div>\
             <div class="bar2"></div>\
@@ -158,10 +160,8 @@ RDFauthor.registerWidget({
           </div>'
         if( $('#propertypicker').length == 0 ) {
             $('body').append(modalwrapper);
-            $('.modal-wrapper-propertyselector').append(spinner)
-                                                .append(propertyPicker);
+            $('.modal-wrapper-propertyselector').append(propertyPicker).append(spinner);
         }
-
         return markup;
     },
 
@@ -461,9 +461,9 @@ RDFauthor.registerWidget({
                     });
 
                     // ready
-                    self._positioning();
                     $('#spinner-propertyselector').remove();
                     $('#propertypicker').fadeIn('fast', function() {
+                        self._positioning();
                         $('#filterProperties').focus().blur(function() {
                             if ($(this).val().length == 0) {
                                 $(this).val(self._filterProperties);                            
@@ -556,7 +556,7 @@ RDFauthor.registerWidget({
                 if ($('#propertypicker').css("display") != "none" && focus == false) {
                     $('#propertypicker').parent().fadeOut();
                     self._reinitialization();
-                }else if (focus == true){
+                } else if (focus == true){
                     $('#propertypicker').parent().fadeIn();
                 }
             });
@@ -581,8 +581,16 @@ RDFauthor.registerWidget({
             $(document).scroll(function() {
                 var height = $(document).height();
                 var width = $(document).width();
-                $('.modal-wrapper-propertyselector').css('height', height);
-                $('.modal-wrapper-propertyselector').css('width', width);
+                var windowh = $(window).height();
+                var windoww = $(window).width();
+                // console.log('scrolltop', $(document).scrollTop());
+                // console.log('bodyh', height);
+                // console.log('bodyw', width);
+                // console.log('windowh', windowh);
+                // console.log('windoww', windoww);
+
+                // $('.modal-wrapper-propertyselector').css('min-height', '100%');
+                // $('.modal-wrapper-propertyselector').css('min-width', '100%');
             });
 
             $('#propertypicker .button-windowclose').live('click', function() {
@@ -623,16 +631,32 @@ RDFauthor.registerWidget({
     },
 
     _positioning: function (element) {
+        if (element !== undefined) {
+            var element = $(element)
+        } else {
+            var element = $('#propertypicker');
+        }
         //trick to get the height and width from a non visible object using jquery
         var bodyh = $(document).height();
         var bodyw = $(document).width();
-        var ww = $('#propertypicker').outerWidth();
-        var wh = $('#propertypicker').outerHeight();
+        var windowh = $(window).height();
+        var windoww = $(window).width();
+        var ww = element.outerWidth();
+        var wh = element.outerHeight();
+        
+        // console.log('scrolltop', $(document).scrollTop());
+        // console.log('bodyh', bodyh);
+        // console.log('bodyw', bodyw);
+        // console.log('windowh', windowh);
+        // console.log('windoww', windoww);
+        // console.log('ww', ww);
+        // console.log('wh', wh);
+
         var offsetPosition = {
-            'top': Math.max( (bodyh - wh) * 0.5 , 20),
+            'top': Math.max( (windowh - wh) * 0.5 + $(document).scrollTop(), 20),
             'left': Math.max( (bodyw - ww) * 0.5 , 50 )
         }
-        $('#propertypicker').offset(offsetPosition);
+        element.offset(offsetPosition);
     },
 
     _reinitialization: function () {
