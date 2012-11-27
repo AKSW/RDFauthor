@@ -54,6 +54,15 @@ var __config = {
                             return v;
                         }
                     };
+                    $.typedValue.types['http://www.w3.org/2001/XMLSchema#dateTime'] = {
+                        regex: /^.*$/,
+                        strip: true,
+                        /** @ignore */
+                        value: function (v, options) {
+                            var opts = $.extend({}, $.typedValue.defaults, options);
+                            return v;
+                        }
+                    };
                 }
             }
         },
@@ -97,7 +106,17 @@ var __config = {
         'markdown' : {
             'path' : 'src/widget.markdown.js',
             'enabled' : true,
-            'hook' : [{
+            'hook' : [
+            {
+                name: 'property',
+                values: ['http://www.w3.org/2000/01/rdf-schema#comment',
+                         'http://purl.org/dc/terms/description',
+                         'http://purl.org/dc/elements/1.1/description',
+                         'http://www.w3.org/2004/02/skos/core#note',
+                         'http://www.w3.org/2004/02/skos/core#editorialNote',
+                         'http://ns.ontowiki.net/SysOnt/Site/content']
+            },
+            {
                 name: 'datatype',
                 values: ['http://ns.ontowiki.net/SysOnt/Markdown'],
                 callback : function () {
@@ -111,10 +130,6 @@ var __config = {
                         }
                     };
                 }
-            },
-            {
-                name: 'property',
-                values: ['http://ns.ontowiki.net/SysOnt/Site/content']
             }]
         },
         /*------------------------------- imagepicker ---------------------------------*/

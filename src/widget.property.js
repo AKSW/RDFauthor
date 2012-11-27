@@ -369,7 +369,9 @@ RDFauthor.registerWidget({
                 var results = data.results.bindings;
                 var queryResult = [];
                 for (var i in results) {
-                    queryResult.push(results[i].resourceUri.value);
+                    if (typeof results[i].resourceUri == 'object') {
+                        queryResult.push(results[i].resourceUri.value);
+                    }
                 }
                 $.isFunction(callback) ? callback(queryResult) : null;
             },

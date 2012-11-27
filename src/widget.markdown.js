@@ -164,7 +164,6 @@ RDFauthor.registerWidget({
     _init: function () {
        var self = this;
        if (self._domRdy && self._markitupRdy && self._showdownRdy) {
-          console.log(self._settings);
           self.element().markItUp(self._settings);
        }
     }
