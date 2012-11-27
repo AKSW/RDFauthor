@@ -19,7 +19,7 @@ function InlineController(options) {
         var element  = this._options.container(statement);
         var _options = $.extend({
             container: element,
-            activate: false,
+            activate: false
         }, options);
 
         var predicateURI = statement.predicateURI();

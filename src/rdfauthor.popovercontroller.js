@@ -271,11 +271,19 @@ PopoverController.prototype = {
         //trick to get the height and width from a non visible object using jquery
         var bodyh = $(document).height();
         var bodyw = $(document).width();
-        var ww = $(self.getElement()).outerWidth();
-        var wh = $(self.getElement()).outerHeight();
+        var windowh = $(window).height();
+        var windoww = $(window).width();
+        var popoverw = $(self.getElement()).outerWidth();
+        var popoverh = $(self.getElement()).outerHeight();
+        // console.log('bodyh', bodyh);
+        // console.log('bodyw', bodyw);
+        // console.log('windowh', windowh);
+        // console.log('windoww', windoww);
+        // console.log('ww', popoverw);
+        // console.log('wh', popoverh);
         var offsetPosition = {
-            'top': Math.max( (bodyh - wh) * 0.5 , 20),
-            'left': Math.max( (bodyw - ww) * 0.5 , 50 )
+            'top': Math.max( (windowh - popoverh) * 0.5 + $(document).scrollTop() , 20),
+            'left': Math.max( (bodyw - popoverw) * 0.5 , 50 )
         }
         $(self.getElement()).offset(offsetPosition);
 

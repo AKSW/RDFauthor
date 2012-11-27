@@ -53,7 +53,7 @@ RDFauthor.registerWidget({
             //sindice:           true,   /* use Sindice semantic search */
             uri:                true,   /* provide generated URI */
             // Filter options:
-            filterRange:        true,   /* show only resources in the rdfs:range of the statement's property */
+            filterRange:        false,   /* show only resources in the rdfs:range of the statement's property */
             filterDomain:       false,  /* show only properties whose domain matches the statement's subject */
             filterProperties:   false,  /* show only resources used as properties */
             // Callbacks
@@ -62,14 +62,15 @@ RDFauthor.registerWidget({
 
         }, this.options);
 
+        // query range
+        this.getRange(function(rangePattern) {
+            self.rangePattern = rangePattern;
+        });
 
         // check conflicting and implied options
         if (this._options.filterRange) {
             this._options.filterDomain     = false;
             this._options.filterProperties = false;
-            this.getRange(function(rangePattern) {
-                self.rangePattern = rangePattern;
-            })
         } else if (this._options.filterDomain) {
             this._options.filterRange      = false;
             this._options.filterProperties = true;
@@ -121,6 +122,12 @@ RDFauthor.registerWidget({
             <div class="rdfauthor-container resource-value">\
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input is-processing" \
                        value="' + value + '" title="' + value + '"/>\
+                <div class="rdfauthor-container util" style="padding:0px;">\
+                    <label><span style="padding-right: 5px;">Filter by</span>\
+                    <input class="checkbox checkbox-range" type="checkbox" name="range"\
+                    '+ (this._options.filterRange ? 'checked="checked"' : '') + '">\
+                    <label>Range</label></label>\
+                </div>\
             </div>';
 
         return markup;
@@ -273,7 +280,6 @@ RDFauthor.registerWidget({
             if (this._options.filterProperties) {
                 propertyPattern = '{?v2 ?uri ?v3 .} UNION {?uri a rdf:Property .}';
             }
-
             if (self._options.filterRange) {
                 var range = RDFauthor.infoForPredicate(self.statement.predicateURI(), 'range');
                 if (range.length > 0) {
@@ -283,7 +289,6 @@ RDFauthor.registerWidget({
                     rangePattern = self.rangePattern;
                 }
             }
-            
             var query = prologue + '\nSELECT DISTINCT ?uri ?literal ?domain ?type\
                 FROM <' + this.statement.graphURI() + '>\
                 WHERE {\
@@ -422,7 +427,7 @@ RDFauthor.registerWidget({
                 results.push({
                     source: 'local',
                     value: searchResults[i]['uri'],
-                    label: searchResults[i]['label'],
+                    label: searchResults[i]['label']
                 });
             };
             // Add results to global callback
@@ -509,6 +514,20 @@ RDFauthor.registerWidget({
     _initAutocomplete: function () {
         var self = this;
         if (this._pluginLoaded && this._domReady && !this._initialized) {
+            // set range option
+            self.element().parent().find('input[name=range]').click(function() {
+                self._options.filterRange = $(this).is(':checked');
+            });
+
+            // keypress events
+            self.element().keypress(function(event) {
+                // commit results on enter
+                if(event.which == 13) {
+                    event.preventDefault();
+                    RDFauthor.commit();
+                }
+            });
+
             self.element().data('objects',[]);
             self.element().parent().parent().parent().parent().parent().parent().find('input').each(function() {
               self.element().data('objects').push($(this).attr('title'));
@@ -599,7 +618,10 @@ RDFauthor.registerWidget({
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
                         return true;
                     }
-                    self.element().blur();
+
+                    // remove focus from input
+                    // self.element().blur();
+
                     // prevent jQuery UI default
                     return false;
                 },
@@ -614,7 +636,6 @@ RDFauthor.registerWidget({
                 if ((e.which === 13) && self._options.selectOnReturn) {
                     self.element().data('autocomplete').destroy();
                     var val = jQuery(e.target).val();
-                    console.log(val);
                     self._normalizeValue(val);
 
                     var splits = val.split(':', 2);
@@ -626,7 +647,6 @@ RDFauthor.registerWidget({
                     }
 
                     self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
-
                     // prevent newline in new widget field
                     e.preventDefault();
                 } else if (e.which === 27) {

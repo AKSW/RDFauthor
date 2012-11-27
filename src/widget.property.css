@@ -3,8 +3,8 @@
   z-index: 10000;
   overflow: auto;
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: -9999px;
+  left: -9999px;
   padding-left: 0px !important;
   padding-top: 0px !important;
   margin-left: 0px !important;
@@ -34,8 +34,8 @@ div.modal-wrapper-propertyselector {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  /* width: 100%; */
+  /* height: 100%; */
 /*    background-color: transparent;*/
   background-color: rgba(255, 255, 255, 0.75);
     /* background-color: rgba(0, 0, 0, 0.2); */

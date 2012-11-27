@@ -147,7 +147,8 @@ RDFauthor = (function($) {
         fetchAllPredicates: true, 
         viewOptions: {
             type: 'popover' /* inline or popover */
-        }
+        },
+        loadOwStylesheet: true
     };
     
     /** actual options initialized to defaults */
@@ -264,8 +265,14 @@ RDFauthor = (function($) {
      * @private
      */
     function _callIfIsFunction(functionSpec, params) {
-        if ($.isFunction(functionSpec)) {
-            functionSpec.apply(functionSpec, params);
+       if ($.isFunction(functionSpec)) {
+           var result
+               = typeof params === 'undefined'
+               ? functionSpec.apply(functionSpec)
+               : functionSpec.apply(functionSpec, params);
+               ;
+           
+           return result;
         }
     }
     
@@ -896,6 +903,7 @@ RDFauthor = (function($) {
         if (typeof RDFAUTHOR_READY_CALLBACK !== 'undefined') {
             RDFAUTHOR_READY_CALLBACK();
         }
+
     }
     
     /**
@@ -1111,105 +1119,115 @@ RDFauthor = (function($) {
             }
         }
     }
-    
-    // RDFauthor setup code ///////////09:27:33+02:00
-    ////////////////////////////////////////
-    
-    if (RDFAUTHOR_BASE.charAt(RDFAUTHOR_BASE.length - 1) !== '/') {
-        RDFAUTHOR_BASE = RDFAUTHOR_BASE + '/';
-    }
-    // let RDFa parser load GRDDL files locally
-    __RDFA_BASE = RDFAUTHOR_BASE + 'libraries/';
-    
-    // RDFA namespace and parser options
-    RDFA = {
-        NAMED_GRAPH_ATTRIBUTE: {ns: UPDATE_NS, attribute: 'from'}, 
-        CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT: _addTriple, 
-        CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT: _addTriple, 
-        CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
-    };
 
-    // Config
-    _loadConfig();
+    /**
+     * Runs RDFauthor setup code. E.g. loading scripts, stylesheets, widgets.
+     * @private
+     */
+    function _setup() {
+        // RDFauthor setup code ///////////09:27:33+02:00
+        ////////////////////////////////////////
 
-    // PropertyCache
-    _loadPropertyCache();
+        // jQuery deferred object will be used to make sure that 
+        // the setup is done, before displaying edit view.
+        var dfd = $.Deferred();
 
-    // Cache
-    _loadCache();
+        if (RDFAUTHOR_BASE.charAt(RDFAUTHOR_BASE.length - 1) !== '/') {
+            RDFAUTHOR_BASE = RDFAUTHOR_BASE + '/';
+        }
+        // let RDFa parser load GRDDL files locally
+        __RDFA_BASE = RDFAUTHOR_BASE + 'libraries/';
+        
+        // RDFA namespace and parser options
+        RDFA = {
+            NAMED_GRAPH_ATTRIBUTE: {ns: UPDATE_NS, attribute: 'from'}, 
+            CALLBACK_NEW_TRIPLE_WITH_URI_OBJECT: _addTriple, 
+            CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT: _addTriple, 
+            CALLBACK_DONE_PARSING: function() {_pageParsed = true;}
+        };
 
-    // jQuery UI
-    if (undefined === $.ui) {
-        _require(RDFAUTHOR_BASE + 'libraries/jquery-ui.js');
-        _loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui.css');
-    }
-    
-    // rdfQuery
-    if (undefined === $.rdf) {
-        _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.rdfa-1.0.js');
-    }
-    
-    // toJSON
-    if (undefined === $.toJSON) {
-        _require(RDFAUTHOR_BASE + 'libraries/jquery.json.js');
-    }
-    
-    // load required scripts
-    _requirePending++;
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');    /* Statement */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js'); /* Predicate Row */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.selector.js');     /* Property selector */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js'); /* Subject Group */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.popovercontroller.js');   /* ViewController */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.mobilecontroller.js');   /* ViewController */
-    _require(RDFAUTHOR_BASE + 'src/rdfauthor.inlinecontroller.js'); /* InlineViewController */
-    _require(__RDFA_BASE + 'rdfa.js');                          /* RDFA */
-    
-    // load widgets; widget prototype is required before all other widgets
-    _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
-        // global widgets
-        $.when(_loadConfig()).then(function() {
-            _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
-            _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
-            _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
-            _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
-            _require(RDFAUTHOR_BASE + 'src/widget.property.js');
-            // additional widgets
-            for ( var widget in __config['widgets']) {
-                // grab widget
-                var wConfig = __config['widgets'][widget];
-                // if enabled the widget will be loaded
-                if (wConfig['enabled']) {
-                    // console.log('enabled: ' + widget);
-                   _require(RDFAUTHOR_BASE + wConfig['path']);
-                } else {
-                    // console.log('disabled: ' + widget);
+        // Config
+        _loadConfig();
+
+        // PropertyCache
+        _loadPropertyCache();
+
+        // Cache
+        _loadCache();
+
+        // jQuery UI
+        if (undefined === $.ui) {
+            _require(RDFAUTHOR_BASE + 'libraries/jquery-ui.js');
+            _loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui.css');
+        }
+        
+        // rdfQuery
+        if (undefined === $.rdf) {
+            _require(RDFAUTHOR_BASE + 'libraries/jquery.rdfquery.rdfa-1.0.js');
+        }
+        
+        // toJSON
+        if (undefined === $.toJSON) {
+            _require(RDFAUTHOR_BASE + 'libraries/jquery.json.js');
+        }
+        
+        // load required scripts
+        _requirePending++;
+        _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');    /* Statement */
+        _require(RDFAUTHOR_BASE + 'src/rdfauthor.predicaterow.js'); /* Predicate Row */
+        _require(RDFAUTHOR_BASE + 'src/rdfauthor.selector.js');     /* Property selector */
+        _require(RDFAUTHOR_BASE + 'src/rdfauthor.subjectgroup.js'); /* Subject Group */
+        _require(RDFAUTHOR_BASE + 'src/rdfauthor.popovercontroller.js');   /* ViewController */
+        _require(RDFAUTHOR_BASE + 'src/rdfauthor.mobilecontroller.js');   /* ViewController */
+        _require(RDFAUTHOR_BASE + 'src/rdfauthor.inlinecontroller.js'); /* InlineViewController */
+        _require(__RDFA_BASE + 'rdfa.js');                          /* RDFA */
+        
+        // load widgets; widget prototype is required before all other widgets
+        _require(RDFAUTHOR_BASE + 'src/widget.prototype.js', function () {
+            // global widgets
+            $.when(_loadConfig()).then(function() {
+                _require(RDFAUTHOR_BASE + 'src/widget.literal.js');
+                _require(RDFAUTHOR_BASE + 'src/widget.resource.js');
+                _require(RDFAUTHOR_BASE + 'src/widget.meta.js');
+                _require(RDFAUTHOR_BASE + 'src/widget.xmlliteral.js');
+                _require(RDFAUTHOR_BASE + 'src/widget.property.js');
+                // additional widgets
+                for ( var widget in __config['widgets']) {
+                    // grab widget
+                    var wConfig = __config['widgets'][widget];
+                    // if enabled the widget will be loaded
+                    if (wConfig['enabled']) {
+                        // console.log('enabled: ' + widget);
+                       _require(RDFAUTHOR_BASE + wConfig['path']);
+                    } else {
+                        // console.log('disabled: ' + widget);
+                    }
                 }
-            }
-            _requirePending--;
+                _requirePending--;
+            });
         });
-    });
-    
-    // load stylesheets
-    if ((typeof RDFAUTHOR_MOBILE != 'undefined') && RDFAUTHOR_MOBILE) {
-        _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor_mobile.css')
-    } else {
-        _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
+        
+        // load stylesheets
+        if ((typeof RDFAUTHOR_MOBILE != 'undefined') && RDFAUTHOR_MOBILE) {
+            _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor_mobile.css')
+        } else {
+            _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.css');
+        }
+
+        
+        // default info predicates
+        _addInfoPredicate(RDF_NS + 'type', 'type');
+        _addInfoPredicate(RDFS_NS + 'range', 'range');
+        _addInfoPredicate(RDFS_NS + 'label', 'label', 'langMatches(lang(?predicate), "en")');
+        
+        // load default options
+        _resetOptions();
+        dfd.resolve();
+        return dfd.promise();
     }
 
-    // load ontowiki stylesheet when rdfauthor is used without ontowiki
-    if (!/ontowiki/gi.test($('head title').text())) {
-        _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
-    }
+    _setup();
 
-    // default info predicates
-    _addInfoPredicate(RDF_NS + 'type', 'type');
-    _addInfoPredicate(RDFS_NS + 'range', 'range');
-    _addInfoPredicate(RDFS_NS + 'label', 'label', 'langMatches(lang(?predicate), "en")');
-    
-    // load default options
-    _resetOptions();
-    
     // return uninstantiable singleton
     /** @lends RDFauthor */
     return {
@@ -1350,82 +1368,154 @@ RDFauthor = (function($) {
         
         /**
          * Edit resources.
-         * @param config type, targetService, targetGraph, targetResource, [targetResourceData]
+         * @param config type, targetSparqlEndpoint, targetUpdateEndpoint, targetGraph, targetResource, [targetResourceData]
          */
         edit: function (config) {
             var self = this;
 
-            var loadingRdy = function() {
-                // reset rdfauthor settings
-                _resetOptions();
-                // set rdfauthor settings
-                self.setInfoForGraph(config.targetGraph, 'queryEndpoint', config.targetService);
-                self.setInfoForGraph(config.targetGraph, 'updateEndpoint', config.targetService);
-                _options.viewOptions.type = config.view;
-                _options.useSPARQL11 = config.useSPARQL11 | false;
-                var data = config.targetResourceData;
-                // console.log('config', config);
-                // console.log('_graphInfo', _graphInfo);
-                // console.log('_options', _options);
-                // console.log('data', data);
-
-                // create statements
-                var protect  = arguments.length >= 2 ? protect : true;
-                var resource = arguments.length >= 3 ? resource : null;
-                var graph    = arguments.length >= 4 ? graph : null;
-                for (var currentProperty in data[config.targetResource]) {
-                    var objects = data[config.targetResource][currentProperty];
-
-                    for (var i = 0; i < objects.length; i++) {
-                        var objSpec = objects[i];
-                        var value;
-                        if ( objSpec.type == 'uri' ) { 
-                            value = '<' + objSpec.value + '>'; 
-                        } else if ( objSpec.type == 'bnode' ) { 
-                            value = '_:' + objSpec.value;
-                        } else {
-                            // IE fix, object keys with empty strings are removed
-                            value = objSpec.value ? objSpec.value : ""; 
-                        }
-
-                        var newObjectSpec = {
-                            value : value,
-                            type: String(objSpec.type).replace('typed-', '')
-                        };
-
-                        if (objSpec.value) {
-                            if (/literal/.test(objSpec.type)) {
-                                if (objSpec.datatype) {
-                                    newObjectSpec.options = {
-                                        'datatype': objSpec.datatype
-                                    };
+            var createStatements = function() {
+                var dfd = $.Deferred();
+                // if resourceTargetData is not defined, query the endpoint
+                if (typeof config.targetResourceData == 'undefined') {
+                    var query = '\
+                        SELECT ?p ?o\
+                        FROM <' + config.targetGraph + '>\
+                        WHERE {\
+                            <' + config.targetResource + '> ?p ?o.\
+                        }';
+                    self.queryGraph(config.targetGraph, query, {
+                        callbackSuccess: function(data, status) {
+                            // create statements
+                            data = data['results']['bindings'];
+                            for (var currentPropertyIndex in data) {
+                                var currentProperty = data[currentPropertyIndex]['p'].value;
+                                var currentPropertyObject = data[currentPropertyIndex]['o'];
+                                var objSpec = currentPropertyObject;
+                                var value;
+                                if ( objSpec.type == 'uri' ) { 
+                                    value = '<' + objSpec.value + '>'; 
+                                } else if ( objSpec.type == 'bnode' ) { 
+                                    value = '_:' + objSpec.value;
+                                } else {
+                                    // IE fix, object keys with empty strings are removed
+                                    value = objSpec.value ? objSpec.value : ""; 
                                 }
-                                if (objSpec.lang) {
-                                    newObjectSpec.options = {
-                                        'lang': objSpec.lang
-                                    };
+
+                                var newObjectSpec = {
+                                    value : value,
+                                    type: String(objSpec.type).replace('typed-', '')
+                                };
+
+
+                                if (objSpec.value) {
+                                    if (/literal/.test(objSpec.type)) {
+                                        if (objSpec.datatype) {
+                                            newObjectSpec.options = {
+                                                'datatype': objSpec.datatype
+                                            };
+                                        }
+                                        if (objSpec.lang) {
+                                            newObjectSpec.options = {
+                                                'lang': objSpec.lang
+                                            };
+                                        }
+                                        if (objSpec['xml:lang']) {
+                                            newObjectSpec.options = {
+                                                'lang': objSpec['xml:lang']
+                                            };
+                                        }
+                                    }
+                                }
+
+                                // console.log('newObjectSpec', newObjectSpec);
+
+                                var stmt = new Statement({
+                                    subject: '<' + config.targetResource + '>', 
+                                    predicate: '<' + currentProperty + '>', 
+                                    object: newObjectSpec
+                                }, {
+                                    graph: config.targetGraph, 
+                                    title: objSpec.title, 
+                                    protect: protect ? true : false, 
+                                    hidden: objSpec.hidden ? objSpec.hidden : false
+                                });
+
+                                // console.log("Adding statement ", stmt);
+                                // console.log('Statement Graph', stmt.graphURI());
+                                self.addStatement(stmt);
+
+                            }
+                            dfd.resolve();
+                        }
+                    });
+
+                } else {
+                    // resourceTargetData was defined and will be used to create the statements
+                    var data = config.targetResourceData;
+
+                    // create statements
+                    var protect  = arguments.length >= 2 ? protect : true;
+                    var resource = arguments.length >= 3 ? resource : null;
+                    var graph    = arguments.length >= 4 ? graph : null;
+                    for (var currentProperty in data[config.targetResource]) {
+                        var objects = data[config.targetResource][currentProperty];
+
+                        for (var i = 0; i < objects.length; i++) {
+                            var objSpec = objects[i];
+                            var value;
+                            if ( objSpec.type == 'uri' ) { 
+                                value = '<' + objSpec.value + '>'; 
+                            } else if ( objSpec.type == 'bnode' ) { 
+                                value = '_:' + objSpec.value;
+                            } else {
+                                // IE fix, object keys with empty strings are removed
+                                value = objSpec.value ? objSpec.value : ""; 
+                            }
+
+                            var newObjectSpec = {
+                                value : value,
+                                type: String(objSpec.type).replace('typed-', '')
+                            };
+
+                            if (objSpec.value) {
+                                if (/literal/.test(objSpec.type)) {
+                                    if (objSpec.datatype) {
+                                        newObjectSpec.options = {
+                                            'datatype': objSpec.datatype
+                                        };
+                                    }
+                                    if (objSpec.lang) {
+                                        newObjectSpec.options = {
+                                            'lang': objSpec.lang
+                                        };
+                                    }
                                 }
                             }
+
+                            // console.log('newObjectSpec', newObjectSpec);
+                            var stmt = new Statement({
+                                subject: '<' + config.targetResource + '>', 
+                                predicate: '<' + currentProperty + '>', 
+                                object: newObjectSpec
+                            }, {
+                                graph: config.targetGraph, 
+                                title: objSpec.title, 
+                                protect: protect ? true : false, 
+                                hidden: objSpec.hidden ? objSpec.hidden : false
+                            });
+
+                            // console.log("Adding statement ", stmt);
+                            // console.log('Statement Graph', stmt.graphURI());
+                            self.addStatement(stmt);
                         }
-
-                        // console.log('newObjectSpec', newObjectSpec);
-                        var stmt = new Statement({
-                            subject: '<' + config.targetResource + '>', 
-                            predicate: '<' + currentProperty + '>', 
-                            object: newObjectSpec
-                        }, {
-                            graph: config.targetGraph, 
-                            title: objSpec.title, 
-                            protect: protect ? true : false, 
-                            hidden: objSpec.hidden ? objSpec.hidden : false
-                        });
-
-                        // console.log("Adding statement ", stmt);
-                        // console.log('Statement Graph', stmt.graphURI());
-                        self.addStatement(stmt);
                     }
+                    dfd.resolve();
                 }
+                return dfd.promise();
+            }
 
+            var setOptions = function() {
+                // var dfd = $.Deferred();
                 // set gui/editing options
                 self.setOptions({
                     saveButtonTitle: config.saveButtonTitle ? config.saveButtonTitle : 'Save',
@@ -1438,11 +1528,16 @@ RDFauthor = (function($) {
                         _callIfIsFunction(config.onSubmitSuccess);
                     }
                 });
+                // dfd.resolve();
+                // return dfd.promise();
+            }
 
+            var createView = function() {
+                // var dfd = $.Deferred();
                 // create editing view
                 var view = self.getView();
                 for (var graph in _databanksByGraph) {
-                    var updateEndpoint = config.targetService
+                    var updateEndpoint = config.targetUpdateEndpoint;
                     if (undefined !== updateEndpoint) {
                         var triples = _databanksByGraph[graph].triples();
                         for (var i = 0, length = triples.length; i < length; i++) {
@@ -1460,9 +1555,46 @@ RDFauthor = (function($) {
                         }
                     }
                 }
-
                 // show view
                 view.show(true);
+                // dfd.resolve();
+                // return dfd.promise();
+            }
+
+            var init = function() {
+                // reset rdfauthor settings
+                _resetOptions();
+                // set rdfauthor settings
+                self.setInfoForGraph(config.targetGraph, 'queryEndpoint', config.targetSparqlEndpoint);
+                self.setInfoForGraph(config.targetGraph, 'updateEndpoint', config.targetUpdateEndpoint);
+                _options.viewOptions.type = config.view;
+                _options.useSPARQL11 = config.useSPARQL11 | false;
+
+                // console.log('config', config);
+                // console.log('_graphInfo', _graphInfo);
+                // console.log('_options', _options);
+                // console.log('data', data);
+                $.when(createStatements()).then(function() {
+                    setOptions();
+                    createView();
+
+                    // TEMPORARY until next big refactoring of RDFauthor
+                    // load ontowiki stylesheet when rdfauthor is used without ontowiki
+                    var loadOwStylesheet = config.loadOwStylesheet === undefined ? true : config.loadOwStylesheet;
+                    if (loadOwStylesheet) {
+                        if (!/ontowiki/gi.test($('head title').text())) {
+                            _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
+                            // _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.update.css');
+                            // preparation for new theme
+                            // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/default.css');
+                            // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/default.dev.css');
+                            // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/deprecated.dev.css');
+                            // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/old.css');
+                        }
+                    }
+
+                });
+
             }
 
             // if rdfauthor is rdy, start editing
@@ -1480,7 +1612,7 @@ RDFauthor = (function($) {
                         // stop interval
                         window.clearInterval(idInterval);
                         // run editing mode
-                        loadingRdy();
+                        init();
                     }
                 } else {
                     // stop interval check after 15seconds
@@ -1767,6 +1899,7 @@ RDFauthor = (function($) {
                 /* request application/sparql-results+json */
                 beforeSend: function (XMLHTTPRequest) {
                     XMLHTTPRequest.setRequestHeader('Accept', 'application/sparql-results+json');
+                    // XMLHTTPRequest.setRequestHeader('Accept', 'application/javascript');
                 }
             };
             
@@ -1949,6 +2082,22 @@ RDFauthor = (function($) {
          * @param {HTMLElement} root
          */
         start: function (root) {
+
+            // TEMPORARY until next big refactoring of RDFauthor
+            // load ontowiki stylesheet when rdfauthor is used without ontowiki
+            if (_options.loadOwStylesheet) {
+                if (!/ontowiki/gi.test($('head title').text())) {
+                    _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.css');
+                    // _loadStylesheet(RDFAUTHOR_BASE + 'src/rdfauthor.ow.update.css');
+                    // preparation for new theme
+                    // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/default.css');
+                    // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/default.dev.css');
+                    // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/deprecated.dev.css');
+                    // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/old.css');
+                }
+            }
+
+            var self = this;
             if (arguments.length >= 1) {
                 _setRoot(root);
             } else {
