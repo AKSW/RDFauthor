@@ -427,7 +427,7 @@ RDFauthor.registerWidget({
                 results.push({
                     source: 'local',
                     value: searchResults[i]['uri'],
-                    label: searchResults[i]['label'],
+                    label: searchResults[i]['label']
                 });
             };
             // Add results to global callback

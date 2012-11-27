@@ -265,8 +265,14 @@ RDFauthor = (function($) {
      * @private
      */
     function _callIfIsFunction(functionSpec, params) {
-        if ($.isFunction(functionSpec)) {
-            functionSpec.apply(functionSpec, params);
+       if ($.isFunction(functionSpec)) {
+           var result
+               = typeof params === 'undefined'
+               ? functionSpec.apply(functionSpec)
+               : functionSpec.apply(functionSpec, params);
+               ;
+           
+           return result;
         }
     }
     
