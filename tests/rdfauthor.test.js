@@ -102,11 +102,11 @@ $(document).ready(function() {
     
     test('loadScript', 3, function() {
         var scriptURI = RDFAUTHOR_BASE + 'tests/resources/dummy.js';
-        equal($('head').find('script[src=' + scriptURI + ']').length, 0, 'Script has not been loaded.');
+        equal($('head').find('script[src="' + scriptURI + '"]').length, 0, 'Script has not been loaded.');
         stop(2000); /* stop and make test fail after 2000 ms */
         
         this.fixture.loadScript(scriptURI, function() {
-            equal($('head').find('script[src=' + scriptURI + ']').length, 1, 'Script should have been loaded.');
+            equal($('head').find('script[src="' + scriptURI + '"]').length, 1, 'Script should have been loaded.');
             ok(DUMMY_LOADED, 'Dummy variable should have been set.');
             start();
         });
@@ -114,15 +114,15 @@ $(document).ready(function() {
     
     test('loadScriptTwice', 4, function() {
         var scriptURI = RDFAUTHOR_BASE + 'tests/resources/dummy2.js';
-        equal($('head').find('script[src=' + scriptURI + ']').length, 0, 'Script has not been loaded.');
+        equal($('head').find('script[src="' + scriptURI + '"]').length, 0, 'Script has not been loaded.');
         stop(2000); /* stop and make test fail after 2000 ms */
         
         var that = this;
         this.fixture.loadScript(scriptURI, function() {
-            equal($('head').find('script[src=' + scriptURI + ']').length, 1, 'Script should have been loaded');
+            equal($('head').find('script[src="' + scriptURI + '"]').length, 1, 'Script should have been loaded');
             // load same script another time
             that.fixture.loadScript(scriptURI, function() {
-                equal($('head').find('script[src=' + scriptURI + ']').length, 1, 'Script should still have been loaded only once');
+                equal($('head').find('script[src="' + scriptURI + '"]').length, 1, 'Script should still have been loaded only once');
                 ok(DUMMY2_LOADED, 'Dummy2 variable should have been set.');
                 start();
             });
@@ -136,16 +136,16 @@ $(document).ready(function() {
         
         for (var i = 0; i < scripts.length; i++) {
             var scriptURI = scripts[i];
-            if ($('head').find('script[src=' + scriptURI + ']').length > 0) {
+            if ($('head').find('script[src="' + scriptURI + '"]').length > 0) {
                 // remove script
-                $('head').find('script[src=' + scriptURI + ']').remove();
+                $('head').find('script[src="' + scriptURI + '"]').remove();
             }
         }
         
         // ensure scripts are not loaded
-        equal($('head').find('script[src=' + RDFAUTHOR_BASE + 'tests/resources/dummy.js' + ']').length, 0, 
+        equal($('head').find('script[src="' + RDFAUTHOR_BASE + 'tests/resources/dummy.js' + '"]').length, 0, 
             'Script has not been loaded.');
-        equal($('head').find('script[src=' + RDFAUTHOR_BASE + 'tests/resources/dummy2.js' + ']').length, 0, 
+        equal($('head').find('script[src="' + RDFAUTHOR_BASE + 'tests/resources/dummy2.js' + '"]').length, 0, 
             'Script has not been loaded.');
         
         stop(2000); /* stop and make test fail after 2000 ms */
@@ -153,9 +153,9 @@ $(document).ready(function() {
         // load scripts combined
         this.fixture.loadScripts(scripts, function() {
             // this should only be called after the second script has loaded, so both dummy vars must be true
-            equal($('head').find('script[src=' + RDFAUTHOR_BASE + 'tests/resources/dummy.js' + ']').length, 1, 
+            equal($('head').find('script[src="' + RDFAUTHOR_BASE + 'tests/resources/dummy.js' + '"]').length, 1, 
                 'Script should have been loaded.');
-            equal($('head').find('script[src=' + RDFAUTHOR_BASE + 'tests/resources/dummy2.js' + ']').length, 1, 
+            equal($('head').find('script[src="' + RDFAUTHOR_BASE + 'tests/resources/dummy2.js' + '"]').length, 1, 
                 'Script should have been loaded.');
             
             ok(DUMMY_LOADED, 'Dummy variable 1 should have been set.');
@@ -167,10 +167,10 @@ $(document).ready(function() {
     
     test('loadStylesheet', 3, function() {
         var stylesheetURI = RDFAUTHOR_BASE + 'tests/resources/dummy.css';
-        equal($('head').find('link[rel=stylesheet][src=' + stylesheetURI + ']').length, 0, 
+        equal($('head').find('link[rel=stylesheet][src="' + stylesheetURI + '"]').length, 0, 
             'Stylesheet has not been loaded.');
         this.fixture.loadStylesheet(stylesheetURI);
-        equal($('head').find('link[rel=stylesheet][href=' + stylesheetURI + ']').length, 1, 
+        equal($('head').find('link[rel=stylesheet][href="' + stylesheetURI + '"]').length, 1, 
             'Stylesheet should have been loaded.');
         equal($('#' + TEST_CONTAINER_ID).length, 1, 'Test container should be in DOM');
     });
