@@ -19,11 +19,10 @@ RDFauthor.registerWidget({
         
         var self = this;
 
-        // load shiftenter plugin
+        //load shiftenter plugin
         RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.shiftenter.js', function () {
             self._shiftenter = true;
             self._init();
-
         });
 
         // load shiftenter stylesheet
@@ -34,7 +33,6 @@ RDFauthor.registerWidget({
             self._elastic = true;
             self._init();
         });
-
         // modify Safari input behaviour (CSS3)
         if ($.browser.webkit) {
             RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.literal.css');
@@ -100,7 +98,7 @@ RDFauthor.registerWidget({
             var jLangSelect     = $('#' + $(this).attr('name').replace('literal-type', 'literal-lang')).eq(0);
 
             if ($(this).val() == 'plain') {
-                textarea.attr('readonly','');
+                textarea.removeAttr('readonly');
                 if(textarea.val() == 'true' || textarea.val() == 'false'){
                     textarea.val('');
                 }
@@ -112,7 +110,7 @@ RDFauthor.registerWidget({
                 // clear datatype
                 jDatatypeSelect.val('');
             } else if ($(this).val() == 'typed') {
-                textarea.attr('readonly','');
+                textarea.removeAttr('readonly');
                 if(textarea.val() == 'true' || textarea.val() == 'false'){
                     textarea.val('');
                 }
