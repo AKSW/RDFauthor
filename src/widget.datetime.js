@@ -157,7 +157,19 @@ RDFauthor.registerWidget({
                             timezone: timezone
                         });
                     break;
-                default: alert('no matched datatype');
+                default: 
+                        // alert('no matched datatype');
+                        this.element().datetimepicker({
+                            dateFormat: $.datepicker.ISO_8601,
+                            separator: 'T',
+                            showSecond: true,
+                            timeFormat: 'hh:mm:ss',
+                            showTimezone: true,
+                            timezone: '+00:00',
+                            // showOn: 'both',
+                            firstDay: 1
+                        });
+                        $('#ui-datepicker-div').css('z-index', 10000);
                     break;
             }
         }
