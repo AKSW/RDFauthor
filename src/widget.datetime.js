@@ -159,13 +159,8 @@ RDFauthor.registerWidget({
                     break;
                 default: 
                         // alert('no matched datatype');
-                        this.element().datetimepicker({
+                        this.element().datepicker({
                             dateFormat: $.datepicker.ISO_8601,
-                            separator: 'T',
-                            showSecond: true,
-                            timeFormat: 'hh:mm:ss',
-                            showTimezone: true,
-                            timezone: '+00:00',
                             // showOn: 'both',
                             firstDay: 1
                         });
