@@ -166,7 +166,6 @@ RDFauthor.registerWidget({
                         });
                         $('#ui-datepicker-div').css('z-index', 10000);
                         self.datatype = self.datatypes['date'];
-                        console.log(self.datatype);
                     break;
             }
         }
