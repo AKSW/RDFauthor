@@ -1,3 +1,19 @@
+libjs-rdfauthor (0.9.5) lod2; urgency=low
+
+  * fix #33 literal widget unchangeable input field
+  * add date widget property hooks (#34)
+  * fix #35 date widget no writes datatype
+
+ -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Fri, 25 Jan 2013 10:01:33 +0100
+
+libjs-rdfauthor (0.9.4) lod2; urgency=low
+
+  * fix qunit tests
+  * change vcard-rdfjson.html
+  * fix edit function
+
+ -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Wed, 12 Dec 2012 17:45:25 +0100
+
 libjs-rdfauthor (0.9.3) lod2; urgency=low
 
   * Fixes for IE7
