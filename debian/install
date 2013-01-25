@@ -1,3 +1,4 @@
+libraries usr/share/libjs-rdfauthor
 src usr/share/libjs-rdfauthor
 img usr/share/libjs-rdfauthor
 Readme.md usr/share/doc/libjs-rdfauthor

@@ -11,11 +11,11 @@ $(document).ready(function() {
     
     test('init', 2, function() {
        ok(this.fixture instanceof SubjectGroup, 'Should be instanceof SubjectGroup');
-       equal($('#test-container').children('.subject-group').length, 1, 'Container should have 1 child of class subject-group.');
+       equal($('#test-container').children('.rdfauthor-subject-group').length, 1, 'Container should have 1 child of class subject-group.');
     });
     
     test('addWidget', 2, function() {        
-        this.fixture.addWidget(statement1, new _Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture.numberOfRows(), 1, 'Should have 1 row.');
         
         // add wrong statement
@@ -31,7 +31,7 @@ $(document).ready(function() {
     });
     
     test('getRowByPredicate', 2, function() {
-        this.fixture.addWidget(statement1, new _Widget);
+        this.fixture.addWidget(statement1, _Widget);
         var r = this.fixture.getRowByPredicate('http://example.com/predicate1');
         ok(r instanceof PredicateRow, 'Should be an instanceof PredicateRow');
         this.fixture.addWidget(statement1, _Widget);

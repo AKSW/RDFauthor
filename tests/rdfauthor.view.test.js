@@ -4,7 +4,7 @@ $(document).ready(function() {
             this.fixtureID = 'rdfAuthorViewTest';
             this.fixtureTitle = 'View Test Title';
             this.fixtureContentContainerClass = 'rdfAuthorViewTestContentContainer';
-            this.fixture = new View({
+            this.fixture = new PopoverController({
                 id: this.fixtureID, 
                 container: $('#' + TEST_CONTAINER_ID), 
                 title: this.fixtureTitle, 
@@ -18,7 +18,7 @@ $(document).ready(function() {
     });
     
     test('init', 4, function() {
-        ok(this.fixture instanceof View, 'Should be instance of View.');
+        ok(this.fixture instanceof PopoverController, 'Should be instance of PopoverController.');
         equal($('#' + TEST_CONTAINER_ID).children('#' + this.fixtureID).length, 1, 'Container should have 1 child with view\'s id.');
         ok($('#' + TEST_CONTAINER_ID).children('#' + this.fixtureID).hasClass('window'), 'View should have class window.');
         equal($('#' + TEST_CONTAINER_ID).children('#' + this.fixtureID).children('.title').html(), this.fixtureTitle, 
@@ -26,11 +26,11 @@ $(document).ready(function() {
     });
     
     test('addWidget', 3, function() {
-        this.fixture.addWidget(statement1, new _Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
-        this.fixture.addWidget(statement2, new _Widget);
+        this.fixture.addWidget(statement2, _Widget);
         equal(this.fixture._subjectCount, 2, 'Should have 2 subjects.');
-        this.fixture.addWidget(statement1, new _Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture._subjectCount, 2, 'Should have 2 subjects.');
     });
     
@@ -46,7 +46,7 @@ $(document).ready(function() {
     });
     
     test('getSubjectGroup', 2, function() {
-        this.fixture.addWidget(statement1, new _Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture._subjectCount, 1, 'Should have 1 subject.');
         ok(this.fixture.getSubjectGroup('http://example.com/subject1') instanceof SubjectGroup, 
             'Returned subject group should be an instance of SubjectGroup.');
@@ -58,11 +58,11 @@ $(document).ready(function() {
     
     test('numberOfSubjects', 4, function() {
         equal(this.fixture.numberOfSubjects(), 0, 'Should have 0 subjects.');
-        this.fixture.addWidget(statement1, new _Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture.numberOfSubjects(), 1, 'Should have 1 subject.');
-        this.fixture.addWidget(statement2, new _Widget);
+        this.fixture.addWidget(statement2, _Widget);
         equal(this.fixture.numberOfSubjects(), 2, 'Should have 2 subjects.');
-        this.fixture.addWidget(statement1, new _Widget);
+        this.fixture.addWidget(statement1, _Widget);
         equal(this.fixture.numberOfSubjects(), 2, 'Should still have 2 subjects.');
     });
     

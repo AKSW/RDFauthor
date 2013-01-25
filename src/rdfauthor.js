@@ -369,8 +369,8 @@ RDFauthor = (function($) {
                 _updateSources();
             }, 
             onAfterCancel: function () {
-                _callIfIsFunction(_options.onCancel);
                 RDFauthor.cancel();
+                _callIfIsFunction(_options.onCancel);
             }, 
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
             useAnimations: _options.useAnimations
@@ -1518,14 +1518,19 @@ RDFauthor = (function($) {
                 // var dfd = $.Deferred();
                 // set gui/editing options
                 self.setOptions({
-                    saveButtonTitle: config.saveButtonTitle ? config.saveButtonTitle : 'Save',
-                    cancelButtonTitle: config.cancelButtonTitle ? config.cancelButtonTitle : 'Cancel',
-                    title: config.title ? config.title : 'Edit Resource: ' + config.targetResource,  
+                    saveButtonTitle: config.saveButtonTitle || 'Save',
+                    cancelButtonTitle: config.cancelButtonTitle || 'Cancel',
+                    title: config.title || 'Edit Resource: ' + config.targetResource,
+                    view: config.view || 'popover',
                     autoParse: false, 
-                    showPropertyButton: config.showPropertyButton ? config.showPropertyButton : true,
+                    showPropertyButton: config.showPropertyButton || true,
                     onSubmitSuccess: function (responseData) {
                         // run callback
                         _callIfIsFunction(config.onSubmitSuccess);
+                        RDFauthor.reset();
+                    },
+                    onCancel: function() {
+                        RDFauthor.reset();
                     }
                 });
                 // dfd.resolve();
@@ -1567,8 +1572,8 @@ RDFauthor = (function($) {
                 // set rdfauthor settings
                 self.setInfoForGraph(config.targetGraph, 'queryEndpoint', config.targetSparqlEndpoint);
                 self.setInfoForGraph(config.targetGraph, 'updateEndpoint', config.targetUpdateEndpoint);
-                _options.viewOptions.type = config.view;
-                _options.useSPARQL11 = config.useSPARQL11 | false;
+                _options.viewOptions.type = config.view || 'popover';
+                _options.useSPARQL11 = config.useSPARQL11 || false;
 
                 // console.log('config', config);
                 // console.log('_graphInfo', _graphInfo);
