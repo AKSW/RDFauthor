@@ -534,7 +534,6 @@ RDFauthor.registerWidget({
             });
             
             //set human-readable label for uri
-            console.log('isURI', self.isURI(self.statement.objectValue()));
             if (self.isURI(self.statement.objectValue())) {
                 self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
                     self.element().data('uri', self.element().val());
