@@ -122,6 +122,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
             graph: statement.graphURI()
         });
         self.addWidget(newStatement, widget.constructor, true);
+
     });
 
     var target = RDFauthor.eventTarget();
@@ -132,50 +133,55 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
      * @param {function} constructor The widget's constructor function (optional)
      */
     this.addWidget = function (statement, constructor, activate) {
-        var widgetInstance = null;
+        // query predicate info before requesting widget for statement
+        $.when(RDFauthor.updateInfoPredicate(statement)).then(function() {
+            // console.log('runs inner addWidget');
 
-        // instantiate widget
-        if ((undefined !== constructor) && (typeof constructor == 'function')) {
-            widgetInstance = new constructor(statement);
-            widgetInstance.constructor = constructor;
-        } else {
-            widgetInstance = RDFauthor.getWidgetForStatement(statement);
-        }
+            var widgetInstance = null;
 
-        // no widget found
-        if (!widgetInstance) {
-            throw 'No suitable widget found.';
-        }
+            // instantiate widget
+            if ((undefined !== constructor) && (typeof constructor == 'function')) {
+                widgetInstance = new constructor(statement);
+                widgetInstance.constructor = constructor;
+            } else {
+                widgetInstance = RDFauthor.getWidgetForStatement(statement);
+            }
 
-        // initialize widget
-        widgetInstance.init();
-        widgetInstance.predicateRow = this;
+            // no widget found
+            if (!widgetInstance) {
+                throw 'No suitable widget found.';
+            }
 
-        var widgetID   = RDFauthor.nextID();
-        var widgetHTML = getWidgetChrome(widgetID, widgetInstance.markup());
-        var widgetIdx  = nextWidgetIndex();
+            // initialize widget
+            widgetInstance.init();
+            widgetInstance.predicateRow = self;
 
-        // store widget-id widgetIdx mapping
-        this._widgets[widgetIdx] = widgetInstance;
-        this._widgetIndicesByID[widgetID] = widgetIdx;
+            var widgetID   = RDFauthor.nextID();
+            var widgetHTML = getWidgetChrome(widgetID, widgetInstance.markup());
+            var widgetIdx  = nextWidgetIndex();
 
-        // make sure, PredicateRow is visible
-        if (jQuery('#' + this.cssID()).children('fieldset').children('.widget').length > 0) {
-            jQuery('#' + this.cssID()).show();
-        }
+            // store widget-id widgetIdx mapping
+            self._widgets[widgetIdx] = widgetInstance;
+            self._widgetIndicesByID[widgetID] = widgetIdx;
 
-        // append HTML
-        jQuery('#' + this._idPrefix + this._id).children('fieldset').append(widgetHTML);
+            // make sure, PredicateRow is visible
+            if (jQuery('#' + self.cssID()).children('fieldset').children('.widget').length > 0) {
+                jQuery('#' + self.cssID()).show();
+            }
 
-        // widget markup ready
-        widgetInstance.ready();
+            // append HTML
+            jQuery('#' + self._idPrefix + self._id).children('fieldset').append(widgetHTML);
 
-        // focus widget
-        if ((undefined !== activate) && activate) {
-            widgetInstance.focus();
-        }
+            // widget markup ready
+            widgetInstance.ready();
 
-        return this._widgetIDPrefix + widgetID;
+            // focus widget
+            if ((undefined !== activate) && activate) {
+                widgetInstance.focus();
+            }
+
+            return self._widgetIDPrefix + widgetID;
+        });
     }
 }
 

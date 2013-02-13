@@ -1643,6 +1643,21 @@ RDFauthor = (function($) {
         },
         
         /**
+         * PrefixedName
+         */
+        expandNamespace: function (prefixedName) {
+            var self = this;
+            var namespaces = self.namespaces();
+            var splits = prefixedName.split(':', 2);
+            if (splits.length >= 2) {
+                if (splits[0] in namespaces) {
+                    return namespaces[splits[0]] + splits[1];
+                }
+            }
+            return prefixedName;
+        },
+
+        /**
          * Returns the current view instance
          */
         getView: function () {
@@ -2116,6 +2131,91 @@ RDFauthor = (function($) {
                 _populateView();
                 _showView();
             });
+        },
+
+        /**
+         * Query for predicate info and update the cache, which will be used for 
+         * choosing the right widget.
+         */
+        updateInfoPredicate: function (statement) {
+            var self = this;
+            // jquery deferred object
+            var dfd = $.Deferred();
+            // necessary uris
+            var predicateURI = statement.predicateURI();
+            // extend cache with type and range if available
+            var typeURI = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+            var rangeURI = 'http://www.w3.org/2000/01/rdf-schema#range';
+
+            // if no predicate info available in __cache (rdfauthor.cache.js)
+            // try to query the knowledge base
+            var options = {
+                callbackSuccess: function (data) {
+                    // console.log('data', data);
+                    // console.log('predicateInfo', _predicateInfo);
+                    if (!_predicateInfo.hasOwnProperty(predicateURI)) {
+                        _predicateInfo[predicateURI] = {};
+                    }
+
+                    // iterate through resultset and add predicate info to cache
+                    var response = data['results']['bindings'];
+                    $(response).each(function(i) {
+                        // console.log('type', self.expandNamespace(response[i]['type'].value));
+                        // add rdf:type info
+                        if (_predicateInfo[predicateURI][typeURI]) {
+                            _predicateInfo[predicateURI][typeURI].push(self.expandNamespace(response[i]['type'].value));
+                        } else {
+                            _predicateInfo[predicateURI][typeURI] = [self.expandNamespace(response[i]['type'].value)];
+                        }
+
+                        // add rdfs:range info
+                        // console.log('range', self.expandNamespace(response[i]['range'].value));
+                        if (_predicateInfo[predicateURI][rangeURI]) {
+                            _predicateInfo[predicateURI][rangeURI].push(self.expandNamespace(response[i]['range'].value));
+                        } else {
+                            _predicateInfo[predicateURI][rangeURI] = [self.expandNamespace(response[i]['range'].value)];
+                        }
+                    });
+
+                    // debug log
+                    // console.log('updated _predicateInfo', _predicateInfo);
+                    // console.log('query processing completed')
+
+                    // resolve deferred object
+                    dfd.resolve();
+                }, 
+                callbackError: function (err) {
+                    console.log('err', err);
+                    // resolve deferred object
+                    dfd.resolve();
+                }, 
+                async: true
+            };
+
+            // query if property hasn't infos
+            if (undefined !== _predicateInfo[predicateURI]) {
+                // debug log
+                // console.log('skip crawling predicate info');
+                // resolve deferred object
+                dfd.resolve();
+            } else {
+                // query
+                var query = 'SELECT ?type ?range'
+                          + ' WHERE {'
+                          + ' <' + predicateURI + '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .'
+                          + ' OPTIONAL { <' + predicateURI + '> <http://www.w3.org/2000/01/rdf-schema#range> ?range }'
+                          + ' }';
+
+                // debug log
+                // console.log('query', query);
+
+                // run query
+                self.queryGraph(statement.graphURI(), query, options);
+            }
+            
+            // promise deferred object
+            return dfd.promise();
         }
+
     }
 })(jQuery);
