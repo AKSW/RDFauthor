@@ -2162,17 +2162,17 @@ RDFauthor = (function($) {
                     $(response).each(function(i) {
                         // console.log('type', self.expandNamespace(response[i]['type'].value));
                         // add rdf:type info
-                        if (_predicateInfo[predicateURI][typeURI]) {
+                        if (_predicateInfo[predicateURI].hasOwnProperty(typeURI)) {
                             _predicateInfo[predicateURI][typeURI].push(self.expandNamespace(response[i]['type'].value));
-                        } else {
+                        } else if (response[i].hasOwnProperty('type')){
                             _predicateInfo[predicateURI][typeURI] = [self.expandNamespace(response[i]['type'].value)];
                         }
 
                         // add rdfs:range info
                         // console.log('range', self.expandNamespace(response[i]['range'].value));
-                        if (_predicateInfo[predicateURI][rangeURI]) {
+                        if (_predicateInfo[predicateURI].hasOwnProperty(rangeURI)) {
                             _predicateInfo[predicateURI][rangeURI].push(self.expandNamespace(response[i]['range'].value));
-                        } else {
+                        } else if (response[i].hasOwnProperty('range')) {
                             _predicateInfo[predicateURI][rangeURI] = [self.expandNamespace(response[i]['range'].value)];
                         }
                     });
