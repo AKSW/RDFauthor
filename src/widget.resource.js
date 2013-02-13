@@ -199,13 +199,13 @@ RDFauthor.registerWidget({
 
         for (var i = 0; i < this.labels.length; ++i) {
             var propertyUri = this.labels[i];
-	
+
             unionPattern += '{ <' + subjectUri + '> <' + propertyUri + '> ?label }';
-        	
+
             if(i != this.labels.length - 1) {
                 unionPattern += " UNION ";
             }
-	}
+        }
 
 
         //build query
@@ -214,22 +214,22 @@ RDFauthor.registerWidget({
         // console.log(query);
         //query
         RDFauthor.queryGraph(this.statement.graphURI(), query, {
-                callbackSuccess: function (data) {
-                    if (data['results']['bindings'].length != 0) {
-                        label = data['results']['bindings'][0]['label'].value;
-                        hasLabel = true;
-                    }
-
-                    if ($.isFunction(responseCallback)) {
-                        responseCallback(label, hasLabel);
-                    }
-                },
-                callbackError: function () {
-                    if ($.isFunction(responseCallback)) {
-                        responseCallback(label, hasLabel);
-                    }
-                    self.element().removeClass('is-processing');
+            callbackSuccess: function (data) {
+                if (data['results']['bindings'].length != 0) {
+                    label = data['results']['bindings'][0]['label'].value;
+                    hasLabel = true;
                 }
+
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(label, hasLabel);
+                }
+            },
+            callbackError: function () {
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(label, hasLabel);
+                }
+                self.element().removeClass('is-processing');
+            }
         });
     },
 
@@ -534,17 +534,23 @@ RDFauthor.registerWidget({
             });
             
             //set human-readable label for uri
-            self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
-                self.element().data('uri', self.element().val());
-                self.element().data('label', label);
-                self.element().data('hasLabel', hasLabel);
-                if (hasLabel) {
-                    self.element().val(label);
-                    self.element().removeClass('resource-autocomplete-uri')
-                                  .addClass('resource-autocomplete-uri-name');
-                }
+            console.log('isURI', self.isURI(self.statement.objectValue()));
+            if (self.isURI(self.statement.objectValue())) {
+                self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
+                    self.element().data('uri', self.element().val());
+                    self.element().data('label', label);
+                    self.element().data('hasLabel', hasLabel);
+                    if (hasLabel) {
+                        self.element().val(label);
+                        self.element().removeClass('resource-autocomplete-uri')
+                                      .addClass('resource-autocomplete-uri-name');
+                    }
+                    self.element().removeClass('is-processing');
+                });
+            } else {
+                // if no uri, remove loading spinner
                 self.element().removeClass('is-processing');
-            });
+            }
             // toggle values
             self.element().focus(function() {
                 if ($(this).data('hasLabel')) {
