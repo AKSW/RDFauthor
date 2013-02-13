@@ -183,7 +183,8 @@ RDFauthor.registerWidget({
     value: function () {
         var self = this;
         var value = self.element().data('uri');
-        if ( self.isURI(value) || (String(value).indexOf(':') > -1) ) {
+        console.log('uri', value);
+        if ( self.isURI(value) ) {
             return value;
         }
 
@@ -473,7 +474,8 @@ RDFauthor.registerWidget({
 
     isURI: function (term) {
         // TODO: more advanced URI check
-        return (/(https?:\/\/|mailto:|tel:)/.exec(term) !== null);
+        // return (/(https?:\/\/|mailto:|tel:)/.exec(term) !== null);
+        return (/^(?:([a-z0-9+.-]+:\/\/)((?:(?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(:(?:\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|([a-z0-9+.-]+:)(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(\?(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?(#(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?$/i.exec(term) !== null);
     },
 
     highlight: function (text, term) {
