@@ -46,7 +46,7 @@ RDFauthor.registerWidget({
             minChars:           3,      /* minmum chars needed to be typed before search starts */
             delay:              1000,   /* delay in ms before search starts */
             max:                9,      /* maximum number of results */
-            maxResults:         3,      /* maximum number of results per source */
+            maxResults:         15,      /* maximum number of results per source */
             // Source options:
             local:              false,  /* Local property cache */
             sparql:             true,   /* use SPARQL endpoint */
