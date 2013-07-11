@@ -1,54 +1,59 @@
-This work was packaged for Debian by:
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDFauthor
+Source: https://github.com/AKSW/RDFauthor
 
-    Sebastian Tramp <tramp@informatik.uni-leipzig.de> on Tue, 13 Jul 2012 15:37:27 +0100
-
-It was downloaded from:
-
-    <https://github.com/AKSW/RDFauthor/tags>
-
-Upstream Author(s):
-
-    Clemens Hoffmann
-    Norman Heino
-    Sebastian Tramp
-    Tim Ermilov
-    Claus Stadler
-    Jonas Brekle
-    Christian Weiske
-
+Files: *
 Copyright:
+    2012 Clemens Hoffmann
+    2012 Norman Heino
+    2012 Sebastian Tramp
+    2012 Tim Ermilov
+    2012 Claus Stadler
+    2012 Jonas Brekle
+    2012 Christian Weiske
+License: GPL-2+
+ This program is free software; you can redistribute it
+ and/or modify it under the terms of the GNU General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the GNU General Public License for more
+ details.
+ .
+ You should have received a copy of the GNU General Public
+ License along with this package; if not, write to the Free
+ Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+ Boston, MA  02110-1301 USA
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
 
-    <Copyright (C) 2012 Clemens Hoffmann>
-    <Copyright (C) 2012 Norman Heino>
-    <Copyright (C) 2012 Sebastian Tramp>
-    <Copyright (C) 2012 Tim Ermilov>
-    <Copyright (C) 2012 Claus Stadler>
-    <Copyright (C) 2012 Jonas Brekle>
-    <Copyright (C) 2012 Christian Weiske>
-
-License:
-
-   This package is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation.
-
-    This package is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program. If not, see <http://www.gnu.org/licenses/>
-
-On Debian systems, the complete text of the GNU General
-Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
-
-The Debian packaging is:
-
-    Copyright (C) 2012 Sebastian Tramp <tramp@informatik.uni-leipzig.de>
-
-you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+Files: debian/*
+Copyright: 2013 Sebastian Tramp
+License: GPL-2+
+ This program is free software; you can redistribute it
+ and/or modify it under the terms of the GNU General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be
+ useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the GNU General Public License for more
+ details.
+ .
+ You should have received a copy of the GNU General Public
+ License along with this package; if not, write to the Free
+ Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+ Boston, MA  02110-1301 USA
+ .
+ On Debian systems, the full text of the GNU General Public
+ License version 2 can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
 

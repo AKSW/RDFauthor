@@ -501,9 +501,6 @@ var __cache = {
       "domain" : [
          "http://www.w3.org/2000/01/rdf-schema#Resource"
       ],
-      "range" : [
-         "http://www.w3.org/2000/01/rdf-schema#Class"
-      ],
       "label" : "type"
    },
    "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest" : {

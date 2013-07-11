@@ -46,7 +46,7 @@ RDFauthor.registerWidget({
             minChars:           3,      /* minmum chars needed to be typed before search starts */
             delay:              1000,   /* delay in ms before search starts */
             max:                9,      /* maximum number of results */
-            maxResults:         3,      /* maximum number of results per source */
+            maxResults:         15,      /* maximum number of results per source */
             // Source options:
             local:              false,  /* Local property cache */
             sparql:             true,   /* use SPARQL endpoint */
@@ -183,7 +183,8 @@ RDFauthor.registerWidget({
     value: function () {
         var self = this;
         var value = self.element().data('uri');
-        if ( self.isURI(value) || (String(value).indexOf(':') > -1) ) {
+        console.log('uri', value);
+        if ( self.isURI(value) ) {
             return value;
         }
 
@@ -199,13 +200,13 @@ RDFauthor.registerWidget({
 
         for (var i = 0; i < this.labels.length; ++i) {
             var propertyUri = this.labels[i];
-	
+
             unionPattern += '{ <' + subjectUri + '> <' + propertyUri + '> ?label }';
-        	
+
             if(i != this.labels.length - 1) {
                 unionPattern += " UNION ";
             }
-	}
+        }
 
 
         //build query
@@ -214,22 +215,22 @@ RDFauthor.registerWidget({
         // console.log(query);
         //query
         RDFauthor.queryGraph(this.statement.graphURI(), query, {
-                callbackSuccess: function (data) {
-                    if (data['results']['bindings'].length != 0) {
-                        label = data['results']['bindings'][0]['label'].value;
-                        hasLabel = true;
-                    }
-
-                    if ($.isFunction(responseCallback)) {
-                        responseCallback(label, hasLabel);
-                    }
-                },
-                callbackError: function () {
-                    if ($.isFunction(responseCallback)) {
-                        responseCallback(label, hasLabel);
-                    }
-                    self.element().removeClass('is-processing');
+            callbackSuccess: function (data) {
+                if (data['results']['bindings'].length != 0) {
+                    label = data['results']['bindings'][0]['label'].value;
+                    hasLabel = true;
                 }
+
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(label, hasLabel);
+                }
+            },
+            callbackError: function () {
+                if ($.isFunction(responseCallback)) {
+                    responseCallback(label, hasLabel);
+                }
+                self.element().removeClass('is-processing');
+            }
         });
     },
 
@@ -473,7 +474,8 @@ RDFauthor.registerWidget({
 
     isURI: function (term) {
         // TODO: more advanced URI check
-        return (/(https?:\/\/|mailto:|tel:)/.exec(term) !== null);
+        // return (/(https?:\/\/|mailto:|tel:)/.exec(term) !== null);
+        return (/^(?:([a-z0-9+.-]+:\/\/)((?:(?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(:(?:\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|([a-z0-9+.-]+:)(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(\?(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?(#(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?$/i.exec(term) !== null);
     },
 
     highlight: function (text, term) {
@@ -534,17 +536,22 @@ RDFauthor.registerWidget({
             });
             
             //set human-readable label for uri
-            self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
-                self.element().data('uri', self.element().val());
-                self.element().data('label', label);
-                self.element().data('hasLabel', hasLabel);
-                if (hasLabel) {
-                    self.element().val(label);
-                    self.element().removeClass('resource-autocomplete-uri')
-                                  .addClass('resource-autocomplete-uri-name');
-                }
+            if (self.isURI(self.statement.objectValue())) {
+                self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
+                    self.element().data('uri', self.element().val());
+                    self.element().data('label', label);
+                    self.element().data('hasLabel', hasLabel);
+                    if (hasLabel) {
+                        self.element().val(label);
+                        self.element().removeClass('resource-autocomplete-uri')
+                                      .addClass('resource-autocomplete-uri-name');
+                    }
+                    self.element().removeClass('is-processing');
+                });
+            } else {
+                // if no uri, remove loading spinner
                 self.element().removeClass('is-processing');
-            });
+            }
             // toggle values
             self.element().focus(function() {
                 if ($(this).data('hasLabel')) {

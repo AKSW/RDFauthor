@@ -1,3 +1,15 @@
+libjs-rdfauthor (0.9.6) lod2; urgency=low
+
+  * remove widget restriction
+  * change default limit for resource widget to 15
+  * refactor uri check regex
+  * remove debug log
+  * add uri check for label request
+  * fix issue concerning adding widgets which haven't set rdfs:range
+  * fix issue #31
+
+ -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Thu, 11 Jul 2013 13:47:51 +0200
+
 libjs-rdfauthor (0.9.5) lod2; urgency=low
 
   * fix #33 literal widget unchangeable input field
