@@ -1,0 +1,30 @@
+widgets
+1. register widgets
+2. create key value store
+   widgetStore = {
+   '_property_' : {
+     'PURI': [] // stores available widgets for property uri (inkl. literal/resource widget)
+   },
+   '_literal_' : {},
+   '_resource_' : {}
+   }
+
+create view
+1. rdf data
+2. insert into rdfstore-js
+3. query resource from rdfstore-js
+4. create resource object
+   resourceInformation = {
+     uri: ...,
+     label: ..., 
+     objects: {
+       'objecturi': [] // set of possible widgets for object
+     },
+     choreographies: [] // automatically choosen
+   }
+
+   resourceInformation.prototype = {
+     getl
+   }
+5. pass resourceInformation to desktopview over .addResource
+

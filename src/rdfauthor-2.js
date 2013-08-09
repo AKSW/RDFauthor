@@ -8,7 +8,7 @@ var RDFauthor = (function() {
   
   // instance stores a reference to the Singleton
   var instance;
-  
+    
   /** handle asynchrony when getInstance is called */
   var RDFAUTHOR_RDY = false;
   /** Callbacks to be executed when RDFauthor is ready */
@@ -42,7 +42,7 @@ var RDFauthor = (function() {
       view: {
         type: 'desktop',
         fullscreen: false,
-        domId: 'rdfauthor-view-' + Math.random()
+        domId: 'rdfauthor-view-' + Math.round(Math.random()*10000)
       },
       choreographies: {
         fallback: 'default',
@@ -51,19 +51,25 @@ var RDFauthor = (function() {
       }
     }
     
-    /** script is in unknown state */
+    /** Script is in unknown state */
     var SCRIPT_STATE_UNKNOWN = undefined;
     
-    /** script is currently loading */
+    /** Script is currently loading */
     var SCRIPT_STATE_LOADING = 1;
     
-    /** script is ready */
+    /** Script is ready */
     var SCRIPT_STATE_READY = 2;
     
-    /** root directory of RDFauthor */
+    /** Root directory of RDFauthor */
     var RDFAUTHOR_BASE = null;
     
-    /** visibility of rdfauthor view */
+    /** Widget directory path */
+    var RDFAUTHOR_WIDGETS = 'src/widgets/';
+    
+    /** Choreography directory path */
+    var RDFAUTHOR_CHOREOGRAPHIES = 'src/choreographies';
+    
+    /** Visibility of rdfauthor view */
     var RDFAUTHOR_VISIBLE = false;
     
     /** Number of pending scripts */
@@ -78,8 +84,25 @@ var RDFauthor = (function() {
     /** Loaded stylesheet URIs */
     var _loadedStylesheets = {};
     
-    /** current view */
+    /** Current view */
     var _viewHolder = null;
+    
+    /** Widget store */
+    var _widgetStore = {
+      __datatype__: {},
+      __property__: {},
+      // fallback widgets if no specific was matched
+      __literal__: {},
+      __resource__: {},
+      widgetInstances: {}
+    }
+    
+    /**
+     * Add widget to widget store.
+     */
+    function _addWidget(uri, hook) {
+      
+    }
     
     /**
      * Calls its parameter if it is of type funtion.
@@ -108,7 +131,63 @@ var RDFauthor = (function() {
           }
         }
       }
-    } 
+    }
+    
+    function _createWidgetStore() {
+      // load fallback widgets for literals and resources
+      _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + 'rdfauthor.widget.literal.js', function() {
+        // register to widget store
+        // TODO: push widget instance here not string
+        _widgetStore.widgetInstances['http://aksw.org/Projects/RDFauthor/local#literal'] = 'add instance here';
+      });
+      _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + 'rdfauthor.widget.resource.js', function() {
+        // register to widget store
+        // TODO: push widget instance here not string
+        _widgetStore.widgetInstances['http://aksw.org/Projects/RDFauthor/local#resource'] = 'add instance here';
+      });
+      
+      // load widgets who are declared as enabled in RDFAUTHOR_CONFIG (refer: rdfauthor.config.js)
+      for (var widget in RDFAUTHOR_CONFIG.widgets) {
+        if (RDFAUTHOR_CONFIG.widgets[widget].enabled) {
+          var widgetConfig = RDFAUTHOR_CONFIG.widgets[widget];
+          var widgetUri = 'http://aksw.org/Projects/RDFauthor‎/local#' + widget;
+          _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + RDFAUTHOR_CONFIG.widgets[widget].src);
+          for (var hookType in widgetConfig.hook) {
+            console.log(hookType);
+            switch (hookType) {
+              case 'property':
+                console.log('property hook');
+                for (var property in widgetConfig.hook[hookType]) {
+                  var propertyUri = widgetConfig.hook[hookType][property];
+                  if (_widgetStore.__property__[propertyUri]) {
+                    _widgetStore.__property__[propertyUri].push(widgetUri);
+                  } else {
+                    _widgetStore.__property__[propertyUri] = [widgetUri];
+                    // TODO: push widget instance here not string
+                    _widgetStore.widgetInstances[widgetUri] = 'add instance here';
+                  }
+                  console.log(_widgetStore);
+                }
+                break;
+              case 'datatype':
+                console.log('datatype hook');
+                for (var datatype in widgetConfig.hook[hookType]) {
+                  var datatypeUri = widgetConfig.hook[hookType][datatype];
+                  if (_widgetStore.__datatype__[propertyUri]) {
+                    _widgetStore.__datatype__[datatypeUri].push(widgetUri);
+                  } else {
+                    _widgetStore.__datatype__[datatypeUri] = [widgetUri];
+                    // TODO: push widget instance to widgetInstances
+                    _widgetStore.widgetInstances[widgetUri] = 'add instance here';
+                  }
+                  console.log(_widgetStore);
+                }
+                break;
+            }
+          }
+        }
+      }
+    }
     
     function _execStoredReadyCallbacks() {
       // execute ready callbacks to return RDFauthor instance
@@ -122,6 +201,34 @@ var RDFauthor = (function() {
       }
     }
     
+    function _getRdfStore(callback) {
+      // init rdfstore-js
+      rdfstore.create({ 
+        name: 'rdfauthor', 
+        overwrite: false, 
+        persistent: true
+      }, function(store) {
+         store.registerDefaultProfileNamespaces();
+        _callIfIsFunction(callback(store));
+      });
+    }
+    
+    function _getSubjects(callback) {
+      var storedSubjects = {};
+      
+      _getRdfStore(function(store) {
+        var query = 'SELECT ?s ?label WHERE { ?s <' + store.rdf.resolve('foaf:name') + '> ?label }';
+        store.execute(query, function(success, result) {
+          
+          for (var subject in result) {
+            storedSubjects[result[subject].s.value] = result[subject].label.value;
+          }
+          
+          _callIfIsFunction(callback(storedSubjects));
+        });
+      });
+    }
+        
     function _isArray(arg) {
       if( Object.prototype.toString.call(arg) === '[object Array]' ) {
         return true;
@@ -136,6 +243,18 @@ var RDFauthor = (function() {
       } else {
         return false;
       }
+    }
+    
+    function _loadResourceIntoStore(resource, callback) {
+      _getRdfStore(function(store) {
+        store.load('text/turtle', resource.src, function(success, results) {
+          store.execute("SELECT *  WHERE { ?s ?p ?o }", function(success, results) {
+            console.log(success);
+            console.log(results);
+            _callIfIsFunction(callback);
+          });
+        });
+      });
     }
     
     function _ready() {
@@ -253,18 +372,80 @@ var RDFauthor = (function() {
       // set RDFAUTHOR_BASE
       _calcRDFauthorBase();
       
+      // load enabled widgets and choreographies
+      _require(RDFAUTHOR_BASE + 'src/rdfauthor.config.js', function() {
+        console.log(RDFAUTHOR_CONFIG);
+        _createWidgetStore();
+      });
+      
+      
+      
       // jQuery
       if ('undefined' === typeof $) {
         _require(RDFAUTHOR_BASE + 'libs/jquery-1.10.1.js', function() {
           // load Bootstrap if jquery is loaded
           if ('undefined' === typeof $.fn.modal) {
             _require(RDFAUTHOR_BASE + 'libs/bootstrap/js/bootstrap.js');
+            _requireCSS(RDFAUTHOR_BASE + 'libs/bootstrap/css/bootstrap.css', function() {
+            // load rdfauthor stylesheet after bootstrap due to overwriting some classes
+            _requireCSS(RDFAUTHOR_BASE + 'src/rdfauthor.stylesheet.css');
+          });
           }
+          // jQuery UI
+          // the view will be created when jquery ui is loaded, because it uses parts of jQuery UI
+          if (undefined === $.ui) {
+              _requireCSS(RDFAUTHOR_BASE + 'libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css');
+              _require(RDFAUTHOR_BASE + 'libs/jquery-ui/js/jquery-ui-1.10.3.custom.min.js', function() {
+                // create view, set view to _view variable which holds the current view
+                _view({
+                  domId: _options.view.domId,
+                  fullscreen: _options.view.fullscreen
+                });
+              });
+          } else {
+            _view({
+              domId: _options.view.domId,
+              fullscreen: _options.view.fullscreen
+            });
+          }
+          // load rdfstore-js
+          _require(RDFAUTHOR_BASE + 'libs/rdfstore-js/rdf_store.js');
+          
         });
+      } else {
+        // load Bootstrap if jquery is loaded
+        if ('undefined' === typeof $.fn.modal) {
+          _require(RDFAUTHOR_BASE + 'libs/bootstrap/js/bootstrap.js');
+          _requireCSS(RDFAUTHOR_BASE + 'libs/bootstrap/css/bootstrap.css', function() {
+            // load rdfauthor stylesheet after bootstrap due to overwriting some classes
+            _requireCSS(RDFAUTHOR_BASE + 'src/rdfauthor.stylesheet.css');
+          });
+        }
+        // jQuery UI
+        // the view will be created when jquery ui is loaded, because it uses parts of jQuery UI
+        if (undefined === $.ui) {
+            _requireCSS(RDFAUTHOR_BASE + 'libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css');
+            _require(RDFAUTHOR_BASE + 'libs/jquery-ui/js/jquery-ui-1.10.3.custom.min.js', function() {
+              // create view, set view to _view variable which holds the current view
+              _view({
+                domId: _options.view.domId,
+                fullscreen: _options.view.fullscreen
+              });
+            });
+        } else {
+          _view({
+            domId: _options.view.domId,
+            fullscreen: _options.view.fullscreen
+          });
+        }
+        // load rdfstore-js
+        _require(RDFAUTHOR_BASE + 'libs/rdfstore-js/rdf_store.js');
       }
       
-      // create view, set view to _view variable which holds the current view
-      _view();
+      // load stylesheets
+      // load rdfauthor stylesheet after bootstrap due to overwriting some classes
+      _requireCSS(RDFAUTHOR_BASE + 'src/rdfauthor.stylesheet.css');
+      _requireCSS(RDFAUTHOR_BASE + 'libs/font-awesome/css/font-awesome.min.css');
       
     }
     
@@ -272,7 +453,7 @@ var RDFauthor = (function() {
       switch (_options.view.type) {
         case 'desktop':
           _require(RDFAUTHOR_BASE + 'src/rdfauthor.view.desktop.js', function() {
-            _viewHolder = new DesktopView(); 
+            _viewHolder = new DesktopView(options);
           });
           break;
       } 
@@ -290,6 +471,14 @@ var RDFauthor = (function() {
       
       // public methods 
       
+      addResource: function(resource) {
+        _loadResourceIntoStore(resource, function() {
+          _getSubjects(function(storedSubjects) {
+            console.log(storedSubjects);
+            _viewHolder.addTabs(storedSubjects);
+          });
+        });
+      },
       
       getOptions: function() {
         return _options;

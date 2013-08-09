@@ -17,10 +17,47 @@
     <script src="src/rdfauthor-2.js">
     </script>
     <script>
+      var me = '\
+      @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\
+      <http://dyndns.clelicy.de/me>\
+          a <http://xmlns.com/foaf/0.1/Person> ;\
+          <http://www.w3.org/2004/02/skos/core#hiddenLabel> "Cannelony", "ClemensHoffmann" ;\
+          <http://www.w3.org/ns/auth/cert#key> [\
+              <http://www.w3.org/ns/auth/cert#exponent> 65537 ;\
+              <http://www.w3.org/ns/auth/cert#modulus> "CA173487345D4BE38AF7020F57F57E394962B96AEB2E71D9FD35899A5D8B9EA43B3B5E76897039201CD9D73069859058CC4302B73A30460EB42B6BFF433AB87FCB72336B8CEA4BD89F122D8A96A19C88D091A59C8CF674E3ADDDF683AEE1C0AE0BAC107B256155A8DDEE4B8245D61DA5C3BFFBF0475E8A8596856B2BCF28F0541365EB88E5E506BCB1FCA776E2303967EA9F67F207D40A71C6FDCB5B7E311DC8D9EA449C4BC98C5C272A9E7141D916EBAF2793C4D03EA8931E4FA0E055457C3BEF4079257A740D45DE5596A7B00A05F09F60C0DD05052D03DA5A05EC3BFDA91F953CE1D87E2D21D8F3218497124FF917AA07D32DE44D9E92874E3250B02666C7"^^<http://www.w3.org/2001/XMLSchema#hexBinary>\
+          ] ;\
+          <http://xmlns.com/foaf/0.1/currentProject> <http://aksw.org/Projects/OntoWiki>, <http://aksw.org/Projects/RDFauthor>, <http://aksw.org/Projects/re-publish> ;\
+          <http://xmlns.com/foaf/0.1/depiction> <https://secure.gravatar.com/avatar/be35f40f610edc7d8218bb866494fcf1?s=140> ;\
+          <http://xmlns.com/foaf/0.1/familyName> "Hoffmann" ;\
+          <http://xmlns.com/foaf/0.1/knows> <http://fb.comiles.eu/?c=person&id=natanael>, <http://id.feedface.de/me>, <http://manu.comiles.eu/foaf.rdf#me>, <http://seebi.homeip.net> ;\
+          <http://xmlns.com/foaf/0.1/mbox> <mailto:cannelony@gmail.com> ;\
+          <http://xmlns.com/foaf/0.1/name> "Clemens Hoffmann" .\
+      ';
+      
+      var me2 = '\
+      @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\
+      @prefix cert: <http://www.w3.org/ns/auth/cert#> .\
+      @prefix ex: <http://example.org/stuff/1.0/> .\
+      <http://dyndns.clelicy.de/MaxMustermann>\
+          a <http://xmlns.com/foaf/0.1/Person> ;\
+          <http://www.w3.org/ns/auth/cert#key> [\
+              <http://www.w3.org/ns/auth/cert#exponent> "65537"^^ex:test\
+          ] ;\
+          <http://xmlns.com/foaf/0.1/name> "Max Mustermann" .\
+      ';
+      
+      console.log(me);
+      
+      var self = this;
+      
       RDFauthor.getInstance(function(RDFauthorInstance) {
         var version = RDFauthorInstance.version;
         console.log(version);
         RDFauthorInstance.version = 0.5;
+        RDFauthorInstance.addResource({
+          type: 'turtle',
+          src: self.me
+        });
         RDFauthorInstance.show();
       });
       
@@ -46,6 +83,11 @@
           var version = RDFauthorInstance.version;
           console.log(version);
           RDFauthorInstance.version = 0.2;
+          //TODO: FIX TAB ADDING
+          // RDFauthorInstance.addResource({
+            // type: 'turtle',
+            // src: self.me2
+          // });
         });
       }, 6000);
       
