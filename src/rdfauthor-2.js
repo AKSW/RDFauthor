@@ -136,14 +136,10 @@ var RDFauthor = (function() {
     function _createWidgetStore() {
       // load fallback widgets for literals and resources
       _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + 'rdfauthor.widget.literal.js', function() {
-        // register to widget store
-        // TODO: push widget instance here not string
-        _widgetStore.widgetInstances['http://aksw.org/Projects/RDFauthor/local#literal'] = 'add instance here';
+        // callback
       });
       _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + 'rdfauthor.widget.resource.js', function() {
-        // register to widget store
-        // TODO: push widget instance here not string
-        _widgetStore.widgetInstances['http://aksw.org/Projects/RDFauthor/local#resource'] = 'add instance here';
+        // callback
       });
       
       // load widgets who are declared as enabled in RDFAUTHOR_CONFIG (refer: rdfauthor.config.js)
@@ -151,40 +147,9 @@ var RDFauthor = (function() {
         if (RDFAUTHOR_CONFIG.widgets[widget].enabled) {
           var widgetConfig = RDFAUTHOR_CONFIG.widgets[widget];
           var widgetUri = 'http://aksw.org/Projects/RDFauthor‎/local#' + widget;
-          _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + RDFAUTHOR_CONFIG.widgets[widget].src);
-          for (var hookType in widgetConfig.hook) {
-            console.log(hookType);
-            switch (hookType) {
-              case 'property':
-                console.log('property hook');
-                for (var property in widgetConfig.hook[hookType]) {
-                  var propertyUri = widgetConfig.hook[hookType][property];
-                  if (_widgetStore.__property__[propertyUri]) {
-                    _widgetStore.__property__[propertyUri].push(widgetUri);
-                  } else {
-                    _widgetStore.__property__[propertyUri] = [widgetUri];
-                    // TODO: push widget instance here not string
-                    _widgetStore.widgetInstances[widgetUri] = 'add instance here';
-                  }
-                  console.log(_widgetStore);
-                }
-                break;
-              case 'datatype':
-                console.log('datatype hook');
-                for (var datatype in widgetConfig.hook[hookType]) {
-                  var datatypeUri = widgetConfig.hook[hookType][datatype];
-                  if (_widgetStore.__datatype__[propertyUri]) {
-                    _widgetStore.__datatype__[datatypeUri].push(widgetUri);
-                  } else {
-                    _widgetStore.__datatype__[datatypeUri] = [widgetUri];
-                    // TODO: push widget instance to widgetInstances
-                    _widgetStore.widgetInstances[widgetUri] = 'add instance here';
-                  }
-                  console.log(_widgetStore);
-                }
-                break;
-            }
-          }
+          _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + RDFAUTHOR_CONFIG.widgets[widget].src, function() {
+            
+          });
         }
       }
     }
@@ -208,7 +173,7 @@ var RDFauthor = (function() {
         overwrite: false, 
         persistent: true
       }, function(store) {
-         store.registerDefaultProfileNamespaces();
+        store.registerDefaultProfileNamespaces();
         _callIfIsFunction(callback(store));
       });
     }
@@ -217,6 +182,7 @@ var RDFauthor = (function() {
       var storedSubjects = {};
       
       _getRdfStore(function(store) {
+        //TODO: extend query
         var query = 'SELECT ?s ?label WHERE { ?s <' + store.rdf.resolve('foaf:name') + '> ?label }';
         store.execute(query, function(success, result) {
           
@@ -486,6 +452,44 @@ var RDFauthor = (function() {
       
       ready: function() {
         _execStoredReadyCallbacks();
+      },
+      
+      registerChoreography: function (choreography) {
+        
+      },
+      
+      registerWidget: function(widget, widgetConfig, callback) {
+        _widgetStore.widgetInstances[widget.widgetUri()] = widget;
+        console.log('widgetStore', _widgetStore);
+        for (var hookType in widgetConfig.hook) {
+          console.log(hookType);
+          switch (hookType) {
+            case 'property':
+              console.log('property hook');
+              for (var property in widgetConfig.hook[hookType]) {
+                var propertyUri = widgetConfig.hook[hookType][property];
+                if (_widgetStore.__property__[propertyUri]) {
+                  _widgetStore.__property__[propertyUri].push(widget.widgetUri());
+                } else {
+                  _widgetStore.__property__[propertyUri] = [widget.widgetUri()];
+                }
+                console.log(_widgetStore);
+              }
+              break;
+            case 'datatype':
+              console.log('datatype hook');
+              for (var datatype in widgetConfig.hook[hookType]) {
+                var datatypeUri = widgetConfig.hook[hookType][datatype];
+                if (_widgetStore.__datatype__[propertyUri]) {
+                  _widgetStore.__datatype__[datatypeUri].push(widget.widgetUri());
+                } else {
+                  _widgetStore.__datatype__[datatypeUri] = [widget.widgetUri()];
+                }
+                console.log(_widgetStore);
+              }
+              break;
+          }
+        }
       },
       
       setOptions: function(options) {

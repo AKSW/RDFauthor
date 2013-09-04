@@ -2,15 +2,7 @@ var RDFAUTHOR_CONFIG = {
   'widgets': {
     'date': {
       'src': 'rdfauthor.widget.date.js',
-      'enabled': true,
-      'hook': {
-        'datatype': [
-          'http://www.w3.org/2001/XMLSchema#date'
-        ],
-        'property': [
-          'http://xmlns.com/foaf/0.1/birthday'
-        ]
-      }
+      'enabled': true
     },
     'datetime': {
       'src': 'rdfauthor.widget.datetime.js',
@@ -22,14 +14,7 @@ var RDFAUTHOR_CONFIG = {
     },
     'mailto': {
       'src': 'rdfauthor.widget.mailto.js',
-      'enabled': true,
-      'hook': {
-        'property': [
-          'http://xmlns.com/foaf/0.1/mbox', 
-          'http://rdfs.org/sioc/ns#email', 
-          'http://usefulinc.com/ns/doap#mailing-list'
-        ]
-      }
+      'enabled': true
     },
     'markdown': {
       'src': 'rdfauthor.widget.markdown.js',
