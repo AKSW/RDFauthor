@@ -353,12 +353,16 @@ RDFauthor.registerWidget({
     },
 
     value: function () {
-        var value = this.element().val();
+        value = this.element().val();
+        return value;
+        /* Formbuilder: We don't want properties to be deleted just because
+           the literal value is empty.
         if (String(value).length > 0) {
             return value;
         }
 
         return null;
+        */
     },
 
     _init: function () {

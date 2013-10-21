@@ -154,11 +154,14 @@ RDFauthor.registerWidget({
 
     value: function () {
         var value = this.element().val();
+        return value;
+        /*
         if (String(value).length > 0 && typeof(value) != "undefined") {
             return value;
         }
 
         return null;
+        */
     },
 
     _init: function () {

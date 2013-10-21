@@ -1086,7 +1086,7 @@ RDFauthor = (function($) {
                 } else {
                     // console.log('use REST');
                     // REST style
-                    var addedJSON = _checkJSON($.rdf.dump(added.triples()));
+                    var addedJSON = $.rdf.dump(added.triples());
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     // , {format: 'application/json', serialize: true})
                     // console.log('JSON Added: ' + $.toJSON(addedJSON));
