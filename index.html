@@ -19,6 +19,7 @@
     <script>
       var me = '\
       @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\
+      @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\
       <http://dyndns.clelicy.de/me>\
           a <http://xmlns.com/foaf/0.1/Person> ;\
           <http://www.w3.org/2004/02/skos/core#hiddenLabel> "Cannelony", "ClemensHoffmann" ;\
@@ -28,10 +29,10 @@
           ] ;\
           <http://xmlns.com/foaf/0.1/currentProject> <http://aksw.org/Projects/OntoWiki>, <http://aksw.org/Projects/RDFauthor>, <http://aksw.org/Projects/re-publish> ;\
           <http://xmlns.com/foaf/0.1/depiction> <https://secure.gravatar.com/avatar/be35f40f610edc7d8218bb866494fcf1?s=140> ;\
-          <http://xmlns.com/foaf/0.1/familyName> "Hoffmann" ;\
+          <http://xmlns.com/foaf/0.1/familyName> "Hoffmann"^^xsd:string ;\
           <http://xmlns.com/foaf/0.1/knows> <http://fb.comiles.eu/?c=person&id=natanael>, <http://id.feedface.de/me>, <http://manu.comiles.eu/foaf.rdf#me>, <http://seebi.homeip.net> ;\
           <http://xmlns.com/foaf/0.1/mbox> <mailto:cannelony@gmail.com> ;\
-          <http://xmlns.com/foaf/0.1/name> "Clemens Hoffmann" .\
+          <http://xmlns.com/foaf/0.1/name> "Clemens Hoffmann"@de .\
       ';
       
       var me2 = '\
@@ -56,7 +57,7 @@
         RDFauthorInstance.version = 0.5;
         RDFauthorInstance.addResource({
           type: 'turtle',
-          src: self.me
+          src: self.me+self.me2
         });
         RDFauthorInstance.show();
       });

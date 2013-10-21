@@ -67,7 +67,7 @@ var RDFauthor = (function() {
     var RDFAUTHOR_WIDGETS = 'src/widgets/';
     
     /** Choreography directory path */
-    var RDFAUTHOR_CHOREOGRAPHIES = 'src/choreographies';
+    var RDFAUTHOR_CHOREOGRAPHIES = 'src/choreographies/';
     
     /** Visibility of rdfauthor view */
     var RDFAUTHOR_VISIBLE = false;
@@ -95,6 +95,13 @@ var RDFauthor = (function() {
       __literal__: {},
       __resource__: {},
       widgetInstances: {}
+    }
+    
+    /** Choreography Store */
+    var _choreographyStore = {
+      'fallback': function() {
+        return _choreographyStore['http://aksw.org/Projects/RDFauthor/localChoreography#default'];
+      }
     }
     
     /**
@@ -133,6 +140,24 @@ var RDFauthor = (function() {
       }
     }
     
+    function _createChoreographyStore() {
+      // load fallback choreography
+      _require(RDFAUTHOR_BASE + RDFAUTHOR_CHOREOGRAPHIES + 'rdfauthor.choreography.default.js', function() {
+        // callback
+      });
+      
+      // load choreography who are declared as enabled in RDFAUTHOR_CONFIG (refer: rdfauthor.config.js)
+      for (var choreography in RDFAUTHOR_CONFIG.choreographies) {
+        if (RDFAUTHOR_CONFIG.choreographies[choreography].enabled) {
+          var choreographyConfig = RDFAUTHOR_CONFIG.choreographies[choreography];
+          var choreographyUri = 'http://aksw.org/Projects/RDFauthor‎/localChoreography#' + choreography;
+          _require(RDFAUTHOR_BASE + RDFAUTHOR_CHOREOGRAPHIES + RDFAUTHOR_CONFIG.choreographies[choreography].src, function() {
+            
+          });
+        }
+      }
+    }
+    
     function _createWidgetStore() {
       // load fallback widgets for literals and resources
       _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + 'rdfauthor.widget.literal.js', function() {
@@ -146,7 +171,7 @@ var RDFauthor = (function() {
       for (var widget in RDFAUTHOR_CONFIG.widgets) {
         if (RDFAUTHOR_CONFIG.widgets[widget].enabled) {
           var widgetConfig = RDFAUTHOR_CONFIG.widgets[widget];
-          var widgetUri = 'http://aksw.org/Projects/RDFauthor‎/local#' + widget;
+          var widgetUri = 'http://aksw.org/Projects/RDFauthor‎/localWidget#' + widget;
           _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + RDFAUTHOR_CONFIG.widgets[widget].src, function() {
             
           });
@@ -175,6 +200,63 @@ var RDFauthor = (function() {
       }, function(store) {
         store.registerDefaultProfileNamespaces();
         _callIfIsFunction(callback(store));
+      });
+    }
+    
+    function _getSubjectData(subjectUri, callback) {
+      var storedSubjectData = {};
+      storedSubjectData[subjectUri] = {};
+      
+      _getRdfStore(function(store) {
+        //TODO: extend query
+        var query = 'SELECT ?p ?o WHERE { <' + subjectUri + '> ?p ?o }';
+        store.execute(query, function(success, properties) {
+          
+          for (var object in properties) {
+            console.log('getDataProperty',properties[object]);
+            var v = properties[object].o.value;
+            var t = properties[object].o.token;
+            var l = properties[object].o.lang;
+            var d = properties[object].o.type;
+            var o = {
+              value: v,
+              type: t
+            }
+            
+            // lang tag available ? add to o
+            if (l) { o.lang = l; }
+            
+            // datatype tag available ? add to o
+            if (d) { o.datatype = d; }
+
+            console.log('o', o);
+            var propertyUri = properties[object].p.value;
+            
+            switch (t) {
+              case 'blank':
+                if (!storedSubjectData[subjectUri].hasOwnProperty(propertyUri)) {
+                  storedSubjectData[subjectUri][propertyUri] = [];
+                } 
+                storedSubjectData[subjectUri][propertyUri].push(o);
+                // query and push blank node data to the storedSubjectData
+                break;
+              case 'literal':
+                if (!storedSubjectData[subjectUri].hasOwnProperty(propertyUri)) {
+                  storedSubjectData[subjectUri][propertyUri] = [];
+                } 
+                storedSubjectData[subjectUri][propertyUri].push(o);
+              case 'uri':
+                if (!storedSubjectData[subjectUri].hasOwnProperty(propertyUri)) {
+                  storedSubjectData[subjectUri][propertyUri] = [];
+                } 
+                storedSubjectData[subjectUri][propertyUri].push(o);
+                break;
+            } 
+                        
+          }
+          console.log('queried subjectData', properties);
+          _callIfIsFunction(callback(storedSubjectData));
+        });
       });
     }
     
@@ -338,17 +420,20 @@ var RDFauthor = (function() {
       // set RDFAUTHOR_BASE
       _calcRDFauthorBase();
       
+      _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');
+      _require(RDFAUTHOR_BASE + 'src/rdfauthor.widget.prototype.js');
+            
       // load enabled widgets and choreographies
       _require(RDFAUTHOR_BASE + 'src/rdfauthor.config.js', function() {
         console.log(RDFAUTHOR_CONFIG);
         _createWidgetStore();
+        _createChoreographyStore();
       });
-      
-      
       
       // jQuery
       if ('undefined' === typeof $) {
         _require(RDFAUTHOR_BASE + 'libs/jquery-1.10.1.js', function() {
+          _require(RDFAUTHOR_BASE + 'libs/jquery-isotope/jquery.isotope.min.js');
           // load Bootstrap if jquery is loaded
           if ('undefined' === typeof $.fn.modal) {
             _require(RDFAUTHOR_BASE + 'libs/bootstrap/js/bootstrap.js');
@@ -360,7 +445,7 @@ var RDFauthor = (function() {
           // jQuery UI
           // the view will be created when jquery ui is loaded, because it uses parts of jQuery UI
           if (undefined === $.ui) {
-              _requireCSS(RDFAUTHOR_BASE + 'libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css');
+              _requireCSS(RDFAUTHOR_BASE + 'libs/jquery-ui/css/rdfauthor/jquery-ui-1.10.3.custom.css');
               _require(RDFAUTHOR_BASE + 'libs/jquery-ui/js/jquery-ui-1.10.3.custom.min.js', function() {
                 // create view, set view to _view variable which holds the current view
                 _view({
@@ -379,6 +464,7 @@ var RDFauthor = (function() {
           
         });
       } else {
+        _require(RDFAUTHOR_BASE + 'libs/jquery-isotope/jquery.isotope.min.js');
         // load Bootstrap if jquery is loaded
         if ('undefined' === typeof $.fn.modal) {
           _require(RDFAUTHOR_BASE + 'libs/bootstrap/js/bootstrap.js');
@@ -390,7 +476,7 @@ var RDFauthor = (function() {
         // jQuery UI
         // the view will be created when jquery ui is loaded, because it uses parts of jQuery UI
         if (undefined === $.ui) {
-            _requireCSS(RDFAUTHOR_BASE + 'libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css');
+            _requireCSS(RDFAUTHOR_BASE + 'libs/jquery-ui/css/rdfauthor/jquery-ui-1.10.3.custom.css');
             _require(RDFAUTHOR_BASE + 'libs/jquery-ui/js/jquery-ui-1.10.3.custom.min.js', function() {
               // create view, set view to _view variable which holds the current view
               _view({
@@ -437,11 +523,20 @@ var RDFauthor = (function() {
       
       // public methods 
       
-      addResource: function(resource) {
+      addResource: function(resource, choreographyType) {
         _loadResourceIntoStore(resource, function() {
           _getSubjects(function(storedSubjects) {
-            console.log(storedSubjects);
-            _viewHolder.addTabs(storedSubjects);
+            for (var subjectUri in storedSubjects) {
+              var choreoSet = [];
+              console.log('storedSubjects', storedSubjects);
+              _getSubjectData(subjectUri, function(resultSet) {
+                console.log('resultSet for '+ subjectUri, resultSet);
+                var label = storedSubjects[subjectUri];
+                console.log('defaultChoreo', _choreographyStore.fallback());
+                choreoSet.push(_choreographyStore.fallback());
+                _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
+              });
+            }
           });
         });
       },
@@ -450,12 +545,69 @@ var RDFauthor = (function() {
         return _options;
       },
       
+      getCompatibleWidgets: function(stmt) {
+        console.log(stmt.subjectUri());
+        
+        // push uri to array which holds compatible widgets for this object
+        var compatibleWidgets = [];
+        
+        if (stmt.objectDatatype()) {
+          // TODO choose compatible widgets
+        }
+        
+        if (stmt.objectLanguage()) {
+          // TODO choose compatible widgets
+        }
+        
+        if (stmt.objectType()) {
+          console.log(stmt.objectType());
+          // get uris for type uri
+          if (stmt.objectType() === 'uri' || stmt.objectType() === 'blank') {
+            compatibleWidgets.push(_widgetStore.__resource__['default']);
+          }
+          
+          // get uris for type literal
+          if (stmt.objectType() === 'literal') {
+            compatibleWidgets.push(_widgetStore.__literal__['default']);
+          }
+        }
+        
+        return compatibleWidgets;
+      },
+      
+      getWidgetForUri: function(widgetUri, stmt) {
+        var widgetSpec = _widgetStore.widgetInstances[widgetUri]; 
+        var F = function () {};
+        F.prototype = Widget;
+        
+        var W = function (options) {
+            this.id = 0;
+            this.statement = stmt;
+            
+            // widget has options
+            if (undefined !== options) {
+                this.options = $.extend(
+                    {},             /* empty base */
+                    this.options,   /* options from prototype chain */
+                    options         /* user-provided options */
+                );
+            }
+        };
+        
+        W.prototype = $.extend(new F(), widgetSpec);
+        W.prototype.constructor = W;
+        
+        return new W();
+      },
+      
       ready: function() {
         _execStoredReadyCallbacks();
       },
       
-      registerChoreography: function (choreography) {
-        
+      registerChoreography: function (choreography, choreographyConfig, callback) {
+        console.log()
+        _choreographyStore[choreography.choreographyUri()] = choreography;
+        console.log('choreographyStore', _choreographyStore);
       },
       
       registerWidget: function(widget, widgetConfig, callback) {
@@ -487,6 +639,16 @@ var RDFauthor = (function() {
                 }
                 console.log(_widgetStore);
               }
+              break;
+            case 'literal':
+              console.log('literal hook');
+              _widgetStore.__literal__['default'] = [widget.widgetUri()];
+              console.log(_widgetStore);           
+              break;
+            case 'resource':
+              console.log('resource hook');
+              _widgetStore.__resource__['default'] = [widget.widgetUri()];
+              console.log(_widgetStore);
               break;
           }
         }

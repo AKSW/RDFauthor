@@ -30,6 +30,9 @@ function DesktopView (options) {
   this._self = this;
   this._container = jQuery('#' + this._options.domId);
   this._modalSize = {};
+  this._id = 1;
+  this._subjectIds = {};
+  
   console.log(this._container);
   console.log(options);
   
@@ -92,17 +95,23 @@ function DesktopView (options) {
   //view initialization
   getView(this._options, function(html, options) {
     $('body').append(html);
+    
+
+       
+    $(document).on('shown.bs.tab', '#resource-tabs a', function(event) {
+      console.log('shown', event.target.hash);
+      $(event.target.hash).find('.portlet-container').isotope('reLayout');
+    });
+
     // hack for correct resizing and dragging
-    $('.modal-dialog').css("margin-right", 0);
-    $('.modal-dialog').css("margin-left", 0);
-    /** activate plugins */
-    var minWidth = $('.modal-dialog').outerWidth()-20;
-    var minHeight = $('.modal-dialog').outerHeight();
-    console.log(minWidth, minHeight);
+    // $('.modal-dialog').css("margin-right", 0);
+    // $('.modal-dialog').css("margin-left", 0);
+    
+    var contentWidth = $('.modal-content').outerWidth();
+    var contentHeight = $('.modal-content').outerHeight();
     $('#' + options.domId + ' .modal-content').resizable({ 
-      // alsoResize: ".modal-dialog",
-      minWidth: minWidth,
-      minHeight: 200
+      minWidth: contentWidth,
+      minHeight: contentHeight
     });
     
     $('.modal').on("drag resize", function(event, ui) {
@@ -111,28 +120,29 @@ function DesktopView (options) {
       $('.modal-dialog').css("margin-left", 0);
     });
     
-    $(".modal").on("resize", function(event, ui) {
-      console.log('ui',ui);
-      // ui.element.css("margin-left", -ui.size.width/2);
-      // ui.element.css("margin-top", -ui.size.height/2);
-      // ui.element.css("left", "50%");
-      // ui.element.css("top", "50%");
-      // fit size of modal body to prevent layout glitches
-      $(ui.element).find('.modal-body').each(function() {
-        var maxHeight = ui.size.height-$('.modal-header').outerHeight()-$('.modal-footer').outerHeight();
-        $(this).css("max-height", maxHeight - 20);
-        $(this).find('.tab-pane').css('height', maxHeight-$('.modal-footer').outerHeight());
-        // store size of modal
-//        self.storeSize();
-      });
+    $('.modal-content').on('resize', function(event, ui) {
       
-    });
-    
+      var offsetWidth = ui.element.context.offsetWidth;
+      var offsetHeight = ui.element.context.offsetHeight;
+      var headerHeight = $(ui.element).find('.modal-header').outerHeight();
+      var bodyHeight = $(ui.element).find('.modal-body').outerHeight();
+      var footerHeight = $(ui.element).find('.modal-footer').outerHeight();
+      var sumHeaderFooterHeight = headerHeight + footerHeight;
+      // console.log(offsetHeight,bodyHeight+sumHeaderFooterHeight + 17);
+      // console.log('footer', footerHeight);
+      // console.log('header', headerHeight);
+      // set width of modal-body
+      $(ui.element).find('.modal-body').css('width', offsetWidth);
+      // set height of modal-body
+      $(ui.element).find('.modal-body').css('height', offsetHeight-sumHeaderFooterHeight-17);
+    });     
        
     $('#' + options.domId + ' .modal-content').draggable({
       handle: '.modal-header',
       cursor: 'move'
     });
+    
+    
     
     $('.portlet-container').sortable({
       disabled : true
@@ -152,7 +162,6 @@ function DesktopView (options) {
     /** jquery events */ 
     // Recource tabs + dropdown 
     $(document).on('click', '#resource-tabs a', function(event) {
-      
       console.log('click on dropdown item');
       var subjectContentID = $(this).parents('.dropdown').find('a.tabs').attr('href');
       var subjectContent = $('#rdfauthor-view ' + subjectContentID);
@@ -165,6 +174,7 @@ function DesktopView (options) {
           addPortlet(subjectContent);
         }
       }
+      
     });
     
     $(document).on('click', '.tabs', function(event) {
@@ -236,48 +246,164 @@ function DesktopView (options) {
 DesktopView.prototype = {
   
   
-  addChoreography: function () {
-    
+  addChoreographyToTab: function (tabId, choreoMarkup) {
+    var self = this;
+    var $container = self.getElement().find('#' + tabId).find('.portlet-container');
+    var $newItems = $(choreoMarkup);
+    $container.append($newItems).isotope('insert', $newItems);
   },
   
   addPortlet: function () {
-    
+    var markup = '';
   },
   
-  addResources: function () {
-    
-  },
-  
-  addTabs: function (storedSubjects) {
+  addResource: function (subjectUri, label, subjectData, choreoSet) {
     var self = this;
-    console.log('test',storedSubjects);
-    var count = 0;
-    var liTab = '';
+    // log storedSubjects
+    console.log('label calling addResources', label);
+    console.log('subjectData calling addResources', subjectData);
+    
     var divTab = '';
-    for (var subject in storedSubjects) {
-      count++;
-      var label = storedSubjects[subject];
-      var uri = subject;
-      
-      liTab += '\
-        <li class="dropdown" name="' + subject + '">\
-          <a class="tabs dropdown-toggle" href="#tab-' + count + '" data-toggle="dropdown">\
-            ' + label + ' <i class="icon-cog settings"></i>\
-          </a>\
-          <ul class="dropdown-menu">\
-            <li><a class="rename-portlet" href="#" data-toggle="tab"><i class="icon-pencil"></i> Rename</a></li>\
-            <li><a class="disabled add-portlet" href="#" data-toggle="tab"><i class="icon-plus-sign"></i> Add Portlet</a></li>\
-          </ul>\
-        </li>';
-      divTab += '<div name="' + subject + '" class="tab-pane" id="tab-' + count + '"></div>';
+    var tabId = 'tab-' + self.getSubjectId(subjectUri);
+    // add tabs
+    self.addTabs(tabId, subjectUri, label);
+    
+    // init isotope
+    var $container = self.getElement().find('#' + tabId).find('.portlet-container');
+    $container.isotope({
+      itemSelector: '.rdfauthor-portlet',
+      itemPositionDataEnabled: true,
+      transformsEnabled: true,
+      animationEngine : 'jquery',
+      onLayout: function() {
+        $container.css('overflow', 'visible');
+      }  
+    });
+    
+    $container.sortable({
+      cursor: 'move'
+      //, tolerance: 'intersection'  //'pointer' is too janky
+      , start: function(event, ui) {
+        //add grabbing and moving classes as user has begun
+        //REMOVE rdfauthor-class so that isotope does not try to sort our item,
+        //resulting in the item moving around and flickering on 'change'
+        ui.item.addClass('grabbing moving').removeClass('rdfauthor-portlet');
+        
+        
+        
+        ui.placeholder
+          .addClass('starting') //adding the 'starting' class removes the transitions from the placeholder.
+          //remove 'moving' class because if the user clicks on a tile they just moved,
+          //the placeholder will have 'moving' class and it will mess with the transitions
+          .removeClass('moving')
+          //put placeholder directly below tile. 'starting' class ensures the
+          //placeholder simply appears and does not 'fly' into place
+          .css({
+            top: ui.originalPosition.top
+            , left: ui.originalPosition.left
+          })
+          ;
+        //reload the items in their current state to override any previous
+        //sorting and to include placeholder, but do NOT call a re-layout
+        $container.isotope('reloadItems');                    
+      }                
+      , change: function(event, ui) {
+        ui.item
+          .css({
+            top: ui.originalPosition.top
+            , left: ui.originalPosition.left
+        });
+        
+        //change only fires when the DOM is changed. the DOM changes when 
+        //the placeholder moves up or down in the document order 
+        //within the sortable container        
+        
+        //remove 'starting' class so that placeholder can now move smoothly
+        //with the interface
+        ui.placeholder.removeClass('starting');
+        //reload items to include the placeholder's new position in the DOM. 
+        //then when you sort, everything around the placeholder moves as 
+        //though the item were moving it.
+        $container
+          .isotope('reloadItems')
+          .isotope({ sortBy: 'original-order'})
+        ;
+      }
+      , beforeStop: function(event, ui) {
+        //in this event, you still have access to the placeholder. this means
+        //you know exactly where in the DOM you're going to place your element.
+        //place it right next to the placeholder. jQuery UI Sortable removes the
+        //placeholder for you after this event, and actually if you try to remove
+        //it in this step it will throw an error.
+        ui.placeholder.after(ui.item);                    
+      }
+      , stop: function(event, ui) {      
+        //user has chosen their location! remove the 'grabbing' class, but don't
+        //kill the 'moving' class right away. because the 'moving' class is 
+        //preventing your item from having transitions, you should keep it on
+        //until isotope is done moving everything around. it will "snap" into place
+        //right where your placeholder was.
+        
+        //also, you must add the 'rdfauthor-portlet' class back to the box so that isotope
+        //will again include your item in its sorting list
+        ui.item.removeClass('grabbing').addClass('rdfauthor-portlet');
+        
+        //reload the items again so that your item is included in the DOM order
+        //for isotope to do its final sort, which actually won't move anything
+        //but ensure that your item is in the right place
+        $container
+          .isotope('reloadItems')
+          .isotope({ sortBy: 'original-order' }, function(){
+            //finally, after sorting is done, take the 'moving' class off.
+            //doing it here ensures that your item "snaps" and isn't resorted
+            //from its original position. since this happens on callback,
+            //if the user grabbed the tile again before callback is fired,
+            //don't remove the moving class in mid-grab
+            
+            //for some reason in this code pen, the callback isn't firing predictably
+            
+            //console.log(ui.item.is('.grabbing')); 
+            if (!ui.item.is('.grabbing')) {
+              ui.item.removeClass('moving');                        
+            }
+          })
+          ;
+      }
+    });
+    
+    // add choreographies
+    for (var i in choreoSet) {
+      console.log('Choreography ' + i, choreoSet[i].choreographyUri());
+      var choreoMarkup = choreoSet[i].markup(subjectData);
+      self.addChoreographyToTab(tabId,choreoMarkup);
     }
+    
+  },
+  
+  addTabs: function (tabId, subjectUri, label) {
+    var self = this;
+         
+    var liTab = '\
+      <li class="dropdown" name="' + subjectUri + '">\
+        <a class="tabs dropdown-toggle" href="#' + tabId + '" data-toggle="dropdown">\
+          ' + label + ' <i class="icon-cog settings"></i>\
+        </a>\
+        <ul class="dropdown-menu">\
+          <li><a class="rename-portlet" href="#" data-toggle="tab"><i class="icon-pencil"></i> Rename</a></li>\
+          <li><a class="disabled add-portlet" href="#" data-toggle="tab"><i class="icon-plus-sign"></i> Add Portlet</a></li>\
+        </ul>\
+      </li>';
+    
+    var divTab = '<div name="' + subjectUri + '" class="tab-pane subject" id="' + tabId + '">\
+        <div class="portlet-container">\
+        </div>\
+      </div>';
+      
     self.getElement().find('#resource-tabs').append(liTab);
     self.getElement().find('#resource-tabs-content').append(divTab);
     self.getElement().find('#resource-tabs a:first').tab('show');
     self.enableSettings();
     // $('.dropdown-toggle').dropdown();
-    
-    
     
   },
   
@@ -295,6 +421,21 @@ DesktopView.prototype = {
   
   getElement: function () {
     return jQuery('#' + this._options.domId);
+  },
+  
+  getSubjectId: function (subjectUri) {
+    var self = this;
+    if(this._subjectIds[subjectUri]) {
+      return this._subjectIds[subjectUri];
+    } else {
+      var id = self.tabId();
+      this._subjectIds[subjectUri] = id;
+      return id;
+    };
+  },
+  
+  tabId: function () {
+    return this._id++;
   },
   
   enableSettings: function () {
@@ -344,6 +485,11 @@ DesktopView.prototype = {
   
   saveResource: function (subjectUri) {
     
+  },
+  
+  setSubjectId: function (subjectUri) {
+    var self = this;
+    this._subjectIds[subjectUri] = self.tabId();
   },
   
   show: function () {
@@ -408,12 +554,12 @@ DesktopView.prototype = {
       // modal.css("margin-top", -modal.outerHeight());
       // modal.css("top", "50%");
       // modal.css("left", "50%");
-      modal.find(".modal-body").each(function() {
-        var maxHeight = modal.height()-$('.modal-header').outerHeight()-$('.modal-footer').outerHeight()-20;
-        $(this).css("max-height", maxHeight);
-        $(this).find('.tab-pane').css('height', maxHeight);
-        $(this).find('.tab-pane').css('height', maxHeight-$('.modal-footer').outerHeight());
-      });
+      // modal.find(".modal-body").each(function() {
+        // var maxHeight = modal.height()-$('.modal-header').outerHeight()-$('.modal-footer').outerHeight()-20;
+        // $(this).css("max-height", maxHeight);
+        // $(this).find('.tab-pane').css('height', maxHeight);
+        // $(this).find('.tab-pane').css('height', maxHeight-$('.modal-footer').outerHeight());
+      // });
     } else {
       //TODO größe wiederherstellen
       var modalSize = self._modalSize;

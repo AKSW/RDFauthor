@@ -1,14 +1,38 @@
-.portlet {
-  position: relative;
-  margin: 15px 0;
-  padding: 39px 19px 14px;
-  *padding-top: 19px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
-     -moz-border-radius: 4px;
-          border-radius: 4px;
+.rdfauthor-portlet {
+  width: 400px;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  float: left;
+  &.ui-sortable-placeholder {
+    visibility: visible!important;
+    background: #aaa;
+    &.active {
+                       
+    }
+    &.starting {
+      transition-property: none;
+    }
+  }
+  &.grabbing {
+    transform: rotate(3deg);            
+  }
+  &.moving {
+    
+    transition: transform 200ms ease;    
+  }
 }
+
+/**** Isotope Filtering - sortable hack****/
+
+.isotope-item {
+  z-index: 2;
+}
+
+.isotope-hidden.isotope-item {
+  pointer-events: none;
+  z-index: 1;
+}
+
 
 /* .portlet:after { */
   /* content: attr(data-content); */
@@ -204,6 +228,80 @@
   color: #DEDEDE;
 }
 
+#rdfauthor .portlet-container {
+  padding-top: 15px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#rdfauthor .tab-content {
+  height: 98%;
+  overflow-y: auto;
+}
+
+#rdfauthor .modal-body {
+  height: 500px;
+}
+
 /* .navbar .nav > li { */
 /* z-index: 10000; */
 /* } */
+
+
+/**** Isotope Filtering ****/
+
+.isotope-item {
+  z-index: 2;
+}
+
+.isotope-hidden.isotope-item {
+  pointer-events: none;
+  z-index: 1;
+}
+
+/**** Isotope CSS3 transitions ****/
+
+.isotope,
+.isotope .isotope-item {
+  -webkit-transition-duration: 0.8s;
+     -moz-transition-duration: 0.8s;
+      -ms-transition-duration: 0.8s;
+       -o-transition-duration: 0.8s;
+          transition-duration: 0.8s;
+}
+
+.isotope {
+  -webkit-transition-property: height, width;
+     -moz-transition-property: height, width;
+      -ms-transition-property: height, width;
+       -o-transition-property: height, width;
+          transition-property: height, width;
+}
+
+.isotope .isotope-item {
+  -webkit-transition-property: -webkit-transform, opacity;
+     -moz-transition-property:    -moz-transform, opacity;
+      -ms-transition-property:     -ms-transform, opacity;
+       -o-transition-property:      -o-transform, opacity;
+          transition-property:         transform, opacity;
+}
+
+/**** disabling Isotope CSS3 transitions ****/
+
+.isotope.no-transition,
+.isotope.no-transition .isotope-item,
+.isotope .isotope-item.no-transition {
+  -webkit-transition-duration: 0s;
+     -moz-transition-duration: 0s;
+      -ms-transition-duration: 0s;
+       -o-transition-duration: 0s;
+          transition-duration: 0s;
+}
+
+.isotope.no-translate,
+.isotope.no-translate .isotope-item,
+.isotope .isotope-item.no-translate {
+  transform: translate(0);
+  -ms-transform: translate(0); /* IE 9 */
+  -webkit-transform: translate(0); /* Safari and Chrome */
+}

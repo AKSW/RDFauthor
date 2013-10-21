@@ -34,8 +34,9 @@ var RDFAUTHOR_CONFIG = {
     }
   }, // end of widgets 
   'choreographies': {
-    'default': {
-      'src': 'rdfauthor.choreography.default.js'
+    'foaf': {
+      'src': 'rdfauthor.choreography.foaf.js',
+      'enabled': false
     }
   } // end of choreogprahies
 } // end of RDFAUTHOR_CONFIG
