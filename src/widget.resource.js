@@ -53,7 +53,7 @@ RDFauthor.registerWidget({
             //sindice:           true,   /* use Sindice semantic search */
             uri:                true,   /* provide generated URI */
             // Filter options:
-            filterRange:        false,   /* show only resources in the rdfs:range of the statement's property */
+            filterRange:        true,   /* show only resources in the rdfs:range of the statement's property */
             filterDomain:       false,  /* show only properties whose domain matches the statement's subject */
             filterProperties:   false,  /* show only resources used as properties */
             // Callbacks
