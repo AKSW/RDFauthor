@@ -104,6 +104,10 @@ var RDFauthor = (function() {
       }
     }
     
+    /** Initial ID */
+    var _idSeed = Math.round(Math.random() * 1000);
+
+    
     /**
      * Add widget to widget store.
      */
@@ -421,6 +425,7 @@ var RDFauthor = (function() {
       _calcRDFauthorBase();
       
       _require(RDFAUTHOR_BASE + 'src/rdfauthor.statement.js');
+      _require(RDFAUTHOR_BASE + 'src/rdfauthor.choreography.prototype.js');
       _require(RDFAUTHOR_BASE + 'src/rdfauthor.widget.prototype.js');
             
       // load enabled widgets and choreographies
@@ -524,6 +529,7 @@ var RDFauthor = (function() {
       // public methods 
       
       addResource: function(resource, choreographyType) {
+        var self = this;
         _loadResourceIntoStore(resource, function() {
           _getSubjects(function(storedSubjects) {
             for (var subjectUri in storedSubjects) {
@@ -532,8 +538,12 @@ var RDFauthor = (function() {
               _getSubjectData(subjectUri, function(resultSet) {
                 console.log('resultSet for '+ subjectUri, resultSet);
                 var label = storedSubjects[subjectUri];
-                console.log('defaultChoreo', _choreographyStore.fallback());
-                choreoSet.push(_choreographyStore.fallback());
+                console.log('defaultChoreo', self.getChoreography(_choreographyStore.fallback()));
+                var choreoInstance = self.getChoreography(_choreographyStore.fallback());
+                // init
+                choreoInstance.init();
+                // push to set
+                choreoSet.push(choreoInstance);
                 _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
               });
             }
@@ -543,6 +553,30 @@ var RDFauthor = (function() {
       
       getOptions: function() {
         return _options;
+      },
+      
+      getChoreography: function(config) {
+        var self = this;
+        var F = function () {};
+        F.prototype = Choreography;
+        
+        var C = function (options) {
+            this.id = self.nextID();
+            
+            // widget has options
+            if (undefined !== options) {
+                this.options = $.extend(
+                    {},             /* empty base */
+                    this.options,   /* options from prototype chain */
+                    options         /* user-provided options */
+                );
+            }
+        };
+        
+        C.prototype = $.extend(new F(), config);
+        C.prototype.constructor = C;
+        
+        return new C();
       },
       
       getCompatibleWidgets: function(stmt) {
@@ -576,12 +610,13 @@ var RDFauthor = (function() {
       },
       
       getWidgetForUri: function(widgetUri, stmt) {
+        var self = this;
         var widgetSpec = _widgetStore.widgetInstances[widgetUri]; 
         var F = function () {};
         F.prototype = Widget;
         
         var W = function (options) {
-            this.id = 0;
+            this.id = self.nextID();
             this.statement = stmt;
             
             // widget has options
@@ -599,6 +634,17 @@ var RDFauthor = (function() {
         
         return new W();
       },
+      
+      /**
+       * With every call, returns a unique ID that can be used to build id attributes
+       * for CSS selector access.
+       * @param prefix string
+       * @return string
+       */
+      nextID: function (prefix) {
+        return (prefix ? String(prefix) : '') + _idSeed++;
+      },
+
       
       ready: function() {
         _execStoredReadyCallbacks();
@@ -652,6 +698,11 @@ var RDFauthor = (function() {
               break;
           }
         }
+      },
+      
+      save: function() {
+        var self = this;
+        console.log('rdfauthor save');
       },
       
       setOptions: function(options) {

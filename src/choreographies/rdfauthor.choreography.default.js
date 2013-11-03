@@ -6,6 +6,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
   RDFauthorInstance.registerChoreography({
     init: function () {
       // run code on create
+      this._widgets = [];
     },
     
     /**
@@ -77,6 +78,8 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
             
             var widget = RDFauthorInstance.getWidgetForUri(compWidgetsUris[0], stmt);
             
+            self._widgets.push(widget);
+            
             console.log('widgetMarkup', widget.markup());
             
             propertyMarkup += widget.markup();
@@ -114,7 +117,10 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     submit: function () {
-      
+      var self = this;
+      for (var w in self._widgets) {
+        console.log('submit widget',self._widgets[w].submit());
+      }
     },
     
     title: function () {

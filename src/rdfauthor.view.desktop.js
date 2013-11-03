@@ -27,14 +27,23 @@ function DesktopView (options) {
   
   this._options = jQuery.extend(defaultOptions, options);
   
-  this._self = this;
+  this._view = this;
+  this._activeTab = null;
+  this._activeResource = null;
+  this._rdfauthor = null;
   this._container = jQuery('#' + this._options.domId);
   this._modalSize = {};
   this._id = 1;
   this._subjectIds = {};
+  this._subjectChoreoSet = {};
   
+  var self = this;
   console.log(this._container);
   console.log(options);
+  
+  RDFauthor.getInstance(function(RDFauthorInstance) {
+    self._rdfauthor = RDFauthorInstance;
+  });
   
   function getHeader () {
     var header = '\
@@ -63,7 +72,7 @@ function DesktopView (options) {
         <!-- consumer mode -->\
         <a href="#" class="btn btn-default consumer-mode" data-dismiss="modal">Close choreography</a>\
         <a href="#" class="btn btn-primary edit">Edit choreography</a>\
-        <a href="#" class="btn btn-primary">Save</a>\
+        <a href="#" class="btn btn-primary save-subject">Save</a>\
         <!-- edit mode-->\
         <a href="#" class="btn btn-default hide edit-mode cancel">Cancel</a>\
         <!-- <a href="#" class="btn hide edit-mode" data-dismiss="modal">Close all</a> -->\
@@ -100,6 +109,8 @@ function DesktopView (options) {
        
     $(document).on('shown.bs.tab', '#resource-tabs a', function(event) {
       console.log('shown', event.target.hash);
+      self._activeTab = event.target.hash;
+      self._activeResource = $(event.target.hash).attr('name');
       $(event.target.hash).find('.portlet-container').isotope('reLayout');
     });
 
@@ -240,6 +251,11 @@ function DesktopView (options) {
       }
     });
     
+    // save event
+    $(document).on('click', '#rdfauthor .modal-footer .save-subject', function(event) {
+      self._view.saveResource(self._activeResource);
+    });
+    
   });
 }
 
@@ -371,12 +387,15 @@ DesktopView.prototype = {
       }
     });
     
-    // add choreographies
+    // add choreographies to dom
     for (var i in choreoSet) {
       console.log('Choreography ' + i, choreoSet[i].choreographyUri());
       var choreoMarkup = choreoSet[i].markup(subjectData);
       self.addChoreographyToTab(tabId,choreoMarkup);
     }
+    
+    // save choreoset, used on save
+    self._subjectChoreoSet[subjectUri] = choreoSet;
     
   },
   
@@ -412,7 +431,7 @@ DesktopView.prototype = {
   },
   
   close: function () {
-    
+    console.log('close');
   },
   
   getNumberOfPortlets: function () {
@@ -484,7 +503,13 @@ DesktopView.prototype = {
   },
   
   saveResource: function (subjectUri) {
-    
+    var self = this;
+    console.log('saveResource', subjectUri);
+    console.log('saveResource choreo', self._subjectChoreoSet[subjectUri]);
+    var choreoSet = self._subjectChoreoSet[subjectUri];
+    for (var i in choreoSet) {
+      choreoSet[i].submit();
+    }
   },
   
   setSubjectId: function (subjectUri) {
