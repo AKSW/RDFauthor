@@ -39,6 +39,10 @@ RDFauthor.registerWidget({
         }
     },
 
+    getWidgetType: function() {
+        return "literal";
+    },
+
     ready: function () {
         var widget = this;
         // disclosure button

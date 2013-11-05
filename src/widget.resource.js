@@ -103,6 +103,10 @@ RDFauthor.registerWidget({
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'src/widget.resource.css');
     },
 
+    getWidgetType: function() {
+        return "resource";
+    },
+
     ready: function () {
         this._domReady = true;
         this._initAutocomplete();
@@ -182,7 +186,9 @@ RDFauthor.registerWidget({
 
     value: function () {
         var self = this;
-        var value = self.element().data('uri');
+        //var value = self.element().data('uri');
+        //temporary work-around to fix commit a resource via enter
+        var value = self.element().val();
         console.log('uri', value);
         if ( self.isURI(value) ) {
             return value;

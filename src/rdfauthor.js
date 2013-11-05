@@ -519,6 +519,54 @@ RDFauthor = (function($) {
         return dfd.promise();
     }
 
+    /*
+     * Fetch values according to the order in the view
+     */
+    function _fetchValues() {
+        var graph;
+        for (var g in _graphInfo) {
+            if (undefined !== RDFauthor.serviceURIForGraph(g)) {
+                graph = g;
+                break;
+            }
+        }
+
+        // fallback to default graph
+        if (undefined === graph) {
+            graph = RDFauthor.defaultGraphURI();
+        }
+
+        var values = new Array();
+        var pred = '';
+
+        for (var index in RDFauthor.getView()._rows) {
+            var subject = RDFauthor.getView()._rows[index]._subjectURI;
+            var predicate = RDFauthor.getView()._rows[index]._predicateURI;
+            if (pred != predicate) {
+                pred = predicate;
+                var query = "select ?v where { <" + subject + "> <" + predicate + "> ?v . }";
+                RDFauthor.queryGraph(graph, query, {
+                    callbackSuccess: function (result) {
+                        if (result && result['results'] && result['results']['bindings']) {
+                            var bindings = result['results']['bindings'];
+                            for (var i = 0; i < bindings.length; i++) {
+                                var row = bindings[i];
+                                /* build  */
+                                values.push(row['v'].value);
+                            }
+                        }
+                    },
+                    callbackError: function () {
+                        // SPARQL error
+                    },
+                    // synchronous
+                    async: false
+                })
+            }
+        }
+        return values;
+    }
+
     /**
      * Loads info predicates for all predicates
      * @private
@@ -1291,6 +1339,12 @@ RDFauthor = (function($) {
             _cloneDatabanks();
             if (this.getView().submit()) {
                 _updateSources();
+                console.log("this.getView()");
+                console.log(this.getView());
+                console.log('graphInfo', _graphInfo);
+                this.getView().resetToUnedit(_fetchValues());
+                RDFauthor.cancel();
+                RDFauthor.reset();
             } else {
                 _restoreDatabanks();
             }
