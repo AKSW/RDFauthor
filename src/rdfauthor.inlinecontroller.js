@@ -86,18 +86,13 @@ InlineController.prototype = {
             for (var wid in this._rows[index]._widgets) {
                 var newVal = updateValues.shift();
                 widgetCount += 1;
-                console.log("---> ", predicateCount, widgetCount);
                 if (widgetCount > 1) {
                     var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 3) + ')');
                     var newLi = $(li.clone());
                     newLi.data('rdfauthor.statement', li.data('rdfauthor.statement'));
                     li.after(newLi);
-                    console.log("inserting an element: ", newLi);
                 }
                 var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 2) + ')');
-                console.log('Li-Element: ', li);
-                console.log('Inherent Data: ', li.data());
-                console.log('Update with: ', newVal);
                 var widgetType;
                 try {
                     widgetType = this._rows[index]._widgets[wid].getWidgetType();
@@ -117,8 +112,6 @@ InlineController.prototype = {
                         li.data('rdfauthor.statement', newStatement);
                         break;
                     case 'resource':
-                        console.log('Inherent Data of first <a>: ', li.children('a:eq(0).data()'));
-                        console.log('Inherent Data of second <a>: ', li.children('a:eq(1).data()'));
                         /* TODO: for 'rdfs:seeAlso' and possibly other predicates,
                          * there is another li-element here
                          */
@@ -131,7 +124,6 @@ InlineController.prototype = {
                         li.children('a:eq(0)').attr('href', href);
                         var oldStatement = li.children('a:eq(0)').data('rdfauthor.statement');
                         var newStatement = oldStatement.copyWithObject(newVal);
-                        console.log(newStatement);
                         li.children('a:eq(0)').removeData();
                         li.children('a:eq(0)').data('rdfauthor.statement', newStatement);
                         // remove autocomplete box (_always_ on page but hidden)
