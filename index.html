@@ -57,7 +57,8 @@
         RDFauthorInstance.version = 0.5;
         RDFauthorInstance.addResource({
           type: 'turtle',
-          src: self.me+self.me2
+          src: self.me+self.me2,
+          updateEndpoint: 'http://localhost/ontowiki/update'
         });
         RDFauthorInstance.show();
       });

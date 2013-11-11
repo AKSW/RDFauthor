@@ -84,7 +84,7 @@ var RDFauthor = (function() {
     /** Loaded stylesheet URIs */
     var _loadedStylesheets = {};
     
-    /** save update source queries */
+    /** Save update source queries */
     var _updateSource = {
       'delete' : [],
       'insert' : [],
@@ -307,6 +307,9 @@ var RDFauthor = (function() {
     }
     
     function _loadResourceIntoStore(resource, callback) {
+      // set update Endpoint
+      _options.setup.updateEndpoint = resource.updateEndpoint;
+      // get rdfstore and load resource source into store
       _getRdfStore(function(store) {
         store.load('text/turtle', resource.src, function(success, results) {
           store.execute("SELECT *  WHERE { ?s ?p ?o }", function(success, results) {
