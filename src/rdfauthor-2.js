@@ -23,7 +23,7 @@ var RDFauthor = (function() {
     var _options = {
       setup: {
         queryEndpoint: '',
-        saveEndpoint: '',
+        updateEndpoint: '',
         resourceFile: '',
         openInstantly: true
       },
