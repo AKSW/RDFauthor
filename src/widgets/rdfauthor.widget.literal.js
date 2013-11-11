@@ -9,12 +9,20 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     element: function () {
-        return jQuery('#input-' + this.id);
+      return jQuery('#input-' + this.id);
+    },
+    
+    hasDatatype: function () {
+      return null !== this.statement.objectDatatype();
     },
 
+    hasLanguageTag: function () {
+      return null !== this.statement.objectLanguage();
+    },
     
     init: function () {
-      
+      this.datatypes = RDFauthorInstance.literalDatatypes();
+      this.languageTags = RDFauthorInstance.literalLanguageTags();
     },
     
     lang: function () {
@@ -22,17 +30,68 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     markup: function () {
-      console.log(this.statement);
+      // indicates a set language or datatype
+      var langClass = this.hasLanguageTag() ? 'language' : '';
+      var datatypeClass = this.hasDatatype() ? 'datatype' : '';
+      
+      // generate datatype submenu markup
+      var datatypeSubmenuMarkup = '\
+        <li class="dropdown-submenu ' + datatypeClass + '">\
+          <a tabindex="-1" href="#">Datatype</a>\
+          <ul class="dropdown-menu">';
+      // iterate through predefined datatypes
+      var matchedType = false;
+      for (var type in this.datatypes) {
+        if (type == this.statement.objectDatatype()) {
+          matchedType = true;
+          datatypeSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + type + '" class="' + datatypeClass + '">' + this.datatypes[type] + '</a></li>';
+        } else {
+          datatypeSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + type + '">' + this.datatypes[type] + '</a></li>';          
+        }
+      }
+      // if type is not part of rdfauthors datatype set, put it at the end
+      if (!matchedType) {
+        datatypeSubmenuMarkup += '<li><a tabindex="-1" href="#" name="' + this.statement.objectDatatype() + '" class="' + datatypeClass + '">' + this.statement.objectDatatype() + '</a></li>';
+      }
+      // close ul and li
+      datatypeSubmenuMarkup += '</ul></li>';
+
+      // generate language submenu markup
+      var languageSubmenuMarkup = '\
+        <li class="dropdown-submenu ' + langClass + '">\
+          <a tabindex="-1" href="#">Language</a>\
+          <ul class="dropdown-menu">';    
+      // iterate through predefined datatypes
+      var matchLang = false;
+      for (var i in this.languageTags) {
+        if (this.languageTags[i] == this.statement.objectLanguage()) {
+          matchLang = true;
+          languageSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + this.languageTags[i] + '" class="' + langClass + '">' + this.languageTags[i] + '</a></li>';
+        } else {
+          languageSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + this.languageTags[i] + '">' + this.languageTags[i] + '</a></li>';        
+        }
+      }
+      // if language is not part of rdfauthors rdfauthor set, put it at the end
+      if (!matchLang) {
+        languageSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + this.statement.objectLanguage() + '" class="' + langClass + '">' + this.statement.objectLanguage() + '</a></li>';
+      } 
+      // close ul and li
+      languageSubmenuMarkup += '</ul></li>';
+
+
+      
+      // widget markup
       var markup = '<div style="margin-bottom: 10px;" class="input-group widget literal">\
               <input id="input-' + this.id + '" type="text" class="form-control" value="' + this.statement.objectValue() + '">\
               <div class="input-group-btn">\
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>\
+                <button type="button" class="btn btn-default dropdown-toggle ' + langClass + ' ' + datatypeClass + '" data-toggle="dropdown"><span class="caret"></span></button>\
                 <ul class="dropdown-menu pull-right">\
                   <li><a href="#">Action</a></li>\
                   <li><a href="#">Another action</a></li>\
                   <li><a href="#">Something else here</a></li>\
                   <li class="divider"></li>\
-                  <li><a href="#">Separated link</a></li>\
+                  ' + languageSubmenuMarkup + '\
+                  ' + datatypeSubmenuMarkup + '\
                 </ul>\
               </div>\
             </div>';
