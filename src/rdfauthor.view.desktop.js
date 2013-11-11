@@ -261,7 +261,7 @@ function DesktopView (options) {
         console.log('updateSource', updateSource);
         console.log('Resource saved');
         // on success - clear update source cache
-        self._rdfauthor.resetUpdateSource();
+        //self._rdfauthor.resetUpdateSource();
       } else {
         alert('error while saving resource ' + self._activeResource);
       }
@@ -515,6 +515,10 @@ DesktopView.prototype = {
   
   saveResource: function (subjectUri) {
     var self = this;
+    
+    // clear update source update
+    self._rdfauthor.resetUpdateSource();
+    
     console.log('saveResource', subjectUri);
     console.log('saveResource choreo', self._subjectChoreoSet[subjectUri]);
     var choreoSet = self._subjectChoreoSet[subjectUri];
