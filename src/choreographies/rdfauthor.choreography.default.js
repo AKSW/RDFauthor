@@ -54,7 +54,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
           
           for (var object in subjectData[subject][property]) {
             console.log(subjectData[subject][property][object]);
-            var o = subjectData[subject][property][object]
+            var o = subjectData[subject][property][object];
             var value = o.value;
             
             var stmtSpec = {
@@ -118,9 +118,13 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     
     submit: function () {
       var self = this;
+      var submitOk = true;
       for (var w in self._widgets) {
-        console.log('submit widget',self._widgets[w].submit());
+        var submitWidgetOk = self._widgets[w].submit();
+        console.log('submit widget', submitWidgetOk);
+        submitOk &= submitWidgetOk;
       }
+      return submitOk;
     },
     
     title: function () {

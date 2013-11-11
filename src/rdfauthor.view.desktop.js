@@ -253,7 +253,18 @@ function DesktopView (options) {
     
     // save event
     $(document).on('click', '#rdfauthor .modal-footer .save-subject', function(event) {
-      self._view.saveResource(self._activeResource);
+      var saveOk = self._view.saveResource(self._activeResource);
+      if (saveOk) {
+        //$(self._activeTab).hide();
+        //$('a[href=' + self._activeTab + ']').hide();
+        var updateSource = self._rdfauthor.getUpdateSource();
+        console.log('updateSource', updateSource);
+        console.log('Resource saved');
+        // on success - clear update source cache
+        self._rdfauthor.resetUpdateSource();
+      } else {
+        alert('error while saving resource ' + self._activeResource);
+      }
     });
     
   });
@@ -507,9 +518,14 @@ DesktopView.prototype = {
     console.log('saveResource', subjectUri);
     console.log('saveResource choreo', self._subjectChoreoSet[subjectUri]);
     var choreoSet = self._subjectChoreoSet[subjectUri];
+    console.log('choreoset', choreoSet);
+    var submitOk = true;
     for (var i in choreoSet) {
-      choreoSet[i].submit();
+      var ok = choreoSet[i].submit();
+      console.log('ok', ok);
+      submitOk &= ok;
     }
+    return submitOk;
   },
   
   setSubjectId: function (subjectUri) {

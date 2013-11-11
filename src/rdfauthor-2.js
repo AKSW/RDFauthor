@@ -84,6 +84,16 @@ var RDFauthor = (function() {
     /** Loaded stylesheet URIs */
     var _loadedStylesheets = {};
     
+    /** save update source queries */
+    var _updateSource = {
+      'delete' : [],
+      'insert' : [],
+      clear: function () {
+        this.delete = [];
+        this.insert = [];
+      }
+    }
+    
     /** Current view */
     var _viewHolder = null;
     
@@ -210,16 +220,15 @@ var RDFauthor = (function() {
     function _getSubjectData(subjectUri, callback) {
       var storedSubjectData = {};
       storedSubjectData[subjectUri] = {};
-      
       _getRdfStore(function(store) {
         //TODO: extend query
         var query = 'SELECT ?p ?o WHERE { <' + subjectUri + '> ?p ?o }';
         store.execute(query, function(success, properties) {
-          
+          console.log('query resultset for subject',properties);
           for (var object in properties) {
             console.log('getDataProperty',properties[object]);
             var v = properties[object].o.value;
-            var t = properties[object].o.token;
+            var t = properties[object].o.token; // type: literal, uri, blank
             var l = properties[object].o.lang;
             var d = properties[object].o.type;
             var o = {
@@ -233,22 +242,22 @@ var RDFauthor = (function() {
             // datatype tag available ? add to o
             if (d) { o.datatype = d; }
 
-            console.log('o', o);
             var propertyUri = properties[object].p.value;
-            
             switch (t) {
               case 'blank':
                 if (!storedSubjectData[subjectUri].hasOwnProperty(propertyUri)) {
                   storedSubjectData[subjectUri][propertyUri] = [];
                 } 
                 storedSubjectData[subjectUri][propertyUri].push(o);
-                // query and push blank node data to the storedSubjectData
+                //TODO query and push blank node data to the storedSubjectData
                 break;
               case 'literal':
                 if (!storedSubjectData[subjectUri].hasOwnProperty(propertyUri)) {
                   storedSubjectData[subjectUri][propertyUri] = [];
-                } 
+                }
+                
                 storedSubjectData[subjectUri][propertyUri].push(o);
+                break;
               case 'uri':
                 if (!storedSubjectData[subjectUri].hasOwnProperty(propertyUri)) {
                   storedSubjectData[subjectUri][propertyUri] = [];
@@ -268,7 +277,7 @@ var RDFauthor = (function() {
       var storedSubjects = {};
       
       _getRdfStore(function(store) {
-        //TODO: extend query
+        //TODO: extend query with rdfs:label,...
         var query = 'SELECT ?s ?label WHERE { ?s <' + store.rdf.resolve('foaf:name') + '> ?label }';
         store.execute(query, function(success, result) {
           
@@ -609,6 +618,10 @@ var RDFauthor = (function() {
         return compatibleWidgets;
       },
       
+      getUpdateSource: function() {
+        return _updateSource;
+      },
+      
       getWidgetForUri: function(widgetUri, stmt) {
         var self = this;
         var widgetSpec = _widgetStore.widgetInstances[widgetUri]; 
@@ -651,7 +664,7 @@ var RDFauthor = (function() {
       },
       
       registerChoreography: function (choreography, choreographyConfig, callback) {
-        console.log()
+        console.log();
         _choreographyStore[choreography.choreographyUri()] = choreography;
         console.log('choreographyStore', _choreographyStore);
       },
@@ -700,6 +713,10 @@ var RDFauthor = (function() {
         }
       },
       
+      resetUpdateSource: function() {
+        return _updateSource.clear();
+      },
+      
       save: function() {
         var self = this;
         console.log('rdfauthor save');
@@ -707,6 +724,10 @@ var RDFauthor = (function() {
       
       setOptions: function(options) {
         _options = $.extend({}, _options, options);
+      },
+      
+      setUpdateSource: function(action, query) {
+        _updateSource[action].push(query);
       },
       
       show: function() {

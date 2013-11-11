@@ -5,7 +5,7 @@
 RDFauthor.getInstance(function(RDFauthorInstance) {
   RDFauthorInstance.registerWidget({
     element: function () {
-        return jQuery('#input-' + this.ID);
+        return jQuery('#input-' + this.id);
     },
     
     init: function () {
@@ -50,29 +50,40 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     
     submit: function () {
       if (this.shouldProcessSubmit()) {
-        console.log('submit resource widget');
-        var hasChanged = (
+        console.log('submit resource widget', this.value());
+        var somethingChanged = (
           this.statement.hasObject()
           && this.statement.objectValue() !== this.value()
           && null !== this.value()
         );
 
-        if (hasChanged || this.removeOnSubmit) {
-          console.log('remove');
+        if (somethingChanged || this.removeOnSubmit) {
+          console.log('remove resource', this.statement.deleteStatementQuery());
         }
 
-        if (!this.removeOnSubmit && this.value()) {
+        // new statement must not be empty
+        var isNew = !this.statement.hasObject() && (null !== this.value());
+
+        if (somethingChanged || this.removeOnSubmit) {
+            //remove
+            console.log('remove resource');
+            RDFauthorInstance.setUpdateSource('delete', this.statement.deleteStatementQuery());
+        }
+        if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
+        //if (!this.removeOnSubmit && this.value()) {
+          
           var self = this;
           try {
+            var objectOptions = {};
             var newStatement = this.statement.copyWithObject({
-              value: '<' + this.value() + '>',
-              // value: ( self.statement._object.type == 'uri' ) ? '<' + this.value() + '>' 
-                                                              // : '_:' + this.value(),
-              // type: ( self.statement._object.type == 'bnode' ) ? 'bnode' : 'uri'
-              type: 'uri'
+              value: ( self.statement._object.type == 'uri' ) ? '<' + this.value() + '>' 
+                                                              : '_:' + this.value(),
+              type: ( self.statement._object.type == 'bnode' ) ? 'bnode' : 'uri',
+              options: objectOptions
             });
             // TODO add new statement
-            console.log('add new statement resource', newStatement);
+            console.log('add new statement resource', newStatement.insertStatementQuery());
+            RDFauthorInstance.setUpdateSource('insert', newStatement.insertStatementQuery());
           } catch (e) {
             var msg = e.message ? e.message : e;
             alert('Could not save resource for the following reason: \n' + msg);

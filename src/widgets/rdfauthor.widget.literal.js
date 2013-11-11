@@ -5,11 +5,11 @@
 RDFauthor.getInstance(function(RDFauthorInstance) {
   RDFauthorInstance.registerWidget({
     datatype: function () {
-      return '';
+      return this.statement.objectDatatype();
     },
     
     element: function () {
-        return jQuery('#input-' + this.ID);
+        return jQuery('#input-' + this.id);
     },
 
     
@@ -18,7 +18,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     lang: function () {
-      return '';
+      return this.statement.objectLanguage();
     },
     
     markup: function () {
@@ -54,7 +54,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     
     submit: function () {
       if (this.shouldProcessSubmit()) {
-        console.log('submit literal widget');
+        console.log('submit literal widget', this.value());
         /*
         var v = this.value();
         // */
@@ -63,7 +63,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
           this.statement.hasObject() && (
             // existing statement should have been edited
             this.statement.objectValue() !== this.value() ||
-            this.statement.objectLang() !== this.lang() ||
+            this.statement.objectLanguage() !== this.lang() ||
             this.statement.objectDatatype() !== this.datatype()
           )
         );
@@ -73,6 +73,8 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
 
         if (somethingChanged || this.removeOnSubmit) {
             //remove
+            console.log('remove literal', this.statement.deleteStatementQuery());
+            RDFauthorInstance.setUpdateSource('delete', this.statement.deleteStatementQuery());
         }
         if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
           try {
@@ -88,7 +90,8 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
                 type: 'literal'
             });
             // TODO add new statement
-            console.log('add new statement literal', newStatement);
+            console.log('add new statement resource', newStatement.insertStatementQuery());
+            RDFauthorInstance.setUpdateSource('insert', newStatement.insertStatementQuery());
           } catch (e) {
               var msg = e.message ? e.message : e;
               alert('Could not save literal for the following reason: \n' + msg);
