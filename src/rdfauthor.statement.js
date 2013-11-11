@@ -103,6 +103,32 @@ Statement.prototype = {
     return this._subject;  
   },
   
+  asTriple: function () {
+    if (this._object.type === 'blank') {
+      var objectString = '<' + this._object.value + '>';
+    }
+    
+    if (this._object.type === 'uri') {
+      var objectString = '<' + this._object.value + '>';
+    }
+    
+    if (this._object.type === 'literal') {
+      console.log('copy literal', this._object);
+      var objectString = '"' + this._object.value + '"';
+      
+      if (this._object.lang != null) {
+        objectString += '@' + this._object.lang;
+      }
+      
+      if (this._object.datatype != null) {
+        objectString += '^^' + this._object.datatype;
+      }
+      
+    }
+    var triple = '<' + this._subject + '> <' + this._predicate + '> ' + objectString;
+    return triple;
+  },
+  
   predicateLabel: function () {
     return this._predicateLabel;
   },
