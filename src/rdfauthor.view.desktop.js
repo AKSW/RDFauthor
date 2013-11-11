@@ -273,11 +273,13 @@ function DesktopView (options) {
 DesktopView.prototype = {
   
   
-  addChoreographyToTab: function (tabId, choreoMarkup) {
+  addChoreographyToTab: function (tabId, choreography, subjectData) {
     var self = this;
+    var markup = choreography.markup(subjectData);
     var $container = self.getElement().find('#' + tabId).find('.portlet-container');
-    var $newItems = $(choreoMarkup);
+    var $newItems = $(markup);
     $container.append($newItems).isotope('insert', $newItems);
+    choreography.ready();
   },
   
   addPortlet: function () {
@@ -401,8 +403,8 @@ DesktopView.prototype = {
     // add choreographies to dom
     for (var i in choreoSet) {
       console.log('Choreography ' + i, choreoSet[i].choreographyUri());
-      var choreoMarkup = choreoSet[i].markup(subjectData);
-      self.addChoreographyToTab(tabId,choreoMarkup);
+      var choreography = choreoSet[i];
+      self.addChoreographyToTab(tabId,choreography, subjectData);
     }
     
     // save choreoset, used on save

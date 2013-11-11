@@ -117,7 +117,11 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     ready: function () {
-      
+      var self = this;
+      // call ready for widgets
+      for (var w in self._widgets) {
+        self._widgets[w].ready();
+      }
     },
     
     submit: function () {

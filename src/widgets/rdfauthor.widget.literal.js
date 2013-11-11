@@ -12,6 +12,10 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
       return jQuery('#input-' + this.id);
     },
     
+    elementDropdown: function () {
+      return this.element().next('div');
+    },
+    
     hasDatatype: function () {
       return null !== this.statement.objectDatatype();
     },
@@ -23,6 +27,8 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     init: function () {
       this.datatypes = RDFauthorInstance.literalDatatypes();
       this.languageTags = RDFauthorInstance.literalLanguageTags();
+      
+      
     },
     
     lang: function () {
@@ -86,9 +92,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
               <div class="input-group-btn">\
                 <button type="button" class="btn btn-default dropdown-toggle ' + langClass + ' ' + datatypeClass + '" data-toggle="dropdown"><span class="caret"></span></button>\
                 <ul class="dropdown-menu pull-right">\
-                  <li><a href="#">Action</a></li>\
-                  <li><a href="#">Another action</a></li>\
-                  <li><a href="#">Something else here</a></li>\
+                  <li><a href="#" class="delete">Delete</a></li>\
                   <li class="divider"></li>\
                   ' + languageSubmenuMarkup + '\
                   ' + datatypeSubmenuMarkup + '\
@@ -99,9 +103,18 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     ready: function () {
-      
+      console.log('rdy called for literal widget');
+      // jquery events
+      console.log('elementDropdown', this.elementDropdown());
     },
     
+    remove: function () {
+      var self = this;
+      self.removeOnSubmit = true;
+      self.element().hide();
+      
+    },
+
     shouldProcessSubmit: function () {
       var t1 = !this.statement.hasObject();
       var t2 = null === this.value();

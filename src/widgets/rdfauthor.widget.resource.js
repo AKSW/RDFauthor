@@ -36,7 +36,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     ready: function () {
-      
+      console.log('rdy called for resource widget');
     },
     
     shouldProcessSubmit: function () {
