@@ -78,7 +78,11 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
             
             var widget = RDFauthorInstance.getWidgetForUri(compWidgetsUris[0], stmt);
             
+            
             self._widgets.push(widget);
+            
+            // init widget
+            widget.init();
             
             console.log('widgetMarkup', widget.markup());
             
