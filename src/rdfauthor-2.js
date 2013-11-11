@@ -648,6 +648,25 @@ var RDFauthor = (function() {
         return new W();
       },
       
+      literalDatatypes: function () {
+        //TODO extend datatypes
+        var datatypes = {
+          'http://www.w3.org/2001/XMLSchema#string': 'xsd:string',
+          'http://www.w3.org/2001/XMLSchema#decimal': 'xsd:decimal',
+          'http://www.w3.org/2001/XMLSchema#integer': 'xsd:integer',
+          'http://www.w3.org/2001/XMLSchema#float': 'xsd:float',
+          'http://www.w3.org/2001/XMLSchema#boolean': 'xsd:boolean',
+          'http://www.w3.org/2001/XMLSchema#date': 'xsd:date',
+          'http://www.w3.org/2001/XMLSchema#time': 'xsd:time'
+        }
+        return datatypes;
+      },
+      
+      literalLanguageTags: function () {
+        var languageTags = ['de', 'en', 'fr', 'nl', 'es', 'it', 'cn', 'ka', 'ru'];
+        return languageTags;
+      },
+      
       /**
        * With every call, returns a unique ID that can be used to build id attributes
        * for CSS selector access.
