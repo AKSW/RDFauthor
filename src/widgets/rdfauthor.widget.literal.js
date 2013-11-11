@@ -74,7 +74,8 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
         if (somethingChanged || this.removeOnSubmit) {
             //remove
             console.log('remove literal', this.statement.deleteStatementQuery());
-            RDFauthorInstance.setUpdateSource('delete', this.statement.deleteStatementQuery());
+            RDFauthorInstance.setUpdateSource('delete', this.statement.asTriple());
+            console.log('remove literal triple', this.statement.asTriple());
         }
         if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
           try {
@@ -91,7 +92,8 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
             });
             // TODO add new statement
             console.log('add new statement resource', newStatement.insertStatementQuery());
-            RDFauthorInstance.setUpdateSource('insert', newStatement.insertStatementQuery());
+            RDFauthorInstance.setUpdateSource('insert', newStatement.asTriple());
+            console.log('new literal triple', newStatement.asTriple());
           } catch (e) {
               var msg = e.message ? e.message : e;
               alert('Could not save literal for the following reason: \n' + msg);

@@ -67,7 +67,8 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
         if (somethingChanged || this.removeOnSubmit) {
             //remove
             console.log('remove resource');
-            RDFauthorInstance.setUpdateSource('delete', this.statement.deleteStatementQuery());
+            RDFauthorInstance.setUpdateSource('delete', this.statement.asTriple());
+            console.log('remove literal triple', this.statement.asTriple());
         }
         if ((null !== this.value()) && !this.removeOnSubmit && (somethingChanged || isNew)) {
         //if (!this.removeOnSubmit && this.value()) {
@@ -76,14 +77,15 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
           try {
             var objectOptions = {};
             var newStatement = this.statement.copyWithObject({
-              value: ( self.statement._object.type == 'uri' ) ? '<' + this.value() + '>' 
+              value: ( self.statement._object.type == 'uri' ) ? '' + this.value() + '' 
                                                               : '_:' + this.value(),
               type: ( self.statement._object.type == 'bnode' ) ? 'bnode' : 'uri',
               options: objectOptions
             });
             // TODO add new statement
             console.log('add new statement resource', newStatement.insertStatementQuery());
-            RDFauthorInstance.setUpdateSource('insert', newStatement.insertStatementQuery());
+            RDFauthorInstance.setUpdateSource('insert', newStatement.asTriple());
+            console.log('new resource triple', newStatement.asTriple());
           } catch (e) {
             var msg = e.message ? e.message : e;
             alert('Could not save resource for the following reason: \n' + msg);
