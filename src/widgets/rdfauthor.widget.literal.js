@@ -48,12 +48,13 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
       // iterate through predefined datatypes
       var matchedType = false;
       for (var type in this.datatypes) {
-        if (type == this.statement.objectDatatype()) {
+        if (type.indexOf(this.statement.objectDatatype()) > -1) {
           matchedType = true;
           datatypeSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + type + '" class="' + datatypeClass + '">' + this.datatypes[type] + '</a></li>';
         } else {
           datatypeSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + type + '">' + this.datatypes[type] + '</a></li>';          
         }
+        console.log('type ', type);
       }
       // if type is not part of rdfauthors datatype set, put it at the end
       if (!matchedType) {
@@ -70,7 +71,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
       // iterate through predefined datatypes
       var matchLang = false;
       for (var i in this.languageTags) {
-        if (this.languageTags[i] == this.statement.objectLanguage()) {
+        if (this.languageTags[i].indexOf(this.statement.objectLanguage()) > -1) {
           matchLang = true;
           languageSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + this.languageTags[i] + '" class="' + langClass + '">' + this.languageTags[i] + '</a></li>';
         } else {
