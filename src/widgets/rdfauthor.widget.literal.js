@@ -57,7 +57,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
         console.log('type ', type);
       }
       // if type is not part of rdfauthors datatype set, put it at the end
-      if (!matchedType) {
+      if (!matchedType && this.statement.objectDatatype() != null) {
         datatypeSubmenuMarkup += '<li><a tabindex="-1" href="#" name="' + this.statement.objectDatatype() + '" class="' + datatypeClass + '">' + this.statement.objectDatatype() + '</a></li>';
       }
       // close ul and li
@@ -79,7 +79,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
         }
       }
       // if language is not part of rdfauthors rdfauthor set, put it at the end
-      if (!matchLang) {
+      if (!matchLang && this.statement.objectLanguage() != null) {
         languageSubmenuMarkup +='<li><a tabindex="-1" href="#" name="' + this.statement.objectLanguage() + '" class="' + langClass + '">' + this.statement.objectLanguage() + '</a></li>';
       } 
       // close ul and li
