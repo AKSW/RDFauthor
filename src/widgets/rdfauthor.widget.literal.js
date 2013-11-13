@@ -93,7 +93,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
               <div class="input-group-btn">\
                 <button type="button" class="btn btn-default dropdown-toggle ' + langClass + ' ' + datatypeClass + '" data-toggle="dropdown"><span class="caret"></span></button>\
                 <ul class="dropdown-menu pull-right">\
-                  <li><a href="#" class="delete">Delete</a></li>\
+                  <li><a href="#" class="remove">Remove</a></li>\
                   <li class="divider"></li>\
                   ' + languageSubmenuMarkup + '\
                   ' + datatypeSubmenuMarkup + '\
@@ -104,15 +104,20 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     ready: function () {
+      var self = this;
       console.log('rdy called for literal widget');
       // jquery events
       console.log('elementDropdown', this.elementDropdown());
+      $(self.elementDropdown()).on('click', '.remove', function (event) {
+        self.remove();
+      });
     },
     
     remove: function () {
       var self = this;
       self.removeOnSubmit = true;
-      self.element().hide();
+      // hide widget chrome inlcuding input and input group (dropdown)
+      self.element().parents('.widget').hide();
       
     },
 
