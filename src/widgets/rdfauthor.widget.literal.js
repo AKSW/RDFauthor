@@ -5,7 +5,13 @@
 RDFauthor.getInstance(function(RDFauthorInstance) {
   RDFauthorInstance.registerWidget({
     datatype: function () {
-      return this.statement.objectDatatype();
+      var self = this;
+      var $type = self.elementDropdown().find('a.hasDatatype'); 
+      if ($type.length > 0) {
+        return $type.attr('name');
+      } else {
+        return null;
+      }
     },
     
     element: function () {
@@ -32,7 +38,13 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     lang: function () {
-      return this.statement.objectLanguage();
+      var self = this;
+      var $langTag = self.elementDropdown().find('a.hasLanguage'); 
+      if ($langTag.length > 0) {
+        return $langTag.attr('name');
+      } else {
+        return null;
+      }
     },
     
     markup: function () {
