@@ -5,7 +5,11 @@
 RDFauthor.getInstance(function(RDFauthorInstance) {
   RDFauthorInstance.registerWidget({
     element: function () {
-        return jQuery('#input-' + this.id);
+      return jQuery('#input-' + this.id);
+    },
+    
+    elementDropdown: function () {
+      return this.element().next('div');
     },
     
     init: function () {
@@ -24,11 +28,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
               <div class="input-group-btn">\
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>\
                 <ul class="dropdown-menu pull-right">\
-                  <li><a href="#">Action</a></li>\
-                  <li><a href="#">Another action</a></li>\
-                  <li><a href="#">Something else here</a></li>\
-                  <li class="divider"></li>\
-                  <li><a href="#">Separated link</a></li>\
+                  <li><a href="#" class="remove">Remove</a></li>\
                 </ul>\
               </div>\
             </div>';
@@ -36,7 +36,21 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     ready: function () {
+      var self = this;
       console.log('rdy called for resource widget');
+      // jquery events
+      console.log('elementDropdown', this.elementDropdown());
+      $(self.elementDropdown()).on('click', '.remove', function (event) {
+        self.remove();
+      });
+    },
+    
+    remove: function () {
+      var self = this;
+      self.removeOnSubmit = true;
+      // hide widget chrome inlcuding input and input group (dropdown)
+      self.element().parents('.widget').hide();
+      
     },
     
     shouldProcessSubmit: function () {
