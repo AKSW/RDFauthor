@@ -243,23 +243,23 @@
   height: 500px;
 }
 
-#rdfauthor .language,
-#rdfauthor .language:hover,
-#rdfauthor .language:focus,
-#rdfauthor .language:active,
-#rdfauthor .open .language .active, 
-#rdfauthor .open .dropdown-toggle.language {
+#rdfauthor .hasLanguage,
+#rdfauthor .hasLanguage:hover,
+#rdfauthor .hasLanguage:focus,
+#rdfauthor .hasLanguage:active,
+#rdfauthor .open .hasLanguage .active, 
+#rdfauthor .open .dropdown-toggle.hasLanguage {
   color: #ffffff;
   background-color: #47a447;
   border-color: #398439;
 }
 
-#rdfauthor .datatype,
-#rdfauthor .datatype:hover,
-#rdfauthor .datatype:focus,
-#rdfauthor .datatype:active,
-#rdfauthor .open .datatype .active, 
-#rdfauthor .open .dropdown-toggle.datatype {
+#rdfauthor .hasDatatype,
+#rdfauthor .hasDatatype:hover,
+#rdfauthor .hasDatatype:focus,
+#rdfauthor .hasDatatype:active,
+#rdfauthor .open .hasDatatype .active, 
+#rdfauthor .open .dropdown-toggle.hasDatatype {
   color: #ffffff;
   background-color: #39b3d7;
   border-color: #269abc;
