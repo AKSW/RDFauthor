@@ -26,9 +26,15 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
       var markup = '<div style="margin-bottom: 10px;" class="input-group widget resource">\
               <input id="input-' + this.id + '" type="text" class="form-control" value="' + this.statement.objectValue() + '">\
               <div class="input-group-btn">\
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>\
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">\
+                  <i class="icon-cog"></i>\
+                </button>\
                 <ul class="dropdown-menu pull-right">\
-                  <li><a href="#" class="remove">Remove</a></li>\
+                  <li><a href="#" class="remove">\
+                    <i class="icon-trash" style="padding-right: 5px;"></i>\
+                    Remove\
+                    </a>\
+                  </li>\
                 </ul>\
               </div>\
             </div>';
