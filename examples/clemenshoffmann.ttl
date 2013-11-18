@@ -1,0 +1,68 @@
+# Exported with the Erfurt API - http://aksw.org/Projects/Erfurt
+
+@base <http://aksw.org/> .
+@prefix sysont: <http://ns.ontowiki.net/SysOnt/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix sioc: <http://rdfs.org/sioc/ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix aksw: <http://aksw.org/schema/> .
+@prefix people: <http://aksw.org/> .
+@prefix v: <http://www.w3.org/2006/vcard/ns#> .
+@prefix partner: <http://aksw.org/Partner/> .
+@prefix content: <http://purl.org/rss/1.0/modules/content/> .
+@prefix site: <http://ns.ontowiki.net/SysOnt/Site/> .
+@prefix lod2: <http://lod2.eu/schema/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix groups: <http://aksw.org/Groups/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dbpedia: <http://dbpedia.org/resource/> .
+@prefix projects: <http://aksw.org/Projects/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix sioct: <http://rdfs.org/sioc/types#> .
+@prefix aiiso: <http://purl.org/vocab/aiiso/schema#> .
+@prefix ov: <http://open.vocab.org/terms/> .
+@prefix ns0: <http://139.18.2.164:4444/demo/> .
+@prefix ns1: <http://139.18.2.164:8080/> .
+@prefix ns2: <http://autosparql.dl-learner.org/app/#> .
+@prefix ns4: <http://nlp2rdf.lod2.eu/> .
+@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix label: <http://purl.org/net/vocab/2004/03/label#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix ns5: <http://www.nittka.de/index_e.html#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix ns6: <http://vocab.ox.ac.uk/projectfunding#> .
+@prefix umbel: <http://umbel.org/umbel#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix ns7: <http://aksw.org/Events/2013/> .
+@prefix ns8: <http://aksw.org/Demo/> .
+@prefix ns9: <http://www.w3.org/ns/auth/cert#> .
+@prefix lswt2013: <http://aksw.org/Events/2013/LeipzigerSemanticWebTag/> .
+@prefix ns10: <http://www.xing.com/profile/> .
+@prefix ns12: <http://www.xing.com/profile/Mario_Lenz#> .
+@prefix ns13: <https://twitter.com/alex_siebert#> .
+@prefix ns14: <https://twitter.com/Daniel_hladky#> .
+@prefix ns15: <http://www.hpi.uni-potsdam.de/meinel/lehrstuhl/team_fotos/current_phd_students/christian_hentschel.html#> .
+@prefix ns16: <https://twitter.com/FroehlichMarcel#> .
+@prefix ns17: <http://semantic-media-web.de/referenten/> .
+@prefix ns18: <http://de.linkedin.com/pub/andreas-both/22/672/942#> .
+@prefix ns19: <http://www.wolterskluwer.de/person#> .
+@prefix ns20: <http://www.mi.fu-berlin.de/inf/groups/ag-csw/Members/almashraee.html#> .
+@prefix ns21: <http://www.mmt.inf.tu-dresden.de/Team/mitarbeiter.xhtml?id> .
+@prefix ns24: <http://www.mmt.inf.tu-dresden.de/Team/mitarbeiter.xhtml?id=309#> .
+@prefix ns32: <http://hans.uszkoreit.net/#> .
+@prefix ns25: <http://cstadler.aksw.org/> .
+@prefix ns26: <http://aksw.org/Events/2013/LeipzigerSemanticWebTag/Presenter/> .
+@prefix ns27: <http://aksw.org/SchemaEvent/> .
+
+people:ClemensHoffmann a foaf:Person ;
+                       skos:hiddenLabel "Cannelony", "ClemensHoffmann" ;
+                       foaf:currentProject projects:OntoWiki, projects:RDFauthor, projects:re-publish ;
+                       foaf:depiction <https://secure.gravatar.com/avatar/be35f40f610edc7d8218bb866494fcf1?s=140> ;
+                       foaf:familyName "Hoffmann" ;
+                       foaf:mbox <mailto:cannelony@gmail.com> ;
+                       foaf:name "Clemens Hoffmann" .
