@@ -58,7 +58,8 @@
         RDFauthorInstance.addResource({
           type: 'turtle',
           src: self.me+self.me2,
-          updateEndpoint: 'http://localhost/ontowiki/update'
+          updateEndpoint: 'http://localhost/ontowiki/update',
+          graph: 'http://dyndns.clelicy.de'
         });
         RDFauthorInstance.show();
       });
