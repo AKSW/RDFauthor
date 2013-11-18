@@ -537,13 +537,15 @@ RDFauthor = (function($) {
         }
 
         var values = new Array();
+        var subj = '';
         var pred = '';
 
         for (var index in RDFauthor.getView()._rows) {
             var subject = RDFauthor.getView()._rows[index]._subjectURI;
             var predicate = RDFauthor.getView()._rows[index]._predicateURI;
-            if (pred != predicate) {
+            if ((pred != predicate) || (subj != subject)) {
                 pred = predicate;
+                subj = subject;
                 var query = "select ?v where { <" + subject + "> <" + predicate + "> ?v . }";
                 RDFauthor.queryGraph(graph, query, {
                     callbackSuccess: function (result) {
@@ -551,7 +553,6 @@ RDFauthor = (function($) {
                             var bindings = result['results']['bindings'];
                             for (var i = 0; i < bindings.length; i++) {
                                 var row = bindings[i];
-                                /* build  */
                                 values.push(row['v'].value);
                             }
                         }
@@ -1339,9 +1340,6 @@ RDFauthor = (function($) {
             _cloneDatabanks();
             if (this.getView().submit()) {
                 _updateSources();
-                console.log("this.getView()");
-                console.log(this.getView());
-                console.log('graphInfo', _graphInfo);
                 this.getView().resetToUnedit(_fetchValues());
                 RDFauthor.cancel();
                 RDFauthor.reset();

@@ -56,25 +56,25 @@ InlineController.prototype = {
 
     resetToUnedit: function(values) {
         var updateValues = values;
-        var predicateURI;
+        var subjectURI;
+        var predicateURI; 
         var predicateCount = 0;
 
         for (var index in this._rows) {
             // test if there is a value for a new predicate
-            // roughly speaking, the predicateCount will 
-            if (predicateURI == this._rows[index]._predicateURI) {
+            // roughly speaking, the predicateCount will
+            if ((predicateURI == this._rows[index]._predicateURI) && (subjectURI == this._rows[index]._subjectURI)) {
                 predicateCount += 1;
             }
             else {
                 predicateURI = this._rows[index]._predicateURI;
+                subjectURI = this._rows[index].predicateURI
                 predicateCount = 1;
             }
             var element = jQuery('#' + this._rows[index].cssID()).parent();
-            console.log('element: ', element);
 
-            // make visible again and disable edit mode
-            // only necessary for the first of (possibly) many equal
-            // predicates
+            // make visible again and disable edit mode only necessary
+            // for the first of (possibly) many equal predicates
             if (predicateCount == 1) {
                 element.removeAttr('class');
                 element.attr('class', 'has-contextmenu-area');
