@@ -132,7 +132,6 @@ function DesktopView (options) {
     });
     
     $('.modal-content').on('resize', function(event, ui) {
-      
       var offsetWidth = ui.element.context.offsetWidth;
       var offsetHeight = ui.element.context.offsetHeight;
       var headerHeight = $(ui.element).find('.modal-header').outerHeight();
@@ -575,55 +574,63 @@ DesktopView.prototype = {
           'left' : '50%'
       },
       'modalBody' : {
-        'maxHeight' : modal.outerHeight()-$('.modal-header').outerHeight()-$('.modal-footer').outerHeight()
+        'height': modal.find('.modal-body').outerHeight()
       }
     }
     
     console.log('modalSize', modalSize);
     
-    // append values to rdfauthor view
+    // set values to rdfauthor view
     self._modalSize = modalSize;
   },
   
   toggleFullscreen: function () {
     var self = this;
-    var modal = self.getElement().find('.modal-dialog');
-    modal.toggleClass('fullscreen');
+    var $modal = self.getElement().find('.modal-dialog');
+    $modal.toggleClass('fullscreen');
     
     
-    if (modal.hasClass('fullscreen')) {
+    if ($modal.hasClass('fullscreen')) {
+      // store size
       self.storeSize();
-      // modal.find('.modal-content').draggable('option', 'disabled', true);
-      // modal.find('.modal-content').resizable('option', 'disabled', true);
-      modal.css('width', '100%');
-      modal.css('height', '100%');
-      // modal.css("margin-left", -modal.outerWidth()/2);
-      // modal.css("margin-top", -modal.outerHeight());
-      // modal.css("top", "50%");
-      // modal.css("left", "50%");
-      // modal.find(".modal-body").each(function() {
-        // var maxHeight = modal.height()-$('.modal-header').outerHeight()-$('.modal-footer').outerHeight()-20;
-        // $(this).css("max-height", maxHeight);
-        // $(this).find('.tab-pane').css('height', maxHeight);
-        // $(this).find('.tab-pane').css('height', maxHeight-$('.modal-footer').outerHeight());
-      // });
+  
+      // add fullscreen classes
+      $('#rdfauthor .modal-dialog').addClass('modal-dialog-fullscreen');
+      $('#rdfauthor .modal-content').addClass('modal-content-fullscreen');
+      $('#rdfauthor .modal-body').addClass('modal-body-fullscreen');
+      
+      // calculate and set new body height
+      var $modalContent = $modal.find('.modal-content');
+      var offsetWidth = $modalContent.outerWidth();
+      var offsetHeight = $modalContent.outerHeight();
+      var headerHeight = $modalContent.find('.modal-header').outerHeight();
+      var bodyHeight = $modalContent.find('.modal-body').outerHeight();
+      var footerHeight = $modalContent.find('.modal-footer').outerHeight();
+      var sumHeaderFooterHeight = headerHeight + footerHeight;
+      // console.log(offsetHeight,bodyHeight+sumHeaderFooterHeight + 17);
+      // console.log('footer', footerHeight);
+      // console.log('header', headerHeight);
+      
+      // set height of modal-body
+      $modal.find('.modal-body').css('height', offsetHeight-sumHeaderFooterHeight-17);
+      
+      // disable draggable and resizable
+      $modal.find('.modal-content').draggable('option', 'disabled', true);
+      $modal.find('.modal-content').resizable('option', 'disabled', true);
     } else {
-      //TODO größe wiederherstellen
+      // restore modal size
       var modalSize = self._modalSize;
-      console.log('modalSize', modalSize);
-      // modal.find('.modal-content').draggable('option', 'disabled', false);
-      // modal.find('.modal-content').resizable('option', 'disabled', false);
-      modal.find('.modal-content').css('width', modalSize.modal.width);
-      modal.find('.modal-content').css('height',modalSize.modal.height);
-      // modal.css("margin-left", modalSize.modal.marginLeft);
-      // modal.css("margin-top", modalSize.modal.marginTop);
-      // modal.css("top", "50%");
-      // modal.css("left", "50%");
-      modal.find(".modal-body").css('max-height', modalSize.modalBody.maxHeight);
-
+      $modal.find(".modal-body").css('height', modalSize.modalBody.height);
+      
+      // remove fullscreen classes
+      $('#rdfauthor .modal-dialog').removeClass('modal-dialog-fullscreen');
+      $('#rdfauthor .modal-content').removeClass('modal-content-fullscreen');
+      $('#rdfauthor .modal-body').removeClass('modal-body-fullscreen');
+      
+      // activate draggable and resizable
+      $modal.find('.modal-content').draggable('option', 'disabled', false);
+      $modal.find('.modal-content').resizable('option', 'disabled', false);
     }
-    
-    // $(".modal-dialog").animate({ width: '100%', height: '700px'},300,'linear');
     
   },
   
