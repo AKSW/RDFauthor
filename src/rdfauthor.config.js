@@ -36,7 +36,7 @@ var RDFAUTHOR_CONFIG = {
   'choreographies': {
     'foaf': {
       'src': 'rdfauthor.choreography.foaf.js',
-      'enabled': false
+      'enabled': true
     }
   } // end of choreogprahies
 } // end of RDFAUTHOR_CONFIG
