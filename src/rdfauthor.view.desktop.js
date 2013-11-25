@@ -114,10 +114,6 @@ function DesktopView (options) {
       $(event.target.hash).find('.portlet-container').isotope('reLayout');
     });
 
-    // hack for correct resizing and dragging
-    // $('.modal-dialog').css("margin-right", 0);
-    // $('.modal-dialog').css("margin-left", 0);
-    
     var contentWidth = $('.modal-content').outerWidth();
     var contentHeight = $('.modal-content').outerHeight();
     $('#' + options.domId + ' .modal-content').resizable({ 
