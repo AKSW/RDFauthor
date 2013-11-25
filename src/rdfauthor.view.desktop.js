@@ -125,12 +125,6 @@ function DesktopView (options) {
       minHeight: contentHeight
     });
     
-    $('.modal').on("drag resize", function(event, ui) {
-      // hack for correct resizing and dragging
-      $('.modal-dialog').css("margin-right", 0);
-      $('.modal-dialog').css("margin-left", 0);
-    });
-    
     $('.modal-content').on('resize', function(event, ui) {
       var offsetWidth = ui.element.context.offsetWidth;
       var offsetHeight = ui.element.context.offsetHeight;
@@ -157,6 +151,7 @@ function DesktopView (options) {
     $('.portlet-container').sortable({
       disabled : true
     }).disableSelection();
+    
     $('.modal-header button').tooltip();
     
     /** bootstrap event */
