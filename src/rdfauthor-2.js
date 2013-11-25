@@ -449,7 +449,7 @@ var RDFauthor = (function() {
       
       // jQuery
       if ('undefined' === typeof $) {
-        _require(RDFAUTHOR_BASE + 'libs/jquery-1.10.1.js', function() {
+        _require(RDFAUTHOR_BASE + 'libs/jquery-1.10.2.js', function() {
           _require(RDFAUTHOR_BASE + 'libs/jquery-isotope/jquery.isotope.min.js');
           // load Bootstrap if jquery is loaded
           if ('undefined' === typeof $.fn.modal) {
