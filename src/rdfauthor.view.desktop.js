@@ -148,7 +148,7 @@ function DesktopView (options) {
       disabled : true
     }).disableSelection();
     
-    $('.modal-header button').tooltip();
+    //$('.modal-header button').tooltip(); // disabled because of wrong style
     
     /** bootstrap event */
     $('#' + options.domId).on('hidden.bs.modal', function () {
