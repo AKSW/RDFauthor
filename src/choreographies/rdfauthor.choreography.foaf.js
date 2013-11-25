@@ -142,7 +142,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     },
     
     title: function () {
-      return 'Default';
+      return 'FOAF';
     },
     
     value: function () {
