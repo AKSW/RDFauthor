@@ -160,28 +160,3 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     // callback
   });
 });
-
-// <div name="' + self.choreographyUri() + '" class="col-md-5 portlet">\
-          // <!-- Navbar -->\
-          // <div class="navbar navbar-fixed-top portlet-navbar" style="position: absolute;">\
-            // <div class="navbar-inner">\
-              // <div class="container" style="width: auto; padding: 0 20px;">\
-                // <a class="brand" href="#">' + self.title() + '</a>\
-                // <ul class="nav actionbar pull-right">\
-                  // <li class="dropdown">\
-                    // <a href="#" class="dropdown-toggle settings" data-toggle="dropdown"><i class="icon-cog"></i></a>\
-                    // <ul class="dropdown-menu">\
-                      // <li><a class="hide-show hide-show-portlet" href="#"><i class="icon-arrow-up" style="padding-right: 5px;"></i>Hide/Show</a></li>\
-                      // <li><a class="remove remove-portlet disabled" href="#"><i class="icon-trash" style="padding-right: 5px;"></i>Remove Portlet</a></li>\
-                      // <li><a class="add add-portlet" href="#"><i class="icon-plus-sign" style="padding-right: 5px;"></i>Add Property</a></li>\
-                      // <li><a class="rename rename-portlet disabled" href=#"><i class="icon-pencil" style="padding-right: 5px;"></i>Rename Portlet</a></li>\
-                    // </ul>\
-                  // </li>\
-                // </ul>\
-              // </div>\
-            // </div>\
-          // </div>\
-          // <!-- Portlet Content -->\
-          // <div class="portlet-content">\
-          // </div>\
-        // </div>\
