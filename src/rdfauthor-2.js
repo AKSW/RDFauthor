@@ -172,6 +172,28 @@ var RDFauthor = (function() {
       }
     }
     
+    function _createStatementsForSubject(subjectData) {
+      var statements = [];
+      for (var subject in subjectData) {
+        for (var property in subjectData[subject]) {
+          for (var object in subjectData[subject][property]) {
+            console.log(subjectData[subject][property][object]);
+            var o = subjectData[subject][property][object];
+            var value = o.value;
+            
+            var stmtSpec = {
+              subject: subject,
+              predicate: property,
+              object: o
+            }
+            
+            statements.push(new Statement(stmtSpec));
+          }
+        }
+      }     
+      return statements;
+    }
+    
     function _createWidgetStore() {
       // load fallback widgets for literals and resources
       _require(RDFAUTHOR_BASE + RDFAUTHOR_WIDGETS + 'rdfauthor.widget.literal.js', function() {
@@ -548,14 +570,19 @@ var RDFauthor = (function() {
               var choreoSet = [];
               console.log('storedSubjects', storedSubjects);
               _getSubjectData(subjectUri, function(resultSet) {
+                var statements = _createStatementsForSubject(resultSet);
+                console.log('statements for subject ', subjectUri, statements);
                 console.log('resultSet for '+ subjectUri, resultSet);
                 var label = storedSubjects[subjectUri];
                 console.log('defaultChoreo', self.getChoreography(_choreographyStore.fallback()));
                 var choreoInstance = self.getChoreography(_choreographyStore.fallback());
+                var choreoFoaf = self.getChoreography(_choreographyStore['http://aksw.org/Projects/RDFauthor/localChoreography#foaf']);
                 // init
                 choreoInstance.init();
+                choreoFoaf.init();
                 // push to set
                 choreoSet.push(choreoInstance);
+                //choreoSet.push(choreoFoaf);
                 _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
               });
             }
