@@ -6,6 +6,7 @@
  */
 var Choreography = {
   options: {},
+  _properties: [],
   _maxWidth: null,
   
   /**
@@ -56,7 +57,14 @@ var Choreography = {
   cancel: function () {
 
   },
-
+  
+  /**
+   * Is called for getting registered properties for this choreography.
+   */
+  getProperties: function () {
+    return this._properties;
+  },
+  
   /**
    * Is called if the user removes a Choreography indicating the aim to delete the
    * statement this Choreography represents.

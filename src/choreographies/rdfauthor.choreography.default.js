@@ -15,17 +15,17 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
      */
     partOfChoreography: function (property) {
       var self = this;
-      var propertyHooks = self.propertyHooks();
-      console.log('propertyHooks', propertyHooks);
+      var properties = self.getProperties();
+      console.log('propertyHooks', properties);
       
       // default
-      if (propertyHooks.length === 0) {
+      if (properties.length === 0) {
         return true;
       }
       
       // check if resource property is hook of choreo property
-      for (var i in propertyHooks) {
-        if (property == propertyHooks[i]) {
+      for (var i in properties) {
+        if (property == properties[i]) {
           return true;
         }
       }
@@ -112,7 +112,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
       return markup;
     },
     
-    propertyHooks: function () {
+    getProperties: function () {
       return [];
     },
     

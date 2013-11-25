@@ -161,11 +161,10 @@ var RDFauthor = (function() {
       });
       
       // load choreography who are declared as enabled in RDFAUTHOR_CONFIG (refer: rdfauthor.config.js)
-      for (var choreography in RDFAUTHOR_CONFIG.choreographies) {
-        if (RDFAUTHOR_CONFIG.choreographies[choreography].enabled) {
-          var choreographyConfig = RDFAUTHOR_CONFIG.choreographies[choreography];
-          var choreographyUri = 'http://aksw.org/Projects/RDFauthor‎/localChoreography#' + choreography;
-          _require(RDFAUTHOR_BASE + RDFAUTHOR_CHOREOGRAPHIES + RDFAUTHOR_CONFIG.choreographies[choreography].src, function() {
+      for (var choreographyUri in RDFAUTHOR_CONFIG.choreographies) {
+        if (RDFAUTHOR_CONFIG.choreographies[choreographyUri].enabled) {
+          var choreographyConfig = RDFAUTHOR_CONFIG.choreographies[choreographyUri];
+          _require(RDFAUTHOR_BASE + RDFAUTHOR_CHOREOGRAPHIES + RDFAUTHOR_CONFIG.choreographies[choreographyUri].src, function() {
             
           });
         }
@@ -575,14 +574,14 @@ var RDFauthor = (function() {
                 console.log('resultSet for '+ subjectUri, resultSet);
                 var label = storedSubjects[subjectUri];
                 console.log('defaultChoreo', self.getChoreography(_choreographyStore.fallback()));
-                var choreoInstance = self.getChoreography(_choreographyStore.fallback());
-                var choreoFoaf = self.getChoreography(_choreographyStore['http://aksw.org/Projects/RDFauthor/localChoreography#foaf']);
+                var choreoInstance = self.getChoreography(_choreographyStore.fallback(), statements);
+                var choreoFoaf = self.getChoreography(_choreographyStore['http://aksw.org/Projects/RDFauthor/localChoreography#foaf'], statements);
                 // init
                 choreoInstance.init();
                 choreoFoaf.init();
                 // push to set
                 choreoSet.push(choreoInstance);
-                //choreoSet.push(choreoFoaf);
+                choreoSet.push(choreoFoaf);
                 _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
               });
             }
@@ -594,14 +593,24 @@ var RDFauthor = (function() {
         return _options;
       },
       
-      getChoreography: function(config) {
+      getChoreography: function(config, stmts) {
         var self = this;
+        
+        var properties = [];
+        if (RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()] !== undefined) {
+          properties = RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()].hasOwnProperty('property') ? 
+                       RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()].property : [];
+        }
+        
         var F = function () {};
         F.prototype = Choreography;
         
         var C = function (options) {
             this.id = self.nextID();
-            
+            this.statements = stmts;
+            this._properties = properties;
+            //this.propertyHooks = RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()].property | [];
+            console.log('config property hook', RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()]);
             // widget has options
             if (undefined !== options) {
                 this.options = $.extend(
@@ -616,6 +625,10 @@ var RDFauthor = (function() {
         C.prototype.constructor = C;
         
         return new C();
+      },
+      
+      getCompatibleChoreographies: function(stmt) {
+        
       },
       
       getCompatibleWidgets: function(stmt) {
