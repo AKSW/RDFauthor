@@ -281,6 +281,7 @@ DesktopView.prototype = {
     // log storedSubjects
     console.log('label calling addResources', label);
     console.log('subjectData calling addResources', subjectData);
+    console.log('choreoSet calling addResource', choreoSet);
     
     var divTab = '';
     var tabId = 'tab-' + self.getSubjectId(subjectUri);
