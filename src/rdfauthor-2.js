@@ -580,7 +580,7 @@ var RDFauthor = (function() {
                 // push to set
                 choreoSet.push(choreoInstance);
                 choreoSet.push(choreoFoaf);
-                self.getCompatibleChoreographies();
+                //self.getCompatibleChoreographies(statements);
                 _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
               });
             }
@@ -624,8 +624,22 @@ var RDFauthor = (function() {
         return new C();
       },
       
+      /**
+       * Return a set of possible choreographies for the given statements.
+       * @returns {array} choreoSet
+       */
       getCompatibleChoreographies: function(stmt) {
         console.log('ChoreographyStore',_choreographyStore);
+        // iterate over choreography store
+        for (var choreoUri in _choreographyStore) {
+          // iterate over statements
+          for (var i in stmt) {
+            // leave loop if one property matches to the choreo
+            if (_choreographyStore[choreoUri].partOfChoreography(stmt[i].objectUri)) {
+              console.log(stmt[i].predicateUri() + ' is part of ' + choreoUri);
+            }
+          }
+        }
         
       },
       
@@ -725,6 +739,17 @@ var RDFauthor = (function() {
       
       registerChoreography: function (choreography, choreographyConfig, callback) {
         console.log();
+        // add properties from config
+        var properties = [];
+        if (RDFAUTHOR_CONFIG.choreographies[choreography.choreographyUri()] !== undefined) {
+          properties = RDFAUTHOR_CONFIG.choreographies[choreography.choreographyUri()].hasOwnProperty('property') ? 
+                       RDFAUTHOR_CONFIG.choreographies[choreography.choreographyUri()].property : [];
+        }
+        // add properties from choreographyConfig
+        if (choreographyConfig.hasOwnProperty('properties')) {
+          properties.concat(choreographyConfig.properties);
+        }
+        choreography['_properties'] = properties;
         _choreographyStore[choreography.choreographyUri()] = choreography;
         console.log('choreographyStore', _choreographyStore);
       },
