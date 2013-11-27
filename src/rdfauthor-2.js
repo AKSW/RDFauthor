@@ -732,7 +732,6 @@ var RDFauthor = (function() {
       },
       
       registerChoreography: function (choreography, choreographyConfig, callback) {
-        console.log();
         // add properties from config
         var properties = [];
         if (RDFAUTHOR_CONFIG.choreographies[choreography.choreographyUri()] !== undefined) {
@@ -740,8 +739,9 @@ var RDFauthor = (function() {
                        RDFAUTHOR_CONFIG.choreographies[choreography.choreographyUri()].property : [];
         }
         // add properties from choreographyConfig
-        if (choreographyConfig.hasOwnProperty('properties')) {
-          properties.concat(choreographyConfig.properties);
+        if (choreographyConfig.hook.hasOwnProperty('property')) {
+          console.log('hasOwnProperty property', choreographyConfig.hook.property);
+          properties = properties.concat(choreographyConfig.hook.property);
         }
         choreography['_properties'] = properties;
         _choreographyStore[choreography.choreographyUri()] = choreography;
