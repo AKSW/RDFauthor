@@ -580,7 +580,7 @@ var RDFauthor = (function() {
                 // push to set
                 choreoSet.push(choreoInstance);
                 choreoSet.push(choreoFoaf);
-                //self.getCompatibleChoreographies(statements);
+                self.getCompatibleChoreographies(statements);
                 _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
               });
             }
@@ -594,20 +594,13 @@ var RDFauthor = (function() {
       
       getChoreography: function(config, stmts) {
         var self = this;
-        
-        var properties = [];
-        if (RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()] !== undefined) {
-          properties = RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()].hasOwnProperty('property') ? 
-                       RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()].property : [];
-        }
-        
+                
         var F = function () {};
         F.prototype = Choreography;
         
         var C = function (options) {
             this.id = self.nextID();
             this.statements = stmts;
-            this._properties = properties;
             // widget has options
             if (undefined !== options) {
                 this.options = $.extend(
@@ -628,19 +621,27 @@ var RDFauthor = (function() {
        * Return a set of possible choreographies for the given statements.
        * @returns {array} choreoSet
        */
-      getCompatibleChoreographies: function(stmt) {
-        console.log('ChoreographyStore',_choreographyStore);
+      getCompatibleChoreographies: function(stmts) {
+        var self = this;
+        var choreoSet = [];
         // iterate over choreography store
         for (var choreoUri in _choreographyStore) {
+          // console.log('current choreoUri', choreoUri);
           // iterate over statements
-          for (var i in stmt) {
+          for (var i in stmts) {
+            // console.log('current statement', stmts[i].predicateUri());
             // leave loop if one property matches to the choreo
-            if (_choreographyStore[choreoUri].partOfChoreography(stmt[i].objectUri)) {
-              console.log(stmt[i].predicateUri() + ' is part of ' + choreoUri);
+            if (_choreographyStore[choreoUri].partOfChoreography(stmts[i].predicateUri())) {
+              // console.log(stmts[i].predicateUri() + ' is part of ' + choreoUri);
+              // create choreo instance and push them to choreset
+              choreoSet.push(self.getChoreography(choreoUri, stmts));
+              // if minimum one property is part of the choreography add them to the choreoSet and leave the loop
+              break;
             }
           }
         }
-        
+        console.log('choreoSet with compatible choreographies', choreoSet);
+        return choreoSet;
       },
       
       getCompatibleWidgets: function(stmt) {
