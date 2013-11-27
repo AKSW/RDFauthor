@@ -634,7 +634,9 @@ var RDFauthor = (function() {
             if (_choreographyStore[choreoUri].partOfChoreography(stmts[i].predicateUri())) {
               // console.log(stmts[i].predicateUri() + ' is part of ' + choreoUri);
               // create choreo instance and push them to choreset
-              choreoSet.push(self.getChoreography(choreoUri, stmts));
+              var choreoInstance = self.getChoreography(choreoUri, stmts);
+              choreoInstance.init();
+              choreoSet.push(choreoInstance);
               // if minimum one property is part of the choreography add them to the choreoSet and leave the loop
               break;
             }
