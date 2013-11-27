@@ -564,7 +564,6 @@ var RDFauthor = (function() {
         _loadResourceIntoStore(resource, function() {
           _getSubjects(function(storedSubjects) {
             for (var subjectUri in storedSubjects) {
-              var choreoSet = [];
               console.log('storedSubjects', storedSubjects);
               _getSubjectData(subjectUri, function(resultSet) {
                 var statements = _createStatementsForSubject(resultSet);
@@ -572,15 +571,7 @@ var RDFauthor = (function() {
                 console.log('resultSet for '+ subjectUri, resultSet);
                 var label = storedSubjects[subjectUri];
                 console.log('defaultChoreo', self.getChoreography(_choreographyStore[DEFAULT_CHOREOGRAPHY]));
-                var choreoInstance = self.getChoreography(_choreographyStore[DEFAULT_CHOREOGRAPHY], statements);
-                var choreoFoaf = self.getChoreography(_choreographyStore['http://aksw.org/Projects/RDFauthor/localChoreography#foaf'], statements);
-                // init
-                choreoInstance.init();
-                choreoFoaf.init();
-                // push to set
-                choreoSet.push(choreoInstance);
-                choreoSet.push(choreoFoaf);
-                self.getCompatibleChoreographies(statements);
+                var choreoSet = self.getCompatibleChoreographies(statements);
                 _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
               });
             }
@@ -634,7 +625,7 @@ var RDFauthor = (function() {
             if (_choreographyStore[choreoUri].partOfChoreography(stmts[i].predicateUri())) {
               // console.log(stmts[i].predicateUri() + ' is part of ' + choreoUri);
               // create choreo instance and push them to choreset
-              var choreoInstance = self.getChoreography(choreoUri, stmts);
+              var choreoInstance = self.getChoreography(_choreographyStore[choreoUri], stmts);
               choreoInstance.init();
               choreoSet.push(choreoInstance);
               // if minimum one property is part of the choreography add them to the choreoSet and leave the loop
