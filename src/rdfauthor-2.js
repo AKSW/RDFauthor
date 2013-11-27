@@ -72,6 +72,8 @@ var RDFauthor = (function() {
     /** Visibility of rdfauthor view */
     var RDFAUTHOR_VISIBLE = false;
     
+    var DEFAULT_CHOREOGRAPHY = 'http://aksw.org/Projects/RDFauthor/localChoreography#default';
+    
     /** Number of pending scripts */
     var _requirePending = 0;
     
@@ -108,12 +110,8 @@ var RDFauthor = (function() {
     }
     
     /** Choreography Store */
-    var _choreographyStore = {
-      'fallback': function() {
-        return _choreographyStore['http://aksw.org/Projects/RDFauthor/localChoreography#default'];
-      }
-    }
-    
+    var _choreographyStore = {};
+        
     /** Initial ID */
     var _idSeed = Math.round(Math.random() * 1000);
 
@@ -573,8 +571,8 @@ var RDFauthor = (function() {
                 console.log('statements for subject ', subjectUri, statements);
                 console.log('resultSet for '+ subjectUri, resultSet);
                 var label = storedSubjects[subjectUri];
-                console.log('defaultChoreo', self.getChoreography(_choreographyStore.fallback()));
-                var choreoInstance = self.getChoreography(_choreographyStore.fallback(), statements);
+                console.log('defaultChoreo', self.getChoreography(_choreographyStore[DEFAULT_CHOREOGRAPHY]));
+                var choreoInstance = self.getChoreography(_choreographyStore[DEFAULT_CHOREOGRAPHY], statements);
                 var choreoFoaf = self.getChoreography(_choreographyStore['http://aksw.org/Projects/RDFauthor/localChoreography#foaf'], statements);
                 // init
                 choreoInstance.init();
@@ -582,6 +580,7 @@ var RDFauthor = (function() {
                 // push to set
                 choreoSet.push(choreoInstance);
                 choreoSet.push(choreoFoaf);
+                self.getCompatibleChoreographies();
                 _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
               });
             }
@@ -609,8 +608,6 @@ var RDFauthor = (function() {
             this.id = self.nextID();
             this.statements = stmts;
             this._properties = properties;
-            //this.propertyHooks = RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()].property | [];
-            console.log('config property hook', RDFAUTHOR_CONFIG.choreographies[config.choreographyUri()]);
             // widget has options
             if (undefined !== options) {
                 this.options = $.extend(
@@ -628,6 +625,7 @@ var RDFauthor = (function() {
       },
       
       getCompatibleChoreographies: function(stmt) {
+        console.log('ChoreographyStore',_choreographyStore);
         
       },
       
