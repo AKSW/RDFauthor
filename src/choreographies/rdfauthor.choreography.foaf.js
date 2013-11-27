@@ -16,17 +16,20 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     partOfChoreography: function (property) {
       var self = this;
       var properties = self.getProperties();
-      console.log('propertyHooks', properties);
       
-      // default
-      if (properties.length === 0) {
-        return true;
-      }
-      
-      // check if resource property is hook of choreo property
-      for (var i in properties) {
-        if (property == properties[i]) {
+      if (properties != undefined) {
+        console.log('propertyHooks', properties);
+        
+        // default
+        if (properties.length === 0) {
           return true;
+        }
+        
+        // check if resource property is hook of choreo property
+        for (var i in properties) {
+          if (property == properties[i]) {
+            return true;
+          }
         }
       }
       
