@@ -35,6 +35,7 @@ function DesktopView (options) {
   this._modalSize = {};
   this._id = 1;
   this._subjectIds = {};
+  this._statements = {};
   this._subjectChoreoSet = {};
   
   var self = this;
@@ -276,7 +277,7 @@ DesktopView.prototype = {
     var markup = '';
   },
   
-  addResource: function (subjectUri, label, subjectData, choreoSet) {
+  addResource: function (subjectUri, label, subjectData, statements, choreoSet) {
     var self = this;
     // log storedSubjects
     console.log('label calling addResources', label);
@@ -444,6 +445,10 @@ DesktopView.prototype = {
   
   getElement: function () {
     return jQuery('#' + this._options.domId);
+  },
+  
+  getStatementForPredicate(subjectUri, predicateUri) {
+    
   },
   
   getSubjectId: function (subjectUri) {

@@ -572,7 +572,7 @@ var RDFauthor = (function() {
                 var label = storedSubjects[subjectUri];
                 console.log('defaultChoreo', self.getChoreography(_choreographyStore[DEFAULT_CHOREOGRAPHY]));
                 var choreoSet = self.getCompatibleChoreographies(statements);
-                _viewHolder.addResource(subjectUri, label, resultSet, choreoSet);
+                _viewHolder.addResource(subjectUri, label, resultSet, statements, choreoSet);
               });
             }
           });
