@@ -283,6 +283,10 @@ DesktopView.prototype = {
     console.log('label calling addResources', label);
     console.log('subjectData calling addResources', subjectData);
     console.log('choreoSet calling addResource', choreoSet);
+    console.log('statements calling addResource', statements);
+    
+    // add statements
+    self._statements[subjectUri] = statements;
     
     var divTab = '';
     var tabId = 'tab-' + self.getSubjectId(subjectUri);
@@ -447,7 +451,7 @@ DesktopView.prototype = {
     return jQuery('#' + this._options.domId);
   },
   
-  getStatementForPredicate(subjectUri, predicateUri) {
+  getStatementForPredicate: function (subjectUri, predicateUri) {
     
   },
   
