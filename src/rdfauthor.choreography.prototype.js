@@ -7,7 +7,14 @@
 var Choreography = {
   options: {},
   _properties: [],
+  _statements: [],
   _maxWidth: null,
+  
+  addStatement: function (statement) {
+    if (typeof statement === 'object') {
+      this._statements.push(statement);
+    }
+  },
   
   /**
    * Returns the available space the Choreography can use in pixels.
