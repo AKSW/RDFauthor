@@ -151,7 +151,7 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
     hook: {
       // if resource has type foaf:person then use this choreo if it is enabled (config)
       type: ['http://xmlns.com/foaf/0.1/person'],
-      property: ['http://xmlns.com/foaf/0.1/lastName']
+      property: ['http://xmlns.com/foaf/0.1/lastName', 'http://xmlns.com/foaf/0.1/depiction']
     }
   },
   function () {
