@@ -7,13 +7,28 @@
 var Choreography = {
   options: {},
   _properties: [],
-  _statements: [],
+  _statements: {},
   _maxWidth: null,
   
   addStatement: function (statement) {
-    if (typeof statement === 'object') {
-      this._statements.push(statement);
+    var self = this;
+    if (self._statements.hasOwnProperty(statement.predicateUri())) {
+      self._statements[statement.predicateUri()].push(statement);
+    } else {
+      self._statements[statement.predicateUri()] = [statement];
     }
+    console.log('statement added', statement);
+  },
+  
+  addStatements: function (statements) {
+    var self = this;
+    // self._statements = statements;
+    for (var predicateUri in statements) {
+      for (var statement in statements[predicateUri]) {
+        self.addStatement(statements[predicateUri][statement]);
+      }
+    }
+    console.log('self._statements',self._statements);
   },
   
   /**

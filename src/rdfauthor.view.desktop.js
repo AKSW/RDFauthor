@@ -269,16 +269,20 @@ DesktopView.prototype = {
     
     console.log('subjectData addChoreotoTap', subjectData);
     
-    var statementsForChoreography = [];
-    for (var subjectUri in subjectData) {
-      for (var predicateUri in subjectData[subjectUri]) {
-        if (choreography.partOfChoreography(predicateUri)) {
-          statementsForChoreography.push(self.getStatementForPredicate(subjectUri, predicateUri));
-          choreography.addStatement(self.getStatementForPredicate(subjectUri, predicateUri));
-        }
-      }
-    }
-    console.log('statementsForChoreography', choreography.choreographyUri(), statementsForChoreography);
+    // var statementsForChoreography = {};
+    // for (var subjectUri in subjectData) {
+      // for (var predicateUri in subjectData[subjectUri]) {
+        // if (choreography.partOfChoreography(predicateUri)) {
+          // var statementForPredicate = self.getStatementsForPredicate(subjectUri, predicateUri);
+          // if (statementForPredicate.length > 0) {
+            // statementsForChoreography[predicateUri] = statementForPredicate;
+            // //choreography.addStatement(statementForPredicate);
+          // }
+        // }
+      // }
+    // }
+    // choreography.addStatements(statementsForChoreography);
+    // console.log('statementsForChoreography', choreography.choreographyUri(), statementsForChoreography);
     
     var markup = choreography.markup(subjectData);
     var $container = self.getElement().find('#' + tabId).find('.portlet-container');
@@ -465,14 +469,17 @@ DesktopView.prototype = {
     return jQuery('#' + this._options.domId);
   },
   
-  getStatementForPredicate: function (subjectUri, predicateUri) {
+  getStatementsForPredicate: function (subjectUri, predicateUri) {
     var self = this;
+    var statements = [];
     for (var s in self._statements[subjectUri]) {
       if (self._statements[subjectUri][s].predicateUri() === predicateUri) {
-        return self._statements[subjectUri][s];
+        statements.push(self._statements[subjectUri][s]);
       }
     }
-    return null;
+    
+    console.log('getStatementsForPredicate', statements);
+    return statements;
   },
   
   getSubjectId: function (subjectUri) {

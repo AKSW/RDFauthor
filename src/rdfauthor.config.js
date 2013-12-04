@@ -40,9 +40,8 @@ var RDFAUTHOR_CONFIG = {
       'property': [
         'http://xmlns.com/foaf/0.1/name',
         'http://xmlns.com/foaf/0.1/surname',
-        'http://xmlns.com/foaf/0.1/knows',
-        'http://xmlns.com/foaf/0.1/currentProject',
-        'http://xmlns.com/foaf/0.1/depiction']
+        'http://xmlns.com/foaf/0.1/knows'
+      ]
     }
   } // end of choreogprahies
 } // end of RDFAUTHOR_CONFIG

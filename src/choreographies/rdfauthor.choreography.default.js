@@ -9,6 +9,20 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
       this._widgets = [];
     },
     
+    getStatementsForPredicate: function (predicateUri) {
+      var self = this;
+      var matchedStmts = [];
+      // console.log('self.statements', self.statements);
+      for (var s in self.statements) {
+        if (self.statements[s].predicateUri() === predicateUri) {
+          matchedStmts.push(self.statements[s]);
+        }
+      }
+      
+      console.log('getStatementsForPredicate', matchedStmts);
+      return matchedStmts;
+    },
+    
     /**
      * Is the subjectData compatible with this choreography 
      * @param {Object} property
@@ -40,67 +54,49 @@ RDFauthor.getInstance(function(RDFauthorInstance) {
       console.log('subjectData markup', subjectData);
       var self = this;
       
-      var propertiesMarkup = '';
-      for (var subject in subjectData) {
-        for (var property in subjectData[subject]) {
-          console.log(property);
-          var propertyMarkup = $('<div class="panel panel-default"></div>')
-            .append('<div class="panel-heading">' + property + '</div>')
-            .append('<div class="panel-body"></div>')
-            .append('<div class="panel-footer"></div>');
-          var propertyMarkup = '\
-            <div class="panel panel-default">\
-              <div class="panel-heading">' + property + '</div>\
-              <div class="panel-body">';
-              
-          
-          for (var object in subjectData[subject][property]) {
-            console.log(subjectData[subject][property][object]);
-            var o = subjectData[subject][property][object];
-            var value = o.value;
-            
-            var stmtSpec = {
-              subject: subject,
-              predicate: property,
-              object: o
+      console.log('statements for choreography', self.statements);
+      
+      var statementsForMarkup = {};
+      for (var subjectUri in subjectData) {
+        for (var predicateUri in subjectData[subjectUri]) {
+          if (self.partOfChoreography(predicateUri)) {
+            var statementForPredicate = self.getStatementsForPredicate(predicateUri);
+            if (statementForPredicate.length > 0) {
+              statementsForMarkup[predicateUri] = statementForPredicate;
             }
-            
-            var stmt = new Statement(stmtSpec);
-            
-            console.log('stmt', stmt);
-            
-            
-            console.log('stmt predicate label', stmt.predicateLabel());
-            
-            console.log('getCompatibleWidget',RDFauthorInstance.getCompatibleWidgets(stmt));
-            
-            var compWidgetsUris = RDFauthorInstance.getCompatibleWidgets(stmt);
-            
-            console.log('compWidgetInstance', RDFauthorInstance.getWidgetForUri(compWidgetsUris[0]));
-            
-            var widget = RDFauthorInstance.getWidgetForUri(compWidgetsUris[0], stmt);
-            
-            
-            self._widgets.push(widget);
-            
-            // init widget
-            widget.init();
-            
-            console.log('widgetMarkup', widget.markup());
-            
-            propertyMarkup += widget.markup();
           }
-          
-          propertyMarkup += '</div>\
+        }
+      }
+      console.log('statementsForChoreography', self.choreographyUri(), statementsForMarkup);
+      
+      var propertiesMarkup = '';
+      for (var property in statementsForMarkup) {
+        console.log('property', property);
+        var propertyMarkup = '\
+          <div class="panel panel-default">\
+            <div class="panel-heading">' + property + '</div>\
+            <div class="panel-body">';
+        for (var s in statementsForMarkup[property]) {
+          var stmt = statementsForMarkup[property][s];
+          console.log('stmt', stmt);
+          console.log('getCompatibleWidget',RDFauthorInstance.getCompatibleWidgets(stmt));
+          var compWidgetsUris = RDFauthorInstance.getCompatibleWidgets(stmt);
+          var widget = RDFauthorInstance.getWidgetForUri(compWidgetsUris[0], stmt);
+          self._widgets.push(widget);
+          // init widget
+          widget.init();
+          console.log('widgetMarkup', widget.markup());
+          propertyMarkup += widget.markup();
+        }
+        propertyMarkup += '</div>\
               <!--div class="panel-footer">Panel footer</div-->\
             </div>\
           ';
           
-          propertiesMarkup += propertyMarkup;
-        }
+        propertiesMarkup += propertyMarkup;
       }
       
-      console.log(propertiesMarkup);
+      console.log('propertiesMarkup', propertiesMarkup);
       
       var markup = '\
         <div class="rdfauthor-portlet panel panel-default">\
