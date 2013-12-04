@@ -266,6 +266,20 @@ DesktopView.prototype = {
   
   addChoreographyToTab: function (tabId, choreography, subjectData) {
     var self = this;
+    
+    console.log('subjectData addChoreotoTap', subjectData);
+    
+    var statementsForChoreography = [];
+    for (var subjectUri in subjectData) {
+      for (var predicateUri in subjectData[subjectUri]) {
+        if (choreography.partOfChoreography(predicateUri)) {
+          statementsForChoreography.push(self.getStatementForPredicate(subjectUri, predicateUri));
+          choreography.addStatement(self.getStatementForPredicate(subjectUri, predicateUri));
+        }
+      }
+    }
+    console.log('statementsForChoreography', choreography.choreographyUri(), statementsForChoreography);
+    
     var markup = choreography.markup(subjectData);
     var $container = self.getElement().find('#' + tabId).find('.portlet-container');
     var $newItems = $(markup);
@@ -452,7 +466,13 @@ DesktopView.prototype = {
   },
   
   getStatementForPredicate: function (subjectUri, predicateUri) {
-    
+    var self = this;
+    for (var s in self._statements[subjectUri]) {
+      if (self._statements[subjectUri][s].predicateUri() === predicateUri) {
+        return self._statements[subjectUri][s];
+      }
+    }
+    return null;
   },
   
   getSubjectId: function (subjectUri) {
