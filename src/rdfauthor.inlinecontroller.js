@@ -57,21 +57,26 @@ InlineController.prototype = {
     resetToUnedit: function(values) {
         var updateValues = values;
         var subjectURI;
-        var predicateURI; 
+        var predicateURI;
         var predicateCount = 0;
+        var liCount = 0;
 
         for (var index in this._rows) {
+            var element = jQuery('#' + this._rows[index].cssID()).parent();
             // test if there is a value for a new predicate
             // roughly speaking, the predicateCount will
             if ((predicateURI == this._rows[index]._predicateURI) && (subjectURI == this._rows[index]._subjectURI)) {
                 predicateCount += 1;
             }
             else {
+                element.find('ul li').attr('rdfauthor-remove', true);
+                console.log(element.find('ul li'));
+                console.log(element.find('ul li').length);
                 predicateURI = this._rows[index]._predicateURI;
-                subjectURI = this._rows[index].predicateURI
+                subjectURI = this._rows[index]._subjectURI;
                 predicateCount = 1;
+                liCount = 0;
             }
-            var element = jQuery('#' + this._rows[index].cssID()).parent();
 
             // make visible again and disable edit mode only necessary
             // for the first of (possibly) many equal predicates
@@ -87,12 +92,24 @@ InlineController.prototype = {
                 var newVal = updateValues.shift();
                 widgetCount += 1;
                 if (widgetCount > 1) {
-                    var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 3) + ')');
-                    var newLi = $(li.clone());
-                    newLi.data('rdfauthor.statement', li.data('rdfauthor.statement'));
+                    console.log("Adding new Li");
+                    //var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 3) + ')');
+                    var li = element.find('ul li:eq(' + (liCount) + ')');
+                    //var li = element.find('ul li').first();
+                    var newLi = $(li.clone([true, true]));
+                    newLi.removeAttr('id');
+                    //newLi.data('rdfauthor.statement', li.data('rdfauthor.statement'));
                     li.after(newLi);
                 }
-                var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 2) + ')');
+                //var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 2) + ')');
+                var li = element.find('ul li:eq(' + liCount + ')');
+                console.log(liCount, ' : ' , li);
+                var widget = this._rows[index]._widgets[wid];
+                if (widget.removeOnSubmit) {
+                    continue;
+                }
+                liCount += 1;
+                li.removeAttr('rdfauthor-remove');
                 var widgetType;
                 try {
                     widgetType = this._rows[index]._widgets[wid].getWidgetType();
@@ -120,7 +137,7 @@ InlineController.prototype = {
                         li.children('a').attr('resource', newVal);
                         var href = li.children('a:eq(0)').attr('href');
                         // TODO: use 'correct' way instead of kludge
-                        href = RDFAUTHOR_BASE.split('/').slice(0, -3).join("/") + '/view/?r=' + newVal;
+                        href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + newVal;
                         li.children('a:eq(0)').attr('href', href);
                         var oldStatement = li.children('a:eq(0)').data('rdfauthor.statement');
                         var newStatement = oldStatement.copyWithObject(newVal);
@@ -129,7 +146,27 @@ InlineController.prototype = {
                         // remove autocomplete box (_always_ on page but hidden)
                         $('.ui-autocomplete').remove();
                         break;
+                    case 'datetime':
+                        li.text(newVal);
+                        var newStatement = li.data('rdfauthor.statement');
+                        newStatement['_object']['value'] = newVal;
+                        newStatement['_object']['representation'] = newVal;
+                        // TODO: update hash?!
+                        li.removeAttr('data-object-hash');
+                        li.removeData();
+                        li.data('rdfauthor.statemtent', newStatement);
+                        console.log(newStatement['_object']);
+                        $('#ui-datepicker-div').remove();
+                        //$( selector ).datepicker( "destroy" );
+                        //$( selector ).removeClass("hasDatepicker").removeAttr('id');
+                        console.log(widget.element());
+                        widget.element().datepicker("destroy");
+                        widget.element().removeClass("hasDatepicker");
+                        widget.element().unbind();
+                        li.unbind();
+                        break;
                     default:
+                        console.log('Falling back to reload!');
                         window.setTimeout(function () {
                             window.location.href = window.location.href;
                         }, 1000);
@@ -138,6 +175,7 @@ InlineController.prototype = {
         }
         // Remove all widgets that RDFauthor has opened
         $('div.rdfauthor-predicate-row').remove();
+        $('li[rdfauthor-remove=true]').remove();
     },
 
     cancel: function () {

@@ -40,7 +40,7 @@ RDFauthor.registerWidget({
     },
 
     getWidgetType: function() {
-        return "literal";
+        return 'literal';
     },
 
     ready: function () {

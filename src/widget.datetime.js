@@ -18,15 +18,33 @@ RDFauthor.registerWidget({
         this._domRdy = false;
         var self = this;
 
+        /*
+        console.log("Widget-Element: ", self.element());
+        self.element().keypress(function(event) {
+            // commit results on enter
+            console.log("Keypress on datetime");
+            if(event.which == 13) {
+                event.preventDefault();
+                RDFauthor.commit();
+            }
+        });
+        */
+
         if (undefined === jQuery.ui.datepicker) {
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.js');
             // RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.css');
         }
-        RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.js', function () {
-            self._datetimepickerLoaded = true;
-            self._init();
-        });
+        //if (undefined === jQuery.ui.Timepicker) {
+            RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.js', function () {
+                self._datetimepickerLoaded = true;
+                self._init();
+            });
+        //}
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.css');
+    },
+
+    getWidgetType: function() {
+        return 'datetime';
     },
 
     // Uncomment this to execute code when you widget's markup is ready in the DOM,

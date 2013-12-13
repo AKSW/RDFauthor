@@ -1343,6 +1343,7 @@ RDFauthor = (function($) {
                 this.getView().resetToUnedit(_fetchValues());
                 RDFauthor.cancel();
                 RDFauthor.reset();
+                //_setup();
             } else {
                 _restoreDatabanks();
             }
