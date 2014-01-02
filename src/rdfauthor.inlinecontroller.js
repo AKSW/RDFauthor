@@ -70,8 +70,6 @@ InlineController.prototype = {
             }
             else {
                 element.find('ul li').attr('rdfauthor-remove', true);
-                console.log(element.find('ul li'));
-                console.log(element.find('ul li').length);
                 predicateURI = this._rows[index]._predicateURI;
                 subjectURI = this._rows[index]._subjectURI;
                 predicateCount = 1;
@@ -89,27 +87,21 @@ InlineController.prototype = {
 
             var widgetCount = 0;
             for (var wid in this._rows[index]._widgets) {
-                var newVal = updateValues.shift();
                 widgetCount += 1;
                 if (widgetCount > 1) {
-                    console.log("Adding new Li");
-                    //var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 3) + ')');
-                    var li = element.find('ul li:eq(' + (liCount) + ')');
-                    //var li = element.find('ul li').first();
+                    var li = element.find('ul li:eq(' + (liCount - 1) + ')');
                     var newLi = $(li.clone([true, true]));
                     newLi.removeAttr('id');
-                    //newLi.data('rdfauthor.statement', li.data('rdfauthor.statement'));
                     li.after(newLi);
                 }
-                //var li = element.find('ul li:eq(' + (predicateCount + widgetCount - 2) + ')');
                 var li = element.find('ul li:eq(' + liCount + ')');
-                console.log(liCount, ' : ' , li);
                 var widget = this._rows[index]._widgets[wid];
                 if (widget.removeOnSubmit) {
                     continue;
                 }
                 liCount += 1;
                 li.removeAttr('rdfauthor-remove');
+                var newVal = updateValues.shift();
                 var widgetType;
                 try {
                     widgetType = this._rows[index]._widgets[wid].getWidgetType();
@@ -133,7 +125,7 @@ InlineController.prototype = {
                          * there is another li-element here
                          */
                         li.children('a:eq(0)').text(newVal);
-                        // update *all* a children (there are two for rdfs:seeAlso)
+                        // update *all* children (there are two for rdfs:seeAlso)
                         li.children('a').attr('resource', newVal);
                         var href = li.children('a:eq(0)').attr('href');
                         // TODO: use 'correct' way instead of kludge
@@ -154,9 +146,7 @@ InlineController.prototype = {
                         // TODO: update hash?!
                         li.removeAttr('data-object-hash');
                         li.removeData();
-                        li.data('rdfauthor.statemtent', newStatement);
-                        //$('#ui-datepicker-div').remove();
-                        console.log(widget.element());
+                        li.data('rdfauthor.statement', newStatement);
                         // is this needed?
                         widget.element().datepicker("destroy");
                         widget.element().removeClass("hasDatepicker");
@@ -171,9 +161,10 @@ InlineController.prototype = {
                 }
             }
         }
+        // remove data RDFauthor added
         $('.rdfauthor-statement-provider').removeAttr('id');
         $('.rdfauthor-statement-provider').removeClass('rdfauthor-statement-provider');
-        // Remove all widgets that RDFauthor has opened
+        // remove all widgets that RDFauthor has opened
         $('div.rdfauthor-predicate-row').remove();
         $('li[rdfauthor-remove=true]').remove();
     },
