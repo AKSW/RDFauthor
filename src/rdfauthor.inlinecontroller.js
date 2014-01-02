@@ -155,11 +155,9 @@ InlineController.prototype = {
                         li.removeAttr('data-object-hash');
                         li.removeData();
                         li.data('rdfauthor.statemtent', newStatement);
-                        console.log(newStatement['_object']);
-                        $('#ui-datepicker-div').remove();
-                        //$( selector ).datepicker( "destroy" );
-                        //$( selector ).removeClass("hasDatepicker").removeAttr('id');
+                        //$('#ui-datepicker-div').remove();
                         console.log(widget.element());
+                        // is this needed?
                         widget.element().datepicker("destroy");
                         widget.element().removeClass("hasDatepicker");
                         widget.element().unbind();
@@ -173,6 +171,8 @@ InlineController.prototype = {
                 }
             }
         }
+        $('.rdfauthor-statement-provider').removeAttr('id');
+        $('.rdfauthor-statement-provider').removeClass('rdfauthor-statement-provider');
         // Remove all widgets that RDFauthor has opened
         $('div.rdfauthor-predicate-row').remove();
         $('li[rdfauthor-remove=true]').remove();

@@ -34,12 +34,12 @@ RDFauthor.registerWidget({
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.js');
             // RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.css');
         }
-        //if (undefined === jQuery.ui.Timepicker) {
+        if (undefined === jQuery.ui.Timepicker) {
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.js', function () {
                 self._datetimepickerLoaded = true;
                 self._init();
             });
-        //}
+        }
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.css');
     },
 
@@ -138,7 +138,8 @@ RDFauthor.registerWidget({
     },
     _init: function () {
         var self = this;
-        if (self._datetimepickerLoaded && self._domRdy) {
+        if (self._domRdy) {
+        //if (self._datetimepickerLoaded && self._domRdy) {
             var datatype = this.statement.objectDatatype();
             switch(datatype) {
                 case self.datatypes['date']:
