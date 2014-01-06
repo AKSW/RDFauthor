@@ -724,7 +724,8 @@ RDFauthor = (function($) {
      * @param {function} function that will be called when the script finished loading (optional)
      */
     function _loadScript(scriptURI, callback) {
-        if (_loadedScripts[scriptURI] === SCRIPT_STATE_UNKNOWN) {
+        if ((_loadedScripts[scriptURI] === SCRIPT_STATE_UNKNOWN) &&
+               ($("script[src='"+ scriptURI + "']").length == 0)) {
             // load script
             var s  = document.createElement('script');
             s.type = 'text/javascript';
@@ -733,6 +734,7 @@ RDFauthor = (function($) {
             // callback handler fro loaded scripts
             var _scriptReady = function () {
                 // now its ready
+                console.log('Ready --> ', scriptURI);
                 _loadedScripts[scriptURI] = SCRIPT_STATE_READY;
 
                 // script is ready, call all callbacks
@@ -1341,7 +1343,7 @@ RDFauthor = (function($) {
             if (this.getView().submit()) {
                 _updateSources();
                 this.getView().resetToUnedit(_fetchValues());
-                RDFauthor.cancel();
+                //RDFauthor.cancel();
                 RDFauthor.reset();
                 //_setup();
             } else {

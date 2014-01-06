@@ -34,12 +34,14 @@ RDFauthor.registerWidget({
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery.ui.js');
             // RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery.ui.css');
         }
-        if (undefined === jQuery.ui.Timepicker) {
+        
+        if (undefined === jQuery.ui.timepicker) {
             RDFauthor.loadScript(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.js', function () {
                 self._datetimepickerLoaded = true;
                 self._init();
             });
         }
+        
         RDFauthor.loadStylesheet(RDFAUTHOR_BASE + 'libraries/jquery-ui-timepicker-addon.css');
     },
 
