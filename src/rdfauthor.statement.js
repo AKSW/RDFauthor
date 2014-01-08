@@ -157,6 +157,7 @@ Statement.prototype = {
      */
     asRdfQueryTriple: function () {
         if (this._object) {
+            // FIXME: What is this?! Why no decode and why twice? To be checked later.
             this._object.value = String(this._object.value).replace('&amp;', '&').replace('&amp;', '&');
         }
 
@@ -221,11 +222,32 @@ Statement.prototype = {
         }
 
         /*
+         * The following block is an ad-hoc fix for a problem that is somewhat
+         * hard to trace ('Uncaught exceptions [object Object]') that occurs
+         * specifically when an empty string with datatype 'xsd:date' is passed
+         * to jQuery.rdf.literal(). This is actually a pathologic case (the empty
+         * string is no date), but can occur when creating new intances and or
+         * adding new propertiesi to a resource.
+         */
+        var value = objectSpec.value;
+        if ((objectSpec.datatype === "http://www.w3.org/2001/XMLSchema#date") && (value === "")) {
+            var pad = function(number) {
+                var r = String(number);
+                if (r.length === 1) {
+                    r = '0' + r;
+                }
+                return r;
+            }
+            var cd = new Date();
+            value = cd.getFullYear() + '-' + pad(cd.getMonth() + 1) + '-' + pad(cd.getDate());
+        }
+
+        /*
          * rdfQuery literal RegEx:
          * /^("""((\\"|[^"])*)"""|"((\\"|[^"])*)")(@([a-z]+(-[a-z0-9]+)*)|\^\^(.+))?$/
          */
 
-        return jQuery.rdf.literal(objectSpec.value, literalOpts);
+        return jQuery.rdf.literal(value, literalOpts);
         // return jQuery.rdf.literal(objectSpec.value.replace('\\', '\\\\'), literalOpts);
     },
 
