@@ -281,30 +281,45 @@ RDFauthor.registerWidget({
                                   + '}';
         var everywhereInUse = {};
         // request properties in use
-        RDFauthor.queryGraph(graphURI, query, {
-            callbackSuccess: function(data) {
-                var results = data.results.bindings;
-                for (var i in results) {
-                    if( (typeof(results[i].resourceUri) != "undefined")  && (i != "last") ) {
-                        var resourceUri = results[i].resourceUri.value;
-                        (typeof(results[i].label) != "undefined") &&
-                        (results[i].label != null)              ? everywhereInUse[resourceUri] = results[i].label.value
-                                                                : everywhereInUse[resourceUri] = null;
-                    }
+        if ($("#template-properties").length > 0) {
+            everywhereInUse = $("#template-properties").data('properties');
+            for (var k in everywhereInUse) {
+               everywhereInUse[k] = null;
+            }
+            self._hasProperties(function(hasProperties){
+                $.merge(self._propertiesInUse, hasProperties);
+                for (var resourceUri in everywhereInUse) {
+                    self._propertiesInUse.push(resourceUri);
                 }
-                self._hasProperties(function(hasProperties){
-                    $.merge(self._propertiesInUse, hasProperties);
-                    for (var resourceUri in everywhereInUse) {
-                        if ($.inArray(resourceUri, hasProperties) != -1) {
-                            delete everywhereInUse[resourceUri];
-                        } else {
-                            self._propertiesInUse.push(resourceUri);
+                $.isFunction(callback) ? callback(everywhereInUse) : null;
+            })
+        }
+        else {
+            RDFauthor.queryGraph(graphURI, query, {
+                callbackSuccess: function(data) {
+                    var results = data.results.bindings;
+                    for (var i in results) {
+                        if( (typeof(results[i].resourceUri) != "undefined")  && (i != "last") ) {
+                            var resourceUri = results[i].resourceUri.value;
+                            (typeof(results[i].label) != "undefined") &&
+                            (results[i].label != null)              ? everywhereInUse[resourceUri] = results[i].label.value
+                                                                    : everywhereInUse[resourceUri] = null;
                         }
                     }
-                    $.isFunction(callback) ? callback(everywhereInUse) : null;
-                })
-            }
-        });
+                    self._hasProperties(function(hasProperties){
+                        $.merge(self._propertiesInUse, hasProperties);
+                        for (var resourceUri in everywhereInUse) {
+                            if ($.inArray(resourceUri, hasProperties) != -1) {
+                                delete everywhereInUse[resourceUri];
+                            } else {
+                                self._propertiesInUse.push(resourceUri);
+                            }
+                        }
+                        $.isFunction(callback) ? callback(everywhereInUse) : null;
+                    })
+                }
+            });
+        }
     },
 
     _hasProperties: function (callback) {
