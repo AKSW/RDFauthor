@@ -7,13 +7,17 @@
 
 
 RDFauthor.registerWidget({
-    init: function () {
+    init: function (addPropertyValues) {
+        this._addPropertyValues = addPropertyValues || undefined;
         this._propertiesInUse = [];
         this._filterProperties = "search for properties or enter a custom property uri";
         this._domReady     = false;
         this._pluginLoaded = false;
         this._initialized  = false;
         this._autocomplete = null;
+
+        /* better support for datatype */
+        this._additionalInfo = [];
 
         this._namespaces = jQuery.extend({
             foaf: 'http://xmlns.com/foaf/0.1/',
@@ -281,10 +285,27 @@ RDFauthor.registerWidget({
                                   + '}';
         var everywhereInUse = {};
         // request properties in use
-        if ($("#template-properties").length > 0) {
-            everywhereInUse = $("#template-properties").data('properties');
-            for (var k in everywhereInUse) {
-               everywhereInUse[k] = null;
+        self._additionalInfo = undefined;
+        if (self._addPropertyValues != undefined) {
+            self._additionalInfo = self._addPropertyValues;
+        }
+        else if ($("#template-properties").length > 0) {
+            self._additionalInfo = $("#template-properties").data('properties');
+        }
+        if (self._additionalInfo != undefined) {
+            for (var k in self._additionalInfo) {
+               if (self._additionalInfo[k] === '') {
+                   delete self._additionalInfo[k];
+                   everywhereInUse[k] = null;
+               }
+               else {
+                  if (self._additionalInfo[k]["label"] != undefined) {
+                      everywhereInUse[k] = self._additionalInfo[k]["label"];
+                  }
+                  else {
+                      everywhereInUse[k] = null;
+                  }
+               }
             }
             self._hasProperties(function(hasProperties){
                 $.merge(self._propertiesInUse, hasProperties);
@@ -445,7 +466,6 @@ RDFauthor.registerWidget({
                                             e.stopPropagation();
                                             $('#propertypicker').parent().fadeOut();
                                             self._reinitialization();
-                                            // console.log('removed');
                                         }
                                     });
                 // query - fills the everywhere in use part
@@ -500,8 +520,12 @@ RDFauthor.registerWidget({
                         }
                     }
 
-                    self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
-
+                    if ((self._additionalInfo != undefined) && (self.selectedResource in self._additionalInfo) && (self.selectedResource[self._additionalInfo] !== '') && ("datatype" in self._additionalInfo[self.selectedResource])) {
+                        self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel, self._additionalInfo[self.selectedResource]["datatype"]);
+                    }
+                    else {
+                        self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
+                    }
                     // prevent newline in new widget field
                     e.preventDefault();
                 } else if (e.which === 27) {
@@ -598,12 +622,6 @@ RDFauthor.registerWidget({
                 var width = $(document).width();
                 var windowh = $(window).height();
                 var windoww = $(window).width();
-                // console.log('scrolltop', $(document).scrollTop());
-                // console.log('bodyh', height);
-                // console.log('bodyw', width);
-                // console.log('windowh', windowh);
-                // console.log('windoww', windoww);
-
                 // $('.modal-wrapper-propertyselector').css('min-height', '100%');
                 // $('.modal-wrapper-propertyselector').css('min-width', '100%');
             });
@@ -658,14 +676,6 @@ RDFauthor.registerWidget({
         var windoww = $(window).width();
         var ww = element.outerWidth();
         var wh = element.outerHeight();
-        
-        // console.log('scrolltop', $(document).scrollTop());
-        // console.log('bodyh', bodyh);
-        // console.log('bodyw', bodyw);
-        // console.log('windowh', windowh);
-        // console.log('windoww', windoww);
-        // console.log('ww', ww);
-        // console.log('wh', wh);
 
         var offsetPosition = {
             'top': Math.max( (windowh - wh) * 0.5 + $(document).scrollTop(), 20),

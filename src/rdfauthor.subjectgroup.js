@@ -117,21 +117,49 @@ SubjectGroup.prototype = {
     /**
      * Returns the property selector instance for this subject group.
      */
-    getPropertySelector: function (callback) {
+    getPropertySelector: function (callback, addPropertyValues) {
         // if (null === this._propertySelector) {
             var self = this;
+            var statement;
+
             var selectorOptions = {
                 container: this.getElement(),
                 selectionCallback: function (uri, label) {
-                    var statement = new Statement({
-                        subject: '<' + self._subjectURI + '>',
-                        predicate: '<' + uri + '>'
-                    }, {
-                        title: label,
-                        graph: self._graphURI
-                    });
                     self._propertySelector.dismiss(false);
+                    var datatype;
 
+                    if ((addPropertyValues != undefined) && (uri in addPropertyValues) && (addPropertyValues[uri] !== '')) {
+                        console.log("Now testing datatype");
+                        if ('datatype' in addPropertyValues[uri]) {
+                            datatype = addPropertyValues[uri]['datatype'];
+                            console.log("Datatype set");
+                        }
+                    }
+
+                    if (datatype != undefined) {
+                        statement = new Statement({
+                            subject: '<' + self._subjectURI + '>',
+                            predicate: '<' + uri + '>',
+                            object: {
+                                value: '',
+                                options: {
+                                   datatype: "http://www.w3.org/2001/XMLSchema#date"
+                                }
+                            }
+                        }, {
+                            title: label,
+                            graph: self._graphURI
+                        });
+                    }
+                    else {
+                        statement = new Statement({
+                            subject: '<' + self._subjectURI + '>',
+                            predicate: '<' + uri + '>'
+                        }, {
+                            title: label,
+                            graph: self._graphURI
+                        });
+                    }
                     var ID = self.addWidget(statement);
 
                     if (typeof callback == 'function') {
@@ -141,7 +169,8 @@ SubjectGroup.prototype = {
                     var row    = self.getRowByPredicate(uri);
                     var widget = row.getWidgetForID(ID);
                     widget.focus();
-                }
+                },
+                addPropertyValues: addPropertyValues
             };
 
             this._propertySelector = new Selector(this._graphURI, this._subjectURI, selectorOptions);

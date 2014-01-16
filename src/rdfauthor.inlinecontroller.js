@@ -141,12 +141,14 @@ InlineController.prototype = {
                     case 'datetime':
                         li.text(newVal);
                         var newStatement = li.data('rdfauthor.statement');
-                        newStatement['_object']['value'] = newVal;
-                        newStatement['_object']['representation'] = newVal;
-                        // TODO: update hash?!
+                        if (newStatement != undefined) {
+                            newStatement['_object']['value'] = newVal;
+                            newStatement['_object']['representation'] = newVal;
+                            // TODO: update hash?!
+                            li.data('rdfauthor.statement', newStatement);
+                        }
                         li.removeAttr('data-object-hash');
                         li.removeData();
-                        li.data('rdfauthor.statement', newStatement);
                         // is this needed?
                         widget.element().datepicker("destroy");
                         widget.element().removeClass("hasDatepicker");

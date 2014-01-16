@@ -99,7 +99,21 @@ RDFauthor.registerWidget({
             if (somethingChanged || this.removeOnSubmit) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
-                    databank.remove(rdfqTriple);
+                    /*
+                     * this check is necessary because of the combined reason of:
+                     * - we need to provide an object due to a bug in the jQuery-RDFquery
+                     *   library concerning empty literals of type xsd:date
+                     * - if this (or any RDFauthor) widget has an object, it basically
+                     *   assumes it is started in edit mode and thus has to delete
+                     *   the old triple
+                     * - jQuery-RDFquery does not check if a triple that is passed
+                     *   to the tripleStore.remove function is indeed in the triple store.
+                     *   in case it actually isn't in the triple store, the first triple
+                     *   will be removed
+                     */
+                    if ($.inArray(rdfqTriple, databank.tripleStore) != -1) {
+                        databank.remove(rdfqTriple);
+                    }
                 }
             }
 
