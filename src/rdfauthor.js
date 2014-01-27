@@ -735,7 +735,6 @@ RDFauthor = (function($) {
             // callback handler fro loaded scripts
             var _scriptReady = function () {
                 // now its ready
-                console.log('Ready --> ', scriptURI);
                 _loadedScripts[scriptURI] = SCRIPT_STATE_READY;
 
                 // script is ready, call all callbacks
@@ -1084,9 +1083,6 @@ RDFauthor = (function($) {
             var updateURI = RDFauthor.updateURIForGraph(g);
             var databank  = RDFauthor.databankForGraph(g);
             var original  = _extractedByGraph[g];
-            // console.log('updateURI', updateURI);
-            // console.log('databank', databank);
-            // console.log('original', original);
             if (undefined !== updateURI && undefined !== databank) {
                 var added   = databank.except(original);
                 var removed = original.except(databank);
@@ -1136,13 +1132,10 @@ RDFauthor = (function($) {
                     }
 
                 } else {
-                    // console.log('use REST');
                     // REST style
                     var addedJSON = $.rdf.dump(added.triples());
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     // , {format: 'application/json', serialize: true})
-                    // console.log('JSON Added: ' + $.toJSON(addedJSON));
-                    // console.log('JSON Removed: ' + $.toJSON(indexes));
                     // return;
                     
                     if (addedJSON || removedJSON) {
@@ -1483,8 +1476,6 @@ RDFauthor = (function($) {
                                     }
                                 }
 
-                                // console.log('newObjectSpec', newObjectSpec);
-
                                 var stmt = new Statement({
                                     subject: '<' + config.targetResource + '>', 
                                     predicate: '<' + currentProperty + '>', 
@@ -1496,8 +1487,6 @@ RDFauthor = (function($) {
                                     hidden: objSpec.hidden ? objSpec.hidden : false
                                 });
 
-                                // console.log("Adding statement ", stmt);
-                                // console.log('Statement Graph', stmt.graphURI());
                                 self.addStatement(stmt);
 
                             }
@@ -1548,7 +1537,6 @@ RDFauthor = (function($) {
                                 }
                             }
 
-                            // console.log('newObjectSpec', newObjectSpec);
                             var stmt = new Statement({
                                 subject: '<' + config.targetResource + '>', 
                                 predicate: '<' + currentProperty + '>', 
@@ -1560,8 +1548,6 @@ RDFauthor = (function($) {
                                 hidden: objSpec.hidden ? objSpec.hidden : false
                             });
 
-                            // console.log("Adding statement ", stmt);
-                            // console.log('Statement Graph', stmt.graphURI());
                             self.addStatement(stmt);
                         }
                     }
@@ -1631,10 +1617,6 @@ RDFauthor = (function($) {
                 _options.viewOptions.type = config.view || 'popover';
                 _options.useSPARQL11 = config.useSPARQL11 || false;
 
-                // console.log('config', config);
-                // console.log('_graphInfo', _graphInfo);
-                // console.log('_options', _options);
-                // console.log('data', data);
                 $.when(createStatements()).then(function() {
                     setOptions();
                     createView();
@@ -1761,6 +1743,8 @@ RDFauthor = (function($) {
             var ranges       = this.infoForPredicate(predicateURI, 'range');
             var types        = this.infoForPredicate(predicateURI, 'type');
             
+            options = { workingMode : _options.workingMode };
+
             // local widget selection
             if (subjectURI in _registeredWidgets.resource) {
                 widgetConstructor = _registeredWidgets.resource[subjectURI];
@@ -2157,8 +2141,7 @@ RDFauthor = (function($) {
          * those triples that where extracted from root or its children are beeing edited.
          * @param {HTMLElement} root
          */
-        start: function (root) {
-
+        start: function (root, workingMode) {
             // TEMPORARY until next big refactoring of RDFauthor
             // load ontowiki stylesheet when rdfauthor is used without ontowiki
             if (_options.loadOwStylesheet) {
@@ -2172,6 +2155,11 @@ RDFauthor = (function($) {
                     // _loadStylesheet(RDFAUTHOR_BASE + 'src/ow-style/old.css');
                 }
             }
+
+            if (workingMode) {
+                _options = $.extend({}, _options, { workingMode: workingMode });
+            }
+
 
             var self = this;
             if (arguments.length >= 1) {

@@ -357,16 +357,19 @@ RDFauthor.registerWidget({
     },
 
     value: function () {
-        value = this.element().val();
-        return value;
+        var value = this.element().val();
         /* Formbuilder: We don't want properties to be deleted just because
            the literal value is empty.
-        if (String(value).length > 0) {
+           Only exception: When resources are created, empty fields should not
+           be initialized empty but not at all.
+        */
+        if (this.options.workingMode != 'class') {
             return value;
         }
-
+        else if (String(value).length > 0) {
+            return value;
+        }
         return null;
-        */
     },
 
     _init: function () {
