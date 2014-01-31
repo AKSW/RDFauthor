@@ -1,3 +1,11 @@
+libjs-rdfauthor (0.9.7) lod2; urgency=low
+
+  * Fix: white screen freeze when adding a property
+  * add option to disable querying for labels
+  * change: handling of empty literal values changed behaviour
+
+ -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Fri, 31 Jan 2014 15:33:41 +0100
+
 libjs-rdfauthor (0.9.6) lod2; urgency=low
 
   * remove widget restriction
@@ -66,3 +74,4 @@ libjs-rdfauthor (0.9) lod2; urgency=low
   * initial rdfauthor package from tag v0.9
 
  -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Mon, 13 Jul 2012 10:42:49 +0100
+
