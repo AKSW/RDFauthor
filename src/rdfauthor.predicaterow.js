@@ -133,6 +133,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
      * @param {function} constructor The widget's constructor function (optional)
      */
     this.addWidget = function (statement, constructor, activate) {
+        var widgetID;
         // query predicate info before requesting widget for statement
         $.when(RDFauthor.updateInfoPredicate(statement)).then(function() {
             // console.log('runs inner addWidget');
@@ -156,7 +157,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
             widgetInstance.init();
             widgetInstance.predicateRow = self;
 
-            var widgetID   = RDFauthor.nextID();
+            widgetID = RDFauthor.nextID();
             var widgetHTML = getWidgetChrome(widgetID, widgetInstance.markup());
             var widgetIdx  = nextWidgetIndex();
 
@@ -179,9 +180,8 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
             if ((undefined !== activate) && activate) {
                 widgetInstance.focus();
             }
-
-            return self._widgetIDPrefix + widgetID;
         });
+        return self._widgetIDPrefix + widgetID;
     }
 }
 

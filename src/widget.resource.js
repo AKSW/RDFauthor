@@ -58,8 +58,8 @@ RDFauthor.registerWidget({
             filterProperties:   false,  /* show only resources used as properties */
             // Callbacks
             selectionCallback:  null,   /* the function to be called when a new selection is made */
-            selectOnReturn:     false   /* executes selection callback if the user hits return in the search field */
-
+            selectOnReturn:     false,   /* executes selection callback if the user hits return in the search field */
+            labels:             true
         }, this.options);
 
         // query range
@@ -536,7 +536,7 @@ RDFauthor.registerWidget({
             });
             
             //set human-readable label for uri
-            if (self.isURI(self.statement.objectValue())) {
+            if (self.isURI(self.statement.objectValue()) && self._options.labels) {
                 self.getLabel(self.statement.objectValue(), function(label, hasLabel) {
                     self.element().data('uri', self.element().val());
                     self.element().data('label', label);
