@@ -125,6 +125,7 @@ function Statement(statementSpec, statementOptions) {
     // the human-readable string representing the property
     if (statementOptions.title && typeof statementOptions.title == 'string' && '' != statementOptions.title) {
         this._predicateLabel = statementOptions.title;
+        this._predicate.label = statementOptions.title;
     } else {
         if (String(this._predicate.value).lastIndexOf('#') > -1) {
             this._predicateLabel = String(this._predicate.value).substr(String(this._predicate.value).lastIndexOf('#') + 1);

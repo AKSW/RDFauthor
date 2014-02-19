@@ -937,7 +937,7 @@ RDFauthor = (function($) {
                             }
                             
                             // init statement
-                            var statement2 = new Statement(triples[i], {'graph': graph, objectLabel: label});
+                            var statement2 = new Statement(triples[i], {'graph': graph, objectLabel: label, 'title': statement['_predicate']['label']});
                             
                             view.addWidget(statement2);
                         }
