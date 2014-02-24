@@ -1113,7 +1113,7 @@ RDFauthor = (function($) {
 
                     // if no changes, don't run query due to bad request (sparql endpoint)
                     if (updateQuery.length != 0) {
-                        (function(_options){
+                        (function(_options, _view){
                             $.ajax({
                                 type: 'POST',
                                 url: updateURI, 
@@ -1127,7 +1127,7 @@ RDFauthor = (function($) {
                             }).fail(function (jqXHR, textStatus, errorThrown) {
                                 alert('error while post request: ' + errorThrown);
                             });
-                        })(_options);
+                        })(_options, _view);
                     } else {
                         _callIfIsFunction(_options.onSubmitSuccess);
                         _view.hide(true);
@@ -1142,7 +1142,7 @@ RDFauthor = (function($) {
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
-                        (function(_options){
+                        (function(_options, _view){
                             $.ajax({
                                 type: 'POST',
                                 url: updateURI, 
@@ -1159,7 +1159,7 @@ RDFauthor = (function($) {
                             }).fail(function (jqXHR, textStatus, errorThrown) {
                                 alert('error while post request: ' + errorThrown);
                             });
-                        })(_options);
+                        })(_options, _view);
                     } else {
                         _view.hide(true);
                         _callIfIsFunction(_options.onSubmitSuccess);
