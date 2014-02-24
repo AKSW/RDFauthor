@@ -1065,19 +1065,21 @@ RDFauthor = (function($) {
 
                     // if no changes, don't run query due to bad request (sparql endpoint)
                     if (updateQuery.length != 0) {
-                        $.ajax({
-                            type: 'POST',
-                            url: updateURI, 
-                            data: {
-                                'query': updateQuery
-                            },
-                            dataType: 'json'
-                        }).done(function (responseData, textStatus, XHR) {
-                            _view.hide(true);
-                            _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
-                        }).fail(function (jqXHR, textStatus, errorThrown) {
-                            alert('error while post request: ' + errorThrown);
-                        });
+                        (function(_options){
+                            $.ajax({
+                                type: 'POST',
+                                url: updateURI, 
+                                data: {
+                                    'query': updateQuery
+                                },
+                                dataType: 'json'
+                            }).done(function (responseData, textStatus, XHR) {
+                                _view.hide(true);
+                                _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                            }).fail(function (jqXHR, textStatus, errorThrown) {
+                                alert('error while post request: ' + errorThrown);
+                            });
+                        })(_options);
                     } else {
                         _callIfIsFunction(_options.onSubmitSuccess);
                         _view.hide(true);
@@ -1095,22 +1097,24 @@ RDFauthor = (function($) {
                     
                     if (addedJSON || removedJSON) {
                         // x-domain request sending works w/ $.get only
-                        $.ajax({
-                            type: 'POST',
-                            url: updateURI, 
-                            data: {
-                                'named-graph-uri': g, 
-                                'insert': addedJSON ? $.toJSON(addedJSON) : '{}', 
-                                'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
-                                'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
-                            },
-                            dataType: 'json'
-                        }).done(function (responseData, textStatus, XHR) {
-                            _view.hide(true);
-                            _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
-                        }).fail(function (jqXHR, textStatus, errorThrown) {
-                            alert('error while post request: ' + errorThrown);
-                        });
+                        (function(_options){
+                            $.ajax({
+                                type: 'POST',
+                                url: updateURI, 
+                                data: {
+                                    'named-graph-uri': g, 
+                                    'insert': addedJSON ? $.toJSON(addedJSON) : '{}', 
+                                    'delete': indexes.plain ? $.toJSON(indexes.plain) : '{}', 
+                                    'delete_hashed': indexes.hashed ? $.toJSON(indexes.hashed) : '{}'
+                                },
+                                dataType: 'json'
+                            }).done(function (responseData, textStatus, XHR) {
+                                _view.hide(true);
+                                _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                            }).fail(function (jqXHR, textStatus, errorThrown) {
+                                alert('error while post request: ' + errorThrown);
+                            });
+                        })(_options);
                     } else {
                         _view.hide(true);
                         _callIfIsFunction(_options.onSubmitSuccess);
