@@ -183,7 +183,6 @@ RDFauthor.registerWidget({
     value: function () {
         var self = this;
         var value = self.element().data('uri');
-        console.log('uri', value);
         if ( self.isURI(value) ) {
             return value;
         }
@@ -526,6 +525,7 @@ RDFauthor.registerWidget({
                 // commit results on enter
                 if(event.which == 13) {
                     event.preventDefault();
+                    self.element().data('uri', self.element().val());
                     RDFauthor.commit();
                 }
             });
