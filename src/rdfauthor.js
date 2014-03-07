@@ -2227,10 +2227,9 @@ RDFauthor = (function($) {
                             _predicateInfo[predicateURI][rangeURI] = [self.expandNamespace(response[i]['range'].value)];
                         }
 
-                        if (response[i] !== "owlOneOf") {
+                        if (response[i].hasOwnProperty('owlOneOf')) {
                             _predicateInfo[predicateURI].owlOneOf = 'TRUE';
                         }
-
                     });
 
                     // debug log
