@@ -35,6 +35,15 @@ var __config = {
                 values: ['http://ns.ontowiki.net/SysOnt/HTML']
             }]
         },
+        /* ------------------------------ Drop Down -----------------------------------*/
+        'dropdown' : {
+            'path' : 'src/widget.dropdown.js',
+            'enabled' : true,
+            'hook' : [{
+                name: 'other',
+                values: ['owlOneOf']
+            }]
+        },
         /*------------------------------- datetime ------------------------------------*/
         'datetime' : {
             'path' : 'src/widget.datetime.js',
