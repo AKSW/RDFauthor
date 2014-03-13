@@ -45,29 +45,31 @@ RDFauthor.registerWidget({
     },
 
     getWidgetType: function() {
-        return 'literal';
+        return 'dropdown';
     },
 
     fetchValues: function() {
         var MAX = 8;
         var drop = [];
+        var dropalt = {};
         var graphURI = this.statement.graphURI();
         
-        var vars = '?v1';
+        var vars = ' ';
+        var labs = ' ';
         var body = '';
         var curlies = '}';
-        for(var i = 1; i < MAX; i++) {
+        for(var i = 0; i < MAX; i++) {
             vars += ' ?v' + (i+1);
+            labs += ' ?l' + (i+1);
             body += 'OPTIONAL {';
             body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> ?v' + (i+1) + ' . ';
+            body += '  OPTIONAL { ?v' + (i+1) + ' <http://www.w3.org/2000/01/rdf-schema#label> ?l' + (i+1) + ' . }';
             body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> ?r' + (i+1) + ' . ';
             curlies += '}';
         }
-        query  = 'SELECT ' + vars + ' WHERE {';
-        query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?v . ';
-        query += '     ?v <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> ?v1 . ';
-        query += '     ?v <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> ?r1 . ';
-        query += body + curlies;
+        query  = 'SELECT' + vars + labs + ' WHERE {';
+        query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?r0 . ';
+        query += body + curlies + ' LIMIT 1';
         console.log('query: ', query);
 
         var options = {
@@ -75,63 +77,30 @@ RDFauthor.registerWidget({
 
                 // iterate through resultset and add predicate info to cache
                 var response = data['results']['bindings'][0];
-                console.log(response);
                 for (var key in response) {
-                    drop.push(response[key]['value']);
+                    var op = 'option' + key.substr(1);
+                    if (dropalt[op] === undefined) {
+                        dropalt[op] = {};
+                    }
+                    if (key.charAt(0) === 'v') {
+                        drop.push(response[key]['value']);
+                        dropalt[op]['value'] = response[key]['value'];
+                        dropalt[op]['type'] = response[key]['type'];
+                    }
+                    else if (key.charAt(0) === 'l') {
+                        dropalt[op]['label'] = response[key]['value'];
+                    }
                 }
             },
             callbackError: function (err) {
                 console.log('err', err);
                 // resolve deferred object
                 dfd.resolve();
-            }, 
+            },
             async: false
         };
         RDFauthor.queryGraph(this.statement.graphURI(), query, options);
-        this.dropValues = drop;
-    },
-
-    fetchValuesRecursively: function() {
-        var drop = [];
-        var graphURI = this.statement.graphURI();
-        var options = {
-            callbackSuccess: function (data) {
-
-                // iterate through resultset and add predicate info to cache
-                var response = data['results']['bindings'];
-                $(response).each(function(i) {
-                    drop.push(response[i]['val'].value);
-                    if (response[i]['rest'].uri !== 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil') {
-                        var nextQuery = 'SELECT ?val ?rest WHERE {'
-                                      + '<' + response[i]['rest'].value + '> '
-                                      + '<http://www.w3.org/1999/02/22-rdf-syntax-ns#first> ?val ;'
-                                      + '<http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> ?rest . }';
-                        RDFauthor.queryGraph(graphURI, nextQuery, options);
-                    }
-                    // console.log('type', self.expandNamespace(response[i]['type'].value));
-                    // add rdf:type info
-                });
-
-                // debug log
-                // console.log('updated _predicateInfo', _predicateInfo);
-                // console.log('query processing completed')
-
-                // resolve deferred object
-            }, 
-            callbackError: function (err) {
-                console.log('err', err);
-                // resolve deferred object
-                dfd.resolve();
-            }, 
-            async: false
-        };
-
-        var startQuery = 'SELECT ?val ?rest WHERE {'
-                       + '<' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?v .'
-                       + '?v <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> ?val .'
-                       + '?v <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> ?rest . }';
-        RDFauthor.queryGraph(this.statement.graphURI(), startQuery, options);
-        this.dropValues = drop;
+        this.dropValues = dropalt;
     },
 
     ready: function () {
@@ -300,7 +269,7 @@ RDFauthor.registerWidget({
     },
 
     element: function () {
-        return jQuery('#literal-value-' + this.ID);
+        return jQuery('#literal-value-' + this.ID + " option:selected");
     },
 
     markup: function () {
@@ -319,12 +288,16 @@ RDFauthor.registerWidget({
         var isBoolean = this.statement.objectDatatype() == this.bool ? true : false;
 
         var dropDown = '';
-        for (var i = 0; i < this.dropValues.length; i++) {
-            if (this.dropValues[i] == this.statement._object.value) {
-                dropDown += '<option selected value="' + this.dropValues[i] + '">' + this.dropValues[i] + '</option>';
+        for (var i = 0; i < Object.keys(this.dropValues).length; i++) {
+            var k = 'option' + (i+1).toString();
+            var value = this.dropValues[k].value;
+            var label = this.dropValues[k].label || this.dropValues[k].value;
+            //var label = uri;
+            if (value == this.statement._object.value) {
+                dropDown += '<option selected value="' + k + '">' + label + '</option>';
             }
             else {
-                dropDown += '<option value="' + this.dropValues[i] + '">' + this.dropValues[i] + '</option>';
+                dropDown += '<option value="' + k + '">' + label + '</option>';
             }
         }
 
@@ -408,15 +381,21 @@ RDFauthor.registerWidget({
                     } else if (null !== this.datatype()) {
                         objectOptions.datatype = this.datatype();
                     }
+                    if (this.valType() === "uri") {
+                        var submitValue = '<' + this.value() + '>';
+                    }
+                    else {
+                        var submitValue = this.value();
+                    }
                     var newStatement = this.statement.copyWithObject({
-                        value: this.value(),
+                        value: submitValue,
                         options: objectOptions,
-                        type: 'literal'
+                        type: this.valType()
                     });
                     databank.add(newStatement.asRdfQueryTriple());
                 } catch (e) {
                     var msg = e.message ? e.message : e;
-                    alert('Could not save literal for the following reason: \n' + msg);
+                    alert('Could not save triple for the following reason: \n' + msg);
                     return false;
                 }
             }
@@ -461,8 +440,16 @@ RDFauthor.registerWidget({
         return null;
     },
 
+    text: function () {
+        return this.element().text();
+    },
+
+    valType: function () {
+        return this.dropValues[this.element().val()].type;
+    },
+
     value: function () {
-        var value = this.element().val();
+        var value = this.dropValues[this.element().val()].value;
         /* Formbuilder: We don't want properties to be deleted just because
            the literal value is empty.
            Only exception: When resources are created, empty fields should not
