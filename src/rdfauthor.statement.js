@@ -187,7 +187,7 @@ Statement.prototype = {
      *
      */
     copyWithObject: function (objectSpec) {
-        if (!("type" in objectSpec)) {
+        if (!(typeof objectSpec === 'object') || !("type" in objectSpec)) {
             jQuery.extend(objectSpec, {type: this.objectType()});
         }
 
