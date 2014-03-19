@@ -155,6 +155,9 @@ InlineController.prototype = {
                         widget.element().unbind();
                         li.unbind();
                         break;
+                    case 'dropdown':
+                        li.html(this._rows[index]._widgets[wid].resetMarkup());
+                        break;
                     default:
                         console.log('Falling back to reload!');
                         window.setTimeout(function () {

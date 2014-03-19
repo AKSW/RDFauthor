@@ -218,6 +218,18 @@ RDFauthor.registerWidget({
         return cls;
     },
 
+    resetMarkup: function() {
+        // TODO: Different markup for literal dropdown values
+        var predicate = this.statement._predicate.value._string;
+        var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();
+        var html = '<a resource="' + this.value() + '" \
+                      class="expandable hasMenu Resource" \
+                      rel="' + predicate + '" \
+                      href="' + href + '">\
+                   ' + this.text() + '</a>';
+        return html;
+    },
+
     isLarge: function () {
         if (this.statement.hasObject()) {
             var objectValue = this.statement.objectValue();
@@ -292,8 +304,8 @@ RDFauthor.registerWidget({
             var k = 'option' + (i+1).toString();
             var value = this.dropValues[k].value;
             var label = this.dropValues[k].label || this.dropValues[k].value;
-            //var label = uri;
-            if (value == this.statement._object.value) {
+            // NOTE: check with != to catch null as well as undefined
+            if (this.statement._object != undefined && value == this.statement._object.value) {
                 dropDown += '<option selected value="' + k + '">' + label + '</option>';
             }
             else {
