@@ -142,7 +142,10 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
 
             // instantiate widget
             if ((undefined !== constructor) && (typeof constructor == 'function')) {
-                widgetInstance = new constructor(statement);
+                if (self._widgets != {}) {
+                    var options = self._widgets[0].options;
+                }
+                widgetInstance = new constructor(statement, options);
                 widgetInstance.constructor = constructor;
             } else {
                 widgetInstance = RDFauthor.getWidgetForStatement(statement);
