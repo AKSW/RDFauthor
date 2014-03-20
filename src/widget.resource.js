@@ -137,6 +137,25 @@ RDFauthor.registerWidget({
         return markup;
     },
 
+    resetMarkup: function(li) {
+        if (this.element().data('hasLabel')) {
+            var label = this.element().data('label');
+        }
+        else {
+            var label = this.value();
+        }
+        var predicate = this.statement._predicate.value._string;
+        var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();
+        var html = '<a resource="' + this.value() + '" \
+            class="expandable hasMenu Resource" \
+            rel="' + predicate + '" \
+            href="' + href + '">\
+            ' + label + '</a>';
+        li.html(html);
+        var widgetID = parseInt(this.ID) + 1;
+        $('#widget-'+widgetID).remove();
+     },
+
     submit: function () {
         if (this.shouldProcessSubmit()) {
             // get databank
@@ -185,12 +204,10 @@ RDFauthor.registerWidget({
     },
 
     value: function () {
-        var self = this;
-        var value = self.element().data('uri');
-        if ( self.isURI(value) ) {
+        var value = this.element().data('uri');
+        if ( this.isURI(value) ) {
             return value;
         }
-
         return null;
     },
     
@@ -530,7 +547,19 @@ RDFauthor.registerWidget({
                 if(event.which == 13) {
                     event.preventDefault();
                     self.element().data('uri', self.element().val());
-                    RDFauthor.commit();
+                    if (self.isURI(self.element().val()) && self._options.labels) {
+                        self.getLabel(self.element().val(), function(label, hasLabel) {
+                            self.element().data('uri', self.element().val());
+                            self.element().data('label', label);
+                            self.element().data('hasLabel', hasLabel);
+                            if (hasLabel) {
+                                self.element().val(label);
+                                self.element().removeClass('resource-autocomplete-uri')
+                                              .addClass('resource-autocomplete-uri-name');
+                            }
+                            RDFauthor.commit();
+                        });
+                    }
                 }
             });
 

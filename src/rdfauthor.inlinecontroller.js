@@ -121,22 +121,7 @@ InlineController.prototype = {
                         li.data('rdfauthor.statement', newStatement);
                         break;
                     case 'resource':
-                        /* TODO: for 'rdfs:seeAlso' and possibly other predicates,
-                         * there is another li-element here
-                         */
-                        li.children('a:eq(0)').text(newVal);
-                        // update *all* children (there are two for rdfs:seeAlso)
-                        li.children('a').attr('resource', newVal);
-                        var href = li.children('a:eq(0)').attr('href');
-                        // TODO: use 'correct' way instead of kludge
-                        href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + newVal;
-                        li.children('a:eq(0)').attr('href', href);
-                        var oldStatement = li.children('a:eq(0)').data('rdfauthor.statement');
-                        var newStatement = oldStatement.copyWithObject(newVal);
-                        li.children('a:eq(0)').removeData();
-                        li.children('a:eq(0)').data('rdfauthor.statement', newStatement);
-                        // remove autocomplete box (_always_ on page but hidden)
-                        $('.ui-autocomplete').remove();
+                        this._rows[index]._widgets[wid].resetMarkup(li);
                         break;
                     case 'datetime':
                         li.text(newVal);
