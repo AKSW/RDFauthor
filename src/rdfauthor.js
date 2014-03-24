@@ -166,7 +166,8 @@ RDFauthor = (function($) {
         'resource':   {}, 
         'property':   {}, 
         'range':      {}, 
-        'datatype':   {}
+        'datatype':   {},
+        'other': {}
     };
     
     /**
@@ -1758,11 +1759,15 @@ RDFauthor = (function($) {
             var datatypeURI  = statement.hasObject() ? statement.objectDatatype() : null;
             var ranges       = this.infoForPredicate(predicateURI, 'range');
             var types        = this.infoForPredicate(predicateURI, 'type');
+            var owlOneOf     = this.infoForPredicate(predicateURI, 'owlOneOf');
             
-            options = { workingMode : _options.workingMode };
+            var options = { workingMode : _options.workingMode };
 
             // local widget selection
-            if (subjectURI in _registeredWidgets.resource) {
+            if (owlOneOf === 'TRUE') {
+                widgetConstructor = _registeredWidgets.other.owlOneOf;
+                options.owlOneOf = ranges[0];
+            } else if (subjectURI in _registeredWidgets.resource) {
                 widgetConstructor = _registeredWidgets.resource[subjectURI];
             } else if (predicateURI in _registeredWidgets.property) {
                 widgetConstructor = _registeredWidgets.property[predicateURI];
@@ -2211,8 +2216,6 @@ RDFauthor = (function($) {
             // try to query the knowledge base
             var options = {
                 callbackSuccess: function (data) {
-                    // console.log('data', data);
-                    // console.log('predicateInfo', _predicateInfo);
                     if (!_predicateInfo.hasOwnProperty(predicateURI)) {
                         _predicateInfo[predicateURI] = {};
                     }
@@ -2234,6 +2237,10 @@ RDFauthor = (function($) {
                             _predicateInfo[predicateURI][rangeURI].push(self.expandNamespace(response[i]['range'].value));
                         } else if (response[i].hasOwnProperty('range')) {
                             _predicateInfo[predicateURI][rangeURI] = [self.expandNamespace(response[i]['range'].value)];
+                        }
+
+                        if (response[i].hasOwnProperty('owlOneOf')) {
+                            _predicateInfo[predicateURI].owlOneOf = 'TRUE';
                         }
                     });
 
@@ -2260,10 +2267,12 @@ RDFauthor = (function($) {
                 dfd.resolve();
             } else {
                 // query
-                var query = 'SELECT ?type ?range'
+                var query = 'SELECT ?type ?range ?owlOneOf'
                           + ' WHERE {'
                           + ' <' + predicateURI + '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .'
-                          + ' OPTIONAL { <' + predicateURI + '> <http://www.w3.org/2000/01/rdf-schema#range> ?range }'
+                          + ' OPTIONAL { <' + predicateURI + '> <http://www.w3.org/2000/01/rdf-schema#range> ?range '
+                          + '    OPTIONAL { ?range <http://www.w3.org/2002/07/owl#oneOf> ?owlOneOf } '
+                          + ' }'
                           + ' }';
 
                 // debug log
