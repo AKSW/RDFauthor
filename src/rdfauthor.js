@@ -61,6 +61,8 @@ RDFauthor = (function($) {
         'hidden': []
     };
 
+    var _toolsLoaded = false;
+
     /** Wheather the property axiom cache has been loaded */
     var _cacheLoaded = false;
 
@@ -487,6 +489,11 @@ RDFauthor = (function($) {
         return null;
     }
 
+    function _loadTools() {
+        if (!_toolsLoaded) {
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.tools.js');
+        }
+    }
     function _loadCache() {
         if (!_cacheLoaded) {
             _require(RDFAUTHOR_BASE + 'src/rdfauthor.cache.js', function () {
@@ -538,6 +545,7 @@ RDFauthor = (function($) {
         }
 
         var values = new Array();
+        var valueObject = {};
         var subj = '';
         var pred = '';
 
@@ -564,9 +572,11 @@ RDFauthor = (function($) {
                     // synchronous
                     async: false
                 })
+                valueObject[pred] = values;
+                values = new Array();
             }
         }
-        return values;
+        return valueObject;
     }
 
     /**
@@ -1203,6 +1213,8 @@ RDFauthor = (function($) {
 
         // Cache
         _loadCache();
+        
+        _loadTools();
 
         // jQuery UI
         if (undefined === $.ui) {

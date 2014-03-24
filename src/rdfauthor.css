@@ -386,3 +386,18 @@ div.modal-wrapper {
 .rdfauthor-subject-group-select.selected {
     background-color: #fff;
 }
+
+
+.strikeThrough {
+    text-decoration: line-through;
+    color: #FF0000;
+}
+
+.update-OK {
+    color: #006600;
+    font-weight: bold;
+}
+
+.update-failure {
+    color: #FF0000;
+}

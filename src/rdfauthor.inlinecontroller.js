@@ -55,7 +55,6 @@ InlineController.prototype = {
     },
 
     resetToUnedit: function(values) {
-        var updateValues = values;
         var subjectURI;
         var predicateURI;
         var predicateCount = 0;
@@ -74,6 +73,7 @@ InlineController.prototype = {
                 subjectURI = this._rows[index]._subjectURI;
                 predicateCount = 1;
                 liCount = 0;
+                var updateValues = values[predicateURI];
             }
 
             // make visible again and disable edit mode only necessary
@@ -100,8 +100,15 @@ InlineController.prototype = {
                     continue;
                 }
                 liCount += 1;
+                if ($.inArray(widget.value(), updateValues) != -1) {
+                    var success = true;
+                    updateValues = $.grep(updateValues, function(value) { return value != widget.value() } );
+                }
+                else {
+                    var success = false;
+                }
                 li.removeAttr('rdfauthor-remove');
-                var newVal = updateValues.shift();
+                var newVal = widget.value();
                 var widgetType;
                 try {
                     widgetType = this._rows[index]._widgets[wid].getWidgetType();
@@ -111,17 +118,10 @@ InlineController.prototype = {
                 }
                 switch(widgetType) {
                     case 'literal':
-                        li.text(newVal);
-                        li.attr('content', newVal);
-                        var oldStatement = li.data('rdfauthor.statement');
-                        var newStatement = oldStatement.copyWithObject(newVal);
-                        li.removeData();
-                        // TODO: update hash?!
-                        li.removeAttr('data-object-hash');
-                        li.data('rdfauthor.statement', newStatement);
+                        this._rows[index]._widgets[wid].resetMarkup(li, success);
                         break;
                     case 'resource':
-                        this._rows[index]._widgets[wid].resetMarkup(li);
+                        this._rows[index]._widgets[wid].resetMarkup(li, success);
                         break;
                     case 'datetime':
                         li.text(newVal);

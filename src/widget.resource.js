@@ -137,7 +137,8 @@ RDFauthor.registerWidget({
         return markup;
     },
 
-    resetMarkup: function(li) {
+    resetMarkup: function(li, success) {
+        var classes = "expandable hasMenu Resource";
         if (this.element().data('hasLabel')) {
             var label = this.element().data('label');
         }
@@ -146,11 +147,17 @@ RDFauthor.registerWidget({
         }
         var predicate = this.statement._predicate.value._string;
         var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();
-        var html = '<a resource="' + this.value() + '" \
-            class="expandable hasMenu Resource" \
-            rel="' + predicate + '" \
-            href="' + href + '">\
-            ' + label + '</a>';
+        if (success) {
+            var html = '<a resource="' + this.value() + '" \
+                class="' + classes + '" \
+                rel="' + predicate + '" \
+                href="' + href + '">\
+                ' + label + '</a>';
+        }
+        else {
+            var html = '<span>' + this.value() + '</span>';
+        }
+        html = RDFAuthorTools.updateStatus(html, success);
         li.html(html);
         var widgetID = parseInt(this.ID) + 1;
         $('#widget-'+widgetID).remove();
