@@ -49,7 +49,7 @@ RDFauthor.registerWidget({
     },
 
     fetchValues: function() {
-        var MAX = 8;
+        var MAX = 6;
         var drop = [];
         var dropalt = {};
         var graphURI = this.statement.graphURI();
