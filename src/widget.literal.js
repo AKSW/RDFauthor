@@ -218,6 +218,21 @@ RDFauthor.registerWidget({
         li.html(html);
         li.attr('content', this.value());
         li.attr('property', predicate);
+
+        if (this.datatype() !== null) {
+            li.attr('datatype', this.datatype());
+        }
+        else {
+            li.removeAttr('datatype');
+        }
+
+        if (this.lang() !== null) {
+            li.attr('xml:lang', this.lang());
+        }
+        else {
+            li.removeAttr('xml:lang');
+        }
+
         li.removeData();
         // TODO: update hash?!
         li.removeAttr('data-object-hash');

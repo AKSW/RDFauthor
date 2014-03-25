@@ -138,7 +138,6 @@ RDFauthor.registerWidget({
     },
 
     resetMarkup: function(li, success) {
-        var classes = "expandable hasMenu Resource";
         if (this.element().data('hasLabel')) {
             var label = this.element().data('label');
         }
@@ -149,7 +148,7 @@ RDFauthor.registerWidget({
         var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();
         if (success) {
             var html = '<a resource="' + this.value() + '" \
-                class="' + classes + '" \
+                class="expandable hasMenu Resource" \
                 rel="' + predicate + '" \
                 href="' + href + '">\
                 ' + label + '</a>';

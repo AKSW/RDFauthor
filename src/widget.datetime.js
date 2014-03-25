@@ -83,6 +83,21 @@ RDFauthor.registerWidget({
         return markup;
     },
 
+    resetMarkup: function(li, success) {
+        var predicate = this.statement._predicate.value._string;
+        var datatype = this.statement.objectDatatype();
+        html = RDFAuthorTools.updateStatus('<span>' + this.value() + '</span>', success);
+        li.html(html);
+        li.attr('datatype', datatype);
+        li.attr('content', this.value());
+        li.attr('property', predicate);
+        li.removeData();
+        // TODO: update hash?!
+        li.removeAttr('data-object-hash');
+        var widgetID = parseInt(this.ID) + 1;
+        $('#widget-'+widgetID).remove();
+    },
+
     // commit changes here (add/remove/change)
     submit: function () {
         if (this.shouldProcessSubmit()) {

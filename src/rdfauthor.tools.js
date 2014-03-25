@@ -7,7 +7,11 @@ var RDFAuthorTools = {
         else {
             html = ' <span class="update-status update-failure">&#x2717; Error</span>';
             element = $(element).addClass("strikeThrough");
-            element = $('<div>').append($(element).clone()).html();
+            // Prior JQuery 1.6:
+            // element = $('<div>').append($(element).clone()).html();
+            // After Jquery 1.6 (should work, but doesn't seem to):
+            // element = element.outerHTML;
+            element = element.prop('outerHTML');
         }
 
         newElement = element + html;

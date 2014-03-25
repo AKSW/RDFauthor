@@ -218,7 +218,25 @@ RDFauthor.registerWidget({
         return cls;
     },
 
-    resetMarkup: function() {
+    resetMarkup: function(li, success) {
+        var predicate = this.statement._predicate.value._string;
+        var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();
+        if (success) {
+            var html = '<a resource="' + this.value() + '" \
+                class="expandable hasMenu Resource" \
+                rel="' + predicate + '" \
+                href="' + href + '">\
+                ' + this.text() + '</a>';
+        }
+        else {
+            var html = '<span>' + this.value() + '</span>';
+        }
+        html = RDFAuthorTools.updateStatus(html, success);
+        li.html(html);
+        var widgetID = parseInt(this.ID) + 1;
+        $('#widget-'+widgetID).remove();
+        return;
+
         // TODO: Different markup for literal dropdown values
         var predicate = this.statement._predicate.value._string;
         var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();

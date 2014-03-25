@@ -124,24 +124,10 @@ InlineController.prototype = {
                         this._rows[index]._widgets[wid].resetMarkup(li, success);
                         break;
                     case 'datetime':
-                        li.text(newVal);
-                        var newStatement = li.data('rdfauthor.statement');
-                        if (newStatement != undefined) {
-                            newStatement['_object']['value'] = newVal;
-                            newStatement['_object']['representation'] = newVal;
-                            // TODO: update hash?!
-                            li.data('rdfauthor.statement', newStatement);
-                        }
-                        li.removeAttr('data-object-hash');
-                        li.removeData();
-                        // is this needed?
-                        widget.element().datepicker("destroy");
-                        widget.element().removeClass("hasDatepicker");
-                        widget.element().unbind();
-                        li.unbind();
+                        this._rows[index]._widgets[wid].resetMarkup(li, success);
                         break;
                     case 'dropdown':
-                        li.html(this._rows[index]._widgets[wid].resetMarkup());
+                        this._rows[index]._widgets[wid].resetMarkup(li, success);
                         break;
                     default:
                         console.log('Falling back to reload!');
