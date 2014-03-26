@@ -2174,7 +2174,7 @@ RDFauthor = (function($) {
          * those triples that where extracted from root or its children are beeing edited.
          * @param {HTMLElement} root
          */
-        start: function (root, workingMode, propertyOrder) {
+        start: function (root, options) {
             // TEMPORARY until next big refactoring of RDFauthor
             // load ontowiki stylesheet when rdfauthor is used without ontowiki
             if (_options.loadOwStylesheet) {
@@ -2189,12 +2189,7 @@ RDFauthor = (function($) {
                 }
             }
 
-            if (workingMode) {
-                _options = $.extend({}, _options, { workingMode: workingMode });
-            }
-            if (propertyOrder) {
-                _options = $.extend({}, _options, { propertyOrder: propertyOrder });
-            }
+            _options = $.extend({}, _options, options);
 
             var self = this;
             if (arguments.length >= 1) {

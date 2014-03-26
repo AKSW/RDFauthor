@@ -137,6 +137,11 @@ InlineController.prototype = {
                 }
             }
         }
+        /*
+        if (updateValues.length > 0) {
+            element.find('ul').append("<li>Warning: " + updateValues.length + " more value(s)</li>");
+        }
+        */
         // remove data RDFauthor added
         $('.rdfauthor-statement-provider').removeAttr('id');
         $('.rdfauthor-statement-provider').removeClass('rdfauthor-statement-provider');
