@@ -936,6 +936,18 @@ RDFauthor = (function($) {
                     var updateEndpoint = RDFauthor.updateURIForGraph(graph);
                     if (undefined !== updateEndpoint) {
                         var triples = _databanksByGraph[graph].triples();
+                        // if an order for the predicates is given, resort triples
+                        if (_options.propertyOrder != null) {
+                            var sortedTriples = [];
+                            for (var i = 0; i < _options.propertyOrder.length; i++) {
+                                for (var j = 0; j < triples.length; j++) {
+                                   if (triples[j].property.value._string === _options.propertyOrder[i]) {
+                                       sortedTriples.push(triples[j]);
+                                   }
+                                }
+                            }
+                            var triples = sortedTriples;
+                        }
                         for (var i = 0, length = triples.length; i < length; i++) {
                             // init statement
                             var statement = new Statement(triples[i], {'graph': graph});
@@ -2162,7 +2174,7 @@ RDFauthor = (function($) {
          * those triples that where extracted from root or its children are beeing edited.
          * @param {HTMLElement} root
          */
-        start: function (root, workingMode) {
+        start: function (root, workingMode, propertyOrder) {
             // TEMPORARY until next big refactoring of RDFauthor
             // load ontowiki stylesheet when rdfauthor is used without ontowiki
             if (_options.loadOwStylesheet) {
@@ -2180,7 +2192,9 @@ RDFauthor = (function($) {
             if (workingMode) {
                 _options = $.extend({}, _options, { workingMode: workingMode });
             }
-
+            if (propertyOrder) {
+                _options = $.extend({}, _options, { propertyOrder: propertyOrder });
+            }
 
             var self = this;
             if (arguments.length >= 1) {
@@ -2188,7 +2202,7 @@ RDFauthor = (function($) {
             } else {
                 _setRoot(null);
             }
-            
+
             this.eventTarget().trigger('rdfauthor.start');
             /* parse */
             _parse(function() {
