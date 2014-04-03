@@ -1915,7 +1915,7 @@ RDFauthor = (function($) {
             
             /* Default ajax options (JSON) */
             var ajaxOptions = {
-                timeout: 2000, 
+                timeout: 10000,
                 dataType: 'json', 
                 url: serviceURI, 
                 data: parameters, 
