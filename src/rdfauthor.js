@@ -61,6 +61,8 @@ RDFauthor = (function($) {
         'hidden': []
     };
 
+    var _i18nLoaded = false;
+
     var _toolsLoaded = false;
 
     /** Wheather the property axiom cache has been loaded */
@@ -139,8 +141,8 @@ RDFauthor = (function($) {
     /** Default options */
     var _defaultOptions = {
         title: 'Title', 
-        saveButtonTitle: 'saveButtonTitle', 
-        cancelButtonTitle: 'cancelButtonTitle', 
+        saveButtonTitle: 'save', 
+        cancelButtonTitle: 'cancel', 
         showButtons: true, 
         useAnimations: true, 
         autoParse: true, 
@@ -380,6 +382,13 @@ RDFauthor = (function($) {
             useAnimations: _options.useAnimations
         });
         
+        options.cancelButtonTitle = _translate(options.cancelButtonTitle
+                                            || _defaultOptions.cancelButtonTitle);
+        options.saveButtonTitle = _translate(options.saveButtonTitle
+                                            || _defaultOptions.saveButtonTitle );
+        options.propertyButtonTitle = _translate("Add Property");
+        options.title = _translate(options.title || _defaultOptions.title);
+
         // init view controller
         var viewController = new PopoverController(options);
         
@@ -495,6 +504,14 @@ RDFauthor = (function($) {
             _require(RDFAUTHOR_BASE + 'src/rdfauthor.tools.js');
         }
     }
+
+    function _loadI18n() {
+        if (!_i18nLoaded) {
+            _require(RDFAUTHOR_BASE + 'src/rdfauthor.i18n.js');
+            _i18nLoaded = true;
+        }
+    }
+
     function _loadCache() {
         if (!_cacheLoaded) {
             _require(RDFAUTHOR_BASE + 'src/rdfauthor.cache.js', function () {
@@ -1228,6 +1245,8 @@ RDFauthor = (function($) {
         _loadCache();
         
         _loadTools();
+
+        _loadI18n();
 
         // jQuery UI
         if (undefined === $.ui) {
