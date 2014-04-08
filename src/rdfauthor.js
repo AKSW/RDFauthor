@@ -2175,6 +2175,7 @@ RDFauthor = (function($) {
          * @param {HTMLElement} root
          */
         start: function (root, options) {
+            window.RDFAUTHOR_LANGUAGE = window.RDFAUTHOR_LANGUAGE || 'en';
             // TEMPORARY until next big refactoring of RDFauthor
             // load ontowiki stylesheet when rdfauthor is used without ontowiki
             if (_options.loadOwStylesheet) {

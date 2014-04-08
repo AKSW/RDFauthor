@@ -63,7 +63,8 @@ RDFauthor.registerWidget({
             labs += ' ?l' + (i+1);
             body += 'OPTIONAL {';
             body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> ?v' + (i+1) + ' . ';
-            body += '  OPTIONAL { ?v' + (i+1) + ' <http://www.w3.org/2000/01/rdf-schema#label> ?l' + (i+1) + ' . }';
+            body += '  OPTIONAL { ?v' + (i+1) + ' <http://www.w3.org/2000/01/rdf-schema#label> ?l' + (i+1) + ' .';
+            body += "             FILTER(lang(?l" + (i+1) + ") = '" + RDFAUTHOR_LANGUAGE + "') } ";
             body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> ?r' + (i+1) + ' . ';
             curlies += '}';
         }
