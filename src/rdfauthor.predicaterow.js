@@ -1,4 +1,4 @@
-/*
+') + '/*
  * This file is part of the RDFauthor project.
  * http://code.google.com/p/rdfauthor
  * Author: Norman Heino <norman.heino@gmail.com>
@@ -88,8 +88,8 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
         var html = '\
             <div class="widget" id="' + self._widgetIDPrefix + widgetID + '">\
                 <div class="rdfauthor-container actions right">\
-                    <a class="delete-button" title="Remove widget and data."></a>\
-                    <a class="add-button" title="Add another widget of the same type."></a>\
+                    <a class="delete-button" title="' + _translate('remove widget') + '"></a>\
+                    <a class="add-button" title="' + _translate('add widget') + '"></a>\
                 </div>' + getOverride() + '<div class="rdfauthor-widget-container" style="width:90%">' + widgetHTML + '</div>\
                 <hr style="clear:both;height:0;border:none" />\
             </div>';

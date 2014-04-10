@@ -90,7 +90,7 @@ RDFauthor.registerWidget({
             </div>';
             var propertyPicker = '\
                 <div id="propertypicker" class="window ui-draggable ui-resizable">\
-                  <h1 class="title">Suggested Properties</h1>\
+                  <h1 class="title">' + _translate('Suggested Properties') + '</h1>\
                   <div class="window-buttons">\
                     <div class="window-buttons-left"></div>\
                     <div class="window-buttons-right">\
@@ -105,10 +105,10 @@ RDFauthor.registerWidget({
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
-                              <a class="item" title="These properties are currently in use at other resources of the same class(es)."><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                              <a class="item" title="' + _translate('elsewhereHelpText') + '"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
                             </div>\
                             <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                            <span>In use elsewhere (<span id="suggestedInUseCount"></span>)</span>\
+                            <span>' + _translate('In use elsewhere') + ' (<span id="suggestedInUseCount"></span>)</span>\
                           </div>\
                         </h1>\
                         <div id="suggestedInUse">\
@@ -120,10 +120,10 @@ RDFauthor.registerWidget({
                         <h1 class="propertyHeadline">\
                           <div class="has-contextmenu-area">\
                             <div class="contextmenu">\
-                              <a class="item" title="These properties are generally applicable to all resources. "><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                              <a class="item" title="' + _translate('generallyHelpText') + '"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
                             </div>\
                             <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
-                            <span>General applicable (<span id="suggestedGeneralCount"></span>)</span>\
+                            <span>' + _translate('Generally applicable') + ' (<span id="suggestedGeneralCount"></span>)</span>\
                           </div>\
                         </h1>\
                         <div id="suggestedGeneral">\

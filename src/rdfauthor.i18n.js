@@ -1,15 +1,7 @@
 var __i18n = {
-    /**
-     * RDfauthor Widget Configurations
-     *
-     * -- required
-     * - path
-     * - enable/disable widgets
-     * - set hook object
-     *
-     * -- optional
-     * - title
-     */
+
+    // Popover controller
+
     'Cancel' : {
         'en' : 'Cancel',
         'de' : 'Abbrechen'
@@ -38,11 +30,50 @@ var __i18n = {
     'editResource' : {
         'en' : 'Edit Resource %1',
         'de' : 'Ressource %1 editieren'
+    },
+
+    // Add property widget
+
+    'Suggested Properties' : {
+        'en' : 'Suggested Properties',
+        'de' : 'Vorgeschlagene Prädikate'
+    },
+
+    'In use elsewhere' : {
+        'en' : 'In use elsewhere',
+        'de' : 'Bei anderen Ressourcen verwendet'
+    },
+
+    'elsewhereHelpText' : {
+        'en' : 'These properties are currently in use at other resources of the same class(es).',
+        'de' : 'Diese Prädikate werden momentan bei anderen Ressourcen der gleichen Klasse benutzt.'
+    },
+
+    'Generally applicable': {
+        'en' : 'Generally applicable',
+        'de' : 'Allgemein anwendbar'
+    },
+
+    'generallyHelpText' : {
+        'en' : 'These properties are generally applicable to all resources.',
+        'de' : 'Diese Prädikate sind allgemein für alle Ressourcen anwendbar.'
+    },
+    
+    // predicate row
+
+    'remove widget' : {
+        'en' : 'Remove widget and data.',
+        'de' : 'Eingabefeld und Daten entfernen'
+    },
+
+    'add widget' : {
+        'en' : 'Add another widget of the same type.',
+        'de' : 'weiteres Eingabefeld des gleichen Typs hinzufügen'
     }
+
 }
 
 var _translate = function (key) {
-    console.log("Translating", key);
     var args = [];
     if (Object.prototype.toString.call(key) === '[object Array]') {
        args = key.slice(1);
