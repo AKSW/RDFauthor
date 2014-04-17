@@ -567,9 +567,9 @@ RDFauthor = (function($) {
         var subj = '';
         var pred = '';
 
-        for (var index in RDFauthor.getView()._rows) {
-            var subject = RDFauthor.getView()._rows[index]._subjectURI;
-            var predicate = RDFauthor.getView()._rows[index]._predicateURI;
+        for (var index in _view._rows) {
+            var subject = _view._rows[index]._subjectURI;
+            var predicate = _view._rows[index]._predicateURI;
             if ((pred != predicate) || (subj != subject)) {
                 pred = predicate;
                 subj = subject;
@@ -1162,8 +1162,10 @@ RDFauthor = (function($) {
                                 },
                                 dataType: 'json'
                             }).done(function (responseData, textStatus, XHR) {
+                                _view.resetToUnedit(_fetchValues());
                                 _view.hide(true);
                                 _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                                RDFauthor.reset();
                             }).fail(function (jqXHR, textStatus, errorThrown) {
                                 alert('error while post request: ' + errorThrown);
                             });
@@ -1194,8 +1196,10 @@ RDFauthor = (function($) {
                                 },
                                 dataType: 'json'
                             }).done(function (responseData, textStatus, XHR) {
+                                _view.resetToUnedit(_fetchValues());
                                 _view.hide(true);
                                 _callIfIsFunction(_options.onSubmitSuccess, [responseData]);
+                                RDFauthor.reset();
                             }).fail(function (jqXHR, textStatus, errorThrown) {
                                 alert('error while post request: ' + errorThrown);
                             });
@@ -1384,10 +1388,6 @@ RDFauthor = (function($) {
             _cloneDatabanks();
             if (this.getView().submit()) {
                 _updateSources();
-                this.getView().resetToUnedit(_fetchValues());
-                //RDFauthor.cancel();
-                RDFauthor.reset();
-                //_setup();
             } else {
                 _restoreDatabanks();
             }
