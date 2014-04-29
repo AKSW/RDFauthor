@@ -302,7 +302,14 @@ PredicateRow.prototype = {
         for (var i = 0; i < this.numberOfWidgets(); i++) {
             var widgetInstance = this.getWidget(i);
             if (widgetInstance) {
-                submitOk &= widgetInstance.submit();
+                var widgetSubmit = widgetInstance.submit();
+                submitOk &= widgetSubmit;
+                if(widgetSubmit == false) {
+                    widgetInstance.element().addClass('submit-failure');
+                }
+                else {
+                    widgetInstance.element().removeClass('submit-failure');
+                }
             }
         }
 
