@@ -150,8 +150,7 @@ var __config = {
             'hook' : [
             {
                 name: 'property',
-                values: ['http://www.w3.org/2000/01/rdf-schema#comment',
-                         'http://purl.org/dc/terms/description',
+                values: ['http://purl.org/dc/terms/description',
                          'http://purl.org/dc/elements/1.1/description',
                          'http://www.w3.org/2004/02/skos/core#note',
                          'http://www.w3.org/2004/02/skos/core#editorialNote',
