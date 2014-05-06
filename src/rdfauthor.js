@@ -1389,7 +1389,7 @@ RDFauthor = (function($) {
             if (this.getView().submit()) {
                 _updateSources();
             } else {
-                _restoreDatabanks();
+                return false;
             }
         },
         
