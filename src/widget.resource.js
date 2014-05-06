@@ -4,7 +4,7 @@
  * Author: Norman Heino <norman.heino@gmail.com>
  */
 
-var MAX_TITLE_LENGTH = 50;
+var MAX_TITLE_LENGTH = 150;
 
 RDFauthor.registerWidget({
     init: function () {
