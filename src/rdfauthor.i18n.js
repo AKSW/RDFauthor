@@ -49,6 +49,16 @@ var __i18n = {
         'de' : 'Diese Prädikate werden momentan bei anderen Ressourcen der gleichen Klasse benutzt.'
     },
 
+    'Template Properties' : {
+        'en' : 'Properties from template',
+        'de' : 'Prädikate aus dem Template'
+    },
+
+    'templatePropertiesHelpText' : {
+        'en' : 'These properties are pre-selected by a template.',
+        'de' : 'Diese Prädikate wurden durch ein Template vorausgewählt.'
+    },
+
     'Generally applicable': {
         'en' : 'Generally applicable',
         'de' : 'Allgemein anwendbar'

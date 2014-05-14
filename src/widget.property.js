@@ -7,9 +7,11 @@
 
 
 RDFauthor.registerWidget({
-    init: function (addPropertyValues) {
+    init: function (addPropertyValues, addOptionalPropertyValues) {
         this._addPropertyValues = addPropertyValues || undefined;
+        this._addOptionalPropertyValues = addOptionalPropertyValues || undefined;
         this._propertiesInUse = [];
+        this._templateProperties = [];
         this._filterProperties = "search for properties or enter a custom property uri";
         this._domReady     = false;
         this._pluginLoaded = false;
@@ -112,6 +114,21 @@ RDFauthor.registerWidget({
                           </div>\
                         </h1>\
                         <div id="suggestedInUse">\
+                          <ul class="inline separated">\
+                          </ul>\
+                        </div>\
+                      </li>\
+                      <li id="templatePropertiesLi" style="display: none;">\
+                        <h1 class="propertyHeadline">\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="' + _translate('templatePropertiesHelpText') + '"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                            <span>' + _translate('Template Properties') + ' (<span id="templateCount"></span>)</span>\
+                          </div>\
+                        </h1>\
+                        <div id="templateProperties">\
                           <ul class="inline separated">\
                           </ul>\
                         </div>\
@@ -287,10 +304,16 @@ RDFauthor.registerWidget({
         // request properties in use
         self._additionalInfo = undefined;
         if (self._addPropertyValues != undefined) {
-            self._additionalInfo = self._addPropertyValues;
+            self._templateProperties = self._addPropertyValues;
+            if (self._addOptionalPropertyValues != undefined) {
+                self._templateProperties = $.extend({}, self._templateProperties, self._addOptionalPropertyValues);
+            }
         }
         else if ($("#template-properties").length > 0) {
-            self._additionalInfo = $("#template-properties").data('properties');
+            self._templateProperties = $("#template-properties").data('properties');
+            if ($("#template-optional-properties").length > 0) {
+                self._templateProperties = $.extend({}, self._templateProperties, $("#template-optional-properties").data('properties'));
+            }
         }
         if (self._additionalInfo != undefined) {
             for (var k in self._additionalInfo) {
@@ -475,6 +498,15 @@ RDFauthor.registerWidget({
                         $('#suggestedInUse ul').append(self._listProperty(resourceUri,everywhereInUse[resourceUri],resourceUri));
                     }
                     $('#suggestedInUseCount').html(Object.size(everywhereInUse));
+
+                    for (var resourceUri in self._templateProperties) {
+                        $('#templateProperties ul').append(self._listProperty(resourceUri,self._templateProperties[resourceUri]['label']));
+                    }
+                    var templateCount = Object.size(self._templateProperties);
+                    if (templateCount > 0) {
+                        $('#templateCount').html(Object.size(self._templateProperties));
+                        $('#templatePropertiesLi').removeAttr('style');
+                    }
 
                     // add general applicable to dom
                     var generalapplicable = __propertycache['generalapplicable'];

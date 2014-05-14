@@ -378,6 +378,7 @@ RDFauthor = (function($) {
                 _callIfIsFunction(_options.onCancel);
             }, 
             addPropertyValues: _options.addPropertyValues,
+            addOptionalPropertyValues: _options.addOptionalPropertyValues,
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
             useAnimations: _options.useAnimations
         });

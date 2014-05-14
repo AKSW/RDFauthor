@@ -47,6 +47,7 @@ function PopoverController(options) {
     this._options   = jQuery.extend(defaultOptions, options);
     this._options.animationTime = this._options.useAnimations ? this._options.animationTime : 0;
     this._options.addPropertyValues = options.addPropertyValues;
+    this._options.addOptionalPropertyValues = options.addOptionalPropertyValues;
     this._container = this._options.container instanceof jQuery
                     ? this._options.container
                     : $(this._options.container);
@@ -156,7 +157,7 @@ function PopoverController(options) {
                 // TODO: seems to not work properly
                 var scrollTo = containerScroll - (containerTop - rowTop);
                 jQuery('.' + self._options.contentContainerClass).animate({scrollTop: scrollTo}, self._options.animationTime);
-            }, self._options.addPropertyValues);
+            }, self._options.addPropertyValues, self._options.addOptionalPropertyValues);
             // FIXME: This is a hack to save the optional parameters
             var saveOptionsHack = jQuery.extend(true, {}, self._options.addPropertyValues);
             propertySelector.presentInContainer(self._options.useAnimations);
