@@ -2104,15 +2104,15 @@ RDFauthor = (function($) {
          * Resets private variables (mainly used for testing).
          */
         reset: function () {
-            _resetDatabanks();
-            _resetOptions();
+            //_resetDatabanks();
+            //_resetOptions();
             _resetParser();
             _resetView();
             
             _defaultGraphURI   = null;
             _defaultSubjectURI = null;
-            _loadedScripts     = {};
-            _loadedStylesheets = {};
+            //_loadedScripts     = {};
+            //_loadedStylesheets = {};
             
             // remove events
             $(this.eventTarget()).unbind();
