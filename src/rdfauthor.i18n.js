@@ -79,6 +79,13 @@ var __i18n = {
     'add widget' : {
         'en' : 'Add another widget of the same type.',
         'de' : 'weiteres Eingabefeld des gleichen Typs hinzufügen'
+    },
+
+    // info texts
+
+    'Reload suggested' : {
+        'en' : 'Changes to the resource type suggests a reload',
+        'de' : 'Nach Änderungen am Typ der Ressource ist ein Neuladen empfehlenswert.'
     }
 
 }
