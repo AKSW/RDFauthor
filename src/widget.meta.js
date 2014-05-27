@@ -106,6 +106,18 @@ RDFauthor.registerWidget({
         return this.activeWidget().submit();
     },
 
+    value: function () {
+        return this.activeWidget().value();
+    },
+
+    resetMarkup: function(li, success) {
+        this.activeWidget().resetMarkup(li, success, this.value());
+    },
+
+    getWidgetType: function() {
+        return this.activeWidget().getWidgetType();
+    },
+
     activeWidget: function () {
         var activeWidget = null;
 
