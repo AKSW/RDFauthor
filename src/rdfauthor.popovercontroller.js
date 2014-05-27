@@ -121,6 +121,10 @@ function PopoverController(options) {
         $('.modal-wrapper').remove();
     }
 
+    function addUpdateScreen() {
+        $('body').append("<div class='modal-wrapper spinner-wrapper'>" + '</div>');
+    }
+
     jQuery(document).bind('keydown.view', handleKeybordEvent);
 
     // view initialization
@@ -138,6 +142,7 @@ function PopoverController(options) {
         jQuery('#rdfauthor-button-submit').die().live('click', function () {
             RDFauthor.commit();
             removePopoverView();
+            addUpdateScreen();
         });
 
         jQuery('#rdfauthor-button-cancel').die().live('click', function () {
