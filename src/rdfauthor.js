@@ -1388,6 +1388,8 @@ RDFauthor = (function($) {
         commit: function () {
             _cloneDatabanks();
             if (this.getView().submit()) {
+                $('.rdfauthor-widget-container input').attr("disabled","disabled");
+                $('.rdfauthor-widget-container textarea').attr("disabled","disabled");
                 _updateSources();
             } else {
                 _restoreDatabanks();

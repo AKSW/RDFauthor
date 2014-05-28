@@ -132,6 +132,13 @@ div.spinner-wrapper {
     background: #fff;
 }
 
+.rdfauthor-widget-container input.text:disabled,
+.rdfauthor-widget-container textarea:disabled,
+.rdfauthor-selector input.text:disabled,
+.rdfauthor-selector textarea:disabled {
+    color: #999;
+}
+
 /*
 #rdfauthor-view textarea {
     min-width: 30em;
