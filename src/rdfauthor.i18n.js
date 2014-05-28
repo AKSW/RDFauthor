@@ -68,7 +68,46 @@ var __i18n = {
         'en' : 'These properties are generally applicable to all resources.',
         'de' : 'Diese Prädikate sind allgemein für alle Ressourcen anwendbar.'
     },
-    
+
+    // resource widget
+
+    'Filter by' : {
+        'en' : 'Filter by',
+        'de' : 'Einschränken auf'
+    },
+
+    // literal widget
+
+    'Toggle details' : {
+        'en' : 'Toggle details disclosure',
+        'de' : 'Details ein-/ausblenden'
+    },
+
+    'Plain' : {
+        'en' : 'Plain',
+        'de' : 'Einfach'
+    },
+
+    'Typed' : {
+        'en' : 'Typed',
+        'de' : 'Ausgezeichnet'
+    },
+
+    'Language' : {
+        'en' : 'Language',
+        'de' : 'Sprache'
+    },
+
+    'none' : {
+        'en' : 'none',
+        'de' : 'keine'
+    },
+
+    'literalHint' : {
+        'en' : 'Shift+Enter for line break - Enter for submitting changes',
+        'de' : 'Shift+Enter für Zeilenumbruch - Enter zum Abschicken der Änderungen'
+    },
+
     // predicate row
 
     'remove widget' : {
