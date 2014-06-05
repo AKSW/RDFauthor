@@ -378,6 +378,7 @@ RDFauthor = (function($) {
                 _callIfIsFunction(_options.onCancel);
             }, 
             addPropertyValues: _options.addPropertyValues,
+            addOptionalPropertyValues: _options.addOptionalPropertyValues,
             container: _options.container ? _options.container : $('.modal-wrapper').eq(0), 
             useAnimations: _options.useAnimations
         });
@@ -1387,6 +1388,8 @@ RDFauthor = (function($) {
         commit: function () {
             _cloneDatabanks();
             if (this.getView().submit()) {
+                $('.rdfauthor-widget-container input').attr("disabled","disabled");
+                $('.rdfauthor-widget-container textarea').attr("disabled","disabled");
                 _updateSources();
             } else {
                 return false;
@@ -2103,15 +2106,15 @@ RDFauthor = (function($) {
          * Resets private variables (mainly used for testing).
          */
         reset: function () {
-            _resetDatabanks();
-            _resetOptions();
+            //_resetDatabanks();
+            //_resetOptions();
             _resetParser();
             _resetView();
             
             _defaultGraphURI   = null;
             _defaultSubjectURI = null;
-            _loadedScripts     = {};
-            _loadedStylesheets = {};
+            //_loadedScripts     = {};
+            //_loadedStylesheets = {};
             
             // remove events
             $(this.eventTarget()).unbind();

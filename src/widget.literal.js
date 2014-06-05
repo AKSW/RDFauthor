@@ -199,7 +199,7 @@ RDFauthor.registerWidget({
 
             // Firefox hack
             if (display == '') {
-                display = '[none]';
+                display = '[' + _translate('none') + ']';
             }
 
             optionString += '<option value="' + options[i] + '"' + (current ? 'selected="selected"' : '') + '>' + display + '</option>';
@@ -265,20 +265,20 @@ RDFauthor.registerWidget({
             </div>\
             <div class="rdfauthor-container util" style="clear:left">\
                 <a class="disclosure-button ' + areaConfig.buttonClass + ' open" id="' + this.disclosureID
-                        + '" title="Toggle details disclosure"></a>\
+                        + '" title="' + _translate("Toggle details") + '"></a>\
             </div>';
 
         var markup = '\
             ' + areaMarkup + '\
             <div class="rdfauthor-container literal-type util ' + this.disclosureID + '" style="display:none">\
                 <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"'
-                        + (this.statement.objectDatatype() ? '' : ' checked="checked"') + ' value="plain" />Plain</label>\
+                        + (this.statement.objectDatatype() ? '' : ' checked="checked"') + ' value="plain" />' + _translate('Plain') + '</label>\
                 <label><input type="radio" class="radio" name="literal-type-' + this.ID + '"'
-                        + (this.statement.objectDatatype() ? ' checked="checked"' : '') + ' value="typed" />Typed</label>\
+                        + (this.statement.objectDatatype() ? ' checked="checked"' : '') + ' value="typed" />' + _translate('Typed') + '</label>\
             </div>\
             <div class="rdfauthor-container util ' + this.disclosureID + '" style="display:none">\
                 <div class="literal-lang"' + (this.statement.objectDatatype() ? ' style="display:none"' : '') + '>\
-                    <label for="literal-lang-' + this.ID + '">Language:\
+                    <label for="literal-lang-' + this.ID + '">' + _translate('Language') + ':\
                         <select id="literal-lang-' + this.ID + '" name="literal-lang-' + this.ID + '">\
                             ' + this.makeOptionString(this.languages, this.statement.objectLang()) + '\
                         </select>\
@@ -407,7 +407,7 @@ RDFauthor.registerWidget({
             self.element()
                 .elastic()
                 .shiftenter({
-                    hint: 'Shift+Enter for line break - Enter for submitting changes',
+                    hint: _translate('literalHint'),
                     onReturn: function() {
                         RDFauthor.commit();
                     }

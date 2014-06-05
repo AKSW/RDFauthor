@@ -49,6 +49,16 @@ var __i18n = {
         'de' : 'Diese Prädikate werden momentan bei anderen Ressourcen der gleichen Klasse benutzt.'
     },
 
+    'Template Properties' : {
+        'en' : 'Properties from template',
+        'de' : 'Prädikate aus dem Template'
+    },
+
+    'templatePropertiesHelpText' : {
+        'en' : 'These properties are pre-selected by a template.',
+        'de' : 'Diese Prädikate wurden durch ein Template vorausgewählt.'
+    },
+
     'Generally applicable': {
         'en' : 'Generally applicable',
         'de' : 'Allgemein anwendbar'
@@ -58,7 +68,46 @@ var __i18n = {
         'en' : 'These properties are generally applicable to all resources.',
         'de' : 'Diese Prädikate sind allgemein für alle Ressourcen anwendbar.'
     },
-    
+
+    // resource widget
+
+    'Filter by' : {
+        'en' : 'Filter by',
+        'de' : 'Einschränken auf'
+    },
+
+    // literal widget
+
+    'Toggle details' : {
+        'en' : 'Toggle details disclosure',
+        'de' : 'Details ein-/ausblenden'
+    },
+
+    'Plain' : {
+        'en' : 'Plain',
+        'de' : 'Einfach'
+    },
+
+    'Typed' : {
+        'en' : 'Typed',
+        'de' : 'Ausgezeichnet'
+    },
+
+    'Language' : {
+        'en' : 'Language',
+        'de' : 'Sprache'
+    },
+
+    'none' : {
+        'en' : 'none',
+        'de' : 'keine'
+    },
+
+    'literalHint' : {
+        'en' : 'Shift+Enter for line break - Enter for submitting changes',
+        'de' : 'Shift+Enter für Zeilenumbruch - Enter zum Abschicken der Änderungen'
+    },
+
     // predicate row
 
     'remove widget' : {
@@ -69,6 +118,13 @@ var __i18n = {
     'add widget' : {
         'en' : 'Add another widget of the same type.',
         'de' : 'weiteres Eingabefeld des gleichen Typs hinzufügen'
+    },
+
+    // info texts
+
+    'Reload suggested' : {
+        'en' : 'Changes to the resource type suggests a reload',
+        'de' : 'Nach Änderungen am Typ der Ressource ist ein Neuladen empfehlenswert.'
     }
 
 }

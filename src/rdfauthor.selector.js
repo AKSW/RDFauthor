@@ -29,7 +29,7 @@ function Selector(graphURI, subjectURI, options) {
     // FIXME: title hack
     var statement = new Statement({subject: '<' + subjectURI + '>'}, {graph: graphURI, title: ' '});
     this._widget = RDFauthor.getWidgetForHook('__PROPERTY__', null, statement, widgetOptions);
-    this._widget.init(options.addPropertyValues);
+    this._widget.init(options.addPropertyValues, options.addOptionalPropertyValues);
 }
 
 Selector.prototype = {

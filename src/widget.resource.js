@@ -127,7 +127,7 @@ RDFauthor.registerWidget({
                 <input type="text" id="resource-input-' + this.ID + '" class="text resource-edit-input is-processing" \
                        value="' + value + '" title="' + value + '"/>\
                 <div class="rdfauthor-container util" style="padding:0px;">\
-                    <label><span style="padding-right: 5px;">Filter by</span>\
+                    <label><span style="padding-right: 5px;">' + _translate("Filter by") + '</span>\
                     <input class="checkbox checkbox-range" type="checkbox" name="range"\
                     '+ (this._options.filterRange ? 'checked="checked"' : '') + '">\
                     <label>Range</label></label>\

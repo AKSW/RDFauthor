@@ -22,6 +22,12 @@ div.modal-wrapper {
     z-index: 1095;
 }
 
+div.spinner-wrapper {
+    background-image: url('./../img/spinner_big.gif');
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
 #rdfauthor-view {
     /* taken from div.window */
     font-size: 12px;
@@ -124,6 +130,13 @@ div.modal-wrapper {
     font-weight: normal;
     color: #333;
     background: #fff;
+}
+
+.rdfauthor-widget-container input.text:disabled,
+.rdfauthor-widget-container textarea:disabled,
+.rdfauthor-selector input.text:disabled,
+.rdfauthor-selector textarea:disabled {
+    color: #999;
 }
 
 /*
@@ -408,3 +421,9 @@ div.modal-wrapper {
 .update-failure {
     color: #FF0000;
 }
+
+.suggestion {
+    color: #FF0000;
+    font-style: italic;
+}
+

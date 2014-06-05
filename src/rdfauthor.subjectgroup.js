@@ -117,7 +117,7 @@ SubjectGroup.prototype = {
     /**
      * Returns the property selector instance for this subject group.
      */
-    getPropertySelector: function (callback, addPropertyValues) {
+    getPropertySelector: function (callback, addPropertyValues, addOptionalPropertyValues) {
         // if (null === this._propertySelector) {
             var self = this;
             var statement;
@@ -170,7 +170,8 @@ SubjectGroup.prototype = {
                     var widget = row.getWidgetForID(ID);
                     widget.focus();
                 },
-                addPropertyValues: addPropertyValues
+                addPropertyValues: addPropertyValues,
+                addOptionalPropertyValues: addOptionalPropertyValues
             };
 
             this._propertySelector = new Selector(this._graphURI, this._subjectURI, selectorOptions);

@@ -7,9 +7,11 @@
 
 
 RDFauthor.registerWidget({
-    init: function (addPropertyValues) {
+    init: function (addPropertyValues, addOptionalPropertyValues) {
         this._addPropertyValues = addPropertyValues || undefined;
+        this._addOptionalPropertyValues = addOptionalPropertyValues || undefined;
         this._propertiesInUse = [];
+        this._templateProperties = [];
         this._filterProperties = "search for properties or enter a custom property uri";
         this._domReady     = false;
         this._pluginLoaded = false;
@@ -112,6 +114,21 @@ RDFauthor.registerWidget({
                           </div>\
                         </h1>\
                         <div id="suggestedInUse">\
+                          <ul class="inline separated">\
+                          </ul>\
+                        </div>\
+                      </li>\
+                      <li id="templatePropertiesLi" style="display: none;">\
+                        <h1 class="propertyHeadline">\
+                          <div class="has-contextmenu-area">\
+                            <div class="contextmenu">\
+                              <a class="item" title="' + _translate('templatePropertiesHelpText') + '"><span class="item icon icon-list ui-icon ui-icon-help"></span></a>\
+                            </div>\
+                            <span style="display: inline-block !important;" class="ui-icon ui-icon-minus"></span>\
+                            <span>' + _translate('Template Properties') + ' (<span id="templateCount"></span>)</span>\
+                          </div>\
+                        </h1>\
+                        <div id="templateProperties">\
                           <ul class="inline separated">\
                           </ul>\
                         </div>\
@@ -242,15 +259,19 @@ RDFauthor.registerWidget({
     },
 
     localName: function (uri) {
-        var s = String(uri);
-        var l;
-        if (s.lastIndexOf('#') > -1) {
-            l = s.substr(s.lastIndexOf('#') + 1);
-        } else {
-            l = s.substr(s.lastIndexOf('/') + 1);
+        if (uri in this._additionalInfo && this._additionalInfo[uri]["label"] != undefined) {
+            return this._additionalInfo[uri]["label"];
         }
-
-        return (l !== '') ? l : s;
+        else {
+            var s = String(uri);
+            var l;
+            if (s.lastIndexOf('#') > -1) {
+                l = s.substr(s.lastIndexOf('#') + 1);
+            } else {
+                l = s.substr(s.lastIndexOf('/') + 1);
+            }
+            return (l !== '') ? l : s;
+        }
     },
 
     expandNamespace: function (prefixedName) {
@@ -275,7 +296,7 @@ RDFauthor.registerWidget({
         var typePattern = '<' + subjectURI + '> a ?class .\n';
         var classPattern = '?others a ?class .\n';
         var uriPattern = '?others ?resourceUri ?object .\n';
-        var labelPattern = 'OPTIONAL {?resourceUri rdfs:label ?label . } .\n';
+        var labelPattern = 'OPTIONAL {?resourceUri rdfs:label ?label . FILTER(langMatches(lang(?label), "' + RDFAUTHOR_LANGUAGE + '"))} .\n';
         var query = prefixPattern + 'SELECT ' + selectPattern
                                   + 'WHERE { \n'
                                   + typePattern
@@ -287,10 +308,20 @@ RDFauthor.registerWidget({
         // request properties in use
         self._additionalInfo = undefined;
         if (self._addPropertyValues != undefined) {
-            self._additionalInfo = self._addPropertyValues;
+            self._templateProperties = self._addPropertyValues;
+            if (self._addOptionalPropertyValues != undefined) {
+                self._templateProperties = $.extend({}, self._templateProperties, self._addOptionalPropertyValues);
+            }
         }
         else if ($("#template-properties").length > 0) {
-            self._additionalInfo = $("#template-properties").data('properties');
+            self._templateProperties = $("#template-properties").data('properties');
+            if ($("#template-optional-properties").length > 0) {
+                self._templateProperties = $.extend({}, self._templateProperties, $("#template-optional-properties").data('properties'));
+            }
+        }
+        self._additionalInfo = [];
+        for (var k in self._templateProperties) {
+            self._additionalInfo[k] = {"label" : self._templateProperties[k]["label"]};
         }
         if (self._additionalInfo != undefined) {
             for (var k in self._additionalInfo) {
@@ -437,7 +468,7 @@ RDFauthor.registerWidget({
     _normalizeValue: function (value) {
         if (!this.selectedResource) {
             this.selectedResource      = this.expandNamespace(value);
-            this.selectedResourceLabel = this.localName(value);
+            this.selectedResourceLabel = this.localName(this.selectedResource);
         }
     },
 
@@ -476,6 +507,15 @@ RDFauthor.registerWidget({
                     }
                     $('#suggestedInUseCount').html(Object.size(everywhereInUse));
 
+                    for (var resourceUri in self._templateProperties) {
+                        $('#templateProperties ul').append(self._listProperty(resourceUri,self._templateProperties[resourceUri]['label']));
+                    }
+                    var templateCount = Object.size(self._templateProperties);
+                    if (templateCount > 0) {
+                        $('#templateCount').html(Object.size(self._templateProperties));
+                        $('#templatePropertiesLi').removeAttr('style');
+                    }
+
                     // add general applicable to dom
                     var generalapplicable = __propertycache['generalapplicable'];
                     // show only new suggested general applicable properties
@@ -501,7 +541,7 @@ RDFauthor.registerWidget({
                         self._positioning();
                         $('#filterProperties').focus().blur(function() {
                             if ($(this).val().length == 0) {
-                                $(this).val(self._filterProperties);                            
+                                $(this).val(self._filterProperties);
                             }
                         });
                     });
@@ -510,8 +550,10 @@ RDFauthor.registerWidget({
                 if ((e.which === 13) && self._options.selectOnReturn) {
                     $('#propertypicker').hide();
                     var val = jQuery(e.target).val();
+                    val = self.expandNamespace(val);
                     self._normalizeValue(val);
 
+                    /*
                     var splits = val.split(':', 2);
                     if (splits.length >= 2 && !self.isURI(val)) {
                         if (splits[0] in self._namespaces) {
@@ -519,6 +561,7 @@ RDFauthor.registerWidget({
                             self.selectedResourceLabel = splits[1];
                         }
                     }
+                    */
 
                     if ((self._additionalInfo != undefined) && (self.selectedResource in self._additionalInfo) && (self.selectedResource[self._additionalInfo] !== '') && ("datatype" in self._additionalInfo[self.selectedResource])) {
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel, self._additionalInfo[self.selectedResource]["datatype"]);
