@@ -1811,7 +1811,7 @@ RDFauthor = (function($) {
          * @return {array}
          */
         literalLanguages: function () {
-            var langs = ['de', 'en', 'fr', 'nl', 'es', 'it', 'cn', 'ka', 'ru'];
+            var langs = ['cn', 'de', 'en', 'es', 'fr', 'hu', 'it', 'ka', 'nl', 'ru'];
             
             /* let others modify languages */
             this.eventTarget().trigger('rdfauthor.languages', langs);
