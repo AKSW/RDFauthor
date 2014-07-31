@@ -1125,7 +1125,7 @@ RDFauthor = (function($) {
             var databank  = RDFauthor.databankForGraph(g);
             var original  = _extractedByGraph[g];
             if (undefined !== updateURI && undefined !== databank) {
-                var added   = databank.except(original);
+                var added   = databank;
                 var removed = original.except(databank);
                 
                 _insertSpecialStatements(added, g);
