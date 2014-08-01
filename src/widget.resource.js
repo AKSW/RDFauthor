@@ -223,7 +223,7 @@ RDFauthor.registerWidget({
 
     value: function () {
         var value = this.element().data('uri');
-        if (value != '') {
+        if (value != '' && value != undefined && value != null) {
             return this.isURI(value);
         }
         else {
