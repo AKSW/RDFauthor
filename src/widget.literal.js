@@ -214,7 +214,12 @@ RDFauthor.registerWidget({
 
     resetMarkup: function(li, success) {
         var predicate = this.statement._predicate.value._string;
-        html = RDFAuthorTools.updateStatus('<span>' + this.value() + '</span>', success);
+        if (this.value() == null) {
+            html = RDFAuthorTools.updateStatus('<span></span>', success, true);
+        }
+        else {
+            html = RDFAuthorTools.updateStatus('<span>' + this.value() + '</span>', success);
+        }
         li.html(html);
         li.attr('content', this.value());
         li.attr('property', predicate);

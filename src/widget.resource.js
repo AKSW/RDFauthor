@@ -138,25 +138,30 @@ RDFauthor.registerWidget({
     },
 
     resetMarkup: function(li, success) {
-        if (this.element().data('hasLabel')) {
-            var label = this.element().data('label');
+        if (this.value() != null) {
+            if (this.element().data('hasLabel')) {
+                var label = this.element().data('label');
+            }
+            else {
+                var label = this.value();
+            }
+            var predicate = this.statement._predicate.value._string;
+            var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();
+            if (success) {
+                var html = '<a resource="' + this.value() + '" \
+                    class="expandable hasMenu Resource" \
+                    rel="' + predicate + '" \
+                    href="' + href + '">\
+                    ' + label + '</a>';
+            }
+            else {
+                var html = '<span>' + this.value() + '</span>';
+            }
+            html = RDFAuthorTools.updateStatus(html, success);
         }
         else {
-            var label = this.value();
+            html = RDFAuthorTools.updateStatus('<span></span>', success, true);
         }
-        var predicate = this.statement._predicate.value._string;
-        var href = RDFAUTHOR_BASE.split('/').slice(0, -3).join('/') + '/view/?r=' + this.value();
-        if (success) {
-            var html = '<a resource="' + this.value() + '" \
-                class="expandable hasMenu Resource" \
-                rel="' + predicate + '" \
-                href="' + href + '">\
-                ' + label + '</a>';
-        }
-        else {
-            var html = '<span>' + this.value() + '</span>';
-        }
-        html = RDFAuthorTools.updateStatus(html, success);
         li.html(html);
         var widgetID = parseInt(this.ID) + 1;
         $('#widget-'+widgetID).remove();
@@ -172,7 +177,7 @@ RDFauthor.registerWidget({
                 && null !== this.value()
             );
 
-            if (hasChanged || this.removeOnSubmit) {
+            if (hasChanged || this.removeOnSubmit || this.value() == null) {
                 var rdfqTriple = this.statement.asRdfQueryTriple();
                 if (rdfqTriple) {
                     databank.remove(rdfqTriple);
@@ -180,7 +185,7 @@ RDFauthor.registerWidget({
             }
 
             if (!this.removeOnSubmit) {
-                if (this.value() && this.value() !== '') {
+                if (this.value() && this.value() !== null) {
                     var self = this;
                     try {
                         var newStatement = this.statement.copyWithObject({
@@ -197,8 +202,11 @@ RDFauthor.registerWidget({
                         return false;
                     }
                 }
-                else {
+                else if (this.value() === false) {
                     return false;
+                }
+                else {
+                    return true;
                 }
             }
         }
@@ -215,7 +223,12 @@ RDFauthor.registerWidget({
 
     value: function () {
         var value = this.element().data('uri');
-        return this.isURI(value);
+        if (value != '') {
+            return this.isURI(value);
+        }
+        else {
+            return null;
+        }
     },
     
     getLabel: function (subjectUri, responseCallback) {
