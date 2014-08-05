@@ -259,6 +259,14 @@ div.spinner-wrapper {
     width: 48%;
 }
 
+#rdfauthor-view fieldset :focus {
+    /* border: 1px dotted orange;
+       outline: none;
+       alternative color: FFEAC0
+    */
+    background: #DEE8EE !important;
+}
+
 #rdfauthor-view .rdfauthor-predicate-row, .rdfauthor-predicate-row .rdfauthor-container {
 /*    border: 1px dotted red;*/
     padding: 0.3em 0.5em;
