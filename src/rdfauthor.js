@@ -1391,6 +1391,7 @@ RDFauthor = (function($) {
                 $('.rdfauthor-widget-container input').attr("disabled","disabled");
                 $('.rdfauthor-widget-container textarea').attr("disabled","disabled");
                 _updateSources();
+                return true;
             } else {
                 _restoreDatabanks();
             }
