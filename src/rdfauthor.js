@@ -1393,7 +1393,7 @@ RDFauthor = (function($) {
                 _updateSources();
                 return true;
             } else {
-                _restoreDatabanks();
+                return false;
             }
         },
         
