@@ -49,6 +49,10 @@ RDFauthor.registerWidget({
     },
 
     fetchValues: function() {
+        this.fetchValuesWithSPARQL10();
+    },
+
+    fetchValuesWithSPARQL10: function() {
         var MAX = 6;
         var drop = [];
         var dropalt = {};
@@ -70,7 +74,6 @@ RDFauthor.registerWidget({
         query  = 'SELECT' + vars + labs + ' WHERE {';
         query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?r0 . ';
         query += body + curlies + ' LIMIT 1';
-        console.log('query: ', query);
 
         var options = {
             callbackSuccess: function (data) {
