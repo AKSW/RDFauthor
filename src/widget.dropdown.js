@@ -49,10 +49,6 @@ RDFauthor.registerWidget({
     },
 
     fetchValuesWithSPARQL11: function() {
-        var drop = [];
-        var dropalt = {};
-        var graphURI = this.statement.graphURI();
-
         var query = 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' ;
         query += 'SELECT ?elem ?label WHERE {';
         query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?list . ';
@@ -67,9 +63,6 @@ RDFauthor.registerWidget({
 
     fetchValuesWithSPARQL10: function() {
         var MAX = 6;
-        var drop = [];
-        var dropalt = {};
-        var graphURI = this.statement.graphURI();
         var vars = ' ';
         var labs = ' ';
         var body = '';
@@ -90,7 +83,10 @@ RDFauthor.registerWidget({
     },
 
     fetchValues: function () {
-        var query = this.fetchValuesWithSPARQL11();
+        var drop = [];
+        var dropalt = {};
+        var graphURI = this.statement.graphURI();
+        var query = this.fetchValuesWithSPARQL10();
         var options = {
             callbackSuccess: function (data) {
                 // iterate through resultset and add predicate info to cache
