@@ -49,6 +49,10 @@ RDFauthor.registerWidget({
     },
 
     fetchValues: function() {
+        this.fetchValuesWithSPARQL11();
+    },
+
+    fetchValuesWithSPARQL11: function() {
         var drop = [];
         var dropalt = {};
         var graphURI = this.statement.graphURI();
