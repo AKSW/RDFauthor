@@ -49,6 +49,9 @@ RDFauthor.registerWidget({
     },
 
     fetchValuesWithSPARQL11: function() {
+        var drop = [];
+        var dropalt = {};
+        var graphURI = this.statement.graphURI();
         var query = 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' ;
         query += 'SELECT ?elem ?label WHERE {';
         query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?list . ';
@@ -58,35 +61,7 @@ RDFauthor.registerWidget({
         query += "        FILTER(lang(?label) = '" + RDFAUTHOR_LANGUAGE + "')";
         query += '    }';
         query += '}';
-        return query;
-    },
 
-    fetchValuesWithSPARQL10: function() {
-        var MAX = 6;
-        var vars = ' ';
-        var labs = ' ';
-        var body = '';
-        var curlies = '}';
-        for(var i = 0; i < MAX; i++) {
-            vars += ' ?v' + (i+1);
-            labs += ' ?l' + (i+1);
-            body += 'OPTIONAL {';
-            body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> ?v' + (i+1) + ' . ';
-            body += '  OPTIONAL { ?v' + (i+1) + ' <http://www.w3.org/2000/01/rdf-schema#label> ?l' + (i+1) + ' . }';
-            body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> ?r' + (i+1) + ' . ';
-            curlies += '}';
-        }
-        query  = 'SELECT' + vars + labs + ' WHERE {';
-        query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?r0 . ';
-        query += body + curlies + ' LIMIT 1';
-        return query;
-    },
-
-    fetchValues: function () {
-        var drop = [];
-        var dropalt = {};
-        var graphURI = this.statement.graphURI();
-        var query = this.fetchValuesWithSPARQL10();
         var options = {
             callbackSuccess: function (data) {
                 // iterate through resultset and add predicate info to cache
@@ -112,6 +87,63 @@ RDFauthor.registerWidget({
         };
         RDFauthor.queryGraph(this.statement.graphURI(), query, options);
         this.dropValues = dropalt;
+    },
+
+    fetchValuesWithSPARQL10: function() {
+        var drop = [];
+        var dropalt = {};
+        var graphURI = this.statement.graphURI();
+        var MAX = 6;
+        var vars = ' ';
+        var labs = ' ';
+        var body = '';
+        var curlies = '}';
+        for(var i = 0; i < MAX; i++) {
+            vars += ' ?v' + (i+1);
+            labs += ' ?l' + (i+1);
+            body += 'OPTIONAL {';
+            body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> ?v' + (i+1) + ' . ';
+            body += '  OPTIONAL { ?v' + (i+1) + ' <http://www.w3.org/2000/01/rdf-schema#label> ?l' + (i+1) + ' . }';
+            body += '  ?r' + i + ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> ?r' + (i+1) + ' . ';
+            curlies += '}';
+        }
+        query  = 'SELECT' + vars + labs + ' WHERE {';
+        query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?r0 . ';
+        query += body + curlies + ' LIMIT 1';
+
+        var options = {
+            callbackSuccess: function (data) {
+
+                // iterate through resultset and add predicate info to cache
+                var response = data['results']['bindings'][0];
+                for (var key in response) {
+                    var op = 'option' + key.substr(1);
+                    if (dropalt[op] === undefined) {
+                        dropalt[op] = {};
+                    }
+                    if (key.charAt(0) === 'v') {
+                        drop.push(response[key]['value']);
+                        dropalt[op]['value'] = response[key]['value'];
+                        dropalt[op]['type'] = response[key]['type'];
+                    }
+                    else if (key.charAt(0) === 'l') {
+                        dropalt[op]['label'] = response[key]['value'];
+                    }
+                }
+            },
+            callbackError: function (err) {
+                console.log('err', err);
+                // resolve deferred object
+                dfd.resolve();
+            },
+            async: false
+        };
+        RDFauthor.queryGraph(this.statement.graphURI(), query, options);
+        this.dropValues = dropalt;
+    },
+
+    fetchValues: function () {
+        var query = this.fetchValuesWithSPARQL11();
     },
 
     ready: function () {
