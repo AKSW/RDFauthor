@@ -1413,6 +1413,7 @@ RDFA.GRDDL.addProfile = function(js_url) {
 };
 
 RDFA.GRDDL.runProfiles = function(doc, callback) {
+
     // patch for prototype <= 1.4 and Internet Explorer (populuate rdfauthor view)
     if (RDFA.GRDDL._profiles.length == 0 || /msie/i.test(navigator.userAgent)) {
       callback();
@@ -1658,6 +1659,12 @@ RDFA.traverse = function (element, subject, namespaces, oldLang, base, hanging, 
     if (attrs['typeof']) {
         var rdf_type = RDFA.CURIE.parse(attrs['typeof'], namespaces);
 
+        // 2014-08-27
+        // if RDF.CURIE.parse returns null for given typeof value
+        // use original typeof value
+        // fixes issue @ https://github.com/AKSW/RDFauthor/issues/45
+        if (!rdf_type) { rdf_type = attrs['typeof']; }
+
         // determine the subject of typeof, which is either explicitly given, or a new blank node.
         // note that this bnode becomes the new explicit subject of any properties and rels, too, so
         // we are effectively updating explicit_subject 
@@ -1668,6 +1675,7 @@ RDFA.traverse = function (element, subject, namespaces, oldLang, base, hanging, 
        	explicit_subject = (explicit_subject == null ?  new RDFBlankNode() : explicit_subject);
 
         var triple = RDFA.add_triple(base, explicit_subject, RDFA.CURIE.parse("rdf:type",namespaces), rdf_type, false);
+
         // 2010-04-07 NH
         // added graph parameter
         RDFA.CALLBACK_NEW_TRIPLE_WITH_LITERAL_OBJECT(element_to_callback, triple, graph);
