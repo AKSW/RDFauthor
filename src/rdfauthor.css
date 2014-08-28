@@ -40,7 +40,7 @@ div.spinner-wrapper {
 
     /* taken from div.versatile */
     position: absolute;
-    width: 80%;
+    width: 48em;
     z-index: 1099;
 
     /* shadow */
@@ -252,11 +252,6 @@ div.spinner-wrapper {
 
 .widget-override {
 
-}
-
-#rdfauthor-view .rdfauthor-predicate-row {
-    float: left;
-    width: 48%;
 }
 
 #rdfauthor-view fieldset :focus {
