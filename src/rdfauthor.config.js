@@ -39,6 +39,8 @@ var __config = {
         'dropdown' : {
             'path' : 'src/widget.dropdown.js',
             'enabled' : true,
+            'method' : 'sparql11',
+            'use_exhaustive' : true,
             'hook' : [{
                 name: 'other',
                 values: ['owlOneOf']

@@ -19,6 +19,7 @@ RDFauthor.registerWidget({
 
         // for testing purposes
         this.datatypeURI = this.options.owlOneOf;
+        this.displayAs = this.options.displayAs;
 
         var self = this;
 
@@ -49,9 +50,6 @@ RDFauthor.registerWidget({
     },
 
     fetchValuesWithSPARQL11: function() {
-        var drop = [];
-        var dropalt = {};
-        var graphURI = this.statement.graphURI();
         var query = 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' ;
         query += 'SELECT ?elem ?label WHERE {';
         query += '    <' + this.datatypeURI + '> <http://www.w3.org/2002/07/owl#oneOf> ?list . ';
@@ -61,7 +59,27 @@ RDFauthor.registerWidget({
         query += "        FILTER(lang(?label) = '" + RDFAUTHOR_LANGUAGE + "')";
         query += '    }';
         query += '}';
+        this.processFetchQuery(query);
+    },
 
+    fetchValuesByExhaustion: function() {
+        var query = 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' ;
+        query += 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' ;
+        query += 'SELECT DISTINCT ?elem ?label WHERE {';
+        query += '    <' + this.statement._predicate.value._string + '> rdfs:range ?range . ';
+        query += '    ?elem a ?range . ';
+        query += '    OPTIONAL {';
+        query += '        ?elem <http://www.w3.org/2000/01/rdf-schema#label> ?label .';
+        query += "        FILTER(lang(?label) = '" + RDFAUTHOR_LANGUAGE + "')";
+        query += '    }';
+        query += '}';
+        this.processFetchQuery(query);
+    },
+
+    processFetchQuery: function(query) {
+        var drop = [];
+        var dropalt = {};
+        var graphURI = this.statement.graphURI();
         var options = {
             callbackSuccess: function (data) {
                 // iterate through resultset and add predicate info to cache
@@ -143,7 +161,17 @@ RDFauthor.registerWidget({
     },
 
     fetchValues: function () {
-        var query = this.fetchValuesWithSPARQL11();
+        var method = __config.widgets.dropdown.method;
+        var use_exhaustive = __config.widgets.dropdown.use_exhaustive;
+        if (use_exhaustive === true && this.displayAs === 'dropdown') {
+            this.fetchValuesByExhaustion();
+        }
+        else if (method === 'sparql11') {
+            this.fetchValuesWithSPARQL11();
+        }
+        else { // method === 'sparql10' or not set
+            this.fetchValuesWithSPARQL10();
+        }
     },
 
     ready: function () {
