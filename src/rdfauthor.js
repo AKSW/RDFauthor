@@ -1794,11 +1794,15 @@ RDFauthor = (function($) {
             var ranges       = this.infoForPredicate(predicateURI, 'range');
             var types        = this.infoForPredicate(predicateURI, 'type');
             var owlOneOf     = this.infoForPredicate(predicateURI, 'owlOneOf');
+            var displayAs    = this.infoForPredicate(predicateURI, 'displayAs');
             
             var options = { workingMode : _options.workingMode };
 
             // local widget selection
-            if (owlOneOf === 'TRUE') {
+            if (displayAs === 'dropdown') {
+                widgetConstructor = _registeredWidgets.other.owlOneOf;
+                options.displayAs = 'dropdown';
+            } else if (owlOneOf === 'TRUE') {
                 widgetConstructor = _registeredWidgets.other.owlOneOf;
                 options.owlOneOf = ranges[0];
             } else if (subjectURI in _registeredWidgets.resource) {
@@ -2274,6 +2278,10 @@ RDFauthor = (function($) {
                         if (response[i].hasOwnProperty('owlOneOf')) {
                             _predicateInfo[predicateURI].owlOneOf = 'TRUE';
                         }
+
+                        if (response[i].hasOwnProperty('displayAs')) {
+                            _predicateInfo[predicateURI].displayAs = response[i].displayAs.value;
+                        }
                     });
 
                     // debug log
@@ -2299,12 +2307,13 @@ RDFauthor = (function($) {
                 dfd.resolve();
             } else {
                 // query
-                var query = 'SELECT ?type ?range ?owlOneOf'
+                var query = 'SELECT ?type ?range ?owlOneOf ?displayAs'
                           + ' WHERE {'
                           + ' <' + predicateURI + '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .'
                           + ' OPTIONAL { <' + predicateURI + '> <http://www.w3.org/2000/01/rdf-schema#range> ?range '
                           + '    OPTIONAL { ?range <http://www.w3.org/2002/07/owl#oneOf> ?owlOneOf } '
                           + ' }'
+                          + ' OPTIONAL { ?range <http://ns.ontowiki.net/SysOnt/displayAs> ?displayAs }'
                           + ' }';
 
                 // debug log
