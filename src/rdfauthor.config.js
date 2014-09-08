@@ -40,7 +40,9 @@ var __config = {
             'path' : 'src/widget.dropdown.js',
             'enabled' : true,
             'method' : 'sparql11',
+            /* --- order_property is used for exhaustive method --- */
             'use_exhaustive' : true,
+            'order_property' : 'http://ns.ontowiki.net/SysOnt/order',
             'hook' : [{
                 name: 'other',
                 values: ['owlOneOf']

@@ -63,6 +63,8 @@ RDFauthor.registerWidget({
     },
 
     fetchValuesByExhaustion: function() {
+        var orderProperty = __config['widgets']['dropdown']['order_property']
+                            || 'http://ns.ontowiki.net/SysOnt/order';
         var query = 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ' ;
         query += 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ' ;
         query += 'SELECT DISTINCT ?elem ?label WHERE {';
@@ -72,7 +74,10 @@ RDFauthor.registerWidget({
         query += '        ?elem <http://www.w3.org/2000/01/rdf-schema#label> ?label .';
         query += "        FILTER(lang(?label) = '" + RDFAUTHOR_LANGUAGE + "')";
         query += '    }';
-        query += '}';
+        query += '    OPTIONAL {';
+        query += "        ?elem <" + orderProperty + "> ?pos"
+        query += '    }';
+        query += '} ORDER BY ?pos';
         this.processFetchQuery(query);
     },
 
