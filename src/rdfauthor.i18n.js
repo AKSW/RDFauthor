@@ -24,7 +24,7 @@ var __i18n = {
 
     'createNewInstanceOf' : {
         'en' : 'Create New Instance Of %1',
-        'de' : 'Neue Ressource vom Typ %1 anlegen'
+        'de' : 'Neue Instanz vom Typ %1 anlegen'
     },
 
     'editResource' : {
@@ -36,7 +36,7 @@ var __i18n = {
 
     'Suggested Properties' : {
         'en' : 'Suggested Properties',
-        'de' : 'Vorgeschlagene Prädikate'
+        'de' : 'Vorgeschlagene Eigenschaften'
     },
 
     'In use elsewhere' : {
@@ -46,17 +46,17 @@ var __i18n = {
 
     'elsewhereHelpText' : {
         'en' : 'These properties are currently in use at other resources of the same class(es).',
-        'de' : 'Diese Prädikate werden momentan bei anderen Ressourcen der gleichen Klasse benutzt.'
+        'de' : 'Diese Eigenschaften werden momentan bei anderen Ressourcen der gleichen Klasse benutzt.'
     },
 
     'Template Properties' : {
         'en' : 'Properties from template',
-        'de' : 'Prädikate aus dem Template'
+        'de' : 'Eigenschaften aus dem Template'
     },
 
     'templatePropertiesHelpText' : {
         'en' : 'These properties are pre-selected by a template.',
-        'de' : 'Diese Prädikate wurden durch ein Template vorausgewählt.'
+        'de' : 'Diese Eigenschaften wurden durch ein Template vorausgewählt.'
     },
 
     'Generally applicable': {
@@ -66,7 +66,7 @@ var __i18n = {
 
     'generallyHelpText' : {
         'en' : 'These properties are generally applicable to all resources.',
-        'de' : 'Diese Prädikate sind allgemein für alle Ressourcen anwendbar.'
+        'de' : 'Diese Eigenschaften sind allgemein für alle Ressourcen anwendbar.'
     },
 
     // resource widget
