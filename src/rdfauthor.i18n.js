@@ -51,12 +51,12 @@ var __i18n = {
 
     'Template Properties' : {
         'en' : 'Properties from template',
-        'de' : 'Eigenschaften aus dem Template'
+        'de' : 'Eigenschaften aus der Vorlage'
     },
 
     'templatePropertiesHelpText' : {
         'en' : 'These properties are pre-selected by a template.',
-        'de' : 'Diese Eigenschaften wurden durch ein Template vorausgewählt.'
+        'de' : 'Diese Eigenschaften wurden durch eine Vorlage vorausgewählt.'
     },
 
     'Generally applicable': {
