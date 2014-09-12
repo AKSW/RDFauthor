@@ -135,7 +135,7 @@ function PredicateRow(subjectURI, predicateURI, title, container, id, allowOverr
     this.addWidget = function (statement, constructor, activate) {
         var widgetID;
         // query predicate info before requesting widget for statement
-        $.when(RDFauthor.updateInfoPredicate(statement)).then(function() {
+        $.when(RDFauthor.updateInfoPredicate(statement, false)).then(function() {
             // console.log('runs inner addWidget');
 
             var widgetInstance = null;
