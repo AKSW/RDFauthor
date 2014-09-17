@@ -10,6 +10,7 @@ var __config = {
      * -- optional
      * - title
      */
+    'changeReason' : true,
     'widgets' : {
         /*------------------------------- xmlliteral ----------------------------------*/
         'xmlliteral' : {

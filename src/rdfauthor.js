@@ -1154,6 +1154,7 @@ RDFauthor = (function($) {
 
                     // if no changes, don't run query due to bad request (sparql endpoint)
                     if (updateQuery.length != 0) {
+
                         (function(_options, _view){
                             $.ajax({
                                 type: 'POST',
@@ -1179,11 +1180,25 @@ RDFauthor = (function($) {
                 } else {
                     // REST style
                     var addedJSON = $.rdf.dump(added.triples());
+                    var removedJSON = $.rdf.dump(removed.triples());
                     var indexes   = _buildHashedObjectIndexes(removed.triples(), g);
                     // , {format: 'application/json', serialize: true})
                     // return;
-                    
-                    if (addedJSON || removedJSON) {
+
+                    if (!($.isEmptyObject(addedJSON)) || !($.isEmptyObject(removedJSON))) {
+                        if (__config.changeReason) {
+                            var reason = prompt(_translate('Change reason'));
+                            if (reason != null) {
+                                // we need to transmit the change reason to the corresponding controller.
+                                // To do so, we append the existing data array with the change reason.
+                                $.ajaxSetup({
+                                    beforeSend: function (jqXHR, settings) {
+                                        settings.data += "&changeReason=";
+                                        settings.data += reason;
+                                    }
+                                });
+                            }
+                        }
                         // x-domain request sending works w/ $.get only
                         (function(_options, _view){
                             $.ajax({
@@ -1205,9 +1220,12 @@ RDFauthor = (function($) {
                                 alert('error while post request: ' + errorThrown);
                             });
                         })(_options, _view);
+                        $.ajaxSetup();
                     } else {
+                        _view.resetToUnedit(_fetchValues());
                         _view.hide(true);
                         _callIfIsFunction(_options.onSubmitSuccess);
+                        RDFauthor.reset();
                     }
                 }
             }

@@ -125,6 +125,13 @@ var __i18n = {
     'Reload suggested' : {
         'en' : 'Changes to the resource type suggests a reload',
         'de' : 'Nach Änderungen am Typ der Ressource ist ein Neuladen empfehlenswert.'
+    },
+
+    // change reason
+
+    'Change reason' : {
+        'en' : "Please enter the reason of the change.\nPress cancel if you don't want to specify any change reason.",
+        'de' : "Bitte geben Sie den Grund der Änderung ein.\nBenutzen Sie die Schaltfläche 'Cancel', wenn sie keinen Grund angeben wollen."
     }
 
 }
