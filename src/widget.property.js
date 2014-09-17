@@ -321,7 +321,12 @@ RDFauthor.registerWidget({
         }
         self._additionalInfo = [];
         for (var k in self._templateProperties) {
-            self._additionalInfo[k] = {"label" : self._templateProperties[k]["label"]};
+            self._additionalInfo[k] = {};
+            for (var property in self._templateProperties[k]) {
+                if (self._templateProperties[k].hasOwnProperty(property)) {
+                    self._additionalInfo[k][property] = self._templateProperties[k][property];
+                }
+            }
         }
         if (self._additionalInfo != undefined) {
             for (var k in self._additionalInfo) {
@@ -562,11 +567,14 @@ RDFauthor.registerWidget({
                         }
                     }
                     */
+                    console.log(self._additionalInfo);
 
                     if ((self._additionalInfo != undefined) && (self.selectedResource in self._additionalInfo) && (self.selectedResource[self._additionalInfo] !== '') && ("datatype" in self._additionalInfo[self.selectedResource])) {
+                        console.log("If-Zweig");
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel, self._additionalInfo[self.selectedResource]["datatype"]);
                     }
                     else {
+                        console.log("Else-Zweig");
                         self._options.selectionCallback(self.selectedResource, self.selectedResourceLabel);
                     }
                     // prevent newline in new widget field
