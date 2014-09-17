@@ -177,6 +177,7 @@ RDFauthor.registerWidget({
                         self.datatype = self.datatypes['date'];
                         this.element().datepicker({
                             dateFormat: $.datepicker.ISO_8601,
+                            changeYear: true,
                             // showOn: 'both',
                             firstDay: 1
                         });
