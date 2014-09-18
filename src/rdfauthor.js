@@ -1186,7 +1186,8 @@ RDFauthor = (function($) {
                     // return;
 
                     if (!($.isEmptyObject(addedJSON)) || !($.isEmptyObject(removedJSON))) {
-                        if (__config.changeReason) {
+                        if ((_options.workingMode === 'edit' || _options.workingMode === undefined)
+                           && __config.changeReason) {
                             var reason = prompt(_translate('Change reason'));
                             if (reason != null) {
                                 // we need to transmit the change reason to the corresponding controller.
