@@ -1397,6 +1397,7 @@ RDFauthor = (function($) {
                 /* trigger plug-ins */
                 self.eventTarget().trigger('rdfauthor.cancel');
             });
+            RDFAUTHOR_STATUS = 'inactive';
         }, 
         
         /**
@@ -2130,8 +2131,8 @@ RDFauthor = (function($) {
          * Resets private variables (mainly used for testing).
          */
         reset: function () {
-            //_resetDatabanks();
-            //_resetOptions();
+            _resetDatabanks();
+            _resetOptions();
             _resetParser();
             _resetView();
             
@@ -2142,6 +2143,7 @@ RDFauthor = (function($) {
             
             // remove events
             $(this.eventTarget()).unbind();
+            RDFAUTHOR_STATUS = 'inactive';
         },
         
         /**
@@ -2221,6 +2223,7 @@ RDFauthor = (function($) {
          * @param {HTMLElement} root
          */
         start: function (root, options) {
+            RDFAUTHOR_STATUS = 'active';
             window.RDFAUTHOR_LANGUAGE = window.RDFAUTHOR_LANGUAGE || 'en';
             // TEMPORARY until next big refactoring of RDFauthor
             // load ontowiki stylesheet when rdfauthor is used without ontowiki
