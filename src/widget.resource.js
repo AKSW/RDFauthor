@@ -528,7 +528,7 @@ RDFauthor.registerWidget({
         }
         if (match[6] !== undefined) {
             if (!(match[6] in RDFauthor.namespaces())) {
-                if($.inArray(match[6], ['mailto', 'tel', 'urn'])) {
+                if($.inArray(match[6], ['mailto', 'tel', 'urn']) != -1) {
                     return term;
                 }
                 else {
