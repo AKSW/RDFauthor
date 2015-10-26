@@ -1,0 +1,18 @@
+{
+    "name": "aksw/rdfauthor",
+    "description": "RDFauthor creates formular widgets out of RDFa-enhanced webpages.",
+    "type": "application",
+    "keywords": ["RDFauthor", "Linked Data", "Semantic Web", "RDF", "authoring", "editing", "curation"],
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Norman Heino",
+            "email": "norman.heino@gmail.com"
+        },
+        {
+            "name": "AKSW",
+            "homepage": "http://aksw.org"
+        }
+    ],
+    "minimum-stability": "dev"
+}
