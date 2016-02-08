@@ -1,7 +1,7 @@
 {
     "name": "aksw/rdfauthor",
     "description": "RDFauthor creates formular widgets out of RDFa-enhanced webpages.",
-    "type": "application",
+    "type": "library",
     "keywords": ["RDFauthor", "Linked Data", "Semantic Web", "RDF", "authoring", "editing", "curation"],
     "license": "GPL-3.0",
     "authors": [
