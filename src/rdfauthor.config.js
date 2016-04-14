@@ -105,8 +105,8 @@ var __config = {
             'hook' : {
                 type: 'ObjectProperty',
                 name: 'property',
-                values: ['http://xmlns.com/foaf/0.1/mbox', 
-                         'http://rdfs.org/sioc/ns#email', 
+                values: ['http://xmlns.com/foaf/0.1/mbox',
+                         'http://rdfs.org/sioc/ns#email',
                          'http://usefulinc.com/ns/doap#mailing-list']
             }
         },
@@ -164,26 +164,7 @@ var __config = {
                 }
             }]
         },
-        /*------------------------------- imagepicker ---------------------------------*/
-        'imagepicker' : {
-            'path' : 'src/widget.imagepicker.js',
-            'enabled' : true,
-            'hook' : {
-                name: 'property',
-                values: ['http://xmlns.com/foaf/0.1/depiction',
-                         'http://open.vocab.org/terms/screenshot',
-                         'http://xmlns.com/foaf/0.1/logo',
-                         'http://purl.org/ontology/mo/image',
-                         'http://xmlns.com/foaf/0.1/img']
-            },
-            'albumtitle' : 'aksw.org',
-            'webuploadurl' : 'https://picasaweb.google.com/lh/webUpload?uname=aksw.group&aid=5646308221729665137&continue=https://picasaweb.google.com/aksw.group/AkswOrg%3Fauthkey%3DGv1sRgCIebodK_ssfhUg', // Link for webupload
-            'albumid' : '5646308221729665137', // Picasa Album ID
-            'authkey' : 'Gv1sRgCISL87-luIbGXg', // Picasa Auth Key
-            'tag' : 'Screenshot', // show pics with tag
-            'thumbsize' : 144, // size of thumbnails
-            'showmore' : 5 // number of thumbnails
-        },
+
         'treeselector' : {
             'path' : 'src/widget.treeselector.js',
             'enabled' : true,
