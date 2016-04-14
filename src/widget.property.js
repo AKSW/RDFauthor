@@ -353,9 +353,7 @@ RDFauthor.registerWidget({
         var classPattern = '?resourceUri a ?class .\n';
         var literalPattern = '?resourceUri ?p0 ?literal .\n';
         var filter1 = 'FILTER (REGEX(?literal, "' + requestTerm + '", "i")). \n';
-        var filter2 = 'FILTER ( ( ( (sameTerm(?class,owl:DatatypeProperty)) || (sameTerm(?class,owl:ObjectProperty)) ) || \
-                                (sameTerm(?class, rdf:Property)) ) || \
-                                (sameTerm(?class, owl:AnnotationProperty)) ).\n';
+        var filter2 = 'FILTER ( ?class=owl:DatatypeProperty || ?class=owl:ObjectProperty || ?class=rdf:Property || ?class=owl:AnnotationProperty ).\n';
         var query = prefixPattern + 'SELECT ' + selectPattern
                                   + 'WHERE { \n'
                                   + classPattern
@@ -641,8 +639,8 @@ RDFauthor.registerWidget({
         var bodyw = $(document).width();
         var windowh = $(window).height();
         var windoww = $(window).width();
-        var ww = element.outerWidth();
-        var wh = element.outerHeight();
+        var ww = element.outerWidth(false);
+        var wh = element.outerHeight(false);
         
         // console.log('scrolltop', $(document).scrollTop());
         // console.log('bodyh', bodyh);
